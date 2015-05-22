@@ -3,7 +3,7 @@
  */
 // Load required packages
 var mongoose = require('mongoose');
-var Address = require('./Address');
+var Address = require('./schema/Address');
 
 // Define our Organization schema
 var OrganizationSchema = new mongoose.Schema({

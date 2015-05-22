@@ -166,14 +166,21 @@ Api.prototype.stop = function(err) {
     rollbar.reportMessage("ERROR \n"+err);
     process.exit(1);
 };
+/**
+ *
+ * @param ex
+ */
+Api.errorStack = function(ex){
+    var err = ex.stack.split("\n");
+    rollbar.reportMessage(err, 'error', function(err){
+        process.exit(1);
+    });
+
+}
 
 try {
     new Api();
 } catch(e){
-    console.log(e);
-    rollbar.reportMessage(e, 'error', function(rollbarErr) {
-        console.log('CALL ROLLBAR: ' + rollbarErr);
-        process.exit(1);
-    });
+    Api.errorStack(e);
 
 }

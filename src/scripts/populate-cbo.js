@@ -17,25 +17,12 @@ var UserPermission  = require('../app/models/UserPermission');
 
 var fs              = require('fs');
 var csv             = require('fast-csv');
-var filecsv         = __dirname + '/Pilot CBOs.csv';
+var filecsv         = __dirname + '/populate.csv';
 
-var async = require('async')
-var _ = require('underscore')
+var async           = require('async');
+var _               = require('underscore');
 
-var Helpers = function(mongoose) {
-    this.mongoose = mongoose || require('mongoose');
-
-    this.dropCollections = function(callback) {
-        var collections = _.keys(mongoose.connection.collections)
-        async.forEach(collections, function(collectionName, done) {
-            var collection = mongoose.connection.collections[collectionName]
-            collection.drop(function(err) {
-                if (err && err.message != 'ns not found') done(err)
-                done(null)
-            })
-        }, callback)
-    }
-};
+var dummyUser       = ['abraham@upwardstech.com', 'ben@upwardstech.com', 'bintang@upwardstech.com', 'hendra@upwardstech.com', 'zaenal@upwardstech.com'];
 
 var mongoose = mongoose || require('mongoose');
 
@@ -51,6 +38,7 @@ var populateCbo = {
             })
         }, callback);
     },
+
     city: function(name){
         var address = {
             address_type:"Mailing",
@@ -59,68 +47,61 @@ var populateCbo = {
             city: "",
             state: "",
             zip: "",
-            country: "", // The country code according to ISO 3166-1 Alpha-2.
+            country: "US", // The country code according to ISO 3166-1 Alpha-2.
             location: {
-                latitude: 0,
-                longitude: 0,
-                accuracy: ""//{type: String, enum: ["Rooftop", "Approximate"] }
+                latitude: Math.random(),
+                longitude: -1 * Math.random(),
+                accuracy: "Approximate"//{type: String, enum: ["Rooftop", "Approximate"] }
             } //An object hash representing the geocoded location information for the address.
         };
         switch(name){
             case 'Aurburn':
-                address.address_line = "";
                 address.city = "Aurburn";
-                address.state = "";
-                address.zip = "";
-                address.country = "";
+                address.address_line = "30611 16th Ave S1";
+                address.state = "WA";
+                address.zip = "98001";
                 break;
 
             case 'Federal Way':
-                address.address_line = "1627 S 312th St";
                 address.city = "Federal Way";
-                address.state = "";
-                address.zip = "";
-                address.country = "";
+                address.address_line = "30611 16th Ave S2";
+                address.state = "WA";
+                address.zip = "98002";
                 break;
 
             case 'Highline':
-                address.address_line = "";
                 address.city = "Highline";
-                address.state = "";
-                address.zip = "";
-                address.country = "";
+                address.address_line = "30611 16th Ave S3";
+                address.state = "WA";
+                address.zip = "98003";
                 break;
 
             case 'Kent':
-                address.address_line = "";
                 address.city = "Kent";
-                address.state = "";
-                address.zip = "";
-                address.country = "";
+                address.address_line = "30611 16th Ave S4";
+                address.state = "WA";
+                address.zip = "98004";
                 break;
 
             case 'Renton':
-                address.address_line = "";
                 address.city = "Renton";
-                address.state = "";
-                address.zip = "";
-                address.country = "";
+                address.address_line = "30611 16th Ave S5";
+                address.state = "WA";
+                address.zip = "98005";
                 break;
 
             case 'Seattle':
-                address.address_line = "";
                 address.city = "Seattle";
-                address.state = "";
-                address.zip = "";
-                address.country = "";
+                address.address_line = "30611 16th Ave S6";
+                address.state = "WA";
+                address.zip = "98006";
                 break;
 
             case 'Tukwila':
-                address.address_line = "";
-                address.city = "Seattle";
-                address.state = "";
-                address.zip = "";
-                address.country = "";
+                address.city = "Tukwila";
+                address.address_line = "30611 16th Ave S7";
+                address.state = "WA";
+                address.zip = "98007";
                 break;
 
             default:
@@ -134,128 +115,150 @@ var populateCbo = {
         var config = require('config');
 
         var done = function(){
+            dummyUser.forEach(function(userEmail){
+                var baseName = userEmail.split('@')[0];
+                var newUser = {
+                    email: userEmail,
+                    first_name: baseName,
+                    middle_name: '',
+                    last_name: '',
+                    password: 'demo',
+                    username: baseName,
+                    permissions: []
+                };
+                UserPermission.find(function(err, userPermissions){
+                    if(err) return console.log(err);
+                    newUser.permissions = userPermissions;
+                    User.findOneAndUpdate({email: newUser.email}, {$set: newUser}, {upsert: true}, function (err, user) {
+                        if (err) return console.log(err);
+                    });
+                });
 
+            })
         };
         self.dropCollections(function(){
             var stream = fs.createReadStream(filecsv);
             var psl = require('psl');
-            var csvStream = csv
-                .fromStream(stream, {ignoreEmpty: true })
-                .on("data", function(row){
-                    if(row[0] == 'CBO'){
-                        return;
-                    }
-                    var rs = {
-                        organization: row[0],
-                        website: row[1],
-                        services: row[2],
-                        grade: row[3],
-                        aurburn: row[4] == 'x' ? 'Aurburn' : null,
-                        federal_way: row[5] == 'x' ? 'Federal Way' : null,
-                        highline: row[6] == 'x' ? 'Highline' : null,
-                        kent: row[7] == 'x' ? 'Kent' : null,
-                        renton: row[8] == 'x' ? 'Renton' : null,
-                        seattle: row[9] == 'x' ? 'Seattle' : null,
-                        tukwila: row[10] == 'x' ? 'Tukwila' : null,
-                        platforms: row[11],
-                        contact: row[12],
-                        email: row[13],
-                        confirmed: row[14],
-                        notes: row[15]
-                    };
-
-                    var parsed = psl.parse(rs.website);
-                    rs.url = parsed.sld;
-                    rs.username = rs.url;
-
-                    if(!rs.url || !rs.email){
-                        return;
-                    }
-                    var createOrg = function(err, user, permission){
-                        if(err) return console.log(err);
-                        var newOrg = {
-                            name: rs.organization,
-                            url: rs.url + '.' + config.get('host'),
-                            website: rs.website,
-                            description: rs.notes,
-                            addresses: []
-                        };
-                        var addrs = null;
-                        var addresses = [];
-                        if(rs.aurburn && (addrs = self.city(rs.aurburn))) addresses.push(addrs);
-                        if(rs.federal_way && (addrs = self.city(rs.federal_way))) addresses.push(addrs);
-                        if(rs.kent && (addrs = self.city(rs.kent))) addresses.push(addrs);
-                        if(rs.renton && (addrs = self.city(rs.renton))) addresses.push(addrs);
-                        if(rs.seattle && (addrs = self.city(rs.seattle))) addresses.push(addrs);
-                        if(rs.tukwila && (addrs = self.city(rs.tukwila))) addresses.push(addrs);
-
-                        /**
-                         * Start insert new record
-                         */
-
-                        Organization.findOneAndUpdate({ name: newOrg.name }, { $set: newOrg }, { upsert: true }, function (err, org) {
-                            if(err) return console.log(err);
-                            if(org) {
-                                //UserPermission.create({
-                                //    organization: org._id,
-                                //    permission: [{operation: '*', allow: true}]
-                                //}, function (err, userPermission) {
-                                //    if (err) return console.log(err);
-                                    var newProgram = {
-                                        name: org.name
-                                    };
-                                    var userPermission = { organization: org._id, permission: [ new Permission({operation: '*', allow: true}) ]};
-                                    Program.create(newProgram, function (err, program) {
-                                        if(err) return console.log(err);
-                                        if(userPermission) {
-                                            User.findOneAndUpdate({email: user.email}, { $set: { permissions:[userPermission] } }, { upsert: true }, function (err, usr) {
-                                                if (err) return console.log(err);
-                                                console.log('Success!');
-                                            });
-                                        }
-                                    });
-
-                                //});
-                            }
-                        });
-                    };
-
-                    var name = rs.contact.split(" ");
-
-                    var newUser = {
-                        email: rs.email,
-                        first_name: '',
-                        middle_name: '',
-                        last_name: '',
-                        password: 'demo',
-                        username: rs.username
-                    };
-
-                    if(name.length > 2){
-                        newUser.first_name = name[0];
-                        newUser.middle_name = name[1];
-                        var lastNames = [];
-                        for(var n = 2; n < name.length; n++){
-                            lastNames.push(name[n]);
+            Permission.create({ operation: '*', allow: true}, function(err, permission) {
+                var csvStream = csv
+                    .fromStream(stream, {ignoreEmpty: true})
+                    .on("data", function (row) {
+                        if (row[0] == 'CBO') {
+                            return;
                         }
-                        newUser.last_name = lastNames.join(" ");
-                    } else {
-                        newUser.first_name = name[0];
-                        newUser.last_name = name[1];
-                    }
+                        var rs = {
+                            organization: row[0],
+                            website: row[1],
+                            services: row[2],
+                            grade: row[3],
+                            aurburn: row[4] == 'x' ? 'Aurburn' : null,
+                            federal_way: row[5] == 'x' ? 'Federal Way' : null,
+                            highline: row[6] == 'x' ? 'Highline' : null,
+                            kent: row[7] == 'x' ? 'Kent' : null,
+                            renton: row[8] == 'x' ? 'Renton' : null,
+                            seattle: row[9] == 'x' ? 'Seattle' : null,
+                            tukwila: row[10] == 'x' ? 'Tukwila' : null,
+                            platforms: row[11],
+                            contact: row[12],
+                            email: row[13],
+                            confirmed: row[14],
+                            notes: row[15]
+                        };
 
-                    User.findOneAndUpdate({email: rs.email}, { $set: newUser }, { upsert: true }, function (err, user) {
-                        if(err) return console.log(err);
-                        createOrg(err, user);
+                        var parsed = psl.parse(rs.website);
+                        rs.url = parsed.sld;
+                        rs.username = rs.url;
+
+                        if (!rs.url || !rs.email) {
+                            return;
+                        }
+                        var createOrg = function (err, user, permission) {
+                            if (err) return console.log(err);
+                            var newOrg = {
+                                name: rs.organization,
+                                url: rs.url + '.' + config.get('host'),
+                                website: rs.website,
+                                description: rs.notes,
+                                addresses: []
+                            };
+                            var addrs = null;
+                            var addresses = [];
+                            if (rs.aurburn && (addrs = self.city(rs.aurburn))) addresses.push(addrs);
+                            if (rs.federal_way && (addrs = self.city(rs.federal_way))) addresses.push(addrs);
+                            if (rs.kent && (addrs = self.city(rs.kent))) addresses.push(addrs);
+                            if (rs.renton && (addrs = self.city(rs.renton))) addresses.push(addrs);
+                            if (rs.seattle && (addrs = self.city(rs.seattle))) addresses.push(addrs);
+                            if (rs.tukwila && (addrs = self.city(rs.tukwila))) addresses.push(addrs);
+
+                            /**
+                             * Start insert new record
+                             */
+                            newOrg.addresses = addresses;
+                            Organization.findOneAndUpdate({name: newOrg.name}, {$set: newOrg}, {upsert: true}, function (err, org) {
+                                if (err) return console.log(err);
+                                if (org) {
+                                    //UserPermission.create({
+                                    //    organization: org._id,
+                                    //    permission: [permission]
+                                    //}, function (err, userPermission) {
+                                        var userPermission = {
+                                            organization: org._id,
+                                            permission: [{ operation: '*', allow: true}]
+                                        };
+                                        if (err) return console.log(err);
+                                        var newProgram = {
+                                            name: org.name
+                                        };
+                                        Program.create(newProgram, function (err, program) {
+                                            if (err) return console.log(err);
+                                            if (userPermission) {
+                                                User.findOneAndUpdate({email: user.email}, {$set: {permissions: [userPermission]}}, {upsert: true}, function (err, usr) {
+                                                    if (err) return console.log(err);
+                                                    console.log('Success!', userPermission);
+                                                });
+                                            }
+                                        });
+
+                                    //});
+                                }
+                            });
+                        };
+
+                        var name = rs.contact.split(" ");
+
+                        var newUser = {
+                            email: rs.email,
+                            first_name: '',
+                            middle_name: '',
+                            last_name: '',
+                            password: 'demo',
+                            username: rs.username
+                        };
+
+                        if (name.length > 2) {
+                            newUser.first_name = name[0];
+                            newUser.middle_name = name[1];
+                            var lastNames = [];
+                            for (var n = 2; n < name.length; n++) {
+                                lastNames.push(name[n]);
+                            }
+                            newUser.last_name = lastNames.join(" ");
+                        } else {
+                            newUser.first_name = name[0];
+                            newUser.last_name = name[1];
+                        }
+
+                        User.findOneAndUpdate({email: rs.email}, {$set: newUser}, {upsert: true}, function (err, user) {
+                            if (err) return console.log(err);
+                            createOrg(err, user, permission);
+                        });
+                    })
+                    .on("end", function () {
+                        done();
                     });
-                })
-                .on("end", function(){
-                    done();
-                });
 
-            stream.pipe(csvStream);
-
-
+                stream.pipe(csvStream);
+            });
         });
     }
 };

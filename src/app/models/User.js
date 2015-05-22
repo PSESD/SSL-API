@@ -1,7 +1,7 @@
 // Load required packages
 var mongoose = require('mongoose');
 var crypto = require('crypto');
-var UserPermission = require('./UserPermission');
+var UserPermission = require('./schema/UserPermission');
 
 // Define our user schema
 var UserSchema = new mongoose.Schema({
