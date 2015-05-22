@@ -40,7 +40,7 @@ Model.prototype.crud = function(){
                 }
 
                 for (prop in req.body) {
-                    movie[prop] = req.body[prop];
+                    obj[prop] = req.body[prop];
                 }
 
                 // save the movie

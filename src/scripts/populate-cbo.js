@@ -24,8 +24,8 @@ var _               = require('underscore');
 
 var dummyUser       = ['abraham@upwardstech.com', 'ben@upwardstech.com', 'bintang@upwardstech.com', 'hendra@upwardstech.com', 'zaenal@upwardstech.com'];
 
-var mongoose = mongoose || require('mongoose');
-
+var mongoose        = mongoose || require('mongoose');
+var permissionValue = { operation: '*', allow: true};
 var populateCbo = {
 
     dropCollections: function(callback) {
@@ -114,7 +114,7 @@ var populateCbo = {
         var self = this;
         var config = require('config');
 
-        var done = function(){
+        var done = function(organization){
             dummyUser.forEach(function(userEmail){
                 var baseName = userEmail.split('@')[0];
                 var newUser = {
@@ -123,23 +123,33 @@ var populateCbo = {
                     middle_name: '',
                     last_name: '',
                     password: 'demo',
-                    username: baseName,
-                    permissions: []
+                    username: baseName
                 };
-                UserPermission.find(function(err, userPermissions){
-                    if(err) return console.log(err);
-                    newUser.permissions = userPermissions;
-                    User.findOneAndUpdate({email: newUser.email}, {$set: newUser}, {upsert: true}, function (err, user) {
-                        if (err) return console.log(err);
-                    });
-                });
+                //newUser.permissions.push({ organization: organization._id, permissions: [permissionValue]});
+                User.findOneAndUpdate({email: newUser.email}, { $set: newUser, $push: { permissions: { organization: organization._id, permissions: [permissionValue]}} }, { upsert: true, new: true },  function (err, user) {
+                    if (err) return console.log(err);
+                    if(!user) return console.log('User not found!');
+                    //console.log('USER UPWARDSTECH: ' , newUser);
+                    var client = new Client();
+                    client.name = user.username;
+                    client.id = user.username;
+                    client.secret = 'demo_client_secret';
+                    client.userId = user.userId;
 
+                    client.save(function(err) {
+                        if (err)
+                            return (err.code && err.code === 11000) ? console.log({ code: err.code, message: 'Client already exists'}) :  console.log(err);
+
+                        //console.log({ code: 0, message: 'Client added to the locker!', data: client });
+                    });
+
+                });
             })
         };
         self.dropCollections(function(){
             var stream = fs.createReadStream(filecsv);
             var psl = require('psl');
-            Permission.create({ operation: '*', allow: true}, function(err, permission) {
+            Permission.create(permissionValue, function(err, permission) {
                 var csvStream = csv
                     .fromStream(stream, {ignoreEmpty: true})
                     .on("data", function (row) {
@@ -174,6 +184,7 @@ var populateCbo = {
                         }
                         var createOrg = function (err, user, permission) {
                             if (err) return console.log(err);
+                            if(!user) return console.log('User empty');
                             var newOrg = {
                                 name: rs.organization,
                                 url: rs.url + '.' + config.get('host'),
@@ -194,32 +205,31 @@ var populateCbo = {
                              * Start insert new record
                              */
                             newOrg.addresses = addresses;
-                            Organization.findOneAndUpdate({name: newOrg.name}, {$set: newOrg}, {upsert: true}, function (err, org) {
+                            Organization.findOneAndUpdate({name: newOrg.name}, {$set: newOrg}, { safe: true, upsert: true, new: true }, function (err, org) {
                                 if (err) return console.log(err);
                                 if (org) {
-                                    //UserPermission.create({
-                                    //    organization: org._id,
-                                    //    permission: [permission]
-                                    //}, function (err, userPermission) {
-                                        var userPermission = {
-                                            organization: org._id,
-                                            permission: [{ operation: '*', allow: true}]
-                                        };
-                                        if (err) return console.log(err);
-                                        var newProgram = {
-                                            name: org.name
-                                        };
-                                        Program.create(newProgram, function (err, program) {
-                                            if (err) return console.log(err);
-                                            if (userPermission) {
-                                                User.findOneAndUpdate({email: user.email}, {$set: {permissions: [userPermission]}}, {upsert: true}, function (err, usr) {
-                                                    if (err) return console.log(err);
-                                                    console.log('Success!', userPermission);
-                                                });
-                                            }
-                                        });
+                                    var userPermission = {
+                                        organization: org._id,
+                                        permission: [{ operation: '*', allow: true}]
+                                    };
+                                    if (err) return console.log(err);
+                                    var newProgram = {
+                                        name: org.name
+                                    };
 
-                                    //});
+                                    Program.findOneAndUpdate({name: newOrg.name}, {$set: newProgram}, { safe: true, upsert: true, new: true }, function (err, program) {
+                                        if (err) return console.log(err);
+                                        if (userPermission) {
+                                            done(org);
+                                            //User.findOneAndUpdate({email: user.email}, { $push: { permissions: [userPermission] }}, {safe: true, upsert: true}, function (err, usr) {
+                                            //    if (err) return console.log(err);
+                                            //    usr.permissions = [userPermission];
+                                            //    usr.save(function(err){ if(err) return console.log('User update filed', err);});
+                                            //});
+                                            //user.permissions = [userPermission];
+                                            //user.save(function(err){ if(err) return console.log('User update filed', err);});
+                                        }
+                                    });
                                 }
                             });
                         };
@@ -248,13 +258,26 @@ var populateCbo = {
                             newUser.last_name = name[1];
                         }
 
-                        User.findOneAndUpdate({email: rs.email}, {$set: newUser}, {upsert: true}, function (err, user) {
-                            if (err) return console.log(err);
-                            createOrg(err, user, permission);
+                        //User.findOneAndUpdate({email: rs.email}, { $set: newUser }, { upsert: true, new: true },  function (err, user) {
+                        //    if (err) return console.log(err);
+                        //    //if(user) return console.log('User was empty => ', user, ' => ', newUser);
+                        //    createOrg(err, user, permission);
+                        //});
+                        var user = new User(newUser);
+                        user.save(function(err) {
+                            if (err) {
+                                (err.code && err.code === 11000) ? console.log({
+                                    code: err.code,
+                                    message: 'User already exists'
+                                }) : console.log(err);
+                            } else {
+                                console.log({code: 0, message: 'New users added!'});
+                            }
+                            createOrg(true, user, permission);
                         });
                     })
                     .on("end", function () {
-                        done();
+
                     });
 
                 stream.pipe(csvStream);
