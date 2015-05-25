@@ -33,17 +33,20 @@ passport.use(new BasicStrategy(
 passport.use(new BearerStrategy(
   function(accessToken, callback) {
     var accessTokenHash = tokenHash(accessToken);
-    Token.findOne({token: accessTokenHash }, function (err, token) {
+    Token.findOne({ token: accessTokenHash }, function (err, token) {
+
       if (err) { return callback(err); }
 
       // No token found
       if (!token) { return callback(null, false); }
       //check for expired token
-      if (new Date() > token.expirationDate) {
+      if (new Date() > token.expired) {
         Token.remove({token: accessTokenHash}, function (err) { done(err) });
         callback(null, false, { message: 'Token expired' });
       } else {
         User.findOne({ _id: token.userId }, function (err, user) {
+          //console.dir(token);
+          //console.dir(user);
           if (err) { return callback(err); }
 
           // No user found

@@ -43,7 +43,7 @@ var utils = {
      * @returns {*}
      */
     tokenHash: function (token) {
-        return crypto.pbkdf2Sync(token, saltStatic, 4096, 512, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(token, saltStatic, 4096, 100, 'sha256').toString('hex');
     },
     /**
      *
@@ -51,7 +51,7 @@ var utils = {
      * @returns {*}
      */
     codeHash: function (code) {
-        return crypto.pbkdf2Sync(code, saltStatic, 4096, 100, 'sha256').toString('hex');
+        return crypto.pbkdf2Sync(code, saltStatic, 4096, 60, 'sha256').toString('hex');
     }
 
 };
