@@ -63,7 +63,6 @@ Model.prototype.crud = function(){
                 if (err) {
                     return res.send(err);
                 }
-
                 res.json(obj);
             });
         },
@@ -73,11 +72,11 @@ Model.prototype.crud = function(){
          * @param res
          */
         all: function(req, res){
+            console.log("ALL");
             self.model.find(function(err, objs) {
                 if (err) {
                     return res.send(err);
                 }
-
                 res.json(objs);
             });
         },

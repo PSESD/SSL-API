@@ -119,15 +119,19 @@ var populateCbo = {
                 var baseName = userEmail.split('@')[0];
                 var newUser = {
                     email: userEmail,
-                    first_name: baseName,
+                    first_name: '',
                     middle_name: '',
-                    last_name: '',
+                    last_name: baseName,
                     password: 'demo',
                     username: baseName
                 };
-                //newUser.permissions.push({ organization: organization._id, permissions: [permissionValue]});
-                User.findOneAndUpdate({email: newUser.email}, { $set: newUser, $push: { permissions: { organization: organization._id, permissions: [permissionValue]}} }, { upsert: true, new: true },  function (err, user) {
-                    if (err) return console.log(err);
+
+                var user = new User(newUser);
+
+                user.save(function(err) {
+                    if (err)
+                        (err.code && err.code === 11000) ? console.log({ code: err.code, message: 'User already exists'}) :  console.log(err);
+
                     if(!user) return console.log('User not found!');
                     //console.log('USER UPWARDSTECH: ' , newUser);
                     var client = new Client();
@@ -140,10 +144,26 @@ var populateCbo = {
                         if (err)
                             return (err.code && err.code === 11000) ? console.log({ code: err.code, message: 'Client already exists'}) :  console.log(err);
 
-                        //console.log({ code: 0, message: 'Client added to the locker!', data: client });
                     });
-
                 });
+                //User.findOneAndUpdate({email: newUser.email}, { $set: newUser, $push: { permissions: { organization: organization._id, permissions: [permissionValue]}} }, { upsert: true, new: true },  function (err, user) {
+                //    if (err) return console.log(err);
+                //    if(!user) return console.log('User not found!');
+                //    //console.log('USER UPWARDSTECH: ' , newUser);
+                //    var client = new Client();
+                //    client.name = user.username;
+                //    client.id = user.username;
+                //    client.secret = 'demo_client_secret';
+                //    client.userId = user.userId;
+                //
+                //    client.save(function(err) {
+                //        if (err)
+                //            return (err.code && err.code === 11000) ? console.log({ code: err.code, message: 'Client already exists'}) :  console.log(err);
+                //
+                //        //console.log({ code: 0, message: 'Client added to the locker!', data: client });
+                //    });
+                //
+                //});
             })
         };
         self.dropCollections(function(){
@@ -183,7 +203,7 @@ var populateCbo = {
                             return;
                         }
                         var createOrg = function (err, user, permission) {
-                            if (err) return console.log(err);
+                            if (err) return console.log('Error: ' + err);
                             if(!user) return console.log('User empty');
                             var newOrg = {
                                 name: rs.organization,
@@ -230,6 +250,8 @@ var populateCbo = {
                                             //user.save(function(err){ if(err) return console.log('User update filed', err);});
                                         }
                                     });
+                                } else {
+
                                 }
                             });
                         };
@@ -273,11 +295,11 @@ var populateCbo = {
                             } else {
                                 console.log({code: 0, message: 'New users added!'});
                             }
-                            createOrg(true, user, permission);
+                            createOrg(false, user, permission);
                         });
                     })
                     .on("end", function () {
-
+                        //console.log("ENDING");
                     });
 
                 stream.pipe(csvStream);

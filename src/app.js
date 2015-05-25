@@ -8,7 +8,9 @@ var rollbar = require('rollbar');
 var methodOverride = require('method-override');
 var port = process.env.PORT || 4000;
 var config = require('config');
+
 var rollbarAccessToken = config.get('rollbar.access_token');
+
 if(rollbarAccessToken) {
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
@@ -66,7 +68,7 @@ Api.prototype.route = function(name){
 /**
  * Scan route and register
  */
-Api.prototype.registerRoute = function(){
+Api.prototype.registerRoute = function(cb){
     var router = express.Router();
     var self = this;
     var fs = require('fs');
@@ -81,6 +83,7 @@ Api.prototype.registerRoute = function(){
         app.use('/'+basename, router);
         var rest_router = new rest(router,self);
     });
+    if(cb) cb();
 };
 /**
  * Connect to database
@@ -89,6 +92,7 @@ Api.prototype.connectDb = function() {
     var dbUri = 'mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name');
     console.log("[%s] DB URI: " + dbUri, app.get('env'));
     this.mongo.connect(dbUri);
+    //this.mongo.set('debug', app.get('env') === 'test');
     this.configureExpress(this.db);
     
 };
@@ -119,11 +123,11 @@ Api.prototype.configureExpress = function(db) {
 
 
     // Use express session support since OAuth2orize requires it
-    app.use(session({ 
-      secret: self.config.get('session.secret'),
-      saveUninitialized: self.config.get('session.saveUninitialized'),
-      resave: self.config.get('session.resave')
-    }));
+    //app.use(session({
+    //  secret: self.config.get('session.secret'),
+    //  saveUninitialized: self.config.get('session.saveUninitialized'),
+    //  resave: self.config.get('session.resave')
+    //}));
 
     var cross = self.config.get('cross');
     if(cross.enable) {
@@ -171,7 +175,9 @@ Api.prototype.stop = function(err) {
  * @param ex
  */
 Api.errorStack = function(ex){
+
     var err = ex.stack.split("\n");
+    console.log(err);
     rollbar.reportMessage(err, 'error', function(err){
         process.exit(1);
     });

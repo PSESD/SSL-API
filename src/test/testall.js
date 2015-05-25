@@ -12,7 +12,7 @@ console.log(dbUri);
 var mongoose = require( 'mongoose' )
     , clearDB = require( 'mocha-mongoose' )( dbUri, {noClear: true} );
 
-describe( 'OAuth2', function () {
+describe( 'OAuth2-Api End Point', function () {
 
     var agent1 = request.agent( url );
     /**
@@ -25,7 +25,11 @@ describe( 'OAuth2', function () {
     var accessCode;
     var token;
 
-    var username = 'test', password = 'test';
+    var username = 'zaenal';
+    var password = 'demo';
+    var client_id = 'zaenal';
+    var name  = 'zaenal';
+    var client_secret = 'demo_client_secret';
 
     before( function (done) {
         if (mongoose.connection.db) return done();
@@ -33,42 +37,12 @@ describe( 'OAuth2', function () {
     } );
 
     before( function (done) {
-        clearDB( done );
+        //clearDB( done );
+        done();
     } );
 
-    it( 'should create a new user', function (done) {
-        request( url ).post( '/api/users' )
-            .send( 'username=test' )
-            .send( 'password=test' )
-            .send( 'last_name=test' )
-            .expect( 'Content-Type', /json/ )
-            .expect( 200 )
-            .expect( function (res) {
-                console.dir( res.body );
-            } )
-            .end( done );
-
-    } );
-    it( 'user should add a new client', function (done) {
-        request( url ).post( '/api/clients' )
-            .auth( 'test', 'test' )
-            .type( 'urlencoded' )
-            .send( {
-                client_id    : 'client',
-                name  : 'client',
-                client_secret: 'secret'
-            } )
-            .expect( 'Content-Type', /json/ )
-            .expect( 200 )
-            .expect( function (res) {
-                console.dir( res.body );
-            } )
-            .end( done );
-
-    } );
     it( 'user should be able to list clients', function (done) {
         request( url ).get( '/api/clients' )
-            //.auth( 'test', 'test' )
             .auth( username, password )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
@@ -82,7 +56,6 @@ describe( 'OAuth2', function () {
     it( 'user should be able get authorised page', function (done) {
         var target = '/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri='+api_endpoint;
         agent1.get( target )
-            //.auth( 'test', 'test' )
             .auth( username, password )
             .set( 'Accept', 'application/json' )
             .set( 'Accept', 'text/html' )
@@ -99,7 +72,6 @@ describe( 'OAuth2', function () {
 
     it( 'user should be able to authorise an access code', function (done) {
         agent1.post( '/api/oauth2/authorize' )
-            //.auth( 'test', 'test' )
             .auth( username, password )
             .type( 'form' )
             .send( {
@@ -108,7 +80,6 @@ describe( 'OAuth2', function () {
             .expect( 302 )
             .expect( function (res) {
                 accessCode = res.text.split( 'code=' )[1];
-                //console.log('Code: ' + accessCode);
             } )
             .end( done );
 
@@ -126,7 +97,6 @@ describe( 'OAuth2', function () {
             .type( 'urlencoded' )
             .expect( 200 )
             .expect( function (res) {
-                //console.log(res.body);
                 token = res.body.access_token;
                 var tokenType = res.body.token_type;
                 console.log('Url: ' + api_endpoint + '/user', 'authorization: ' + tokenType + ' ' + token);
