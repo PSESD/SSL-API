@@ -9,7 +9,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 #Set Environment Variable
 ENV NODE_ENV production
-ENV NODE_CONFIG_DIR /config
+ENV NODE_CONFIG_DIR /src/config
 
 # Install Required Packages
 RUN apt-get update && apt-get -y upgrade
@@ -41,3 +41,4 @@ ADD /config/supervisord.conf /etc/supervisord.conf
 EXPOSE 443
 
 CMD ["/usr/local/bin/supervisord","-n"]
+
