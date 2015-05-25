@@ -7,3 +7,4 @@ Thumbs.db
 /src/node_modules
 /src/npm-debug.log
 *.log
+/config
