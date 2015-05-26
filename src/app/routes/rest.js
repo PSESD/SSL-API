@@ -17,7 +17,10 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	var auth = Api.controller('Auth');
 
 	router.get('/', indexCtr.index);
-	
+	router.get('/heartbeat', function(req, res) {
+        res.send('OK');
+    });
+
 	router.route('/user')
 		.get(auth.isBearerAuthenticated, userCtr.get)
         .put(auth.isBearerAuthenticated, userCtr.save);
