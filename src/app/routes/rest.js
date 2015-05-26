@@ -17,7 +17,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	var auth = Api.controller('Auth');
 
 	router.get('/', indexCtr.index);
-	router.get('/heatbeat', function(req, res) {
+	router.get('/heartbeat', function(req, res) {
         res.send('OK');
     });
 
