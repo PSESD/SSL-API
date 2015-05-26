@@ -14,6 +14,7 @@
     "crypto": "0.0.3",
     "express": "^4.12.3",
     "express-session": "^1.11.1",
+    "express-subdomain": "^1.0.3",
     "fast-csv": "^0.6.0",
     "method-override": "^2.3.3",
     "mocha": "^2.2.4",

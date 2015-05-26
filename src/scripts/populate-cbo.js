@@ -133,37 +133,18 @@ var populateCbo = {
                         (err.code && err.code === 11000) ? console.log({ code: err.code, message: 'User already exists'}) :  console.log(err);
 
                     if(!user) return console.log('User not found!');
-                    //console.log('USER UPWARDSTECH: ' , newUser);
                     var client = new Client();
                     client.name = user.username;
                     client.id = user.username;
                     client.secret = 'demo_client_secret';
                     client.userId = user.userId;
-
+                    client.redirectUri = '*.cbo.upwardst.st';
                     client.save(function(err) {
                         if (err)
                             return (err.code && err.code === 11000) ? console.log({ code: err.code, message: 'Client already exists'}) :  console.log(err);
 
                     });
                 });
-                //User.findOneAndUpdate({email: newUser.email}, { $set: newUser, $push: { permissions: { organization: organization._id, permissions: [permissionValue]}} }, { upsert: true, new: true },  function (err, user) {
-                //    if (err) return console.log(err);
-                //    if(!user) return console.log('User not found!');
-                //    //console.log('USER UPWARDSTECH: ' , newUser);
-                //    var client = new Client();
-                //    client.name = user.username;
-                //    client.id = user.username;
-                //    client.secret = 'demo_client_secret';
-                //    client.userId = user.userId;
-                //
-                //    client.save(function(err) {
-                //        if (err)
-                //            return (err.code && err.code === 11000) ? console.log({ code: err.code, message: 'Client already exists'}) :  console.log(err);
-                //
-                //        //console.log({ code: 0, message: 'Client added to the locker!', data: client });
-                //    });
-                //
-                //});
             })
         };
         self.dropCollections(function(){

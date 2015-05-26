@@ -8,10 +8,11 @@ var self = new Model(model);
 var UserController = extend(self.crud(), {
     get: function(req, res){
         self.model.findOne({ username: req.user.username}, function(err, obj) {
-            //console.log('FindUser', obj);
             if (err) {
                 return res.send(err);
             }
+            if(obj.hashedPassword) delete obj.hashedPassword;
+            if(obj.salt) delete obj.salt;
             res.json(obj);
         });
     },
@@ -39,7 +40,7 @@ var UserController = extend(self.crud(), {
                 res.json({message: 'Successfully updated!'});
             });
         });
-    },
+    }
 });
 
 module.exports = UserController;
