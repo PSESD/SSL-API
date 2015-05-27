@@ -62,8 +62,14 @@ UserSchema.virtual('password')
  * @param cb
  */
 UserSchema.methods.verifyPassword = function(password, cb) {
-  cb(null, this.encryptPassword(password) === this.hashedPassword);
+  if(!this.salt){
+    cb(null, false);
+  } else {
+    cb(null, this.encryptPassword(password) === this.hashedPassword);
+  }
 };
+
+UserSchema.set('toJSON', { hide: 'hashedPassword' });
 
 // Export the Mongoose model
 module.exports = mongoose.model('User', UserSchema);

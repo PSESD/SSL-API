@@ -11,8 +11,7 @@ var UserController = extend(self.crud(), {
             if (err) {
                 return res.send(err);
             }
-            if(obj.hashedPassword) delete obj.hashedPassword;
-            if(obj.salt) delete obj.salt;
+
             res.json(obj);
         });
     },

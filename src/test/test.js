@@ -27,6 +27,7 @@ describe( 'OAuth2', function () {
     var token;
     var refreshToken;
     var tokenType;
+    var secretCode;
 
     var username = 'test', password = 'test';
 
@@ -47,7 +48,7 @@ describe( 'OAuth2', function () {
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
-                console.dir( res.body );
+                //console.dir( res.body );
             } )
             .end( done );
 
@@ -59,13 +60,14 @@ describe( 'OAuth2', function () {
             .send( {
                 client_id    : 'client',
                 name  : 'client',
-                client_secret: 'secret',
                 redirect_uri: api_endpoint
             } )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
+                secretCode = res.body.client_secret;
                 console.dir( res.body );
+                console.log('SECRET: ', secretCode);
             } )
             .end( done );
 
@@ -119,7 +121,7 @@ describe( 'OAuth2', function () {
 
     it( 'use access code to get a token', function (done) {
         request( url ).post( '/api/oauth2/token' )
-            .auth( 'client', 'secret' )
+            .auth( 'client', secretCode )
             .expect( 'Content-Type', /json/ ).type( 'form' )
             .send( {
                 code        : accessCode,
@@ -165,7 +167,7 @@ describe( 'OAuth2', function () {
         console.log(url+'/api/oauth2/token', out.join("&"));
 
         request( url ).post( '/api/oauth2/token' )
-            .auth( 'client', 'secret' )
+            .auth( 'client', secretCode )
             .expect( 'Content-Type', /json/ ).type( 'form' )
             .send( rfParam )
             .type( 'urlencoded' )
