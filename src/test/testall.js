@@ -25,7 +25,7 @@ describe( 'OAuth2-Api End Point', function () {
     var accessCode;
     var token;
 
-    var username = 'zaenal';
+    var email = 'zaenal@upwardstech.com';
     var password = 'demo';
     var client_id = 'zaenal';
     var name  = 'zaenal';
@@ -43,7 +43,7 @@ describe( 'OAuth2-Api End Point', function () {
 
     it( 'user should be able to list clients', function (done) {
         request( url ).get( '/api/clients' )
-            .auth( username, password )
+            .auth( email, password )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
@@ -56,7 +56,7 @@ describe( 'OAuth2-Api End Point', function () {
     it( 'user should be able get authorised page', function (done) {
         var target = '/api/oauth2/authorize?client_id=client&response_type=code&redirect_uri='+api_endpoint;
         agent1.get( target )
-            .auth( username, password )
+            .auth( email, password )
             .set( 'Accept', 'application/json' )
             .set( 'Accept', 'text/html' )
             .type( 'urlencoded' )
@@ -72,7 +72,7 @@ describe( 'OAuth2-Api End Point', function () {
 
     it( 'user should be able to authorise an access code', function (done) {
         agent1.post( '/api/oauth2/authorize' )
-            .auth( username, password )
+            .auth( email, password )
             .type( 'form' )
             .send( {
                 transaction_id: transactionId

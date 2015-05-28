@@ -123,8 +123,7 @@ var populateCbo = {
                     first_name: '',
                     middle_name: '',
                     last_name: baseName,
-                    password: 'demo',
-                    username: baseName
+                    password: 'demo'
                 };
 
                 var user = new User(newUser);
@@ -138,8 +137,8 @@ var populateCbo = {
 
                     if (!user) return console.log('User not found!');
                     var client = new Client();
-                    client.name = user.username;
-                    client.id = user.username;
+                    client.name = user.email;
+                    client.id = user.email;
                     client.userId = user.userId;
                     client.redirectUri = '*.cbo.upwardst.st';
                     client.save(function (err) {

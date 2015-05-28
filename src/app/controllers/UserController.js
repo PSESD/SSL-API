@@ -7,7 +7,7 @@ var extend = require('util')._extend;
 var self = new Model(model);
 var UserController = extend(self.crud(), {
     get: function(req, res){
-        self.model.findOne({ username: req.user.username}, function(err, obj) {
+        self.model.findOne({ email: req.user.username}, function(err, obj) {
             if (err) {
                 return res.send(err);
             }
