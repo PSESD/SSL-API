@@ -1,47 +1,48 @@
 /**
  * Created by zaenal on 21/05/15.
  */
-var Address         = require('../app/models/Address');
-var Client          = require('../app/models/Client');
-var Code            = require('../app/models/Code');
-var Organization    = require('../app/models/Organization');
-var Permission      = require('../app/models/Permission');
-var Program         = require('../app/models/Program');
-var RefreshToken    = require('../app/models/RefreshToken');
-var Student         = require('../app/models/Student');
-var StudentProgram  = require('../app/models/StudentProgram');
-var Token           = require('../app/models/Token');
-var User            = require('../app/models/User');
-var UserPermission  = require('../app/models/UserPermission');
+var Address = require('../app/models/Address');
+var Client = require('../app/models/Client');
+var Code = require('../app/models/Code');
+var Organization = require('../app/models/Organization');
+var Permission = require('../app/models/Permission');
+var Program = require('../app/models/Program');
+var RefreshToken = require('../app/models/RefreshToken');
+var Student = require('../app/models/Student');
+var StudentProgram = require('../app/models/StudentProgram');
+var Token = require('../app/models/Token');
+var User = require('../app/models/User');
+var UserPermission = require('../app/models/UserPermission');
+var secretHash = require('../lib/utils').secretHash;
 
 
-var fs              = require('fs');
-var csv             = require('fast-csv');
-var filecsv         = __dirname + '/populate.csv';
+var fs = require('fs');
+var csv = require('fast-csv');
+var filecsv = __dirname + '/populate.csv';
 
-var async           = require('async');
-var _               = require('underscore');
+var async = require('async');
+var _ = require('underscore');
 
-var dummyUser       = ['abraham@upwardstech.com', 'ben@upwardstech.com', 'bintang@upwardstech.com', 'hendra@upwardstech.com', 'zaenal@upwardstech.com'];
+var dummyUser = ['abraham@upwardstech.com', 'ben@upwardstech.com', 'bintang@upwardstech.com', 'hendra@upwardstech.com', 'zaenal@upwardstech.com'];
 
-var mongoose        = mongoose || require('mongoose');
-var permissionValue = { operation: '*', allow: true};
+var mongoose = mongoose || require('mongoose');
+var permissionValue = {operation: '*', allow: true};
 var populateCbo = {
 
-    dropCollections: function(callback) {
+    dropCollections: function (callback) {
         var collections = _.keys(mongoose.connection.collections);
-        async.forEach(collections, function(collectionName, done) {
+        async.forEach(collections, function (collectionName, done) {
             var collection = mongoose.connection.collections[collectionName];
-            collection.drop(function(err) {
+            collection.drop(function (err) {
                 if (err && err.message != 'ns not found') done(err);
                 done(null);
             })
         }, callback);
     },
 
-    city: function(name){
+    city: function (name) {
         var address = {
-            address_type:"Mailing",
+            address_type: "Mailing",
             venue: "", // Optional venue name at the address, useful for names of buildings. (ex: Smith Hall)
             address_line: "",
             city: "",
@@ -54,7 +55,7 @@ var populateCbo = {
                 accuracy: "Approximate"//{type: String, enum: ["Rooftop", "Approximate"] }
             } //An object hash representing the geocoded location information for the address.
         };
-        switch(name){
+        switch (name) {
             case 'Aurburn':
                 address.city = "Aurburn";
                 address.address_line = "30611 16th Ave S1";
@@ -110,47 +111,59 @@ var populateCbo = {
         return address;
     },
 
-    run: function(){
+    run: function () {
         var self = this;
         var config = require('config');
 
-        var done = function(organization){
-            dummyUser.forEach(function(userEmail){
+        var done = function (organization) {
+            dummyUser.forEach(function (userEmail) {
                 var baseName = userEmail.split('@')[0];
                 var newUser = {
                     email: userEmail,
                     first_name: '',
                     middle_name: '',
                     last_name: baseName,
-                    password: 'demo',
-                    username: baseName
+                    password: 'demo'
                 };
 
                 var user = new User(newUser);
 
-                user.save(function(err) {
+                user.save(function (err) {
                     if (err)
-                        (err.code && err.code === 11000) ? console.log({ code: err.code, message: 'User already exists'}) :  console.log(err);
+                        (err.code && err.code === 11000) ? console.log({
+                            code: err.code,
+                            message: 'User already exists'
+                        }) : console.log(err);
 
-                    if(!user) return console.log('User not found!');
+                    if (!user) return console.log('User not found!');
                     var client = new Client();
-                    client.name = user.username;
-                    client.id = user.username;
-                    client.secret = 'demo_client_secret';
+                    client.name = user.email;
+                    client.id = user.email;
                     client.userId = user.userId;
                     client.redirectUri = '*.cbo.upwardst.st';
-                    client.save(function(err) {
+                    client.save(function (err) {
                         if (err)
-                            return (err.code && err.code === 11000) ? console.log({ code: err.code, message: 'Client already exists'}) :  console.log(err);
+                            return (err.code && err.code === 11000) ? console.log({
+                                code: err.code,
+                                message: 'Client already exists'
+                            }) : console.log(err);
+                        Client.findByIdAndUpdate(client._id, {$set: {secret: secretHash('' + client._id)}}, function (err, newClient) {
+                            if (err)
+                                return (err.code && err.code === 11000) ? console.log({
+                                    code: err.code,
+                                    message: 'Client already exists'
+                                }) : console.log(err);
+                            console.log({code: 0, message: 'Client added to the locker!', data: newClient});
+                        });
 
                     });
                 });
             })
         };
-        self.dropCollections(function(){
+        self.dropCollections(function () {
             var stream = fs.createReadStream(filecsv);
             var psl = require('psl');
-            Permission.create(permissionValue, function(err, permission) {
+            Permission.create(permissionValue, function (err, permission) {
                 var csvStream = csv
                     .fromStream(stream, {ignoreEmpty: true})
                     .on("data", function (row) {
@@ -185,7 +198,7 @@ var populateCbo = {
                         }
                         var createOrg = function (err, user, permission) {
                             if (err) return console.log('Error: ' + err);
-                            if(!user) return console.log('User empty');
+                            if (!user) return console.log('User empty');
                             var newOrg = {
                                 name: rs.organization,
                                 url: rs.url + '.' + config.get('host'),
@@ -206,19 +219,27 @@ var populateCbo = {
                              * Start insert new record
                              */
                             newOrg.addresses = addresses;
-                            Organization.findOneAndUpdate({name: newOrg.name}, {$set: newOrg}, { safe: true, upsert: true, new: true }, function (err, org) {
+                            Organization.findOneAndUpdate({name: newOrg.name}, {$set: newOrg}, {
+                                safe: true,
+                                upsert: true,
+                                new: true
+                            }, function (err, org) {
                                 if (err) return console.log(err);
                                 if (org) {
                                     var userPermission = {
                                         organization: org._id,
-                                        permission: [{ operation: '*', allow: true}]
+                                        permission: [{operation: '*', allow: true}]
                                     };
                                     if (err) return console.log(err);
                                     var newProgram = {
                                         name: org.name
                                     };
 
-                                    Program.findOneAndUpdate({name: newOrg.name}, {$set: newProgram}, { safe: true, upsert: true, new: true }, function (err, program) {
+                                    Program.findOneAndUpdate({name: newOrg.name}, {$set: newProgram}, {
+                                        safe: true,
+                                        upsert: true,
+                                        new: true
+                                    }, function (err, program) {
                                         if (err) return console.log(err);
                                         if (userPermission) {
                                             done(org);
@@ -267,7 +288,7 @@ var populateCbo = {
                         //    createOrg(err, user, permission);
                         //});
                         var user = new User(newUser);
-                        user.save(function(err) {
+                        user.save(function (err) {
                             if (err) {
                                 (err.code && err.code === 11000) ? console.log({
                                     code: err.code,

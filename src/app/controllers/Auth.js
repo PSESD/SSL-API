@@ -9,7 +9,7 @@ var tokenHash = require('../../lib/utils').tokenHash;
 
 passport.use(new BasicStrategy(
   function(username, password, callback) {
-    User.findOne({ username: username }, function (err, user) {
+    User.findOne({ email: username }, function (err, user) {
       if (err) { return callback(err); }
 
       // No user found with that username
@@ -34,7 +34,6 @@ passport.use(new BearerStrategy(
   function(accessToken, callback) {
     var accessTokenHash = tokenHash(accessToken);
     Token.findOne({ token: accessTokenHash }, function (err, token) {
-
       if (err) { return callback(err); }
 
       // No token found
@@ -45,8 +44,6 @@ passport.use(new BearerStrategy(
         callback(null, false, { message: 'Token expired' });
       } else {
         User.findOne({ _id: token.userId }, function (err, user) {
-          //console.dir(token);
-          //console.dir(user);
           if (err) { return callback(err); }
 
           // No user found
