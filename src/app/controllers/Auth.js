@@ -34,7 +34,6 @@ passport.use(new BearerStrategy(
   function(accessToken, callback) {
     var accessTokenHash = tokenHash(accessToken);
     Token.findOne({ token: accessTokenHash }, function (err, token) {
-
       if (err) { return callback(err); }
 
       // No token found
