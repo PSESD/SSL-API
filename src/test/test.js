@@ -60,7 +60,7 @@ describe( 'OAuth2', function () {
             .send( {
                 client_id    : 'client',
                 name  : 'client',
-                redirect_uri: api_endpoint
+                redirect_uri: '^localhost:4000$'
             } )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
