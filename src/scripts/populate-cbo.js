@@ -140,7 +140,7 @@ var populateCbo = {
                     client.name = user.email;
                     client.id = user.email;
                     client.userId = user.userId;
-                    client.redirectUri = '*.cbo.upwardst.st';
+                    client.redirectUri = '([\\w.-]+)?cbo\\.upward\\.st';
                     client.save(function (err) {
                         if (err)
                             return (err.code && err.code === 11000) ? console.log({
