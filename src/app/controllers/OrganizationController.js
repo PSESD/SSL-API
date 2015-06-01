@@ -7,38 +7,24 @@ var extend = require('util')._extend;
 var self = new Model(model);
 var OrganizationController = extend(self.crud(), {
     get: function(req, res){
-        self.model.findOne({ email: req.user.username}, function(err, obj) {
-            if (err) {
-                return res.send(err);
-            }
-            res.json(obj);
-        });
-    },
-    /**
-     *
-     * @param req
-     * @param res
-     */
-    save: function(req, res){
-        self.model.findOne({ _id: req.user._id }, function(err, obj) {
-            if (err) {
-                return res.send(err);
-            }
-
-            for (prop in req.body) {
-                obj[prop] = req.body[prop];
-            }
-
-            // save the movie
-            obj.save(function (err) {
-                if (err) {
-                    return res.send(err);
-                }
-
-                res.json({message: 'Successfully updated!'});
+        var crit = req.query.url ? { url: req.query.url } : {};
+        var user = req.user;
+        if(user.permissions.length > 0){
+            var _id = [];
+            user.permissions.forEach(function(organization){
+                _id.push(organization.organization);
             });
+            crit._id = { $in: _id };
+        }
+        console.log('CRIT: ', crit);
+        self.model.find(crit, function(err, objs) {
+            if (err) {
+                return res.send(err);
+            }
+            res.json(objs);
         });
     },
+
     profile: function(req, res){
 
     },

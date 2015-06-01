@@ -33,3 +33,4 @@ node_modules
 .idea
 src/node_modules
 *.log
+config
