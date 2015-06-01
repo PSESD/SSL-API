@@ -137,7 +137,7 @@ var populateCbo = {
 
                     if (!user) return console.log('User not found!');
                     var client = new Client();
-                    client.name = user.email;
+                    client.name = 'App ' + user.email;
                     client.id = user.email;
                     client.userId = user.userId;
                     client.redirectUri = '([\\w.-]+)?cbo\\.upward\\.st';
@@ -153,7 +153,7 @@ var populateCbo = {
                                     code: err.code,
                                     message: 'Client already exists'
                                 }) : console.log(err);
-                            console.log({code: 0, message: 'Client added to the locker!', data: newClient});
+                            // console.log({code: 0, message: 'Client added to the locker!', data: newClient});
                         });
 
                     });
@@ -228,7 +228,7 @@ var populateCbo = {
                                 if (org) {
                                     var userPermission = {
                                         organization: org._id,
-                                        permission: [{operation: '*', allow: true}]
+                                        permission: [ {operation: '*', allow: true} ]
                                     };
                                     if (err) return console.log(err);
                                     var newProgram = {
@@ -242,14 +242,11 @@ var populateCbo = {
                                     }, function (err, program) {
                                         if (err) return console.log(err);
                                         if (userPermission) {
-                                            done(org);
-                                            //User.findOneAndUpdate({email: user.email}, { $push: { permissions: [userPermission] }}, {safe: true, upsert: true}, function (err, usr) {
-                                            //    if (err) return console.log(err);
-                                            //    usr.permissions = [userPermission];
-                                            //    usr.save(function(err){ if(err) return console.log('User update filed', err);});
-                                            //});
-                                            //user.permissions = [userPermission];
-                                            //user.save(function(err){ if(err) return console.log('User update filed', err);});
+                                            
+                                            User.findOneAndUpdate({email: user.email}, { $push: { permissions: [userPermission] }}, {safe: true, upsert: true}, function (err, usr) {
+                                               if (err) return console.log(err);
+                                               done(org);
+                                            });
                                         }
                                     });
                                 } else {
