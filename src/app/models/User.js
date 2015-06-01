@@ -53,6 +53,20 @@ UserSchema.virtual('password')
     })
     .get(function() { return this._plainPassword; });
 /**
+ * User organization id
+ */
+UserSchema.virtual('organizationId').get(function(){
+  var _id = [];
+  if(this.permissions.length > 0){
+      
+      this.permissions.forEach(function(organization){
+          _id.push(organization.organization);
+      });
+      crit._id = { $in: _id };
+  }
+  return _id;
+});
+/**
  *
  * @param password
  * @param cb

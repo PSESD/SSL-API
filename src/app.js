@@ -91,7 +91,7 @@ Api.prototype.connectDb = function() {
     var dbUri = 'mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name');
     console.log("[%s] DB URI: " + dbUri, app.get('env'));
     this.mongo.connect(dbUri);
-    //this.mongo.set('debug', app.get('env') === 'test');
+    this.mongo.set('debug', app.get('env') === 'test');
     this.configureExpress(this.db);
     
 };
@@ -101,7 +101,7 @@ Api.prototype.migrate = function(){
          * Run Process to migrate data
          */
         var populateCbo = require('./scripts/populate-cbo');
-        populateCbo.run();
+        //populateCbo.run();
     }
 }
 /**

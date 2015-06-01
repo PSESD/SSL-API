@@ -98,5 +98,28 @@ Model.prototype.crud = function(){
         }
     }
 };
+/**
+ *
+ * @param user
+ * @returns {Array}
+ * @private
+ */
+Model.prototype.orgId = function(user){
+    var _id = [];
+    if(user.permissions.length > 0){
 
+        user.permissions.forEach(function(organization){
+            _id.push(organization.organization);
+        });
+    }
+    return _id;
+};
+Model.prototype.cb = function(res) {
+    return function (err, obj) {
+        if (err) {
+            return res.json({ error: err.message});
+        }
+        res.json(obj);
+    };
+};
 module.exports = Model;
