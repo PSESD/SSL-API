@@ -21,6 +21,7 @@
     "mocha-mongoose": "^1.0.4",
     "mongodb": "^1.4.37",
     "mongoose": "^4.0.2",
+    "mongoose-protector": "^0.1.5",
     "morgan": "^1.5.2",
     "oauth2orize": "^1.0.1",
     "passport": "^0.2.1",
@@ -42,5 +43,5 @@
     "url": "git@github.com:PSESD/CBO-Portal-API.git"
   },
   "author": "upwardstech",
-  "license": "ISC"
+  "license": "MIT"
 }

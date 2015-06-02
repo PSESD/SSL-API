@@ -5,12 +5,13 @@ var model = require('../models/Organization');
 var Program = require('../models/Program');
 var Model = require('../../lib/model');
 var extend = require('util')._extend;
+var _ = require('underscore');
 var self = new Model(model);
 
 var OrganizationController = extend(self.crud(), {
 
     /**
-     *
+     * Get the list of all organizations that this user have access to in our system.
      * @param req
      * @param res
      * @returns {*}
@@ -18,31 +19,12 @@ var OrganizationController = extend(self.crud(), {
     get: function(req, res){
         var user = req.user;
         var crit = req.query.url ? { url: req.query.url } : {};
-        var orgId = self.orgId(user);
-        if(orgId.length > 0){
-
-            crit._id = { $in: orgId };
-        }
-
-        if(req.params.organizationId){
-            if(orgId.length === 0 || orgId.indexOf(req.params.organizationId) >= 0) {
-                return self.model.findOne({_id: req.params.organizationId}, function (err, obj) {
-                    if (err) {
-                        return res.send(err);
-                    }
-                    res.json(obj);
-                });
-            } else {
-                return res.json({});
-            }
-        }
-
-
-        self.model.find(crit, function(err, objs) {
-            if (err) {
-                return res.send(err);
-            }
-            res.json(objs);
+        var orgs = [];
+        var orgIds = _.pluck(req.user.permissions, 'organization');
+        crit._id = { $in: orgIds };
+        self.model.find( crit, function (err, orgs) {
+            if (err) return res.json({ error: err.message });
+            res.json(orgs);
         });
     },
 
