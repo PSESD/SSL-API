@@ -12,6 +12,7 @@ function Rest(router, Api) {
 Rest.prototype.handleRoutes= function(router, Api) {
 	var userCtr = Api.controller('UserController');
 	var organizationCtr = Api.controller('OrganizationController');
+	var studentCtr = Api.controller('StudentController');
 	var indexCtr = Api.controller('Index');
 	var addressController = Api.controller('AddressController');
 	var auth = Api.controller('Auth');
@@ -34,6 +35,8 @@ Rest.prototype.handleRoutes= function(router, Api) {
     router.route('/:organizationId/users/:userId').get(auth.isBearerAuthenticated, organizationCtr.getUser);
     router.route('/:organizationId/programs').get(auth.isBearerAuthenticated, organizationCtr.allProgram);
     router.route('/:organizationId/programs/:programId').get(auth.isBearerAuthenticated, organizationCtr.getProgram);
+    router.route('/:organizationId/students/:studentId/backpack').get(auth.isBearerAuthenticated, studentCtr.getStudentsBackpack);
+    //router.get('/:organizationId/students/:studentId/backpack', studentCtr.getStudentsBackpack);
 
 
 

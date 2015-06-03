@@ -23,7 +23,7 @@ var filecsv = __dirname + '/populate.csv';
 var async = require('async');
 var _ = require('underscore');
 
-var dummyUser = ['abraham@upwardstech.com', 'ben@upwardstech.com', 'bintang@upwardstech.com', 'hendra@upwardstech.com', 'zaenal@upwardstech.com'];
+var dummyUser = ['demo@upwardstech.com', 'abraham@upwardstech.com', 'ben@upwardstech.com', 'bintang@upwardstech.com', 'hendra@upwardstech.com', 'zaenal@upwardstech.com'];
 
 var mongoose = mongoose || require('mongoose');
 var permissionValue = {operation: '*', allow: true};
@@ -243,7 +243,7 @@ var populateCbo = {
                                         if (err) return console.log(err);
                                         if (userPermission) {
                                             
-                                            User.findOneAndUpdate({email: user.email}, { $push: { permissions: [userPermission] }}, {safe: true, upsert: true}, function (err, usr) {
+                                            User.findOneAndUpdate({email: user.email}, { $push: { permissions: userPermission }}, {safe: true, upsert: true}, function (err, usr) {
                                                if (err) return console.log(err);
                                                done(org);
                                             });

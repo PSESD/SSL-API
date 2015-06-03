@@ -151,6 +151,18 @@ describe( 'OAuth2', function () {
             .end( done );
 
     } );
+
+    it('get broker student backpack', function(done){
+        request(api_endpoint)
+            .get('/556c4c6bd5bf16973c91d203/students/1111111111/backpack')
+            .set('authorization', tokenType + ' ' + token)
+            .expect( function (res) {
+                console.dir(res.body);
+            } )
+            .expect( 200 )
+            .end( done );
+    });
+
     it( 'use refresh token to get a token', function (done) {
 
         var rfParam = {

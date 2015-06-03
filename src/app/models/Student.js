@@ -25,7 +25,7 @@ var StudentSchema = new mongoose.Schema({
     first_name: { type: String },
     last_name: { type: String, required: true, index: true },
     middle_name: { type: String },
-    student_id: { type: String },
+    district_student_id: { type: String },
     addresses: [ Address ],
     school_district: { type: String },
     programs: [ StudentProgram ],
