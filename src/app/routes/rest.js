@@ -35,8 +35,14 @@ Rest.prototype.handleRoutes= function(router, Api) {
     router.route('/:organizationId/users/:userId').get(auth.isBearerAuthenticated, organizationCtr.getUser);
     router.route('/:organizationId/programs').get(auth.isBearerAuthenticated, organizationCtr.allProgram);
     router.route('/:organizationId/programs/:programId').get(auth.isBearerAuthenticated, organizationCtr.getProgram);
+
+    router.route('/:organizationId/students')
+          .get(auth.isBearerAuthenticated, studentCtr.getStudents);
+    router.route('/:organizationId/students/:studentId')
+        .get(auth.isBearerAuthenticated, studentCtr.getStudentById);
+
     router.route('/:organizationId/students/:studentId/backpack').get(auth.isBearerAuthenticated, studentCtr.getStudentsBackpack);
-    //router.get('/:organizationId/students/:studentId/backpack', studentCtr.getStudentsBackpack);
+    router.get('/:organizationId/students/:studentId/backpack-skip', studentCtr.getStudentsBackpack);
 
 
 

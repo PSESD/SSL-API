@@ -37,6 +37,7 @@ describe( 'OAuth2', function () {
     } );
 
     before( function (done) {
+        //done();
         clearDB( done );
     } );
 

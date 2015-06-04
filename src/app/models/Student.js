@@ -12,8 +12,8 @@
  */
 // Load required packages
 var mongoose = require('mongoose');
-var StudentProgram = require('./StudentProgram');
-var Address = require('./Address');
+var StudentProgram = require('./schema/StudentProgram');
+var Address = require('./schema/Address');
 
 // Define our Student schema
 // TODO: On create, the student needs to be added to the list of students on the User Permission of the user who added it.

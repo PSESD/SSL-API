@@ -37,6 +37,30 @@ var StudentController = extend(self.crud(), {
                 });
             }
         });
+    },
+    /**
+     * Get all student in organization
+     * @param req
+     * @param res
+     */
+    getStudents: function(req, res){
+        var orgId = req.params.organizationId;
+        self.model.find({ organization: orgId }, function(err, students){
+            if(err) return res.json(err);
+            res.json(students);
+        });
+    },
+    /**
+     * Get student organization by id
+     * @param req
+     * @param res
+     */
+    getStudentById: function(req, res){
+        var orgId = req.params.organizationId;
+        self.model.findOne({ organization: orgId, _id: req.params.studentId }, function(err, student){
+            if(err) return res.json(err);
+            res.json(student);
+        });
     }
 });
 
