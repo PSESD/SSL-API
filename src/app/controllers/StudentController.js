@@ -20,23 +20,33 @@ var StudentController = extend(self.crud(), {
     getStudentsBackpack: function(req, res){
         var orgId = req.params.organizationId;
         var studentId = req.params.studentId;
-        var zoneId = req.body.zoneId || 'federalway';
-        var brokerRequest = new Request();
-        brokerRequest.addHeader( 'districtStudentId', studentId );
-        var request = brokerRequest.create('/validation-sre/' + studentId + ';zoneId='+zoneId+';contextId=CBO', 'GET', function (error, response, body) {
-            if(response.statusCode == '200'){
-                parseString(body, function (err, result) {
-                    var json = result.sre;
-                    delete json['$'];
-                    res.json(json);
-                });
-            } else {
-                parseString(body, function (err, result) {
-                    var json = result.Error;
-                    res.json(json);
-                });
-            }
+        self.model.findOne({ district_student_id: studentId, organization: orgId }, function(err, student){
+
+            if(err) return res.json(err);
+            /**
+             * If student is empty from database
+             */
+            if(!student) return res.json({error: true, message: 'The student not found in database'});
+
+            var zoneId = student.school_district;
+            var brokerRequest = new Request();
+            brokerRequest.addHeader( 'districtStudentId', studentId );
+            var request = brokerRequest.create('/validation-sre/' + studentId + ';zoneId='+zoneId+';contextId=CBO', 'GET', function (error, response, body) {
+                if(response.statusCode == '200'){
+                    parseString(body, function (err, result) {
+                        var json = result.sre;
+                        delete json['$'];
+                        res.json(json);
+                    });
+                } else {
+                    parseString(body, function (err, result) {
+                        var json = result.Error;
+                        res.json(json);
+                    });
+                }
+            });
         });
+
     },
     /**
      * Get all student in organization

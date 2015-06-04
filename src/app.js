@@ -100,8 +100,8 @@ Api.prototype.migrate = function(){
         /**
          * Run Process to migrate data
          */
-        var populateCbo = require('./scripts/populate-cbo');
-        populateCbo.run();
+        //var populateCbo = require('./scripts/populate-cbo');
+        //populateCbo.run();
     }
 }
 /**
