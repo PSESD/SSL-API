@@ -8,6 +8,7 @@ var _ = require('underscore');
 var self = new Model(model);
 var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
+var brokerRequest = new Request();
 
 var StudentController = extend(self.crud(), {
 
@@ -20,7 +21,7 @@ var StudentController = extend(self.crud(), {
     getStudentsBackpack: function(req, res){
         var orgId = req.params.organizationId;
         var studentId = req.params.studentId;
-        self.model.findOne({ district_student_id: studentId, organization: orgId }, function(err, student){
+        self.model.findOne({ _id: ''+studentId, organization: ''+orgId }, function(err, student){
 
             if(err) return res.json(err);
             /**
@@ -28,11 +29,11 @@ var StudentController = extend(self.crud(), {
              */
             if(!student) return res.json({error: true, message: 'The student not found in database'});
 
-            var zoneId = student.school_district;
-            var brokerRequest = new Request();
-            brokerRequest.addHeader( 'districtStudentId', studentId );
-            var request = brokerRequest.create('/validation-sre/' + studentId + ';zoneId='+zoneId+';contextId=CBO', 'GET', function (error, response, body) {
-                if(response.statusCode == '200'){
+            var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
+                if(!body){
+                    return res.json({error: true, message: 'Data not found'});
+                }
+                if(response && response.statusCode == '200'){
                     parseString(body, function (err, result) {
                         var json = result.sre;
                         delete json['$'];
