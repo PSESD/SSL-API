@@ -7,8 +7,7 @@ var UserPermission = require('./schema/UserPermission');
 var UserSchema = new mongoose.Schema({
     hashedAuthCode: { type: String },
     hashedPassword: {
-        type: String,
-        required: true
+        type: String
     },
     /**
     * Store salt as plain text

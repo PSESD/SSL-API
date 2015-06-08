@@ -1,78 +1,86 @@
 /**
  * Created by zaenal on 21/05/15.
  */
-var model = require('../models/User');
-var Model = require('../../lib/model');
-var extend = require('util')._extend;
-var self = new Model(model);
-var UserController = extend(self.crud(), {
-    /**
-     *
-     * @param req
-     * @param res
-     */
-    deleteByEmail: function(req, res){
-        var cb = function(userId, req, res){
+var User = require('../models/User');
+var BaseController = require('./BaseController');
+var util = require('util');
+var extend = util._extend;
+var _ = require('underscore');
 
-            self.model.remove({
-                _id: userId
-            }, function(err, obj) {
+var UserController = new BaseController(User).crud();
+/**
+ * Get Current User Login
+ * @param req
+ * @param res
+ */
+UserController.get = function (req, res) {
+    User.findOne({email: req.user.email}, function (err, obj) {
+        if (err) {
+            return res.errJson(err);
+        }
+        res.okJson(obj);
+    });
+};
+/**
+ * Delete by email
+ * @param req
+ * @param res
+ */
+UserController.deleteByEmail = function (req, res) {
+    var model = User;
+    var cb = function (userId, req) {
+
+        model.remove({
+            _id: userId
+        }, function (err, obj) {
+            if (err) {
+                return res.errJson(err);
+            }
+
+
+
+            Client.remove({userId: userId}, function (err) {
                 if (err) {
-                    return res.send(err);
+                    return res.errJson(err);
                 }
-
-                Client.remove({ userId: userId  }, function(err){
+                Code.remove({userId: userId}, function (err) {
                     if (err) {
-                        return res.send(err);
+                        return res.errJson(err);
                     }
-                    Code.remove({ userId: userId  }, function(err) {
-                        if (err) {
-                            return res.send(err);
-                        }
-                    });
                 });
-
-                res.json({ message: 'Successfully deleted' });
             });
-        };
 
-        self.model.findOne();
-
-    },
-    get: function(req, res){
-
-        self.model.findOne({ email: req.user.email}, function(err, obj) {
-            if (err) {
-                return res.send(err);
-            }
-            res.json(obj);
+            res.okJson('Successfully deleted');
         });
-    },
-    /**
-     *
-     * @param req
-     * @param res
-     */
-    save: function(req, res){
-        self.model.findOne({ _id: req.user._id }, function(err, obj) {
+    };
+
+    User.findOne({email: req.body.email}, function (err, user) {
+        if (err) return res.errJson(err);
+
+        if(!user) return res.errJson('User not found');
+
+        cb(user._id, req);
+    });
+
+};
+UserController.save = function (req, res) {
+    User.findOne({_id: req.user._id}, function (err, obj) {
+        if (err) {
+            return res.errJson(err);
+        }
+
+        for (var prop in req.body) {
+            obj[prop] = req.body[prop];
+        }
+
+        // save the movie
+        obj.save(function (err) {
             if (err) {
-                return res.send(err);
+                return res.errJson(err);
             }
 
-            for (prop in req.body) {
-                obj[prop] = req.body[prop];
-            }
-
-            // save the movie
-            obj.save(function (err) {
-                if (err) {
-                    return res.send(err);
-                }
-
-                res.json({message: 'Successfully updated!'});
-            });
+            res.okJson('Successfully updated!');
         });
-    }
-});
-
+    });
+};
 module.exports = UserController;

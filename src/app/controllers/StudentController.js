@@ -1,78 +1,100 @@
 /**
  * Created by zaenal on 03/06/15.
  */
-var model = require('../models/Student');
-var Model = require('../../lib/model');
-var extend = require('util')._extend;
+var mongoose = require('mongoose');
+var Student = require('../models/Student');
+var BaseController = require('./BaseController');
 var _ = require('underscore');
-var self = new Model(model);
 var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
 var brokerRequest = new Request();
 
-var StudentController = extend(self.crud(), {
 
-    /**
-     * Get the list of all organizations that this user have access to in our system.
-     * @param req
-     * @param res
-     * @returns {*}
-     */
-    getStudentsBackpack: function(req, res){
-        var orgId = req.params.organizationId;
-        var studentId = req.params.studentId;
-        self.model.findOne({ _id: ''+studentId, organization: ''+orgId }, function(err, student){
+var StudentController = new BaseController(Student).crud();
+/**
+ * Get the list of all organizations that this user have access to in our system.
+ * @param req
+ * @param res
+ * @returns {*}
+ */
+StudentController.getStudentsBackpack = function (req, res) {
+    var orgId = req.params.organizationId;
+    var studentId = req.params.studentId;
 
-            if(err) return res.json(err);
-            /**
-             * If student is empty from database
-             */
-            if(!student) return res.json({error: true, message: 'The student not found in database'});
+    Student.findOne({_id: '' + studentId, organization: '' + orgId}, function (err, student) {
 
-            var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
-                if(!body){
-                    return res.json({error: true, message: 'Data not found'});
-                }
-                if(response && response.statusCode == '200'){
-                    parseString(body, function (err, result) {
-                        var json = result.sre;
-                        delete json['$'];
-                        res.json(json);
-                    });
-                } else {
-                    parseString(body, function (err, result) {
-                        var json = result.Error;
-                        res.json(json);
-                    });
-                }
-            });
+        if (err) return res.errJson(err);
+        /**
+         * If student is empty from database
+         */
+        if (!student) return res.errJson('The student not found in database');
+
+        var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
+            if (!body) {
+                return res.errJson('Data not found');
+            }
+            if (response && response.statusCode == '200') {
+                parseString(body, function (err, result) {
+                    var json = result.sre;
+                    delete json['$'];
+                    res.okJson(json);
+                });
+            } else {
+                parseString(body, function (err, result) {
+                    var json = result.Error;
+                    res.errJson(json);
+                });
+            }
         });
+    });
+};
+/**
+ * Get all student in organization
+ * @param req
+ * @param res
+ */
+StudentController.getStudents = function (req, res) {
+    var orgId = req.params.organizationId;
+    Student.find({organization: orgId}, function (err, students) {
+        if (err) return res.errJson(err);
+        res.okJson(null, students);
+    });
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.createByOrgId = function (req, res) {
 
-    },
-    /**
-     * Get all student in organization
-     * @param req
-     * @param res
-     */
-    getStudents: function(req, res){
-        var orgId = req.params.organizationId;
-        self.model.find({ organization: orgId }, function(err, students){
-            if(err) return res.json(err);
-            res.json(students);
-        });
-    },
-    /**
-     * Get student organization by id
-     * @param req
-     * @param res
-     */
-    getStudentById: function(req, res){
-        var orgId = req.params.organizationId;
-        self.model.findOne({ organization: orgId, _id: req.params.studentId }, function(err, student){
-            if(err) return res.json(err);
-            res.json(student);
-        });
-    }
-});
+    var obj = new Student(req.body);
+    obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
+    obj.save(function (err) {
+        if (err) {
+            return res.errJson(err);
+        }
+
+        res.okJson('Successfully Added');
+    });
+};
+/**
+ * Get student organization by id
+ * @param req
+ * @param res
+ */
+StudentController.getStudentById = function (req, res) {
+    var orgId = req.params.organizationId;
+    Student.findOne({organization: orgId, _id: req.params.studentId}, function (err, student) {
+        if (err) return res.errJson(err);
+        res.okJson(student);
+    });
+};
+StudentController.deleteStudentById = function (req, res) {
+    var orgId = req.params.organizationId;
+    Student.remove({organization: orgId, _id: req.params.studentId}, function (err, student) {
+        if (err) return res.errJson(err);
+        res.okJson('Successfully deleted');
+    });
+};
 
 module.exports = StudentController;
