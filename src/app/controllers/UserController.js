@@ -21,6 +21,7 @@ UserController.get = function (req, res) {
         res.okJson(obj);
     });
 };
+
 /**
  * Delete by email
  * @param req

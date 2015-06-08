@@ -1,8 +1,10 @@
 /**
  * Created by zaenal on 21/05/15.
  */
+var mongoose = require('mongoose');
 var Organization = require('../models/Organization');
 var Program = require('../models/Program');
+var User = require('../models/User');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 
@@ -29,11 +31,41 @@ OrganizationController.get = function (req, res) {
 OrganizationController.profile = function (req, res) {
 
 };
+/**
+ * Find all users by org id
+ * @param req
+ * @param res
+ */
 OrganizationController.allUsers = function (req, res) {
+    if(!req.params.organizationId) return res.errJson('Data not found!');
 
+    User.find({
+        $or: [
+            { permissions: { $elemMatch: { organization : mongoose.Types.ObjectId(req.params.organizationId) } } },
+            { permissions: [] }
+        ]
+    }, function(err, users){
+        if(err) return res.errJson(err);
+        res.okJson(null, users);
+    });
 };
+/**
+ * Find organization by user id
+ * @param req
+ * @param res
+ */
 OrganizationController.getUser = function (req, res) {
+    if(!req.params.organizationId || !req.params.userId) return res.errJson('Data not found!');
 
+    User.findOne({ _id: mongoose.Types.ObjectId(req.params.userId),
+        $or: [
+            { permissions: { $elemMatch: { organization : mongoose.Types.ObjectId(req.params.organizationId) } } },
+            { permissions: [] }
+        ]
+   }, function(err, user){
+        if(err) return res.errJson(err);
+        res.okJson(user);
+    });
 };
 /**
  *
@@ -42,7 +74,7 @@ OrganizationController.getUser = function (req, res) {
  */
 OrganizationController.allProgram = function (req, res) {
     var user = req.user;
-    var orgId = self.orgId(user);
+    var orgId = this.getOrgIdByUser(user);
     if (orgId.length === 0 || orgId.indexOf(req.params.organizationId) >= 0) {
         var crit = {_id: req.params.organizationId};
         Organization.findOne(crit, function (err, org) {
@@ -56,6 +88,17 @@ OrganizationController.allProgram = function (req, res) {
             });
         });
     }
+};
+
+OrganizationController.getOrgIdByUser = function(user){
+    var _id = [];
+    if(user.permissions.length > 0){
+
+        user.permissions.forEach(function(organization){
+            _id.push(organization.organization);
+        });
+    }
+    return _id;
 };
 /**
  *
