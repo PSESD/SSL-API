@@ -1,17 +1,16 @@
+/**
+ * Created by zaenal on 28/05/15.
+ */
 'use strict';
 
 process.env.NODE_ENV = 'test';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 var expect = require( 'chai' ).expect;
 var request = require( 'supertest' );
 var cheerio = require( 'cheerio' );
-var url = 'http://localhost:3000';
-//var url = 'https://auth.cbo.upward.st';
-var api_endpoint = 'http://localhost:4000';
+var url = 'https://auth.cbo.upward.st';
+var api_endpoint = 'https://api.cbo.upward.st';
 var config = require('config');
-var dbUri = 'mongodb://'+config.get('db.mongo.host')+'/'+config.get('db.mongo.name');
-console.log(dbUri);
-var mongoose = require( 'mongoose' )
-    , clearDB = require( 'mocha-mongoose' )( dbUri, {noClear: true} );
 
 describe( 'OAuth2', function () {
 
@@ -31,19 +30,11 @@ describe( 'OAuth2', function () {
 
     var email = 'test@test.com', password = 'test';
 
-    before( function (done) {
-        if (mongoose.connection.db) return done();
-        mongoose.connect( dbUri, done );
-    } );
-
-    before( function (done) {
-        clearDB( done );
-    } );
 
     it( 'should create a new user', function (done) {
         request( url ).post( '/api/users' )
-            .send( 'email='+email )
-            .send( 'password=' + password )
+            .send( 'email=test' )
+            .send( 'password=test' )
             .send( 'last_name=test' )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
@@ -55,16 +46,17 @@ describe( 'OAuth2', function () {
     } );
     it( 'user should add a new client', function (done) {
         request( url ).post( '/api/clients' )
-            .auth( email, password )
+            .auth( 'test', 'test' )
             .type( 'urlencoded' )
             .send( {
                 client_id    : 'client',
                 name  : 'client',
-                redirect_uri: '^localhost:4000$'
+                redirect_uri: api_endpoint
             } )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
+                console.dir( res.body );
                 secretCode = res.body.client_secret;
                 console.dir( res.body );
                 console.log('SECRET: ', secretCode);
@@ -74,11 +66,12 @@ describe( 'OAuth2', function () {
     } );
     it( 'user should be able to list clients', function (done) {
         request( url ).get( '/api/clients' )
+            //.auth( 'test', 'test' )
             .auth( email, password )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
-                console.dir( res.body );
+                //console.dir( res.body );
             } )
             .end( done );
 
@@ -130,7 +123,6 @@ describe( 'OAuth2', function () {
             .type( 'urlencoded' )
             .expect( 200 )
             .expect( function (res) {
-
                 token = res.body.access_token;
                 refreshToken = res.body.refresh_token;
                 tokenType = res.body.token_type;
@@ -151,12 +143,13 @@ describe( 'OAuth2', function () {
             .end( done );
 
     } );
-
     it( 'use refresh token to get a token', function (done) {
 
         var rfParam = {
             grant_type  : 'refresh_token',
-            refresh_token: refreshToken
+            refresh_token: refreshToken,
+            //client_id: 'client',
+            //client_secret: 'secret'
         };
 
         var out = [];
@@ -174,53 +167,6 @@ describe( 'OAuth2', function () {
             .expect( function (res) {
                 console.dir(res.body);
             } )
-            .end( done );
-
-    } );
-
-    var newUser = {
-        email: 'support@upwardstech.com',
-        name: 'Upwardstech',
-        last_name: 'Upwardstech'
-    };
-
-    it( 'first delete user if exists', function (done) {
-        request(api_endpoint)
-            .delete('/user')
-            .set('authorization', tokenType + ' ' + token)
-            .send({ email: newUser.email })
-            .expect( function (res) {
-                console.dir(res.body);
-            } )
-            .expect( 200 )
-            .end( done );
-
-    } );
-
-    it( 'create new user', function (done) {
-        request(api_endpoint)
-            .post('/user')
-            .set('authorization', tokenType + ' ' + token)
-            .send(newUser)
-            .expect( function (res) {
-                console.dir(res.body);
-            } )
-            .expect( 200 )
-            .end( done );
-
-    } );
-
-    newUser.first_name = 'CV.';
-
-    it( 'update new user', function (done) {
-        request(api_endpoint)
-            .put('/user')
-            .set('authorization', tokenType + ' ' + token)
-            .send(newUser)
-            .expect( function (res) {
-                console.dir(res.body);
-            } )
-            .expect( 200 )
             .end( done );
 
     } );
