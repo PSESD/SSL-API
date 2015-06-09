@@ -23,7 +23,11 @@ var filecsv = __dirname + '/populate.csv';
 var async = require('async');
 var _ = require('underscore');
 
-var dummyUser = ['abraham@upwardstech.com', 'ben@upwardstech.com', 'bintang@upwardstech.com', 'hendra@upwardstech.com', 'zaenal@upwardstech.com'];
+var Request = require('../lib/broker/Request');
+var parseString = require('xml2js').parseString;
+
+
+var dummyUser = ['demo@upwardstech.com', 'abraham@upwardstech.com', 'ben@upwardstech.com', 'bintang@upwardstech.com', 'hendra@upwardstech.com', 'zaenal@upwardstech.com'];
 
 var mongoose = mongoose || require('mongoose');
 var permissionValue = {operation: '*', allow: true};
@@ -111,10 +115,67 @@ var populateCbo = {
         return address;
     },
 
+    fakeStudentData: function(){
+
+    },
+
     run: function () {
         var self = this;
         var config = require('config');
 
+        /**
+         *
+         * @param organization
+         * @param programs
+         */
+        function addStudents(organization, programs){
+            if(organization.name !== 'Helping Hand CBO') return;
+            var orgId = organization._id;
+            var studentId = '1111111111';
+            var zoneId = 'federalway';
+            var brokerRequest = new Request();
+            brokerRequest.addHeader( 'districtStudentId', studentId );
+            var request = brokerRequest.create('/validation-sre/' + studentId + ';zoneId='+zoneId+';contextId=CBO', 'GET', function (error, response, body) {
+                if(response.statusCode == '200'){
+                    parseString(body, function (err, result) {
+                        var json = result.sre;
+                        delete json['$'];
+                        if(json.programs){
+                            _.each(json.programs, function(program){
+
+                            });
+                        }
+                        var addrs = self.city('Federal Way');
+                        var set = {
+                            organization: organization._id,
+                            first_name: json.firstName[0],
+                            last_name: json.lastOrSurname[0],
+                            middle_name: json.middleName[0],
+                            district_student_id: studentId,
+                            addresses: [ addrs ],
+                            school_district: zoneId,
+                            programs: [ {
+                                program: programs._id,
+                                active: true, // Whether the student is currently active in the program or not.
+                                //participation_start_date: ,
+                                //participation_end_date: { type: Date },
+                                //cohort: { type: String },
+                                //created: { type: Date, required: true, default: Date.now },
+                                //creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+                                //last_updated: { type: Date, required: true, default: Date.now },
+                                //last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+                            } ],
+                            last_updated_by: organization.userId
+                        };
+                        Student.findOneAndUpdate({organization: organization._id}, { $set: set }, {safe: true, upsert: true}, function (err, student) {
+                            if(err) return console.dir(err, set);
+                            console.log('Add student success');
+                        });
+                    });
+                }
+            });
+
+        }
         var done = function (organization) {
             dummyUser.forEach(function (userEmail) {
                 var baseName = userEmail.split('@')[0];
@@ -136,8 +197,9 @@ var populateCbo = {
                         }) : console.log(err);
 
                     if (!user) return console.log('User not found!');
+
                     var client = new Client();
-                    client.name = user.email;
+                    client.name = 'App ' + user.email;
                     client.id = user.email;
                     client.userId = user.userId;
                     client.redirectUri = '([\\w.-]+)?cbo\\.upward\\.st';
@@ -153,12 +215,13 @@ var populateCbo = {
                                     code: err.code,
                                     message: 'Client already exists'
                                 }) : console.log(err);
-                            console.log({code: 0, message: 'Client added to the locker!', data: newClient});
+                            // console.log({code: 0, message: 'Client added to the locker!', data: newClient});
                         });
 
                     });
                 });
-            })
+            });
+            self.fakeStudentData();
         };
         self.dropCollections(function () {
             var stream = fs.createReadStream(filecsv);
@@ -226,9 +289,10 @@ var populateCbo = {
                             }, function (err, org) {
                                 if (err) return console.log(err);
                                 if (org) {
+
                                     var userPermission = {
                                         organization: org._id,
-                                        permission: [{operation: '*', allow: true}]
+                                        permission: [ { model: 'Student', operation: '*', allow: 'all'} ]
                                     };
                                     if (err) return console.log(err);
                                     var newProgram = {
@@ -242,14 +306,11 @@ var populateCbo = {
                                     }, function (err, program) {
                                         if (err) return console.log(err);
                                         if (userPermission) {
-                                            done(org);
-                                            //User.findOneAndUpdate({email: user.email}, { $push: { permissions: [userPermission] }}, {safe: true, upsert: true}, function (err, usr) {
-                                            //    if (err) return console.log(err);
-                                            //    usr.permissions = [userPermission];
-                                            //    usr.save(function(err){ if(err) return console.log('User update filed', err);});
-                                            //});
-                                            //user.permissions = [userPermission];
-                                            //user.save(function(err){ if(err) return console.log('User update filed', err);});
+                                            addStudents(org, newProgram);
+                                            User.findOneAndUpdate({email: user.email}, { $push: { permissions: userPermission }}, {safe: true, upsert: true}, function (err, usr) {
+                                               if (err) return console.log(err);
+                                               done(org);
+                                            });
                                         }
                                     });
                                 } else {
@@ -309,4 +370,5 @@ var populateCbo = {
         });
     }
 };
+
 module.exports = populateCbo;

@@ -5,6 +5,7 @@ var app  = express();
 var session = require('express-session');
 var passport = require('passport');
 var rollbar = require('rollbar');
+var _ = require('underscore');
 var methodOverride = require('method-override');
 var port = process.env.PORT || 4000;
 var config = require('config');
@@ -37,6 +38,9 @@ function Api(){
  * @link https://rollbar.com
  */
 Api.prototype.sendMessage = function(type, message, cb){
+
+    if(!rollbarAccessToken) return;
+
     rollbar.reportMessage(message, type || 'debug', function(rollbarErr) {
         if(cb) cb(rollbarErr);
     });
@@ -44,9 +48,13 @@ Api.prototype.sendMessage = function(type, message, cb){
 /**
  * load controller
  */
-Api.prototype.controller = function(name){
+Api.prototype.controller = function(name, newInstance){
     var self = this;
-    return require(self.controllerDir + '/' + name);
+    var obj = require(self.controllerDir + '/' + name);
+    if(newInstance){
+        return new obj();
+    }
+    return obj;
 };
 /**
  * load controller
@@ -100,8 +108,8 @@ Api.prototype.migrate = function(){
         /**
          * Run Process to migrate data
          */
-        var populateCbo = require('./scripts/populate-cbo');
-        populateCbo.run();
+        //var populateCbo = require('./scripts/populate-cbo');
+        //populateCbo.run();
     }
 }
 /**
@@ -128,6 +136,34 @@ Api.prototype.configureExpress = function(db) {
     //  resave: self.config.get('session.resave')
     //}));
 
+    app.use(function(req, res, next){
+        res.okJson = function (message, data) {
+            /**
+             * If message is object will direct return
+             */
+            if(_.isObject(message)){
+                return res.json(message);
+            }
+            /**
+             * populate response
+             * @type {{success: boolean}}
+             */
+            var response = { success: true };
+            if(message){
+                response.message = message;
+            }
+            if(data && _.isArray(data)){
+                response.total = data.length;
+                response.data = data;
+            }
+            return res.json(response);
+        };
+        res.errJson = function (err) {
+            return res.json({success: false, error: err});
+        };
+        next();
+    });
+
     var cross = self.config.get('cross');
     if(cross.enable) {
         /**
@@ -136,6 +172,7 @@ Api.prototype.configureExpress = function(db) {
         app.use(function (req, res, next) {
             res.header("Access-Control-Allow-Origin", cross.allow_origin ||  "*");
             res.header("Access-Control-Allow-Headers", cross.allow_headers || "Origin, X-Requested-With, Content-Type, Accept");
+            res.header("Access-Control-Allow-Methods", cross.allow_method || "POST, GET, PUT, OPTIONS, DELETE");
             next();
         });
     }
@@ -166,7 +203,7 @@ Api.prototype.startServer = function() {
  */
 Api.prototype.stop = function(err) {
     console.log("ERROR \n" + err);
-    rollbar.reportMessage("ERROR \n"+err);
+    if(rollbarAccessToken) rollbar.reportMessage("ERROR \n"+err);
     process.exit(1);
 };
 /**
@@ -177,9 +214,11 @@ Api.errorStack = function(ex){
 
     var err = ex.stack.split("\n");
     console.log(err);
-    rollbar.reportMessage(err, 'error', function(err){
-        process.exit(1);
-    });
+    if(rollbarAccessToken) {
+        rollbar.reportMessage(err, 'error', function (err) {
+            process.exit(1);
+        });
+    }
 
 }
 

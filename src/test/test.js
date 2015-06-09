@@ -42,8 +42,8 @@ describe( 'OAuth2', function () {
 
     it( 'should create a new user', function (done) {
         request( url ).post( '/api/users' )
-            .send( 'email=test@test.com' )
-            .send( 'password=test' )
+            .send( 'email='+email )
+            .send( 'password=' + password )
             .send( 'last_name=test' )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
@@ -74,12 +74,11 @@ describe( 'OAuth2', function () {
     } );
     it( 'user should be able to list clients', function (done) {
         request( url ).get( '/api/clients' )
-            //.auth( 'test', 'test' )
             .auth( email, password )
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .expect( function (res) {
-                //console.dir( res.body );
+                console.dir( res.body );
             } )
             .end( done );
 
@@ -131,6 +130,7 @@ describe( 'OAuth2', function () {
             .type( 'urlencoded' )
             .expect( 200 )
             .expect( function (res) {
+
                 token = res.body.access_token;
                 refreshToken = res.body.refresh_token;
                 tokenType = res.body.token_type;
@@ -151,13 +151,12 @@ describe( 'OAuth2', function () {
             .end( done );
 
     } );
+
     it( 'use refresh token to get a token', function (done) {
 
         var rfParam = {
             grant_type  : 'refresh_token',
-            refresh_token: refreshToken,
-            //client_id: 'client',
-            //client_secret: 'secret'
+            refresh_token: refreshToken
         };
 
         var out = [];
@@ -175,6 +174,53 @@ describe( 'OAuth2', function () {
             .expect( function (res) {
                 console.dir(res.body);
             } )
+            .end( done );
+
+    } );
+
+    var newUser = {
+        email: 'support@upwardstech.com',
+        name: 'Upwardstech',
+        last_name: 'Upwardstech'
+    };
+
+    it( 'first delete user if exists', function (done) {
+        request(api_endpoint)
+            .delete('/user')
+            .set('authorization', tokenType + ' ' + token)
+            .send({ email: newUser.email })
+            .expect( function (res) {
+                console.dir(res.body);
+            } )
+            .expect( 200 )
+            .end( done );
+
+    } );
+
+    it( 'create new user', function (done) {
+        request(api_endpoint)
+            .post('/user')
+            .set('authorization', tokenType + ' ' + token)
+            .send(newUser)
+            .expect( function (res) {
+                console.dir(res.body);
+            } )
+            .expect( 200 )
+            .end( done );
+
+    } );
+
+    newUser.first_name = 'CV.';
+
+    it( 'update new user', function (done) {
+        request(api_endpoint)
+            .put('/user')
+            .set('authorization', tokenType + ' ' + token)
+            .send(newUser)
+            .expect( function (res) {
+                console.dir(res.body);
+            } )
+            .expect( 200 )
             .end( done );
 
     } );

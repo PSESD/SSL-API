@@ -22,6 +22,27 @@ OrganizationSchema.virtual('Id')
     return this.id;
 });
 
+/**
+ *
+ * @param user
+ * @param crit
+ * @param done
+ */
+OrganizationSchema.statics.findByUser = function(user, crit, done){
+    crit = crit || {};
+    if(user.permissions.length > 0){
+        var _id = [];
+        user.permissions.forEach(function(organization){
+            _id.push(organization.organization);
+        });
+        /**
+         * If has permission
+         * Filter here
+         */
+        crit._id = { $in: _id };
+    }
+    this.find(crit, done);
+};
 
 // Export the Mongoose model
 module.exports = mongoose.model('Organization', OrganizationSchema);
