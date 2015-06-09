@@ -38,6 +38,9 @@ function Api(){
  * @link https://rollbar.com
  */
 Api.prototype.sendMessage = function(type, message, cb){
+
+    if(!rollbarAccessToken) return;
+
     rollbar.reportMessage(message, type || 'debug', function(rollbarErr) {
         if(cb) cb(rollbarErr);
     });
@@ -169,6 +172,7 @@ Api.prototype.configureExpress = function(db) {
         app.use(function (req, res, next) {
             res.header("Access-Control-Allow-Origin", cross.allow_origin ||  "*");
             res.header("Access-Control-Allow-Headers", cross.allow_headers || "Origin, X-Requested-With, Content-Type, Accept");
+            res.header("Access-Control-Allow-Methods", cross.allow_method || "POST, GET, PUT, OPTIONS, DELETE");
             next();
         });
     }
@@ -199,7 +203,7 @@ Api.prototype.startServer = function() {
  */
 Api.prototype.stop = function(err) {
     console.log("ERROR \n" + err);
-    rollbar.reportMessage("ERROR \n"+err);
+    if(rollbarAccessToken) rollbar.reportMessage("ERROR \n"+err);
     process.exit(1);
 };
 /**
@@ -210,9 +214,11 @@ Api.errorStack = function(ex){
 
     var err = ex.stack.split("\n");
     console.log(err);
-    rollbar.reportMessage(err, 'error', function(err){
-        process.exit(1);
-    });
+    if(rollbarAccessToken) {
+        rollbar.reportMessage(err, 'error', function (err) {
+            process.exit(1);
+        });
+    }
 
 }
 

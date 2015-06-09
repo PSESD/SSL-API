@@ -30,6 +30,10 @@ StudentController.getStudentsBackpack = function (req, res) {
         if (!student) return res.errJson('The student not found in database');
 
         var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
+
+            if(error){
+                return res.errJson(error);
+            }
             if (!body) {
                 return res.errJson('Data not found');
             }

@@ -96,21 +96,24 @@ Request.prototype = {
         var timestamp = this.headers.timestamp = this.getTimezone();
         this.headers.Authorization = 'SIF_HMACSHA256 ' + this.generateHZAuthToken(timestamp);
         var options = {
-            url: url,
-            baseUrl: this.url,
+            url: this.url + url,
             method: method || 'GET',
             headers: this.getHeaders(),
-            qsParseOptions: { sep: ';'}
+            qsParseOptions: { sep: ';'},
+            strictSSL: false
         };
         console.log("SEND DATA TO HZ");
         console.dir(options);
         return request.get(options, callback || function (error, response, body) {
-
-            if(response && response.statusCode == 201){
-                console.log(body)
+            if(error){
+                console.log('error: ', error);
             } else {
-                console.log('error: '+ response.statusCode);
-                console.log(body)
+                if (response && response.statusCode == 201) {
+                    console.log(body)
+                } else {
+                    console.log('RESPONSE: ', response);
+                    console.log(body)
+                }
             }
         });
     },

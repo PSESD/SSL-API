@@ -37,8 +37,7 @@ describe( 'OAuth2', function () {
     } );
 
     before( function (done) {
-        done();
-        //clearDB( done );
+        clearDB( done );
     } );
 
     it( 'should create a new user', function (done) {
