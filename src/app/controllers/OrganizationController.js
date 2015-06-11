@@ -25,7 +25,7 @@ OrganizationController.get = function (req, res) {
         crit._id = { $in: user.organizationId };
     }
 
-    this.grant(req, res, function(){
+    OrganizationController.grant(req, res, function(){
         Organization.find(crit, function (err, orgs) {
             if (err) return res.errJson(err);
             res.okJson(null, orgs);
