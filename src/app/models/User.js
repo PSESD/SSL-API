@@ -2,6 +2,7 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
 var UserPermission = require('./schema/UserPermission');
+var Organization = require('./Organization');
 
 // Define our user schema
 var UserSchema = new mongoose.Schema({
@@ -38,8 +39,16 @@ UserSchema.virtual('userId')
  * @param password
  * @returns {*}
  */
-UserSchema.methods.encryptPassword = function(password){
-  return crypto.pbkdf2Sync(password, this.salt, 4096, 512, 'sha256').toString('hex');
+UserSchema.methods.encryptPassword = function (password) {
+    return crypto.pbkdf2Sync(''+password, this.salt, 4096, 512, 'sha256').toString('hex');
+};
+/**
+ *
+ * @param password
+ * @returns {String|string|*}
+ */
+UserSchema.methods.encryptAuthCode = function (code) {
+    return crypto.pbkdf2Sync(''+code, this.salt, 4096, 64, 'sha256').toString('hex');
 };
 /**
  *
@@ -51,6 +60,20 @@ UserSchema.virtual('password')
       this.hashedPassword = this.encryptPassword(password);
     })
     .get(function() { return this._plainPassword; });
+
+UserSchema.virtual('authCode')
+    .set(function (code) {
+        var password = crypto.randomBytes(12).toString('base64');
+        this._plainAuthCode = code;
+        this._plainPassword = password;
+        this.salt = crypto.randomBytes(128).toString('base64');
+        this.hashedPassword = this.encryptPassword(password);
+        this.hashedAuthCode = this.encryptAuthCode(code);
+    })
+    .get(function () {
+        return this._plainAuthCode;
+    });
+
 /**
  * User organization id
  */
@@ -61,7 +84,6 @@ UserSchema.virtual('organizationId').get(function(){
       this.permissions.forEach(function(organization){
           _id.push(organization.organization);
       });
-      crit._id = { $in: _id };
   }
   return _id;
 });
@@ -77,6 +99,89 @@ UserSchema.methods.verifyPassword = function(password, cb) {
     cb(null, this.encryptPassword(password) === this.hashedPassword);
   }
 };
+
+UserSchema.methods.verifyAuthCode = function (code, cb) {
+    if (!this.salt) {
+        cb(null, false);
+    } else {
+        cb(null, this.encryptAuthCode(code) === this.hashedAuthCode);
+    }
+};
+/**
+ *
+ * @param permissions
+ * @param done
+ */
+//UserSchema.methods.addPermission = function(permissions, done){
+//
+//
+//    if(typeof permissions !== 'array'){
+//        permissions = [ permissions ];
+//    }
+//    var deleteIns = [];
+//    permissions.forEach(function(permission, i){
+//        if(typeof permission.organization === undefined){
+//            delete permissions[i];
+//        } else {
+//            deleteIns.push(mongoose.Types.ObjectId(permission.organization));
+//        }
+//    });
+//    var model = this.model('User');
+//    var email = this.email;
+//    var crit  = { email: email,  permissions: { $elemMatch: { organization : { $in: deleteIns } } }  };
+//    model.remove(crit
+//    , function(err) {
+//        if (err) {
+//            return done(err);
+//        }
+//        model.findOne({email: email}, function (err, user) {
+//            if (err) {
+//                return done(err);
+//            }
+//            permissions.forEach(function (permission, i) {
+//                user.permissions.push(permission);
+//            });
+//            user.save(done);
+//        });
+//    });
+//};
+/**
+ *
+ * @param orgid
+ * @param done
+ * @returns {*}
+ */
+//UserSchema.methods.deletePermission = function(orgid, done){
+//
+//
+//
+//    if(!orgid instanceof Array){
+//        orgid = [ orgid ];
+//    }
+//
+//    orgid.forEach(function(org, i){
+//        orgid[i] = org;
+//    });
+//    console.log(orgid);
+//    var User = this.model('User');
+//
+//    User.findOne({ email: this.email }, function(err, user){
+//        if(err){
+//            return done(err);
+//        }
+//        if(!user) return done("User not found");
+//
+//        user.permissions.forEach(function(permission, i){
+//            if(orgid.indexOf(permission.organization.toString())){
+//                delete user.permissions[i];
+//            }
+//        });
+//
+//        console.log(user.permissions);
+//
+//        user.save(done);
+//    });
+//};
 
 UserSchema.set('toJSON', { hide: 'hashedPassword' });
 

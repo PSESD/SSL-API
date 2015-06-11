@@ -65,7 +65,12 @@ UserController.deleteByEmail = function (req, res) {
 
 };
 UserController.save = function (req, res) {
-    User.findOne({_id: req.user._id}, function (err, obj) {
+    var crit = {_id: req.user._id};
+    if(req.body.email){
+        crit = { email: req.body.email };
+    }
+    req.app.get('log')(crit);
+    User.findOne(crit, function (err, obj) {
         if (err) {
             return res.errJson(err);
         }
@@ -80,7 +85,7 @@ UserController.save = function (req, res) {
                 return res.errJson(err);
             }
 
-            res.okJson('Successfully updated!');
+            res.okJson('Successfully updated!', obj);
         });
     });
 };

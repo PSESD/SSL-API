@@ -19,13 +19,19 @@ var OrganizationController = new BaseController(Organization).crud();
 OrganizationController.get = function (req, res) {
     var user = req.user;
     var crit = req.query.url ? {url: req.query.url} : {};
-    var orgs = [];
-    var orgIds = _.pluck(req.user.permissions, 'organization');
-    crit._id = {$in: orgIds};
-    Organization.find(crit, function (err, orgs) {
-        if (err) return res.errJson(err);
-        res.okJson(null, orgs);
+    var orgs = user.organizationId;
+
+    if(orgs.length > 0){
+        crit._id = { $in: user.organizationId };
+    }
+
+    this.grant(req, res, function(){
+        Organization.find(crit, function (err, orgs) {
+            if (err) return res.errJson(err);
+            res.okJson(null, orgs);
+        });
     });
+
 };
 
 OrganizationController.profile = function (req, res) {
@@ -89,7 +95,40 @@ OrganizationController.allProgram = function (req, res) {
         });
     }
 };
+/**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.deleteUser = function (req, res) {
 
+    OrganizationController.grant(req, res, function(){
+        User.findOne({_id: mongoose.Types.ObjectId(req.params.userId)}, function(err, user){
+            if(err) return res.errJson(err);
+
+            if(!user) return res.errJson("User not found");
+
+            var allpermission = [];
+
+            for(var i = 0; i < user.permissions.length; i++){
+                if(req.params.organizationId != (user.permissions[i].organization+'')){
+                    allpermission.push(user.permissions[i]);
+                }
+            }
+
+            User.where({_id: user._id}).update({ $set: { permissions: allpermission }}, function(err, updated){
+                if(err) return res.errJson(err);
+
+                res.okJson('Delete success');
+            });
+        });
+    });
+};
+/**
+ *
+ * @param user
+ * @returns {Array}
+ */
 OrganizationController.getOrgIdByUser = function(user){
     var _id = [];
     if(user.permissions.length > 0){
@@ -121,5 +160,25 @@ OrganizationController.getProgram = function (req, res) {
         });
     }
 };
+/**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.postProgram =  function(req, res){
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.putProgram =  function(req, res){};
+/**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.deleteProgram =  function(req, res){};
 
 module.exports = OrganizationController;

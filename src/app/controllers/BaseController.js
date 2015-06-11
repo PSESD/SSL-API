@@ -11,7 +11,42 @@ function BaseController(model){
  */
 BaseController.prototype.crud = function() {
     var self = this;
+
     return {
+        /**
+         *
+         * @param req
+         * @returns {*}
+         */
+        _checkPermission: function(req){
+
+            if(!req.user) return false;
+
+            if(typeof req.params.organizationId === undefined) return false;
+
+            if(!req.params.organizationId) return false;
+
+            var orgid = req.user.organizationId;
+
+            if(orgid.length === 0){
+                return true;
+            }
+
+            return orgid.indexOf(req.params.organizationId);
+        },
+        /**
+         *
+         * @param req
+         * @param res
+         * @param callback
+         */
+        grant: function(req, res, callback){
+            if(this._checkPermission(req)){
+                callback();
+            } else {
+                res.errJson("Permission denied!");
+            }
+        },
         /**
          *
          * @param req
@@ -26,7 +61,7 @@ BaseController.prototype.crud = function() {
                     return res.errJson(err);
                 }
 
-                res.okJson('Successfully Added');
+                res.okJson('Successfully Added', obj);
             });
         },
         /**
@@ -35,6 +70,7 @@ BaseController.prototype.crud = function() {
          * @param res
          */
         save: function (req, res) {
+
             self.model.findOne({_id: req.params.id}, function (err, obj) {
                 if (err) {
                     return res.errJson(err);
@@ -50,7 +86,7 @@ BaseController.prototype.crud = function() {
                         return res.errJson(err);
                     }
 
-                    res.okJson('Successfully updated!');
+                    res.okJson('Successfully updated!', obj);
                 });
             });
         },

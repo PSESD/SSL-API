@@ -27,8 +27,9 @@ function Api(){
     //console.log('NODE_ENV: ' + self.config.util.getEnv('NODE_ENV'));
     self.mongo = mongoose;
 
+    self.env = app.get('env');
     self.connectDb();
-};
+}
 /**
  *
  * @param type
@@ -104,7 +105,7 @@ Api.prototype.connectDb = function() {
     
 };
 Api.prototype.migrate = function(){
-    if(app.get('env') !== 'production'){
+    if(app.get('env') === 'test'){
         /**
          * Run Process to migrate data
          */
@@ -119,6 +120,8 @@ Api.prototype.migrate = function(){
 Api.prototype.configureExpress = function(db) {
     var self = this;
     app.set('api', self);
+
+    app.set('log', require('./lib/utils').log);
     app.use(bodyParser.urlencoded({ extended: true }));
 
     app.use(bodyParser.json());
@@ -152,9 +155,13 @@ Api.prototype.configureExpress = function(db) {
             if(message){
                 response.message = message;
             }
-            if(data && _.isArray(data)){
-                response.total = data.length;
-                response.data = data;
+            if(data){
+                if(_.isArray(data)) {
+                    response.total = data.length;
+                    response.data = data;
+                } else {
+                    response.info = data;
+                }
             }
             return res.json(response);
         };

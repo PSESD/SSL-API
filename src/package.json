@@ -29,6 +29,7 @@
     "passport": "^0.2.1",
     "passport-http": "^0.2.2",
     "passport-http-bearer": "^1.0.1",
+    "phpjs": "^1.3.2",
     "psl": "^1.1.5",
     "rollbar": "^0.5.3",
     "should": "^6.0.1",
