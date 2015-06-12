@@ -27,7 +27,7 @@ BaseController.prototype.crud = function() {
             if(!req.params.organizationId) return false;
 
             var orgid = req.user.organizationId;
-
+            console.log(orgid);
             if(orgid.length === 0){
                 return true;
             }

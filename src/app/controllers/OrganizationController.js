@@ -24,11 +24,23 @@ OrganizationController.get = function (req, res) {
     if(orgs.length > 0){
         crit._id = { $in: user.organizationId };
     }
+    Organization.find(crit, function (err, orgs) {
+        if (err) return res.errJson(err);
+        res.okJson(null, orgs);
+    });
+
+};
+
+OrganizationController.find = function (req, res) {
+    var user = req.user;
+    var crit = req.query.url ? {url: req.query.url} : {};
+    crit._id = req.params.organizationId;
+
 
     OrganizationController.grant(req, res, function(){
-        Organization.find(crit, function (err, orgs) {
+        Organization.findOne(crit, function (err, org) {
             if (err) return res.errJson(err);
-            res.okJson(null, orgs);
+            res.okJson(org);
         });
     });
 

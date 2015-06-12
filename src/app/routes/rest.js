@@ -38,7 +38,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .put(auth.isBearerAuthenticated, organizationCtr.save)
         .get(auth.isBearerAuthenticated, organizationCtr.get);
 
-    router.route('/:organizationId').get(auth.isBearerAuthenticated, organizationCtr.get);
+    router.route('/:organizationId').get(auth.isBearerAuthenticated, organizationCtr.find);
     router.route('/:organizationId/profile').get(auth.isBearerAuthenticated, organizationCtr.profile);
     router.route('/:organizationId/users').get(auth.isBearerAuthenticated, organizationCtr.allUsers);
     router.route('/:organizationId/users/:userId')
