@@ -259,7 +259,11 @@ OrganizationController.putProgram = function (req, res) {
 
             for (var prop in req.body) {
 
-                obj[prop] = req.body[prop];
+                if(prop in obj) {
+
+                    obj[prop] = req.body[prop];
+
+                }
 
             }
 

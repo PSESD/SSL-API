@@ -80,8 +80,12 @@ BaseController.prototype.crud = function(idName) {
                     return res.errJson(err);
                 }
 
+                if(!obj) return res.errJson('Data not found');
+
                 for (var prop in req.body) {
-                    obj[prop] = req.body[prop];
+                    if(prop in obj) {
+                        obj[prop] = req.body[prop];
+                    }
                 }
 
                 // save the movie
