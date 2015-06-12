@@ -70,8 +70,6 @@ Rest.prototype.handleRoutes= function(router, Api) {
     router.route('/:organizationId/students/:studentId/programs')
         .get(auth.isBearerAuthenticated, studentProgramCtr.getByStudentId)
         .post(auth.isBearerAuthenticated, studentProgramCtr.createByStudentId)
-        .put(auth.isBearerAuthenticated, studentProgramCtr.saveByStudentId)
-        .delete(auth.isBearerAuthenticated, studentProgramCtr.deleteByStudentId)
     ;
 
     /**

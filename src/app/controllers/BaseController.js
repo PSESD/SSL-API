@@ -1,3 +1,5 @@
+var mongoose = require('mongoose');
+var ObjectId = mongoose.Types.ObjectId;
 /**
  * Created by zaenal on 05/06/15.
  */
@@ -9,8 +11,10 @@ function BaseController(model){
  *
  * @returns {{create: Function, save: Function, get: Function, all: Function, delete: Function}}
  */
-BaseController.prototype.crud = function() {
+BaseController.prototype.crud = function(idName) {
     var self = this;
+
+    var id = idName || 'id';
 
     return {
         /**
@@ -27,7 +31,7 @@ BaseController.prototype.crud = function() {
             if(!req.params.organizationId) return false;
 
             var orgid = req.user.organizationId;
-            console.log(orgid);
+
             if(orgid.length === 0){
                 return true;
             }
@@ -71,7 +75,7 @@ BaseController.prototype.crud = function() {
          */
         save: function (req, res) {
 
-            self.model.findOne({_id: req.params.id}, function (err, obj) {
+            self.model.findOne({ _id: ObjectId(req.params[id]) }, function (err, obj) {
                 if (err) {
                     return res.errJson(err);
                 }
@@ -96,7 +100,7 @@ BaseController.prototype.crud = function() {
          * @param res
          */
         get: function (req, res) {
-            self.model.findOne({_id: req.params.id}, function (err, obj) {
+            self.model.findOne({ _id: ObjectId(req.params[id]) }, function (err, obj) {
                 if (err) {
                     return res.errJson(err);
                 }
@@ -123,7 +127,7 @@ BaseController.prototype.crud = function() {
          */
         delete: function (req, res) {
             self.model.remove({
-                _id: req.params.id
+                _id: ObjectId(req.params[id])
             }, function (err, obj) {
                 if (err) {
                     return res.errJson(err);
