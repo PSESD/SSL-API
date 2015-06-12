@@ -44,15 +44,16 @@ OrganizationController.profile = function (req, res) {
  */
 OrganizationController.allUsers = function (req, res) {
     if(!req.params.organizationId) return res.errJson('Data not found!');
-
-    User.find({
-        $or: [
-            { permissions: { $elemMatch: { organization : mongoose.Types.ObjectId(req.params.organizationId) } } },
-            { permissions: [] }
-        ]
-    }, function(err, users){
-        if(err) return res.errJson(err);
-        res.okJson(null, users);
+    OrganizationController.grant(req, res, function() {
+        User.find({
+            $or: [
+                {permissions: {$elemMatch: {organization: mongoose.Types.ObjectId(req.params.organizationId)}}},
+                {permissions: []}
+            ]
+        }, function (err, users) {
+            if (err) return res.errJson(err);
+            res.okJson(null, users);
+        });
     });
 };
 /**
@@ -62,15 +63,17 @@ OrganizationController.allUsers = function (req, res) {
  */
 OrganizationController.getUser = function (req, res) {
     if(!req.params.organizationId || !req.params.userId) return res.errJson('Data not found!');
-
-    User.findOne({ _id: mongoose.Types.ObjectId(req.params.userId),
-        $or: [
-            { permissions: { $elemMatch: { organization : mongoose.Types.ObjectId(req.params.organizationId) } } },
-            { permissions: [] }
-        ]
-   }, function(err, user){
-        if(err) return res.errJson(err);
-        res.okJson(user);
+    OrganizationController.grant(req, res, function() {
+        User.findOne({
+            _id: mongoose.Types.ObjectId(req.params.userId),
+            $or: [
+                {permissions: {$elemMatch: {organization: mongoose.Types.ObjectId(req.params.organizationId)}}},
+                {permissions: []}
+            ]
+        }, function (err, user) {
+            if (err) return res.errJson(err);
+            res.okJson(user);
+        });
     });
 };
 /**
@@ -166,19 +169,29 @@ OrganizationController.getProgram = function (req, res) {
  * @param res
  */
 OrganizationController.postProgram =  function(req, res){
+    OrganizationController.grant(req, res, function() {
 
+    });
 };
 /**
  *
  * @param req
  * @param res
  */
-OrganizationController.putProgram =  function(req, res){};
+OrganizationController.putProgram =  function(req, res){
+    OrganizationController.grant(req, res, function() {
+
+    });
+};
 /**
  *
  * @param req
  * @param res
  */
-OrganizationController.deleteProgram =  function(req, res){};
+OrganizationController.deleteProgram =  function(req, res){
+    OrganizationController.grant(req, res, function() {
+
+    });
+};
 
 module.exports = OrganizationController;
