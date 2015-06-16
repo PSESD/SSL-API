@@ -52,9 +52,57 @@ OrganizationController.find = function (req, res) {
     OrganizationController.grant(req, res, cb);
 
 };
-
+/**
+ * General information and setup of an organization.
+ * Get organization item
+ * @param req
+ * @param res
+ */
 OrganizationController.profile = function (req, res) {
+    var crit = req.query.url ? {url: req.query.url} : {};
 
+    crit._id = req.params.organizationId;
+
+    var cb = function () {
+        Organization.findOne(crit, function (err, org) {
+            if (err) return res.errJson(err);
+            res.okJson(org);
+        });
+    };
+
+    OrganizationController.grant(req, res, cb);
+};
+/**
+ * General information and setup of an organization.
+ * @param req
+ * @param res
+ */
+OrganizationController.updateProfile = function(req, res){
+    var cb = function () {
+        Organization.findOne({_id: ObjectId(req.params.organizationId)}, function (err, obj) {
+
+            if (err)  return res.errJson(err);
+
+            if (!obj) return res.errJson('Data not found');
+
+            for (var prop in req.body) {
+                if (prop in obj) {
+                    obj[prop] = req.body[prop];
+                }
+            }
+
+            // save the movie
+            obj.save(function (err) {
+                if (err) {
+                    return res.errJson(err);
+                }
+
+                res.okJson('Successfully updated!', obj);
+            });
+        });
+    };
+
+    OrganizationController.grant(req, res, cb);
 };
 /**
  * Find all users by org id
@@ -112,29 +160,58 @@ OrganizationController.getUser = function (req, res) {
  * @param req
  * @param res
  */
-OrganizationController.allProgram = function (req, res) {
-
+OrganizationController.putUser = function (req, res) {
     var cb = function () {
 
-        var crit = {_id: req.params.organizationId};
+        User.findOne({_id: ObjectId(req.params.userId)}, function (err, obj) {
 
-        Organization.findOne(crit, function (err, org) {
+            if (err)  return res.errJson(err);
 
-            if (err) return res.errJson(err);
+            if (!obj) return res.errJson('Data not found');
 
-            Program.find({name: org.name}, function (err, obj) {
+            for (var prop in req.body) {
+
+                if(prop in obj) {
+
+                    obj[prop] = req.body[prop];
+
+                }
+
+            }
+
+            // save the movie
+            obj.save(function (err) {
 
                 if (err) {
 
                     return res.errJson(err);
-
                 }
 
-                res.okJson(obj);
+                res.okJson('Successfully updated!', obj);
 
             });
 
         });
+
+    };
+
+    OrganizationController.grant(req, res, cb);
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.allProgram = function (req, res) {
+
+    var cb = function () {
+
+            Program.find({organization: ObjectId(req.params.organizationId)}, function (err, objs) {
+
+                if (err)  return res.errJson(err);
+
+                res.okJson(null, objs);
+            });
 
     };
 
@@ -188,27 +265,16 @@ OrganizationController.deleteUser = function (req, res) {
 OrganizationController.getProgram = function (req, res) {
 
     var cb = function () {
-        if (req.params.programId) {
 
-            var crit = {_id: req.params.organizationId};
+        Program.findOne({_id: ObjectId(req.params.programId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-            Organization.findOne(crit, function (err, org) {
+            if (err)  return res.errJson(err);
 
-                if (err) return res.errJson(err);
+            if (!obj) return res.errJson('Data not found');
 
-                Program.find({name: org.name, _id: req.params.programId}, function (err, obj) {
+            res.okJson(obj);
 
-                    if (err) {
-                        return res.errJson(err);
-                    }
-
-                    res.okJson(obj);
-
-                });
-
-            });
-
-        }
+        });
 
     };
 
@@ -224,6 +290,8 @@ OrganizationController.postProgram = function (req, res) {
     var cb = function () {
 
         var obj = new Program(req.body);
+
+        obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
 
         obj.save(function (err) {
 
@@ -247,15 +315,14 @@ OrganizationController.postProgram = function (req, res) {
  * @param res
  */
 OrganizationController.putProgram = function (req, res) {
+
     var cb = function () {
 
-        Program.findOne({_id: ObjectId(req.params.programId)}, function (err, obj) {
+        Program.findOne({_id: ObjectId(req.params.programId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-            if (err) {
+            if (err)  return res.errJson(err);
 
-                return res.errJson(err);
-
-            }
+            if (!obj) return res.errJson('Data not found');
 
             for (var prop in req.body) {
 
@@ -295,9 +362,8 @@ OrganizationController.deleteProgram = function (req, res) {
     var cb = function () {
 
         Program.remove({
-
-            _id: ObjectId(req.params.programId)
-
+            _id: ObjectId(req.params.programId),
+            organization: ObjectId(req.params.organizationId)
         }, function (err, obj) {
 
             if (err) {

@@ -64,6 +64,11 @@ UserController.deleteByEmail = function (req, res) {
     });
 
 };
+/**
+ *
+ * @param req
+ * @param res
+ */
 UserController.save = function (req, res) {
     var crit = {_id: req.user._id};
     if(req.body.email){
@@ -89,4 +94,8 @@ UserController.save = function (req, res) {
         });
     });
 };
+/**
+ *
+ * @type {{_checkPermission, grant, create, save, get, all, delete}|{create: Function, save: Function, get: Function, all: Function, delete: Function}}
+ */
 module.exports = UserController;

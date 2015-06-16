@@ -31,6 +31,85 @@ describe( 'All-Test', function () {
     var tokenType;
     var secretCode;
 
+
+
+    var profileData = {};
+
+    var organizationId = null;
+
+    var orgData = {
+        "name" : "Helping Hand CBO",
+        "addresses" : [
+            {
+                "country" : "US",
+                "zip" : "98002",
+                "state" : "WA",
+                "city" : "Federal Way",
+                "address_line" : "30611 16th Ave S2",
+                "venue" : "",
+                "address_type" : "Mailing",
+                "location" : {
+                    "accuracy" : "Approximate",
+                    "longitude" : -0.4185710000000000,
+                    "latitude" : 0.0950210000000000
+                }
+            },
+            {
+                "country" : "US",
+                "zip" : "98005",
+                "state" : "WA",
+                "city" : "Renton",
+                "address_line" : "30611 16th Ave S5",
+                "venue" : "",
+                "address_type" : "Mailing",
+                "location" : {
+                    "accuracy" : "Approximate",
+                    "longitude" : -0.8049260000000000,
+                    "latitude" : 0.4436020000000000
+                }
+            },
+            {
+                "country" : "US",
+                "zip" : "98006",
+                "state" : "WA",
+                "city" : "Seattle",
+                "address_line" : "30611 16th Ave S6",
+                "venue" : "",
+                "address_type" : "Mailing",
+                "location" : {
+                    "accuracy" : "Approximate",
+                    "longitude" : -0.6203090000000000,
+                    "latitude" : 0.3607280000000000
+                }
+            }
+        ],
+        "description" : null,
+        "website" : "helpinghand.org",
+        "url" : "helpinghand.cbo.upward.st"
+    };
+
+    var studentData = {
+        "first_name" : "Abraham",
+        "last_name" : "Tester",
+        "district_student_id" : "1111111111",
+        "programs" : [],
+        "addresses" : []
+    };
+
+    var studentId, studentProgramId, studentProgramData = {
+        programId: null,
+        active: true, // Whether the student is currently active in the program or not.
+        participation_start_date: new Date(Date.parse('May 8, 2015')).toString(),
+        participation_end_date: new Date(Date.parse('Jul 8, 2015')).toString(),
+        cohort: 'Test'
+    };
+
+    var newUser = {
+        email: 'support@upwardstech.com',
+        password: 'demo',
+        last_name: 'Upwardstech'
+    };
+
     var email = 'test@test.com', password = 'test';
 
     before( function (done) {
@@ -156,11 +235,7 @@ describe( 'All-Test', function () {
     });
 
     describe('API-User', function() {
-        var newUser = {
-            email: 'support@upwardstech.com',
-            password: 'demo',
-            last_name: 'Upwardstech'
-        };
+
 
         it('GET /user', function (done) {
             request(api_endpoint)
@@ -223,65 +298,16 @@ describe( 'All-Test', function () {
 
     describe('API-Organizations', function() {
 
-        var data = {
-            "name" : "Helping Hand CBO",
-            "addresses" : [
-                {
-                    "country" : "US",
-                    "zip" : "98002",
-                    "state" : "WA",
-                    "city" : "Federal Way",
-                    "address_line" : "30611 16th Ave S2",
-                    "venue" : "",
-                    "address_type" : "Mailing",
-                    "location" : {
-                        "accuracy" : "Approximate",
-                        "longitude" : -0.4185710000000000,
-                        "latitude" : 0.0950210000000000
-                    }
-                },
-                {
-                    "country" : "US",
-                    "zip" : "98005",
-                    "state" : "WA",
-                    "city" : "Renton",
-                    "address_line" : "30611 16th Ave S5",
-                    "venue" : "",
-                    "address_type" : "Mailing",
-                    "location" : {
-                        "accuracy" : "Approximate",
-                        "longitude" : -0.8049260000000000,
-                        "latitude" : 0.4436020000000000
-                    }
-                },
-                {
-                    "country" : "US",
-                    "zip" : "98006",
-                    "state" : "WA",
-                    "city" : "Seattle",
-                    "address_line" : "30611 16th Ave S6",
-                    "venue" : "",
-                    "address_type" : "Mailing",
-                    "location" : {
-                        "accuracy" : "Approximate",
-                        "longitude" : -0.6203090000000000,
-                        "latitude" : 0.3607280000000000
-                    }
-                }
-            ],
-            "description" : null,
-            "website" : "helpinghand.org",
-            "url" : "helpinghand.cbo.upward.st"
-        };
 
         it('POST /organizations', function (done) {
             request(api_endpoint)
                 .post('/organizations')
                 .set('authorization', tokenType + ' ' + token)
-                .send(data)
+                .send(orgData)
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
-                    assert.equal(data.name, res.body.info.name);
+                    assert.equal(orgData.name, res.body.info.name);
+                    organizationId = res.body.info._id;
                 })
                 .expect(200)
                 .end(done);
@@ -296,13 +322,195 @@ describe( 'All-Test', function () {
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
                     assert.equal(1, res.body.total);
-                    assert.equal(data.name, res.body.data[0].name);
+                    assert.equal(orgData.name, res.body.data[0].name);
+                })
+                .expect(200)
+                .end(done);
+        });
+
+        it('GET /:organizationId', function (done) {
+            request(api_endpoint)
+                .get('/'+organizationId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    assert.equal(orgData.name, res.body.name);
+                    assert.equal(organizationId, res.body._id);
+                })
+                .expect(200)
+                .end(done);
+        });
+
+        it('GET /:organizationId/profile', function (done) {
+            request(api_endpoint)
+                .get('/'+organizationId+'/profile')
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    profileData = res.body;
+                    assert.equal(orgData.name, profileData.name);
+                })
+                .expect(200)
+                .end(done);
+        });
+
+
+        it('PUT /:organizationId/profile', function (done) {
+            request(api_endpoint)
+                .put('/'+organizationId+'/profile')
+                .set('authorization', tokenType + ' ' + token)
+                .send({
+                    description: 'There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...'
+                })
+                .expect(function (res) {
+                    profileData = res.body.info;
+                    assert.equal(true, res.body.success);
+                    assert.equal(orgData.name, profileData.name);
+                    assert.equal('There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...', profileData.description);
+                })
+                .expect(200)
+                .end(done);
+        });
+
+        var programsName = 'Information Technologies';
+        var programId = '';
+        it('POST /:organizationId/programs', function (done) {
+            request(api_endpoint)
+                .post('/'+organizationId+'/programs')
+                .set('authorization', tokenType + ' ' + token)
+                .send({
+                    name: programsName,
+                    organizationId: organizationId
+                })
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(programsName, res.body.info.name);
+                    assert.equal(organizationId, res.body.info.organization);
+                    programId = res.body.info._id;
                 })
                 .expect(200)
                 .end(done);
 
         });
+
+        it('PUT /:organizationId/programs/:programId', function (done) {
+            request(api_endpoint)
+                .put('/'+organizationId+'/programs/'+programId)
+                .set('authorization', tokenType + ' ' + token)
+                .send({
+                    name: 'Information Technologies US'
+                })
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal('Information Technologies US', res.body.info.name);
+                    assert.equal(organizationId, res.body.info.organization);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('POST /:organizationId/students', function (done) {
+            request(api_endpoint)
+                .post('/'+organizationId+'/students')
+                .set('authorization', tokenType + ' ' + token)
+                .send(studentData)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(studentData.district_student_id, res.body.info.district_student_id);
+                    assert.equal(organizationId, res.body.info.organization);
+                    studentId = res.body.info._id;
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('PUT /:organizationId/students/:studentId', function (done) {
+            request(api_endpoint)
+                .put('/'+organizationId+'/students/'+studentId)
+                .set('authorization', tokenType + ' ' + token)
+                .send({
+                    last_name: 'Godong'
+                })
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal('Godong', res.body.info.last_name);
+                    assert.equal(organizationId, res.body.info.organization);
+                    //console.log(api_endpoint + '/'+organizationId+'/students/'+studentId+'/programs '+ tokenType + ' ' + token );
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+
+        //it('GET /:organizationId/students/:studentId/backpack', function (done) {
+        //    request(api_endpoint)
+        //        .get('/'+organizationId+'/students/'+studentId+'/backpack')
+        //        .set('authorization', tokenType + ' ' + token)
+        //        .expect(function (res) {
+        //            console.log(res.body);
+        //        })
+        //        .expect(200)
+        //        .end(done);
+        //});
+
+        it('POST /:organizationId/students/:studentId/programs', function (done) {
+            request(api_endpoint)
+                .post('/'+organizationId+'/students/'+studentId+'/programs')
+                .set('authorization', tokenType + ' ' + token)
+                .send(studentProgramData)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(studentData.district_student_id, res.body.info.district_student_id);
+                    assert.equal(organizationId, res.body.info.organization);
+                    studentProgramId = res.body.info.programs[0]._id;
+                    assert.ok(studentProgramId);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('GET /:organizationId/students/:studentId/programs', function (done) {
+            request(api_endpoint)
+                .get('/'+organizationId+'/students/'+studentId+'/programs')
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    assert.equal(studentProgramData.cohort, res.body[0].cohort);
+                    assert.equal(studentProgramId, res.body[0]._id);
+                })
+                .expect(200)
+                .end(done);
+        });
+
+        /**
+         * Delete All Data Test Here
+         */
+        //it('DELETE /:organizationId/students/:studentId', function (done) {
+        //    request(api_endpoint)
+        //        .delete('/'+organizationId+'/students/'+studentId)
+        //        .set('authorization', tokenType + ' ' + token)
+        //        .expect(function (res) {
+        //            assert.equal(true, res.body.success);
+        //        })
+        //        .expect(200)
+        //        .end(done);
+        //
+        //});
+        //it('DELETE /:organizationId/programs/:programId', function (done) {
+        //    request(api_endpoint)
+        //        .delete('/'+organizationId+'/programs/'+programId)
+        //        .set('authorization', tokenType + ' ' + token)
+        //        .expect(function (res) {
+        //            assert.equal(true, res.body.success);
+        //        })
+        //        .expect(200)
+        //        .end(done);
+        //
+        //});
+
     });
+
 
     after( function (done) {
         done();

@@ -16,7 +16,6 @@ Rest.prototype.handleRoutes= function(router, Api) {
 
 	var studentCtr = Api.controller('StudentController');
 	var indexCtr = Api.controller('Index');
-	var addressController = Api.controller('AddressController');
     var studentProgramCtr = Api.controller('StudentProgramController');
 	var auth = Api.controller('Auth');
 
@@ -38,9 +37,16 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .get(auth.isBearerAuthenticated, organizationCtr.get);
 
     router.route('/:organizationId').get(auth.isBearerAuthenticated, organizationCtr.find);
-    router.route('/:organizationId/profile').get(auth.isBearerAuthenticated, organizationCtr.profile);
-    router.route('/:organizationId/users').get(auth.isBearerAuthenticated, organizationCtr.allUsers);
+
+    router.route('/:organizationId/profile')
+        .get(auth.isBearerAuthenticated, organizationCtr.profile)
+        .put(auth.isBearerAuthenticated, organizationCtr.updateProfile);
+
+    router.route('/:organizationId/users')
+        .get(auth.isBearerAuthenticated, organizationCtr.allUsers);
+
     router.route('/:organizationId/users/:userId')
+        .put(auth.isBearerAuthenticated, organizationCtr.putUser)
         .get(auth.isBearerAuthenticated, organizationCtr.getUser)
         .delete(auth.isBearerAuthenticated, organizationCtr.deleteUser)
     ;
@@ -61,6 +67,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
 
     router.route('/:organizationId/students/:studentId')
         .get(auth.isBearerAuthenticated, studentCtr.getStudentById)
+        .put(auth.isBearerAuthenticated, studentCtr.putStudentById)
         .delete(auth.isBearerAuthenticated, studentCtr.deleteStudentById);
 
     router.route('/:organizationId/students/:studentId/backpack').get(auth.isBearerAuthenticated, studentCtr.getStudentsBackpack);

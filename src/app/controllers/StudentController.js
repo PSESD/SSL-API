@@ -8,6 +8,7 @@ var _ = require('underscore');
 var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
 var brokerRequest = new Request();
+var ObjectId = mongoose.Types.ObjectId;
 
 
 var StudentController = new BaseController(Student).crud();
@@ -18,39 +19,46 @@ var StudentController = new BaseController(Student).crud();
  * @returns {*}
  */
 StudentController.getStudentsBackpack = function (req, res) {
-    var orgId = req.params.organizationId;
-    var studentId = req.params.studentId;
 
-    Student.findOne({_id: '' + studentId, organization: '' + orgId}, function (err, student) {
+    var cb = function() {
+        var orgId = ObjectId(req.params.organizationId);
 
-        if (err) return res.errJson(err);
-        /**
-         * If student is empty from database
-         */
-        if (!student) return res.errJson('The student not found in database');
+        var studentId = ObjectId(req.params.studentId);
 
-        var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
+        Student.findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-            if(error){
-                return res.errJson(error);
-            }
-            if (!body) {
-                return res.errJson('Data not found');
-            }
-            if (response && response.statusCode == '200') {
-                parseString(body, function (err, result) {
-                    var json = result.sre;
-                    delete json['$'];
-                    res.okJson(json);
-                });
-            } else {
-                parseString(body, function (err, result) {
-                    var json = result.Error;
-                    res.errJson(json);
-                });
-            }
+            if (err) return res.errJson(err);
+            /**
+             * If student is empty from database
+             */
+            if (!student) return res.errJson('The student not found in database');
+
+            var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
+
+
+                if (error) {
+                    return res.errJson(error);
+                }
+                if (!body) {
+                    return res.errJson('Data not found');
+                }
+                if (response && response.statusCode == '200') {
+                    parseString(body, function (err, result) {
+                        var json = result.sre;
+                        delete json['$'];
+                        res.okJson(json);
+                    });
+                } else {
+                    parseString(body, function (err, result) {
+                        var json = result ? result.Error : 'Error not response';
+                        res.errJson(json);
+                    });
+                }
+            });
         });
-    });
+    };
+
+    StudentController.grant(req, res, cb);
 };
 /**
  * Get all student in organization
@@ -58,11 +66,19 @@ StudentController.getStudentsBackpack = function (req, res) {
  * @param res
  */
 StudentController.getStudents = function (req, res) {
-    var orgId = req.params.organizationId;
-    Student.find({organization: orgId}, function (err, students) {
-        if (err) return res.errJson(err);
-        res.okJson(null, students);
-    });
+
+    var cb = function() {
+        var orgId = ObjectId(req.params.organizationId);
+
+        Student.find({organization: orgId}, function (err, students) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson(null, students);
+        });
+    };
+
+    StudentController.grant(req, res, cb);
 };
 /**
  *
@@ -71,15 +87,21 @@ StudentController.getStudents = function (req, res) {
  */
 StudentController.createByOrgId = function (req, res) {
 
-    var obj = new Student(req.body);
-    obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
-    obj.save(function (err) {
-        if (err) {
-            return res.errJson(err);
-        }
+    var cb = function() {
+        var obj = new Student(req.body);
 
-        res.okJson('Successfully Added');
-    });
+        obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
+
+        obj.save(function (err) {
+            if (err) {
+                return res.errJson(err);
+            }
+
+            res.okJson('Successfully Added', obj);
+        });
+    };
+
+    StudentController.grant(req, res, cb);
 };
 /**
  * Get student organization by id
@@ -87,18 +109,89 @@ StudentController.createByOrgId = function (req, res) {
  * @param res
  */
 StudentController.getStudentById = function (req, res) {
-    var orgId = req.params.organizationId;
-    Student.findOne({organization: orgId, _id: req.params.studentId}, function (err, student) {
-        if (err) return res.errJson(err);
-        res.okJson(student);
-    });
-};
-StudentController.deleteStudentById = function (req, res) {
-    var orgId = req.params.organizationId;
-    Student.remove({organization: orgId, _id: req.params.studentId}, function (err, student) {
-        if (err) return res.errJson(err);
-        res.okJson('Successfully deleted');
-    });
-};
 
+    var cb = function() {
+        var orgId = req.params.organizationId;
+
+        Student.findOne({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
+
+            if (err) return res.errJson(err);
+            /**
+             * If student is empty from database
+             */
+            if (!student) return res.errJson('The student not found in database');
+
+            res.okJson(student);
+        });
+    };
+
+    StudentController.grant(req, res, cb);
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.deleteStudentById = function (req, res) {
+
+    var cb = function() {
+        var orgId = req.params.organizationId;
+
+        Student.remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson('Successfully deleted');
+        });
+    };
+
+    StudentController.grant(req, res, cb);
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.putStudentById = function(req, res){
+
+    var cb = function () {
+
+        Student.findOne({_id: ObjectId(req.params.studentId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
+
+            if (err)  return res.errJson(err);
+
+            if (!obj) return res.errJson('Data not found');
+
+            for (var prop in req.body) {
+
+                if(prop in obj) {
+
+                    obj[prop] = req.body[prop];
+
+                }
+
+            }
+
+            // save the movie
+            obj.save(function (err) {
+
+                if (err) {
+
+                    return res.errJson(err);
+                }
+
+                res.okJson('Successfully updated!', obj);
+
+            });
+
+        });
+
+    };
+
+    StudentController.grant(req, res, cb);
+};
+/**
+ *
+ * @type {{_checkPermission, grant, create, save, get, all, delete}|{create: Function, save: Function, get: Function, all: Function, delete: Function}}
+ */
 module.exports = StudentController;
