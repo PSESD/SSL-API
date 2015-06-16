@@ -486,28 +486,28 @@ describe( 'All-Test', function () {
         /**
          * Delete All Data Test Here
          */
-        //it('DELETE /:organizationId/students/:studentId', function (done) {
-        //    request(api_endpoint)
-        //        .delete('/'+organizationId+'/students/'+studentId)
-        //        .set('authorization', tokenType + ' ' + token)
-        //        .expect(function (res) {
-        //            assert.equal(true, res.body.success);
-        //        })
-        //        .expect(200)
-        //        .end(done);
-        //
-        //});
-        //it('DELETE /:organizationId/programs/:programId', function (done) {
-        //    request(api_endpoint)
-        //        .delete('/'+organizationId+'/programs/'+programId)
-        //        .set('authorization', tokenType + ' ' + token)
-        //        .expect(function (res) {
-        //            assert.equal(true, res.body.success);
-        //        })
-        //        .expect(200)
-        //        .end(done);
-        //
-        //});
+        it('DELETE /:organizationId/students/:studentId', function (done) {
+            request(api_endpoint)
+                .delete('/'+organizationId+'/students/'+studentId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+        it('DELETE /:organizationId/programs/:programId', function (done) {
+            request(api_endpoint)
+                .delete('/'+organizationId+'/programs/'+programId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
 
     });
 
