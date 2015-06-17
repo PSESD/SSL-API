@@ -61,6 +61,8 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, organizationCtr.deleteProgram)
     ;
 
+
+
     router.route('/:organizationId/students')
           .post(auth.isBearerAuthenticated, studentCtr.createByOrgId)
           .get(auth.isBearerAuthenticated, studentCtr.getStudents);
@@ -75,7 +77,12 @@ Rest.prototype.handleRoutes= function(router, Api) {
 
     router.route('/:organizationId/students/:studentId/programs')
         .get(auth.isBearerAuthenticated, studentProgramCtr.getByStudentId)
-        .post(auth.isBearerAuthenticated, studentProgramCtr.createByStudentId)
+        .post(auth.isBearerAuthenticated, studentProgramCtr.addByStudentId)
+    ;
+
+    router.route('/:organizationId/programs/:programId/students')
+        .get(auth.isBearerAuthenticated, studentProgramCtr.getByProgramId)
+        .post(auth.isBearerAuthenticated, studentProgramCtr.addByProgramId)
     ;
 
     /**

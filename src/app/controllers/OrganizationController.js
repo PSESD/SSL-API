@@ -380,5 +380,8 @@ OrganizationController.deleteProgram = function (req, res) {
 
     OrganizationController.grant(req, res, cb);
 };
-
+/**
+ *
+ * @type {{_checkPermission, grant, create, save, get, all, delete}|{create: Function, save: Function, get: Function, all: Function, delete: Function}}
+ */
 module.exports = OrganizationController;
