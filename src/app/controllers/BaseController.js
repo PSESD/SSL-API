@@ -60,6 +60,12 @@ BaseController.prototype.crud = function(idName) {
 
             var newModel = self.model;
             var obj = new newModel(req.body);
+            // set update time and update by user
+            if(!obj.created) obj.created = new Date();
+            if(!obj.creator) obj.creator = req.user.userId;
+            if(!obj.last_updated) obj.last_updated = new Date();
+            if(!obj.last_updated_by) obj.last_updated_by = req.user.userId;
+
             obj.save(function (err) {
                 if (err) {
                     return res.errJson(err);
@@ -88,6 +94,8 @@ BaseController.prototype.crud = function(idName) {
                     }
                 }
 
+                if(!obj.last_updated) obj.last_updated = new Date();
+                if(!obj.last_updated_by) obj.last_updated_by = req.user.userId;
                 // save the movie
                 obj.save(function (err) {
                     if (err) {

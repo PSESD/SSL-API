@@ -9,6 +9,7 @@ var _ = require('underscore');
 var methodOverride = require('method-override');
 var port = process.env.PORT || 4000;
 var config = require('config');
+var AWS = require('aws-sdk');
 
 var rollbarAccessToken = config.get('rollbar.access_token');
 
@@ -100,6 +101,9 @@ Api.prototype.connectDb = function() {
     var dbUri = 'mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name');
     console.log("[%s] DB URI: " + dbUri, app.get('env'));
     this.mongo.connect(dbUri);
+    if(config.has('aws')){
+
+    }
     //this.mongo.set('debug', app.get('env') === 'test');
     this.configureExpress(this.db);
     

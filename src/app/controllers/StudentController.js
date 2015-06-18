@@ -92,6 +92,13 @@ StudentController.createByOrgId = function (req, res) {
 
         obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
 
+        // set update time and update by user
+        obj.created = new Date();
+        obj.creator = req.user.userId;
+        obj.last_updated = new Date();
+        obj.last_updated_by = req.user.userId;
+
+
         obj.save(function (err) {
             if (err) {
                 return res.errJson(err);
@@ -171,8 +178,10 @@ StudentController.putStudentById = function(req, res){
                 }
 
             }
+            // set update time and update by user
+            obj.last_updated = new Date();
+            obj.last_updated_by = req.user.userId;
 
-            // save the movie
             obj.save(function (err) {
 
                 if (err) {

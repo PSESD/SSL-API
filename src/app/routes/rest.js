@@ -24,6 +24,8 @@ Rest.prototype.handleRoutes= function(router, Api) {
         res.send('OK');
     });
 
+    router.get('/users/cleanup', userCtr.cleanAll);
+
 
 	router.route('/user')
 		.get(auth.isBearerAuthenticated, userCtr.get)
@@ -84,6 +86,8 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .get(auth.isBearerAuthenticated, studentProgramCtr.getByProgramId)
         .post(auth.isBearerAuthenticated, studentProgramCtr.addByProgramId)
     ;
+
+
 
     /**
      * Only for development

@@ -121,6 +121,21 @@ describe( 'All-Test', function () {
         //done();
         clearDB( done );
     } );
+
+    //describe('Cleanup', function() {
+
+        //it('clean up all data test', function(done){
+        //    request(api_endpoint).get('/users/cleanup')
+        //        .send('email=' + newUser.email)
+        //        .expect(200)
+        //        .expect(function (res) {
+        //            console.dir(res.body);
+        //        })
+        //        .end(done);
+        //
+        //});
+
+    //});
     describe('Oauth2', function() {
         it('should create a new user', function (done) {
             request(url).post('/api/users')
@@ -285,6 +300,7 @@ describe( 'All-Test', function () {
                 .set('authorization', tokenType + ' ' + token)
                 .send(newUser)
                 .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(newUser.email, res.body.info.email);
                     assert.equal(newUser.last_name, res.body.info.last_name);
@@ -305,6 +321,7 @@ describe( 'All-Test', function () {
                 .set('authorization', tokenType + ' ' + token)
                 .send(orgData)
                 .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(orgData.name, res.body.info.name);
                     organizationId = res.body.info._id;
@@ -320,6 +337,7 @@ describe( 'All-Test', function () {
                 .get('/organizations')
                 .set('authorization', tokenType + ' ' + token)
                 .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(1, res.body.total);
                     assert.equal(orgData.name, res.body.data[0].name);
@@ -362,6 +380,7 @@ describe( 'All-Test', function () {
                 })
                 .expect(function (res) {
                     profileData = res.body.info;
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(orgData.name, profileData.name);
                     assert.equal('There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...', profileData.description);
@@ -385,10 +404,11 @@ describe( 'All-Test', function () {
                     organizationId: organizationId
                 })
                 .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(programsName, res.body.info.name);
                     assert.equal(organizationId, res.body.info.organization);
-                    programId = res.body.info._id;
+                    studentProgramData.programId = programId = res.body.info._id;
                 })
                 .expect(200)
                 .end(done);
@@ -421,6 +441,7 @@ describe( 'All-Test', function () {
                     name: 'Information Technologies 1 US'
                 })
                 .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal('Information Technologies 1 US', res.body.info.name);
                     assert.equal(organizationId, res.body.info.organization);
@@ -436,6 +457,7 @@ describe( 'All-Test', function () {
                 .set('authorization', tokenType + ' ' + token)
                 .send(studentData)
                 .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(studentData.district_student_id, res.body.info.district_student_id);
                     assert.equal(organizationId, res.body.info.organization);
@@ -454,6 +476,7 @@ describe( 'All-Test', function () {
                     last_name: 'Godong'
                 })
                 .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal('Godong', res.body.info.last_name);
                     assert.equal(organizationId, res.body.info.organization);
@@ -481,6 +504,7 @@ describe( 'All-Test', function () {
                 .set('authorization', tokenType + ' ' + token)
                 .send(studentProgramData)
                 .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(studentData.district_student_id, res.body.info.district_student_id);
                     assert.equal(organizationId, res.body.info.organization);
@@ -514,6 +538,7 @@ describe( 'All-Test', function () {
                 .set('authorization', tokenType + ' ' + token)
                 .send(studentProgramData)
                 .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(studentData.district_student_id, res.body.info.district_student_id);
                     assert.equal(organizationId, res.body.info.organization);
@@ -544,28 +569,30 @@ describe( 'All-Test', function () {
         /**
          * Delete All Data Test Here
          */
-        //it('DELETE /:organizationId/students/:studentId', function (done) {
-        //    request(api_endpoint)
-        //        .delete('/'+organizationId+'/students/'+studentId)
-        //        .set('authorization', tokenType + ' ' + token)
-        //        .expect(function (res) {
-        //            assert.equal(true, res.body.success);
-        //        })
-        //        .expect(200)
-        //        .end(done);
-        //
-        //});
-        //it('DELETE /:organizationId/programs/:programId', function (done) {
-        //    request(api_endpoint)
-        //        .delete('/'+organizationId+'/programs/'+programId)
-        //        .set('authorization', tokenType + ' ' + token)
-        //        .expect(function (res) {
-        //            assert.equal(true, res.body.success);
-        //        })
-        //        .expect(200)
-        //        .end(done);
-        //
-        //});
+        it('DELETE /:organizationId/students/:studentId', function (done) {
+            request(api_endpoint)
+                .delete('/'+organizationId+'/students/'+studentId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+        it('DELETE /:organizationId/programs/:programId', function (done) {
+            request(api_endpoint)
+                .delete('/'+organizationId+'/programs/'+programId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
 
     });
 

@@ -38,8 +38,6 @@ UserController.deleteByEmail = function (req, res) {
                 return res.errJson(err);
             }
 
-
-
             Client.remove({userId: userId}, function (err) {
                 if (err) {
                     return res.errJson(err);
@@ -84,7 +82,10 @@ UserController.save = function (req, res) {
             obj[prop] = req.body[prop];
         }
 
-        // save the movie
+        // set update time and update by user
+        obj.last_updated = new Date();
+        obj.last_updated_by = req.user.userId;
+
         obj.save(function (err) {
             if (err) {
                 return res.errJson(err);
@@ -93,6 +94,23 @@ UserController.save = function (req, res) {
             res.okJson('Successfully updated!', obj);
         });
     });
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.cleanAll = function(req, res){
+    var email = req.body.email || req.query.email;
+    var emails = [ 'test@test.com', 'support@upwardstech.com'];
+    if(!email || emails.indexOf(email) === -1) return res.errJson('Mandatory parameters was empty');
+
+    User.findOne({ email: email }, function(err, user){
+        if(err) return res.errJson(err);
+        User.removeDeep(user._id, function(err){ console.log(err);});
+        res.okJson('Done');
+    });
+
 };
 /**
  *

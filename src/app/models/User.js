@@ -3,6 +3,11 @@ var mongoose = require('mongoose');
 var crypto = require('crypto');
 var UserPermission = require('./schema/UserPermission');
 var Organization = require('./Organization');
+var Code = require('./Code');
+var Client = require('./Client');
+var Student = require('./Student');
+var Program = require('./Program');
+var ObjectId = mongoose.Types.ObjectId;
 
 // Define our user schema
 var UserSchema = new mongoose.Schema({
@@ -18,7 +23,7 @@ var UserSchema = new mongoose.Schema({
     },
     first_name: { type: String, trim: true },
     middle_name: { type: String, trim: true },
-    last_name: { type: String, trim: true, required: true },
+    last_name: { type: String, trim: true },
     email: { type: String, trim: true, unique: true, required: true, index: true, minlength: 6 },
     permissions: [ UserPermission ], // Store a permission a user has, by each organization.
     created: {
@@ -106,6 +111,18 @@ UserSchema.methods.verifyAuthCode = function (code, cb) {
     } else {
         cb(null, this.encryptAuthCode(code) === this.hashedAuthCode);
     }
+};
+/**
+ *
+ */
+UserSchema.statics.removeDeep = function(userId, done){
+    Client.remove({ userId: userId }, done);
+    Code.remove({ userId: userId }, done);
+    Program.remove({ creator: userId }, done);
+    Student.remove({ creator: userId }, done);
+    Organization.remove({ creator: userId }, done);
+    this.model('User').remove({_id: userId}, done);
+    console.log('REMOVE CALL');
 };
 /**
  *

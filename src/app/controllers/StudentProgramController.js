@@ -57,7 +57,10 @@ StudentProgramController.addByStudentId = function (req, res) {
         if(req.body.active) studentProgram.active = (req.body.active === 'true');
         if(req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
         if(req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
-
+        studentProgram.created = new Date();
+        studentProgram.creator = req.user.userId;
+        studentProgram.last_updated = new Date();
+        studentProgram.last_updated_by = req.user.userId;
 
         if(_.isEmpty(studentProgram)) {
             return res.errJson('POST parameter is empty!');
@@ -77,6 +80,9 @@ StudentProgramController.addByStudentId = function (req, res) {
             //if(!subdoc.isNew){
             //    return res.errJson('Student program failed to add because is duplicate or error');
             //}
+            // set update time and update by user
+            student.last_updated = new Date();
+            student.last_updated_by = req.user.userId;
 
             student.save(function(err){
 
@@ -132,7 +138,10 @@ StudentProgramController.addByProgramId = function(req, res){
         if(req.body.active) studentProgram.active = (req.body.active === 'true');
         if(req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
         if(req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
-
+        studentProgram.created = new Date();
+        studentProgram.creator = req.user.userId;
+        studentProgram.last_updated = new Date();
+        studentProgram.last_updated_by = req.user.userId;
 
         if(!stdId || _.isEmpty(studentProgram)) {
             return res.errJson('POST parameter is empty!');
@@ -152,6 +161,9 @@ StudentProgramController.addByProgramId = function(req, res){
             //if(!subdoc.isNew){
             //    return res.errJson('Student program failed to add because is duplicate or error');
             //}
+            // set update time and update by user
+            student.last_updated = new Date();
+            student.last_updated_by = req.user.userId;
 
             student.save(function(err){
 

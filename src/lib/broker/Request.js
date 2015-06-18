@@ -125,6 +125,12 @@ Request.prototype = {
      * @returns {*|request}
      */
     createRequestProvider: function(districtStudentId, zoneId, callback){
+        if(!districtStudentId){
+
+            if(!callback) return;
+
+            return callback('District student id was not set', null, null);
+        }
         var url = '/requestProvider/' + this.config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+this.config.contextId;
         this.addHeader( 'districtStudentId', districtStudentId );
         return this.create(url, 'GET', callback);

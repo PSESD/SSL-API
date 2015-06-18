@@ -90,7 +90,9 @@ OrganizationController.updateProfile = function(req, res){
                     obj[prop] = req.body[prop];
                 }
             }
-
+            // set update time and update by user
+            obj.last_updated = new Date();
+            obj.last_updated_by = req.user.userId;
             // save the movie
             obj.save(function (err) {
                 if (err) {
@@ -113,21 +115,19 @@ OrganizationController.allUsers = function (req, res) {
 
     var cb = function () {
 
-        OrganizationController.grant(req, res, function () {
+        User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
 
-            User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
+            if (err) return res.errJson(err);
 
-                if (err) return res.errJson(err);
-
-                res.okJson(null, users);
-
-            });
+            res.okJson(null, users);
 
         });
+
     };
 
     OrganizationController.grant(req, res, cb);
 };
+
 /**
  * Find organization by user id
  * @param req
@@ -179,7 +179,10 @@ OrganizationController.putUser = function (req, res) {
 
             }
 
-            // save the movie
+            // set update time and update by user
+            obj.last_updated = new Date();
+            obj.last_updated_by = req.user.userId;
+
             obj.save(function (err) {
 
                 if (err) {
@@ -243,8 +246,7 @@ OrganizationController.deleteUser = function (req, res) {
 
                 }
             }
-
-            User.where({_id: user._id}).update({$set: {permissions: allpermission}}, function (err, updated) {
+            User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: Date.now, last_updated_by: req.user.userId }, function (err, updated) {
 
                 if (err) return res.errJson(err);
 
@@ -292,6 +294,11 @@ OrganizationController.postProgram = function (req, res) {
         var obj = new Program(req.body);
 
         obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
+        // set update time and update by user
+        obj.created = new Date();
+        obj.creator = req.user.userId;
+        obj.last_updated = new Date();
+        obj.last_updated_by = req.user.userId;
 
         obj.save(function (err) {
 
@@ -334,7 +341,10 @@ OrganizationController.putProgram = function (req, res) {
 
             }
 
-            // save the movie
+            // set update time and update by user
+            obj.last_updated = new Date();
+            obj.last_updated_by = req.user.userId;
+
             obj.save(function (err) {
 
                 if (err) {
