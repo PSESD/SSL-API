@@ -201,7 +201,7 @@ OrganizationController.postUser = function (req, res) {
                 if (err) return res.errJson(err);
 
 
-                res.okJson('Student Program successfully add', user);
+                res.okJson('Organization successfully add to User', user);
             });
 
         });

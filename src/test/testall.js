@@ -5,6 +5,7 @@ var expect = require( 'chai' ).expect;
 var request = require( 'supertest' );
 var cheerio = require( 'cheerio' );
 var querystring = require('querystring');
+var php = require('phpjs');
 var _ = require('underscore');
 var url = 'http://localhost:3000';
 
@@ -22,8 +23,7 @@ var assert = require('assert');
  * @param post
  */
 function http_build_query(post){
-    return;
-    console.log('%j', querystring.stringify(post));
+    console.log('%j', php.http_build_query(post));
 }
 describe( 'All-Test', function () {
 
@@ -357,6 +357,7 @@ describe( 'All-Test', function () {
         it('POST /:organizationId/users', function (done) {
             permissionsData.organization = organizationId;
             permissionsData.userId = userId;
+            http_build_query(permissionsData);
             request(api_endpoint)
                 .post('/'+organizationId+'/users')
                 .set('authorization', tokenType + ' ' + token)
@@ -459,7 +460,7 @@ describe( 'All-Test', function () {
                 name: programsName,
                 organizationId: organizationId
             });
-            request(api_endpoint)
+                request(api_endpoint)
                 .post('/' + organizationId + '/programs')
                 .set('authorization', tokenType + ' ' + token)
                 .send({
@@ -589,8 +590,9 @@ describe( 'All-Test', function () {
                 .get('/'+organizationId+'/students/'+studentId+'/programs')
                 .set('authorization', tokenType + ' ' + token)
                 .expect(function (res) {
-                    assert.equal(studentProgramData.cohort, res.body[0].cohort);
-                    assert.equal(studentProgramId, res.body[0]._id);
+                    //console.log('%j', res.body);
+                    assert.equal(studentProgramData.cohort, res.body.data[0].cohort);
+                    assert.equal(studentProgramId, res.body.data[0]._id);
                 })
                 .expect(200)
                 .end(done);

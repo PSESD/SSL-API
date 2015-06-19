@@ -33,7 +33,7 @@ StudentProgramController.getByStudentId = function (req, res) {
 
             if(!student) return res.errJson('Data not found');
 
-            res.okJson(student.programs);
+            res.okJson(null, student.programs);
         });
     };
 
