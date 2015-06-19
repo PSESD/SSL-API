@@ -26,7 +26,7 @@ OrganizationController.get = function (req, res) {
     } else {
         return res.okJson(null, []);
     }
-    console.log('ORG CRIT: %j', crit);
+    //console.log('ORG CRIT: %j', crit);
     Organization.find(crit, function (err, orgs) {
         if (err) return res.errJson(err);
         res.okJson(null, orgs);
@@ -171,8 +171,8 @@ OrganizationController.postUser = function (req, res) {
         var permissions = {};
 
         if (req.body.organization) permissions.organization = ObjectId(req.body.organization);
-        if (req.body.students) permissions.students = req.body.students;
-        if (req.body.permissions) permissions.permissions = req.body.permissions;
+        permissions.students = req.body.students || [];
+        permissions.permissions = req.body.permissions || [];
 
         permissions.created = new Date();
         permissions.creator = req.user.userId;
