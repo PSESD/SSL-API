@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var ObjectId = mongoose.Types.ObjectId;
+var User = require('../models/User');
+var _ = require('underscore');
 /**
  * Created by zaenal on 05/06/15.
  */
@@ -32,9 +34,9 @@ BaseController.prototype.crud = function(idName) {
 
             var orgid = req.user.organizationId;
 
-            if(orgid.length === 0){
-                return true;
-            }
+            //if(orgid.length === 0){
+            //    return true;
+            //}
 
             return orgid.indexOf(req.params.organizationId);
         },
@@ -70,8 +72,7 @@ BaseController.prototype.crud = function(idName) {
                 if (err) {
                     return res.errJson(err);
                 }
-
-                res.okJson('Successfully Added', obj);
+                return res.okJson('Successfully Added', obj);
             });
         },
         /**

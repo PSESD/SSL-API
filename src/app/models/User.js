@@ -92,6 +92,7 @@ UserSchema.virtual('organizationId').get(function(){
   }
   return _id;
 });
+
 /**
  *
  * @param password
@@ -200,7 +201,8 @@ UserSchema.statics.removeDeep = function(userId, done){
 //    });
 //};
 
-UserSchema.set('toJSON', { hide: 'hashedPassword' });
+UserSchema.set('toJSON', { hide: 'hashedPassword', virtuals: true });
+UserSchema.set('toObject', { hide: 'hashedPassword', virtuals: true });
 
 // Export the Mongoose model
 module.exports = mongoose.model('User', UserSchema);

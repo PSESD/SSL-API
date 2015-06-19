@@ -4,7 +4,10 @@ process.env.NODE_ENV = 'test';
 var expect = require( 'chai' ).expect;
 var request = require( 'supertest' );
 var cheerio = require( 'cheerio' );
+var querystring = require('querystring');
+var _ = require('underscore');
 var url = 'http://localhost:3000';
+
 //var url = 'https://auth.cbo.upward.st';
 var api_endpoint = 'http://localhost:4000';
 var config = require('config');
@@ -14,7 +17,14 @@ var mongoose = require( 'mongoose' )
     , clearDB = require( 'mocha-mongoose' )( dbUri, {noClear: true} );
 
 var assert = require('assert');
-
+/**
+ *
+ * @param post
+ */
+function http_build_query(post){
+    return;
+    console.log('%j', querystring.stringify(post));
+}
 describe( 'All-Test', function () {
 
     var agent1 = request.agent( url );
@@ -38,7 +48,7 @@ describe( 'All-Test', function () {
     var organizationId = null;
 
     var orgData = {
-        "name" : "Helping Hand CBO",
+        "name" : "FC CBO",
         "addresses" : [
             {
                 "country" : "US",
@@ -84,8 +94,8 @@ describe( 'All-Test', function () {
             }
         ],
         "description" : null,
-        "website" : "helpinghand.org",
-        "url" : "helpinghand.cbo.upward.st"
+        "website" : "fc.org",
+        "url" : "fc.cbo.upward.st"
     };
 
     var studentData = {
@@ -96,7 +106,7 @@ describe( 'All-Test', function () {
         "addresses" : []
     };
 
-    var studentId, studentProgramId, studentProgramData = {
+    var userId, studentId, studentProgramId, studentProgramData = {
         programId: null,
         active: true, // Whether the student is currently active in the program or not.
         participation_start_date: new Date(Date.parse('May 8, 2015')).toString(),
@@ -146,6 +156,8 @@ describe( 'All-Test', function () {
                 .expect(200)
                 .expect(function (res) {
                     assert.equal(res.body.email, email);
+                    userId = res.body.id;
+                    assert.ok(userId);
                 })
                 .end(done);
 
@@ -314,8 +326,8 @@ describe( 'All-Test', function () {
 
     describe('API-Organizations', function() {
 
-
         it('POST /organizations', function (done) {
+            http_build_query(orgData);
             request(api_endpoint)
                 .post('/organizations')
                 .set('authorization', tokenType + ' ' + token)
@@ -331,6 +343,51 @@ describe( 'All-Test', function () {
 
         });
 
+        var permissionsData = {
+            organization: organizationId,
+            userId: userId,
+            students: [],
+            permissions: [{
+                model: 'Student',
+                operation: '*',
+                allow: 'all'
+            }]
+        };
+        var permissionId = '';
+        it('POST /:organizationId/users', function (done) {
+            permissionsData.organization = organizationId;
+            permissionsData.userId = userId;
+            request(api_endpoint)
+                .post('/'+organizationId+'/users')
+                .set('authorization', tokenType + ' ' + token)
+                .send(permissionsData)
+                .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                    var permit = res.body.info.permissions[0];
+                    assert.equal(organizationId, permit.organization);
+                    assert.ok(_.isArray(permit.students), 'Student must array');
+                    assert.ok(_.isArray(permit.permissions), 'Permission must array');
+                    permissionId = permit._id;
+                    assert.ok(permit);
+                })
+                .expect(200)
+                .end(done);
+        });
+
+        it('GET /:organizationId/users', function (done) {
+            request(api_endpoint)
+                .get('/'+organizationId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    assert.equal(orgData.name, res.body.name);
+                    assert.equal(organizationId, res.body._id);
+                })
+                .expect(200)
+                .end(done);
+        });
+
+
 
         it('GET /organizations', function (done) {
             request(api_endpoint)
@@ -345,6 +402,8 @@ describe( 'All-Test', function () {
                 .expect(200)
                 .end(done);
         });
+
+
 
         it('GET /:organizationId', function (done) {
             request(api_endpoint)
@@ -396,6 +455,10 @@ describe( 'All-Test', function () {
 
 
         it('POST /:organizationId/programs 1', function (done) {
+            http_build_query({
+                name: programsName,
+                organizationId: organizationId
+            });
             request(api_endpoint)
                 .post('/' + organizationId + '/programs')
                 .set('authorization', tokenType + ' ' + token)
@@ -452,6 +515,7 @@ describe( 'All-Test', function () {
         });
 
         it('POST /:organizationId/students', function (done) {
+            http_build_query(studentData);
             request(api_endpoint)
                 .post('/'+organizationId+'/students')
                 .set('authorization', tokenType + ' ' + token)
@@ -469,6 +533,9 @@ describe( 'All-Test', function () {
         });
 
         it('PUT /:organizationId/students/:studentId', function (done) {
+            http_build_query({
+                last_name: 'Godong'
+            });
             request(api_endpoint)
                 .put('/'+organizationId+'/students/'+studentId)
                 .set('authorization', tokenType + ' ' + token)
@@ -499,6 +566,7 @@ describe( 'All-Test', function () {
         //});
 
         it('POST /:organizationId/students/:studentId/programs', function (done) {
+            http_build_query(studentProgramData);
             request(api_endpoint)
                 .post('/'+organizationId+'/students/'+studentId+'/programs')
                 .set('authorization', tokenType + ' ' + token)
@@ -533,6 +601,7 @@ describe( 'All-Test', function () {
             studentProgramData.studentId = studentId;
             delete studentProgramData.programId;
             studentProgramData.cohort = 'Test 2';
+            http_build_query(studentProgramData);
             request(api_endpoint)
                 .post('/'+organizationId+'/programs/'+programId2+'/students')
                 .set('authorization', tokenType + ' ' + token)
@@ -569,30 +638,30 @@ describe( 'All-Test', function () {
         /**
          * Delete All Data Test Here
          */
-        it('DELETE /:organizationId/students/:studentId', function (done) {
-            request(api_endpoint)
-                .delete('/'+organizationId+'/students/'+studentId)
-                .set('authorization', tokenType + ' ' + token)
-                .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
-                    assert.equal(true, res.body.success);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-        it('DELETE /:organizationId/programs/:programId', function (done) {
-            request(api_endpoint)
-                .delete('/'+organizationId+'/programs/'+programId)
-                .set('authorization', tokenType + ' ' + token)
-                .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
-                    assert.equal(true, res.body.success);
-                })
-                .expect(200)
-                .end(done);
-
-        });
+        //it('DELETE /:organizationId/students/:studentId', function (done) {
+        //    request(api_endpoint)
+        //        .delete('/'+organizationId+'/students/'+studentId)
+        //        .set('authorization', tokenType + ' ' + token)
+        //        .expect(function (res) {
+        //            if(!res.body.success) console.log('%j', res.body);
+        //            assert.equal(true, res.body.success);
+        //        })
+        //        .expect(200)
+        //        .end(done);
+        //
+        //});
+        //it('DELETE /:organizationId/programs/:programId', function (done) {
+        //    request(api_endpoint)
+        //        .delete('/'+organizationId+'/programs/'+programId)
+        //        .set('authorization', tokenType + ' ' + token)
+        //        .expect(function (res) {
+        //            if(!res.body.success) console.log('%j', res.body);
+        //            assert.equal(true, res.body.success);
+        //        })
+        //        .expect(200)
+        //        .end(done);
+        //
+        //});
 
     });
 

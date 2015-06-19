@@ -23,8 +23,10 @@ OrganizationController.get = function (req, res) {
 
     if (orgs.length > 0) {
         crit._id = {$in: orgs};
+    } else {
+        return res.okJson(null, []);
     }
-
+    console.log('ORG CRIT: %j', crit);
     Organization.find(crit, function (err, orgs) {
         if (err) return res.errJson(err);
         res.okJson(null, orgs);
@@ -151,6 +153,58 @@ OrganizationController.getUser = function (req, res) {
 
         });
 
+    };
+
+    OrganizationController.grant(req, res, cb);
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.postUser = function (req, res) {
+
+    var cb = function() {
+        var orgId = req.params.organizationId;
+        var userId = req.body.userId;
+
+        var permissions = {};
+
+        if (req.body.organization) permissions.organization = ObjectId(req.body.organization);
+        if (req.body.students) permissions.students = req.body.students;
+        if (req.body.permissions) permissions.permissions = req.body.permissions;
+
+        permissions.created = new Date();
+        permissions.creator = req.user.userId;
+        permissions.last_updated = new Date();
+        permissions.last_updated_by = req.user.userId;
+
+        if (_.isEmpty(permissions)) {
+            return res.errJson('POST parameter is empty!');
+        }
+
+        User.findOne({_id: ObjectId(userId)}, function (err, user) {
+
+            if (err) return res.errJson(err);
+
+            if (!user) return res.errJson('User data not found');
+
+            user.permissions.push(permissions);
+
+
+            // set update time and update by user
+            user.last_updated = new Date();
+            user.last_updated_by = req.user.userId;
+
+            user.save(function (err) {
+
+                if (err) return res.errJson(err);
+
+
+                res.okJson('Student Program successfully add', user);
+            });
+
+        });
     };
 
     OrganizationController.grant(req, res, cb);
