@@ -3,11 +3,12 @@
  */
 var mongoose = require('mongoose');
 var Student = require('../models/Student');
+var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
-var brokerRequest = new Request();
+
 var ObjectId = mongoose.Types.ObjectId;
 
 
@@ -33,28 +34,45 @@ StudentController.getStudentsBackpack = function (req, res) {
              */
             if (!student) return res.errJson('The student not found in database');
 
-            var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
+            Organization.findOne({ _id: orgId }, function(err, organization){
+                if (err) return res.errJson(err);
+                /**
+                 * If student is empty from database
+                 */
+                if (!student) return res.errJson('The student not found in database');
+
+                var brokerRequest = new Request({ 
+                    externalServiceId: organization.externalServiceId,  
+                    personnelId: organization.personnelId,  
+                    authorizedEntityId: organization.authorizedEntityId,  
+                
+                });
+
+                var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
 
 
-                if (error) {
-                    return res.errJson(error);
-                }
-                if (!body) {
-                    return res.errJson('Data not found');
-                }
-                if (response && response.statusCode == '200') {
-                    parseString(body, function (err, result) {
-                        var json = result.sre;
-                        delete json['$'];
-                        res.okJson(json);
-                    });
-                } else {
-                    parseString(body, function (err, result) {
-                        var json = result ? result.Error : 'Error not response';
-                        res.errJson(json);
-                    });
-                }
+                    if (error) {
+                        return res.errJson(error);
+                    }
+
+                    if (!body) {
+                        return res.errJson('Data not found');
+                    }
+                    if (response && response.statusCode == '200') {
+                        parseString(body, function (err, result) {
+                            var json = result.sre;
+                            delete json['$'];
+                            res.okJson(json);
+                        });
+                    } else {
+                        parseString(body, function (err, result) {
+                            var json = result ? result.Error : 'Error not response';
+                            res.errJson(json);
+                        });
+                    }
+                });
             });
+            
         });
     };
 

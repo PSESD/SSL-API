@@ -95,7 +95,10 @@ describe( 'All-Test', function () {
         ],
         "description" : null,
         "website" : "fc.org",
-        "url" : "fc.cbo.upward.st"
+        "url" : "fc.cbo.upward.st",
+        "externalServiceId": 2,
+        "personnelId": 3,
+        "authorizedEntityId": 1
     };
 
     var studentData = {
@@ -370,7 +373,7 @@ describe( 'All-Test', function () {
                     assert.ok(_.isArray(permit.students), 'Student must array');
                     assert.ok(_.isArray(permit.permissions), 'Permission must array');
                     permissionId = permit._id;
-                    assert.ok(permit);
+                    assert.ok(permissionId);
                 })
                 .expect(200)
                 .end(done);
@@ -555,16 +558,16 @@ describe( 'All-Test', function () {
         });
 
 
-        //it('GET /:organizationId/students/:studentId/backpack', function (done) {
-        //    request(api_endpoint)
-        //        .get('/'+organizationId+'/students/'+studentId+'/backpack')
-        //        .set('authorization', tokenType + ' ' + token)
-        //        .expect(function (res) {
-        //            console.log(res.body);
-        //        })
-        //        .expect(200)
-        //        .end(done);
-        //});
+        it('GET /:organizationId/students/:studentId/backpack', function (done) {
+           request(api_endpoint)
+               .get('/'+organizationId+'/students/'+studentId+'/backpack')
+               .set('authorization', tokenType + ' ' + token)
+               .expect(function (res) {
+                   console.log(res.body);
+               })
+               .expect(200)
+               .end(done);
+        });
 
         it('POST /:organizationId/students/:studentId/programs', function (done) {
             http_build_query(studentProgramData);
@@ -640,30 +643,30 @@ describe( 'All-Test', function () {
         /**
          * Delete All Data Test Here
          */
-        //it('DELETE /:organizationId/students/:studentId', function (done) {
-        //    request(api_endpoint)
-        //        .delete('/'+organizationId+'/students/'+studentId)
-        //        .set('authorization', tokenType + ' ' + token)
-        //        .expect(function (res) {
-        //            if(!res.body.success) console.log('%j', res.body);
-        //            assert.equal(true, res.body.success);
-        //        })
-        //        .expect(200)
-        //        .end(done);
-        //
-        //});
-        //it('DELETE /:organizationId/programs/:programId', function (done) {
-        //    request(api_endpoint)
-        //        .delete('/'+organizationId+'/programs/'+programId)
-        //        .set('authorization', tokenType + ' ' + token)
-        //        .expect(function (res) {
-        //            if(!res.body.success) console.log('%j', res.body);
-        //            assert.equal(true, res.body.success);
-        //        })
-        //        .expect(200)
-        //        .end(done);
-        //
-        //});
+        it('DELETE /:organizationId/students/:studentId', function (done) {
+            request(api_endpoint)
+                .delete('/'+organizationId+'/students/'+studentId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+        it('DELETE /:organizationId/programs/:programId', function (done) {
+            request(api_endpoint)
+                .delete('/'+organizationId+'/programs/'+programId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
 
     });
 

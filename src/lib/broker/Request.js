@@ -10,10 +10,11 @@ var uuid = require('node-uuid');
 
 var CryptoJS = require("crypto-js");
 
-function Request(env) {
+function Request(options, env) {
     if(!config.has('hz')){
         throw new Error("config HZ not found!");
     }
+    options = options || {};
     var hz = config.get('hz');
     this.env = env || 'dev';
     this.config = hz;
@@ -24,10 +25,10 @@ function Request(env) {
     this.headers.messageId = null;
     this.headers.externalServiceId = hz.externalServiceId;
     this.headers.Accept = 'application/xml';
-    this.headers.personnelId = hz.personnelId;
+    this.headers.personnelId = options.personnelId;
     this.headers.districtStudentId = null;
-    this.headers.authorizedEntityId = hz.authorizedEntityId;
-    this.headers.externalServiceId = hz.externalServiceId;
+    this.headers.authorizedEntityId = options.authorizedEntityId;
+    this.headers.externalServiceId = options.externalServiceId;
     this.headers.requestAction = hz.requestAction;
     this.headers.messageType = hz.messageType;
     this.headers["Content-Type"] = "application/xml";
