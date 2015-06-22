@@ -39,7 +39,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                 /**
                  * If student is empty from database
                  */
-                if (!student) return res.errJson('The student not found in database');
+                if (!student) return res.errJson('The organization not found in database');
 
                 var brokerRequest = new Request({ 
                     externalServiceId: organization.externalServiceId,  
