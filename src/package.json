@@ -24,6 +24,8 @@
     "moment": "^2.10.3",
     "mongodb": "^1.4.37",
     "mongoose": "^4.0.2",
+    "mongoose-acl": "^0.2.3",
+    "mongoose-authorize": "^0.1.1",
     "morgan": "^1.5.2",
     "node-uuid": "^1.4.3",
     "oauth2orize": "^1.0.1",

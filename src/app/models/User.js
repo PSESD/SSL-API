@@ -30,6 +30,7 @@ var UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    role: { type: String, default: 'case-worker' },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
@@ -93,6 +94,57 @@ UserSchema.virtual('organizationId').get(function(){
   return _id;
 });
 
+UserSchema.virtual('allPermissions').get(function(){
+    var _permissions = [];
+    if(this.permissions.length > 0){
+
+        this.permissions.forEach(function(perm){
+            _permissions.push(perm.permissions);
+        });
+    }
+    return _permissions;
+});
+
+UserSchema.virtual('allPermissionsByOrganization').get(function(){
+    var _permissions = {};
+    if(this.permissions.length > 0){
+
+        this.permissions.forEach(function(perm){
+            if(!_permissions.hasOwnProperty(perm.organization)){
+                _permissions[perm.organization] = [];
+            }
+            _permissions[perm.organization].push(perm.permissions);
+        });
+    }
+    return _permissions;
+});
+
+UserSchema.virtual('allStudents').get(function(){
+    var _students = [];
+    if(this.permissions.length > 0){
+
+        this.permissions.forEach(function(perm){
+            _students.push(perm._students);
+        });
+    }
+    return _students;
+});
+
+UserSchema.virtual('allStudentsByOrganization').get(function(){
+    var _students = {};
+    if(this.permissions.length > 0){
+
+        this.permissions.forEach(function(perm){
+            if(!_students.hasOwnProperty(perm.organization)){
+                _students[perm.organization] = [];
+            }
+            _students[perm.organization].push(perm.students);
+        });
+    }
+    return _students;
+});
+
+
 /**
  *
  * @param password
@@ -113,6 +165,7 @@ UserSchema.methods.verifyAuthCode = function (code, cb) {
         cb(null, this.encryptAuthCode(code) === this.hashedAuthCode);
     }
 };
+
 /**
  *
  */
@@ -125,81 +178,7 @@ UserSchema.statics.removeDeep = function(userId, done){
     this.model('User').remove({_id: userId}, done);
     console.log('REMOVE CALL');
 };
-/**
- *
- * @param permissions
- * @param done
- */
-//UserSchema.methods.addPermission = function(permissions, done){
-//
-//
-//    if(typeof permissions !== 'array'){
-//        permissions = [ permissions ];
-//    }
-//    var deleteIns = [];
-//    permissions.forEach(function(permission, i){
-//        if(typeof permission.organization === undefined){
-//            delete permissions[i];
-//        } else {
-//            deleteIns.push(mongoose.Types.ObjectId(permission.organization));
-//        }
-//    });
-//    var model = this.model('User');
-//    var email = this.email;
-//    var crit  = { email: email,  permissions: { $elemMatch: { organization : { $in: deleteIns } } }  };
-//    model.remove(crit
-//    , function(err) {
-//        if (err) {
-//            return done(err);
-//        }
-//        model.findOne({email: email}, function (err, user) {
-//            if (err) {
-//                return done(err);
-//            }
-//            permissions.forEach(function (permission, i) {
-//                user.permissions.push(permission);
-//            });
-//            user.save(done);
-//        });
-//    });
-//};
-/**
- *
- * @param orgid
- * @param done
- * @returns {*}
- */
-//UserSchema.methods.deletePermission = function(orgid, done){
-//
-//
-//
-//    if(!orgid instanceof Array){
-//        orgid = [ orgid ];
-//    }
-//
-//    orgid.forEach(function(org, i){
-//        orgid[i] = org;
-//    });
-//    console.log(orgid);
-//    var User = this.model('User');
-//
-//    User.findOne({ email: this.email }, function(err, user){
-//        if(err){
-//            return done(err);
-//        }
-//        if(!user) return done("User not found");
-//
-//        user.permissions.forEach(function(permission, i){
-//            if(orgid.indexOf(permission.organization.toString())){
-//                delete user.permissions[i];
-//            }
-//        });
-//
-//        console.log(user.permissions);
-//
-//        user.save(done);
-//    });
-//};
+
 
 UserSchema.set('toJSON', { hide: 'hashedPassword', virtuals: true });
 UserSchema.set('toObject', { hide: 'hashedPassword', virtuals: true });

@@ -95,6 +95,46 @@ UserController.save = function (req, res) {
         });
     });
 };
+
+UserController.addRole = function(){
+
+    if(!req.body.email){
+        return res.errJson('User not found');
+    }
+
+    var crit = { email: req.body.email };
+
+    User.findOne(crit, function (err, obj) {
+        if (err) {
+            return res.errJson(err);
+        }
+
+        for (var prop in req.body) {
+            obj[prop] = req.body[prop];
+        }
+
+        // set update time and update by user
+        obj.last_updated = new Date();
+        obj.last_updated_by = req.user.userId;
+
+        obj.save(function (err) {
+            if (err) {
+                return res.errJson(err);
+            }
+
+            res.okJson('Successfully updated!', obj);
+        });
+    });
+};
+
+
+
+UserController.getRole = function(){
+    return res.okJson(null, [
+            { role: 'admin', description: 'Have access to all students in a CBO' },
+            { role: 'case-worker', description: 'Some case workers only have access to the students in their permission list, some other have access to all students.' }
+    ]);
+};
 /**
  *
  * @param req

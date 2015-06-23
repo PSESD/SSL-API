@@ -3,6 +3,7 @@
  */
 var mongoose = require('mongoose');
 var Student = require('../models/Student');
+var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
@@ -116,14 +117,35 @@ StudentController.createByOrgId = function (req, res) {
         obj.last_updated = new Date();
         obj.last_updated_by = req.user.userId;
 
+        User.findOne({ _id: req.user._id }, function(err, user){
 
-        obj.save(function (err) {
-            if (err) {
-                return res.errJson(err);
-            }
+            if(err) return res.errJson(err);
 
-            res.okJson('Successfully Added', obj);
+            if(!user) return res.errJson('User not update successfully');
+
+
+            obj.save(function (err) {
+
+                if (err)  return res.errJson(err);
+
+                _.each(user.permissions, function(permission, key){
+
+                    if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+                        user.permissions[key].students.push(obj._id);
+                    }
+                });
+
+                user.save(function(err){
+
+                    if (err)  return res.errJson(err);
+
+                    res.okJson('Successfully Added', obj);
+                });
+
+            });
+
         });
+
     };
 
     StudentController.grant(req, res, cb);
@@ -166,7 +188,27 @@ StudentController.deleteStudentById = function (req, res) {
 
             if (err) return res.errJson(err);
 
-            res.okJson('Successfully deleted');
+            User.findOne({ _id: req.user._id }, function(err, user){
+
+                if(err) return res.errJson(err);
+
+                if(!user) return res.errJson('User not update successfully');
+
+                _.each(user.permissions, function(permission, key){
+                    var indexOf = permission.students.indexOf(ObjectId(req.params.studentId));
+                    if(permission.organization.toString() === orgId && indexOf !== -1){
+                        delete user.permissions[key].students[indexOf];
+                    }
+                });
+
+                user.save(function(err){
+
+                    if (err)  return res.errJson(err);
+
+                    res.okJson('Successfully deleted');
+                });
+
+            });
         });
     };
 
