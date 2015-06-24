@@ -14,6 +14,7 @@ var ObjectId = mongoose.Types.ObjectId;
 
 
 var StudentController = new BaseController(Student).crud();
+
 /**
  * Get the list of all organizations that this user have access to in our system.
  * @param req
@@ -27,7 +28,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
         var studentId = ObjectId(req.params.studentId);
 
-        Student.findOne({_id: studentId, organization: orgId}, function (err, student) {
+        Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
             if (err) return res.errJson(err);
             /**
@@ -45,8 +46,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                 var brokerRequest = new Request({ 
                     externalServiceId: organization.externalServiceId,  
                     personnelId: organization.personnelId,  
-                    authorizedEntityId: organization.authorizedEntityId,  
-                
+                    authorizedEntityId: organization.authorizedEntityId
                 });
 
                 var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
@@ -60,13 +60,13 @@ StudentController.getStudentsBackpack = function (req, res) {
                         return res.errJson('Data not found');
                     }
                     if (response && response.statusCode == '200') {
-                        parseString(body, function (err, result) {
+                        parseString(body, { explicitArray: false }, function (err, result) {
                             var json = result.sre;
                             delete json['$'];
                             res.okJson(json);
                         });
                     } else {
-                        parseString(body, function (err, result) {
+                        parseString(body, { explicitArray: false }, function (err, result) {
                             var json = result ? result.Error : 'Error not response';
                             res.errJson(json);
                         });
@@ -89,7 +89,7 @@ StudentController.getStudents = function (req, res) {
     var cb = function() {
         var orgId = ObjectId(req.params.organizationId);
 
-        Student.find({organization: orgId}, function (err, students) {
+        Student.protect(req.user.role, null, req.user).find({organization: orgId}, function (err, students) {
 
             if (err) return res.errJson(err);
 
@@ -160,7 +160,7 @@ StudentController.getStudentById = function (req, res) {
     var cb = function() {
         var orgId = req.params.organizationId;
 
-        Student.findOne({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
+        Student.protect(req.user.role, null, req.user).findOne({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
 
             if (err) return res.errJson(err);
             /**
@@ -184,7 +184,7 @@ StudentController.deleteStudentById = function (req, res) {
     var cb = function() {
         var orgId = req.params.organizationId;
 
-        Student.remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
+        Student.protect(req.user.role, null, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
 
             if (err) return res.errJson(err);
 
@@ -223,7 +223,7 @@ StudentController.putStudentById = function(req, res){
 
     var cb = function () {
 
-        Student.findOne({_id: ObjectId(req.params.studentId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
+        Student.protect(req.user.role, null, req.user).findOne({_id: ObjectId(req.params.studentId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
             if (err)  return res.errJson(err);
 

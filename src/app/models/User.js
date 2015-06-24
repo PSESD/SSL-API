@@ -50,8 +50,8 @@ UserSchema.methods.encryptPassword = function (password) {
 };
 /**
  *
- * @param password
- * @returns {String|string|*}
+ * @param code
+ * @returns {*}
  */
 UserSchema.methods.encryptAuthCode = function (code) {
     return crypto.pbkdf2Sync(''+code, this.salt, 4096, 64, 'sha256').toString('hex');

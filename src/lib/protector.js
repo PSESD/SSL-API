@@ -5,27 +5,40 @@
 
 var rules = {};
 var mongoose = require('mongoose');
+var _ = require('underscore');
 var collection;
 var context;
 var currentRole;
 var protectFilter;
 
 var _permissions;
+var _acl;
 
 module.exports = function protector(schema, options) {
     /**
      *
      * @param user
+     * @param collection
      */
-    function setUser(user){
+    function setUser(user, collection) {
         _permissions = [];
-        var _collectionName = this.collection.name;
-        user.permissions.forEach(function(perm){
-            if(_collectionName == perm.models) {
-                _permissions.push(perm);
+        _acl = [];
+        var _collectionName = collection;
+        user.permissions.forEach(function (permission) {
+            _permissions.push(permission);
+            if(permission.permissions.length > 0) {
+                permission.permissions.forEach(function(perm){
+                    if (perm.model && _collectionName.indexOf(perm.model.toLowerCase()) !== -1) {
+                        _acl.push(perm);
+                    }
+                    console.log(_collectionName, perm.model.toLowerCase());
+                });
             }
         });
+
+        console.log('Permissions: ', _acl);
     }
+
     /**
      *
      * @param req
@@ -39,19 +52,16 @@ module.exports = function protector(schema, options) {
 
         var caller = this;
 
-//        if (typeof caller.role !== "undefined") {
-//
-//            caller.invalidate('role', 'You do not have permission to write property');
-//        } else {
-//            console.log("caller role ", caller.role);
-//        }
-
         /**
          *  FYI, THE FOLLOWING SECTION WAS A QUICK HACK TO GET SOMETHING WORKING
          *  I'LL MAKE THIS NICE AND PRETTY AND REFACTORED SHORTLY.
          *
          */
         return {
+            /**
+             *
+             * @param args
+             */
             save: function (args) {
                 var gotRules = null, inRules = null, role = null, localRules = null;
                 // this is a new document, does the user have create permission?
@@ -96,7 +106,7 @@ module.exports = function protector(schema, options) {
                         if ("function" == typeof args) {
                             args("Unauthorized");
                         } else {
-                            throw new mongoose.Error("Unauthorized");
+                            _denied();
                         }
 
                     }
@@ -107,6 +117,7 @@ module.exports = function protector(schema, options) {
         }
 
     };
+
 
     /**
      *
@@ -120,8 +131,8 @@ module.exports = function protector(schema, options) {
         context = this;
         currentRole = req;
         collection = this.collection.name;
-        protectFilter = _protectFilter;
-        setUser(user);
+        protectFilter = _protectFilter || {};
+        setUser(user, collection);
 
         return {
 
@@ -138,6 +149,9 @@ module.exports = function protector(schema, options) {
             save: function (fn) {
                 console.log('here');
                 return true;
+            },
+            remove: function (args, callback) {
+                return _delete(args, callback);
             }
 
         };
@@ -192,6 +206,94 @@ module.exports = function protector(schema, options) {
 
 
     };
+    /**
+     *
+     * @param crit
+     * @param allowName
+     * @returns {*}
+     * @private
+     */
+    var _buildCrit = function (crit, allowName) {
+
+        var gotRules = getRules(collection);
+
+        allowName = allowName || 'read';
+
+        var inRules = (typeof gotRules !== "undefined") ? gotRules : [];
+
+        var role = (typeof currentRole !== "undefined") ? currentRole : "";
+
+        var localRules = getRulesForRoleForMethod(inRules, role, allowName);
+
+        var acl = checkAcl(allowName);
+
+        if(acl.denied) return _denied();
+
+        if (!localRules) {
+            return false;
+        }
+
+        if (typeof localRules.where !== "undefined") {
+
+            switch (acl.allow){
+                case 'all':
+
+                    break;
+                case 'own':
+
+                    if(_permissions.indexOf(collection) != -1){
+                        if(_permissions[collection].indexOf(protectFilter.value) === -1){
+                            _denied();
+                        }
+                    }
+                    break;
+
+                case 'none':
+                default:
+                    _denied();
+                    break;
+            }
+
+            for (var attrn in localRules.where) {
+
+                if (localRules.where[attrn].hasOwnProperty('$in')) {
+                    var inArray = localRules.where[attrn]['$in'];
+                    var projectionArray = [];
+                    inArray.forEach(function (val) {
+
+
+                        var theKey = checkDynamic(val);
+                        if (theKey && protectFilter.hasOwnProperty(theKey)) {
+                            projectionArray.push(protectFilter[theKey]);
+                        }
+
+
+                    });
+
+                    if (projectionArray.length > 0) {
+                        localRules.where[attrn]['$in'] = projectionArray;
+                    }
+                } else {
+
+                    var key = checkDynamic(localRules.where[attrn]);
+                    if (key && protectFilter.hasOwnProperty(key)) {
+                        localRules.where[attrn] = protectFilter[key];
+
+                    }
+
+
+                }
+
+                crit[attrn] = localRules.where[attrn];
+
+
+            }
+        }
+        if (localRules.properties.hasOwnProperty('*')) {
+            localRules.properties = {};
+        }
+        return {fields: localRules.properties, crit: crit};
+    };
 
     /**
      *
@@ -202,64 +304,20 @@ module.exports = function protector(schema, options) {
      */
     var _find = function (args, callback) {
 
-        var gotRules = getRules(collection);
-        var inRules = (typeof gotRules !== "undefined") ? gotRules : [];
+        var localRules = _buildCrit(args);
 
-        var role = (typeof currentRole !== "undefined") ? currentRole : "";
+        if (localRules !== false) {
 
-        var localRules = getRulesForRoleForMethod(inRules, role, 'read');
-
-
-        if (localRules) {
-
-            if (typeof localRules.where !== "undefined") {
-
-                for (var attrn in localRules.where) {
-
-                    if (localRules.where[attrn].hasOwnProperty('$in')) {
-                        var inArray = localRules.where[attrn]['$in'];
-                        var projectionArray = [];
-                        inArray.forEach(function (val) {
-
-
-                            var theKey = checkDynamic(val);
-                            if (theKey && protectFilter.hasOwnProperty(theKey)) {
-                                projectionArray.push(protectFilter[theKey]);
-                            }
-
-
-                        });
-
-                        if (projectionArray.length > 0) {
-                            localRules.where[attrn]['$in'] = projectionArray;
-                        }
-                    } else {
-
-                        var key = checkDynamic(localRules.where[attrn]);
-                        if (key && protectFilter.hasOwnProperty(key)) {
-                            localRules.where[attrn] = protectFilter[key];
-
-                        }
-
-
-                    }
-
-                    args[attrn] = localRules.where[attrn];
-
-
-                }
-            }
-            if (localRules.properties.hasOwnProperty('*')) {
-                localRules.properties = {};
-            }
             if (typeof callback === "function") {
 
+                context.find(localRules.crit, localRules.fields).where().exec(callback);
 
-                context.find(args, localRules.properties).where().exec(callback);
+            } else {
+
+                return context.find(localRules.crit, localRules.fields);
+
             }
-            else {
-                return context.find(args, localRules.properties);
-            }
+
         } else {
 
             if (typeof callback === "function") {
@@ -296,66 +354,20 @@ module.exports = function protector(schema, options) {
     var _findOne = function (args, callback) {
 
 
-        var gotRules = getRules(collection);
-        var inRules = (typeof gotRules !== "undefined") ? gotRules : [];
+        var localRules = _buildCrit(args);
 
-        var role = (typeof currentRole !== "undefined") ? currentRole : "";
+        if (localRules !== false) {
 
-        var localRules = getRulesForRoleForMethod(inRules, role, 'read');
-
-        if (localRules) {
-
-            if (typeof localRules.where !== "undefined") {
-
-                for (var attrn in localRules.where) {
-
-                    if (localRules.where[attrn].hasOwnProperty('$in')) {
-                        var inArray = localRules.where[attrn]['$in'];
-                        var projectionArray = [];
-                        inArray.forEach(function (val) {
-
-
-                            var theKey = checkDynamic(val);
-
-                            if (theKey && protectFilter.hasOwnProperty(theKey)) {
-
-                                projectionArray.push(protectFilter[theKey]);
-
-                            }
-
-
-                        });
-
-                        if (projectionArray.length > 0) {
-                            localRules.where[attrn]['$in'] = projectionArray;
-                        }
-                    } else {
-
-                        var key = checkDynamic(localRules.where[attrn]);
-                        if (key && protectFilter.hasOwnProperty(key)) {
-                            localRules.where[attrn] = protectFilter[key];
-
-                        }
-
-
-                    }
-
-                    args[attrn] = localRules.where[attrn];
-
-
-                }
-            }
-            if (localRules.properties.hasOwnProperty('*')) {
-                localRules.properties = {};
-            }
             if (typeof callback === "function") {
 
+                context.findOne(localRules.crit, localRules.fields).where().exec(callback);
 
-                context.findOne(args, localRules.properties).where().exec(callback);
+            } else {
+
+                return context.findOne(localRules.crit, localRules.fields);
+
             }
-            else {
-                return context.findOne(args, localRules.properties);
-            }
+
         } else {
 
             if (typeof callback === "function") {
@@ -381,9 +393,87 @@ module.exports = function protector(schema, options) {
             }
         }
     };
+    /**
+     * Delete or remove
+     * @param args
+     * @param callback
+     * @returns {*}
+     * @private
+     */
+    var _delete = function (args, callback) {
 
+
+        var localRules = _buildCrit(args, 'delete');
+
+        if (localRules !== false) {
+
+            if (typeof callback === "function") {
+
+
+                context.remove(args).where().exec(callback);
+            }
+            else {
+                return context.remove(args);
+            }
+        } else {
+
+            if (typeof callback === "function") {
+
+                callback('Unauthorized');
+
+            } else {
+                // this is pretty hacky
+                return {
+                    exec: function (callback) {
+
+                        callback('Unauthorized');
+                    }
+                }
+
+            }
+        }
+    };
 
 }; //end export
+/**
+ *
+ * @private
+ */
+function _denied () {
+    throw new mongoose.Error("Unauthorized");
+}
+/**
+ *
+ * @param method
+ * @returns {{denied: boolean, permission: null}}
+ */
+function checkAcl(method){
+
+    if(!_acl) return {
+        denied: true,
+        permission: null
+    };
+
+
+    var operation = [ '*', method ];
+
+    _acl.forEach(function (acl) {
+
+        if(operation.indexOf(acl.operation) !== false){
+
+            return {
+                denied: false,
+                permission: acl
+            };
+
+        }
+    });
+
+    return {
+        denied: true,
+        permission: null
+    };
+}
 /**
  *
  * @param rules
@@ -393,11 +483,9 @@ module.exports = function protector(schema, options) {
  */
 function getRulesForRoleForMethod(rules, roleName, method) {
 
-
     for (var i = 0; i < rules.length; i++) {
 
         if (rules[i].role.name == roleName) {
-
 
             if (typeof rules[i].role.allow !== "undefined") {
 

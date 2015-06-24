@@ -25,7 +25,9 @@ function Request(options, env) {
     this.headers.messageId = null;
     this.headers.externalServiceId = hz.externalServiceId;
     this.headers.Accept = 'application/xml';
-    this.headers.personnelId = options.personnelId;
+    if(options.personnelId) {
+        this.headers.personnelId = options.personnelId;
+    }
     this.headers.districtStudentId = null;
     this.headers.authorizedEntityId = options.authorizedEntityId;
     this.headers.externalServiceId = options.externalServiceId;

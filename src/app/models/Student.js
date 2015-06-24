@@ -54,7 +54,7 @@ Student.setRules([
                         '*': '*' // allows all fields to be visible
                     },
                     where: {
-                        creator: "$dynamic.creator"
+                        //creator: "$dynamic._id"
                     }
 
                 },
@@ -63,7 +63,7 @@ Student.setRules([
                         '*': '*' // allows all fields to be visible
                     },
                     where: {
-                        creator: "$dynamic.creator"
+                        //creator: "$dynamic._id"
                     }
 
                 },
@@ -72,7 +72,7 @@ Student.setRules([
                         '*': '*' // allows all fields to be visible
                     },
                     where: {
-                        creator: "$dynamic.creator"
+                        //creator: "$dynamic._id"
                     }
 
                 }
