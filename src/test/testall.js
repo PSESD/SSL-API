@@ -1,9 +1,9 @@
 'use strict';
 
 process.env.NODE_ENV = 'test';
-var expect = require( 'chai' ).expect;
-var request = require( 'supertest' );
-var cheerio = require( 'cheerio' );
+var expect = require('chai').expect;
+var request = require('supertest');
+var cheerio = require('cheerio');
 var querystring = require('querystring');
 var php = require('phpjs');
 var _ = require('underscore');
@@ -12,22 +12,22 @@ var url = 'http://localhost:3000';
 //var url = 'https://auth.cbo.upward.st';
 var api_endpoint = 'http://localhost:4000';
 var config = require('config');
-var dbUri = 'mongodb://'+config.get('db.mongo.host')+'/'+config.get('db.mongo.name');
+var dbUri = 'mongodb://' + config.get('db.mongo.host') + '/' + config.get('db.mongo.name');
 console.log(dbUri);
-var mongoose = require( 'mongoose' )
-    , clearDB = require( 'mocha-mongoose' )( dbUri, {noClear: true} );
+var mongoose = require('mongoose')
+    , clearDB = require('mocha-mongoose')(dbUri, {noClear: true});
 
 var assert = require('assert');
 /**
  *
  * @param post
  */
-function http_build_query(post){
+function http_build_query(post) {
     console.log('%j', php.http_build_query(post));
 }
-describe( 'All-Test', function () {
+describe('All-Test', function () {
 
-    var agent1 = request.agent( url );
+    var agent1 = request.agent(url);
     /**
      * Store transaction Id to use in post request
      */
@@ -42,74 +42,73 @@ describe( 'All-Test', function () {
     var secretCode;
 
 
-
     var profileData = {};
 
     var organizationId = null;
 
     var orgData = {
-        "name" : "FC CBO",
-        "addresses" : [
+        "name": "FC CBO",
+        "addresses": [
             {
-                "country" : "US",
-                "zip" : "98002",
-                "state" : "WA",
-                "city" : "Federal Way",
-                "address_line" : "30611 16th Ave S2",
-                "venue" : "",
-                "address_type" : "Mailing",
-                "location" : {
-                    "accuracy" : "Approximate",
-                    "longitude" : -0.4185710000000000,
-                    "latitude" : 0.0950210000000000
+                "country": "US",
+                "zip": "98002",
+                "state": "WA",
+                "city": "Federal Way",
+                "address_line": "30611 16th Ave S2",
+                "venue": "",
+                "address_type": "Mailing",
+                "location": {
+                    "accuracy": "Approximate",
+                    "longitude": -0.4185710000000000,
+                    "latitude": 0.0950210000000000
                 }
             },
             {
-                "country" : "US",
-                "zip" : "98005",
-                "state" : "WA",
-                "city" : "Renton",
-                "address_line" : "30611 16th Ave S5",
-                "venue" : "",
-                "address_type" : "Mailing",
-                "location" : {
-                    "accuracy" : "Approximate",
-                    "longitude" : -0.8049260000000000,
-                    "latitude" : 0.4436020000000000
+                "country": "US",
+                "zip": "98005",
+                "state": "WA",
+                "city": "Renton",
+                "address_line": "30611 16th Ave S5",
+                "venue": "",
+                "address_type": "Mailing",
+                "location": {
+                    "accuracy": "Approximate",
+                    "longitude": -0.8049260000000000,
+                    "latitude": 0.4436020000000000
                 }
             },
             {
-                "country" : "US",
-                "zip" : "98006",
-                "state" : "WA",
-                "city" : "Seattle",
-                "address_line" : "30611 16th Ave S6",
-                "venue" : "",
-                "address_type" : "Mailing",
-                "location" : {
-                    "accuracy" : "Approximate",
-                    "longitude" : -0.6203090000000000,
-                    "latitude" : 0.3607280000000000
+                "country": "US",
+                "zip": "98006",
+                "state": "WA",
+                "city": "Seattle",
+                "address_line": "30611 16th Ave S6",
+                "venue": "",
+                "address_type": "Mailing",
+                "location": {
+                    "accuracy": "Approximate",
+                    "longitude": -0.6203090000000000,
+                    "latitude": 0.3607280000000000
                 }
             }
         ],
-        "description" : null,
-        "website" : "fc.org",
-        "url" : "fc.cbo.upward.st",
+        "description": null,
+        "website": "fc.org",
+        "url": "fc.cbo.upward.st",
         "externalServiceId": 2,
         "personnelId": 3,
         "authorizedEntityId": 1
     };
 
     var studentData = {
-        "first_name" : "Abraham",
-        "last_name" : "Tester",
-        "district_student_id" : "1111111111",
-        "programs" : [],
-        "addresses" : []
+        "first_name": "Abraham",
+        "last_name": "Tester",
+        "district_student_id": "1111111111",
+        "programs": [],
+        "addresses": []
     };
 
-    var userId, studentId, studentProgramId, studentProgramData = {
+    var userId, userId2, userId3, userId4, studentId, studentProgramId, studentProgramData = {
         programId: null,
         active: true, // Whether the student is currently active in the program or not.
         participation_start_date: new Date(Date.parse('May 8, 2015')).toString(),
@@ -123,33 +122,51 @@ describe( 'All-Test', function () {
         last_name: 'Upwardstech'
     };
 
+    var newUser2 = {
+        email: 'support2@upwardstech.com',
+        password: 'demo',
+        last_name: 'Upwardstech2'
+    };
+
+    var newUser3 = {
+        email: 'support3@upwardstech.com',
+        password: 'demo',
+        last_name: 'Upwardstech3'
+    };
+
+    var newUser4 = {
+        email: 'support4@upwardstech.com',
+        password: 'demo',
+        last_name: 'Upwardstech4'
+    };
+
+
     var email = 'test@test.com', password = 'test';
 
-    before( function (done) {
+    before(function (done) {
         if (mongoose.connection.db) return done();
-        mongoose.connect( dbUri, done );
-    } );
+        mongoose.connect(dbUri, done);
+    });
 
-    before( function (done) {
-        //done();
-        clearDB( done );
-    } );
+    before(function (done) {
+        clearDB(done);
+    });
 
     //describe('Cleanup', function() {
 
-        //it('clean up all data test', function(done){
-        //    request(api_endpoint).get('/users/cleanup')
-        //        .send('email=' + newUser.email)
-        //        .expect(200)
-        //        .expect(function (res) {
-        //            console.dir(res.body);
-        //        })
-        //        .end(done);
-        //
-        //});
+    //it('clean up all data test', function(done){
+    //    request(api_endpoint).get('/users/cleanup')
+    //        .send('email=' + newUser.email)
+    //        .expect(200)
+    //        .expect(function (res) {
+    //            console.dir(res.body);
+    //        })
+    //        .end(done);
+    //
+    //});
 
     //});
-    describe('Oauth2', function() {
+    describe('Oauth2', function () {
         it('should create a new user', function (done) {
             request(url).post('/api/users')
                 .send('email=' + email)
@@ -261,10 +278,9 @@ describe( 'All-Test', function () {
         });
 
 
-
     });
 
-    describe('API-User', function() {
+    describe('API-User', function () {
 
 
         it('GET /user', function (done) {
@@ -292,7 +308,7 @@ describe( 'All-Test', function () {
 
         });
 
-        it('POST /user', function (done) {
+        it('POST /user 1', function (done) {
             request(api_endpoint)
                 .post('/user')
                 .set('authorization', tokenType + ' ' + token)
@@ -307,6 +323,57 @@ describe( 'All-Test', function () {
 
         });
 
+        it('POST /user 2', function (done) {
+            request(api_endpoint)
+                .post('/user')
+                .set('authorization', tokenType + ' ' + token)
+                .send(newUser2)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(newUser2.email, res.body.info.email);
+                    assert.equal(newUser2.last_name, res.body.info.last_name);
+                    userId2 = res.body.info._id;
+                    assert.ok(userId2);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('POST /user 3', function (done) {
+            request(api_endpoint)
+                .post('/user')
+                .set('authorization', tokenType + ' ' + token)
+                .send(newUser3)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(newUser3.email, res.body.info.email);
+                    assert.equal(newUser3.last_name, res.body.info.last_name);
+                    userId3 = res.body.info._id;
+                    assert.ok(userId3);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('POST /user 4', function (done) {
+            request(api_endpoint)
+                .post('/user')
+                .set('authorization', tokenType + ' ' + token)
+                .send(newUser4)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(newUser4.email, res.body.info.email);
+                    assert.equal(newUser4.last_name, res.body.info.last_name);
+                    userId4 = res.body.info._id;
+                    assert.ok(userId4);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
         newUser.first_name = 'CV.';
 
         it('PUT /user', function (done) {
@@ -315,7 +382,7 @@ describe( 'All-Test', function () {
                 .set('authorization', tokenType + ' ' + token)
                 .send(newUser)
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(newUser.email, res.body.info.email);
                     assert.equal(newUser.last_name, res.body.info.last_name);
@@ -327,7 +394,7 @@ describe( 'All-Test', function () {
         });
     });
 
-    describe('API-Organizations', function() {
+    describe('API-Organizations', function () {
 
         it('POST /organizations', function (done) {
             http_build_query(orgData);
@@ -336,7 +403,7 @@ describe( 'All-Test', function () {
                 .set('authorization', tokenType + ' ' + token)
                 .send(orgData)
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(orgData.name, res.body.info.name);
                     organizationId = res.body.info._id;
@@ -357,16 +424,19 @@ describe( 'All-Test', function () {
             }]
         };
         var permissionId = '';
+        /**
+         * Test for admin User
+         */
         it('POST /:organizationId/users', function (done) {
             permissionsData.organization = organizationId;
             permissionsData.userId = userId;
             http_build_query(permissionsData);
             request(api_endpoint)
-                .post('/'+organizationId+'/users')
+                .post('/' + organizationId + '/users')
                 .set('authorization', tokenType + ' ' + token)
                 .send(permissionsData)
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     var permit = res.body.info.permissions[0];
                     assert.equal(organizationId, permit.organization);
@@ -379,9 +449,74 @@ describe( 'All-Test', function () {
                 .end(done);
         });
 
+        var permissions = {};
+
+
+        /**
+         * Test for admin User
+         */
+        it('POST /:organizationId/users', function (done) {
+            [userId2, userId3, userId4].forEach(function (userID) {
+                var allow = 'all';
+                if (userID == userId3) {
+                    allow = 'own';
+                }
+                if (userID == userId4) {
+                    allow = 'none';
+                }
+                permissions[userID] = {
+                    organization: organizationId,
+                    userId: userID,
+                    students: [],
+                    permissions: [{
+                        model: 'Student',
+                        operation: 'read',
+                        allow: allow
+                    }, {
+                        model: 'Student',
+                        operation: 'create',
+                        allow: allow
+                    }, {
+                        model: 'Student',
+                        operation: 'update',
+                        allow: allow
+                    }, {
+                        model: 'Student',
+                        operation: 'delete',
+                        allow: allow
+                    }]
+                };
+                permissions[userID].organization = organizationId;
+                permissions[userID].userId = userID;
+                permissions[userID].students = [];
+                http_build_query(permissions[userID]);
+                var req = request(api_endpoint)
+                    .post('/' + organizationId + '/users')
+                    .set('authorization', tokenType + ' ' + token)
+                    .send(permissions[userID])
+                    .expect(function (res) {
+                        if (!res.body.success) console.log('%j', res.body);
+                        assert.equal(true, res.body.success);
+                        var permit = res.body.info.permissions[0];
+                        assert.equal(organizationId, permit.organization);
+                        assert.ok(_.isArray(permit.students), 'Student must array');
+                        assert.ok(_.isArray(permit.permissions), 'Permission must array');
+                        permissions[userID].id = permit._id;
+                        assert.ok(permissions[userID].id);
+                    })
+                    .expect(200);
+
+                if (userID == userId4) {
+                    req.end(done);
+                } else {
+                    req.end(function(){});
+                }
+            });
+        });
+
         it('GET /:organizationId/users', function (done) {
             request(api_endpoint)
-                .get('/'+organizationId)
+                .get('/' + organizationId)
                 .set('authorization', tokenType + ' ' + token)
                 .expect(function (res) {
                     assert.equal(orgData.name, res.body.name);
@@ -396,7 +531,7 @@ describe( 'All-Test', function () {
                 .get('/organizations')
                 .set('authorization', tokenType + ' ' + token)
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(1, res.body.total);
                     assert.equal(orgData.name, res.body.data[0].name);
@@ -407,7 +542,7 @@ describe( 'All-Test', function () {
 
         it('GET /:organizationId', function (done) {
             request(api_endpoint)
-                .get('/'+organizationId)
+                .get('/' + organizationId)
                 .set('authorization', tokenType + ' ' + token)
                 .expect(function (res) {
                     assert.equal(orgData.name, res.body.name);
@@ -419,7 +554,7 @@ describe( 'All-Test', function () {
 
         it('GET /:organizationId/profile', function (done) {
             request(api_endpoint)
-                .get('/'+organizationId+'/profile')
+                .get('/' + organizationId + '/profile')
                 .set('authorization', tokenType + ' ' + token)
                 .expect(function (res) {
                     profileData = res.body;
@@ -429,17 +564,16 @@ describe( 'All-Test', function () {
                 .end(done);
         });
 
-
         it('PUT /:organizationId/profile', function (done) {
             request(api_endpoint)
-                .put('/'+organizationId+'/profile')
+                .put('/' + organizationId + '/profile')
                 .set('authorization', tokenType + ' ' + token)
                 .send({
                     description: 'There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...'
                 })
                 .expect(function (res) {
                     profileData = res.body.info;
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(orgData.name, profileData.name);
                     assert.equal('There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...', profileData.description);
@@ -447,11 +581,11 @@ describe( 'All-Test', function () {
                 .expect(200)
                 .end(done);
         });
+
         var programsName = 'Information Technologies 1';
         var programsName2 = 'Information Technologies 2';
         var programId = '';
         var programId2 = '';
-
 
 
         it('POST /:organizationId/programs 1', function (done) {
@@ -459,7 +593,7 @@ describe( 'All-Test', function () {
                 name: programsName,
                 organizationId: organizationId
             });
-                request(api_endpoint)
+            request(api_endpoint)
                 .post('/' + organizationId + '/programs')
                 .set('authorization', tokenType + ' ' + token)
                 .send({
@@ -467,7 +601,7 @@ describe( 'All-Test', function () {
                     organizationId: organizationId
                 })
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(programsName, res.body.info.name);
                     assert.equal(organizationId, res.body.info.organization);
@@ -476,6 +610,7 @@ describe( 'All-Test', function () {
                 .expect(200)
                 .end(done);
         });
+
         it('POST /:organizationId/programs 2', function (done) {
             request(api_endpoint)
                 .post('/' + organizationId + '/programs')
@@ -495,16 +630,15 @@ describe( 'All-Test', function () {
         });
 
 
-
         it('PUT /:organizationId/programs/:programId', function (done) {
             request(api_endpoint)
-                .put('/'+organizationId+'/programs/'+programId)
+                .put('/' + organizationId + '/programs/' + programId)
                 .set('authorization', tokenType + ' ' + token)
                 .send({
                     name: 'Information Technologies 1 US'
                 })
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal('Information Technologies 1 US', res.body.info.name);
                     assert.equal(organizationId, res.body.info.organization);
@@ -515,20 +649,20 @@ describe( 'All-Test', function () {
         });
 
         it('POST /:organizationId/students', function (done) {
-            console.log(api_endpoint, '/'+organizationId+'/students', ' ', tokenType + ' ' + token);
+            console.log(api_endpoint, '/' + organizationId + '/students', ' ', tokenType + ' ' + token);
             http_build_query(studentData);
             request(api_endpoint)
-                .post('/'+organizationId+'/students')
+                .post('/' + organizationId + '/students')
                 .set('authorization', tokenType + ' ' + token)
                 .send(studentData)
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(studentData.district_student_id, res.body.info.district_student_id);
                     assert.equal(organizationId, res.body.info.organization);
                     studentId = res.body.info._id;
                 })
-                //.expect(200)
+                .expect(200)
                 .end(done);
 
         });
@@ -537,19 +671,20 @@ describe( 'All-Test', function () {
             http_build_query({
                 last_name: 'Godong'
             });
+            console.log('/' + organizationId + '/students/' + studentId);
             request(api_endpoint)
-                .put('/'+organizationId+'/students/'+studentId)
+                .put('/' + organizationId + '/students/' + studentId)
                 .set('authorization', tokenType + ' ' + token)
                 .send({
                     last_name: 'Godong'
                 })
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal('Godong', res.body.info.last_name);
                     assert.equal(organizationId, res.body.info.organization);
                 })
-                //.expect(200)
+                .expect(200)
                 .end(done);
 
         });
@@ -569,11 +704,11 @@ describe( 'All-Test', function () {
         it('POST /:organizationId/students/:studentId/programs', function (done) {
             http_build_query(studentProgramData);
             request(api_endpoint)
-                .post('/'+organizationId+'/students/'+studentId+'/programs')
+                .post('/' + organizationId + '/students/' + studentId + '/programs')
                 .set('authorization', tokenType + ' ' + token)
                 .send(studentProgramData)
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(studentData.district_student_id, res.body.info.district_student_id);
                     assert.equal(organizationId, res.body.info.organization);
@@ -587,7 +722,7 @@ describe( 'All-Test', function () {
 
         it('GET /:organizationId/students/:studentId/programs', function (done) {
             request(api_endpoint)
-                .get('/'+organizationId+'/students/'+studentId+'/programs')
+                .get('/' + organizationId + '/students/' + studentId + '/programs')
                 .set('authorization', tokenType + ' ' + token)
                 .expect(function (res) {
                     //console.log('%j', res.body);
@@ -598,18 +733,17 @@ describe( 'All-Test', function () {
                 .end(done);
         });
 
-
         it('POST /:organizationId/programs/:programId/students', function (done) {
             studentProgramData.studentId = studentId;
             delete studentProgramData.programId;
             studentProgramData.cohort = 'Test 2';
             http_build_query(studentProgramData);
             request(api_endpoint)
-                .post('/'+organizationId+'/programs/'+programId2+'/students')
+                .post('/' + organizationId + '/programs/' + programId2 + '/students')
                 .set('authorization', tokenType + ' ' + token)
                 .send(studentProgramData)
                 .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(studentData.district_student_id, res.body.info.district_student_id);
                     assert.equal(organizationId, res.body.info.organization);
@@ -622,11 +756,11 @@ describe( 'All-Test', function () {
 
         it('GET /:organizationId/programs/:programId/students', function (done) {
             request(api_endpoint)
-                .get('/'+organizationId+'/programs/'+programId2+'/students')
+                .get('/' + organizationId + '/programs/' + programId2 + '/students')
                 .set('authorization', tokenType + ' ' + token)
                 .expect(function (res) {
-                    res.body.data.forEach(function(data, i){
-                        if(data._id === studentProgramId){
+                    res.body.data.forEach(function (data, i) {
+                        if (data._id === studentProgramId) {
                             assert.equal(studentProgramData.cohort, data.cohort);
                             assert.equal(studentProgramId, data._id);
                         }
@@ -640,36 +774,37 @@ describe( 'All-Test', function () {
         /**
          * Delete All Data Test Here
          */
-        it('DELETE /:organizationId/students/:studentId', function (done) {
-            request(api_endpoint)
-                .delete('/'+organizationId+'/students/'+studentId)
-                .set('authorization', tokenType + ' ' + token)
-                .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
-                    assert.equal(true, res.body.success);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-        it('DELETE /:organizationId/programs/:programId', function (done) {
-            request(api_endpoint)
-                .delete('/'+organizationId+'/programs/'+programId)
-                .set('authorization', tokenType + ' ' + token)
-                .expect(function (res) {
-                    if(!res.body.success) console.log('%j', res.body);
-                    assert.equal(true, res.body.success);
-                })
-                .expect(200)
-                .end(done);
-
-        });
+        //it('DELETE /:organizationId/students/:studentId', function (done) {
+        //    request(api_endpoint)
+        //        .delete('/'+organizationId+'/students/'+studentId)
+        //        .set('authorization', tokenType + ' ' + token)
+        //        .expect(function (res) {
+        //            if(!res.body.success) console.log('%j', res.body);
+        //            assert.equal(true, res.body.success);
+        //        })
+        //        .expect(200)
+        //        .end(done);
+        //
+        //});
+        //
+        //it('DELETE /:organizationId/programs/:programId', function (done) {
+        //    request(api_endpoint)
+        //        .delete('/'+organizationId+'/programs/'+programId)
+        //        .set('authorization', tokenType + ' ' + token)
+        //        .expect(function (res) {
+        //            if(!res.body.success) console.log('%j', res.body);
+        //            assert.equal(true, res.body.success);
+        //        })
+        //        .expect(200)
+        //        .end(done);
+        //
+        //});
 
     });
 
 
-    after( function (done) {
+    after(function (done) {
         done();
-    } )
+    })
 
-} );
+});

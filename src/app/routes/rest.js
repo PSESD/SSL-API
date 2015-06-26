@@ -95,6 +95,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
      */
     if(Api.env !== 'production') {
         router.get('/:organizationId/students/:studentId/backpack-skip', studentCtr.getStudentsBackpack);
+        router.get('/dummy/test', Api.controller('DummyController').index);
     }
 
 

@@ -159,8 +159,8 @@ StudentController.getStudentById = function (req, res) {
 
     var cb = function() {
         var orgId = req.params.organizationId;
-
-        Student.protect(req.user.role, null, req.user).findOne({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
+        var studentId = ObjectId(req.params.studentId);
+        Student.protect(req.user.role, { students: studentId }, req.user).findOne({organization: ObjectId(orgId), _id: studentId}, function (err, student) {
 
             if (err) return res.errJson(err);
             /**
@@ -183,8 +183,9 @@ StudentController.deleteStudentById = function (req, res) {
 
     var cb = function() {
         var orgId = req.params.organizationId;
+        var studentId = ObjectId(req.params.studentId);
 
-        Student.protect(req.user.role, null, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
+        Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
 
             if (err) return res.errJson(err);
 
@@ -222,8 +223,8 @@ StudentController.deleteStudentById = function (req, res) {
 StudentController.putStudentById = function(req, res){
 
     var cb = function () {
-
-        Student.protect(req.user.role, null, req.user).findOne({_id: ObjectId(req.params.studentId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
+        var studentId = ObjectId(req.params.studentId);
+        Student.protect(req.user.role, { students: studentId }, req.user).findOne({_id: studentId, organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
             if (err)  return res.errJson(err);
 

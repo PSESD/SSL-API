@@ -72,7 +72,8 @@ UserController.save = function (req, res) {
     if(req.body.email){
         crit = { email: req.body.email };
     }
-    req.app.get('log')(crit);
+    //req.app.get('log')(crit);
+
     User.findOne(crit, function (err, obj) {
         if (err) {
             return res.errJson(err);

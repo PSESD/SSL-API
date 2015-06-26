@@ -13,6 +13,7 @@ var protectFilter;
 
 var _permissions;
 var _acl;
+var _errorMessage = 'Access Denied';
 
 module.exports = function protector(schema, options) {
     /**
@@ -24,19 +25,26 @@ module.exports = function protector(schema, options) {
         _permissions = [];
         _acl = [];
         var _collectionName = collection;
-        user.permissions.forEach(function (permission) {
-            _permissions.push(permission);
-            if(permission.permissions.length > 0) {
-                permission.permissions.forEach(function(perm){
-                    if (perm.model && _collectionName.indexOf(perm.model.toLowerCase()) !== -1) {
-                        _acl.push(perm);
-                    }
-                    console.log(_collectionName, perm.model.toLowerCase());
-                });
-            }
-        });
 
-        console.log('Permissions: ', _acl);
+        if(user && _.isArray(user.permissions)) {
+            user.permissions.forEach(function (permission) {
+                var is = false;
+                if (permission.permissions.length > 0) {
+                    permission.permissions.forEach(function (perm) {
+                        if (perm.model && _collectionName.indexOf(perm.model.toLowerCase()) !== -1) {
+                            _acl.push(perm);
+                            is = true;
+                        }
+                        //console.log(_collectionName, perm.model.toLowerCase());
+                    });
+                }
+                if(is){
+                    _permissions = permission;
+                }
+            });
+        }
+
+        console.log('ROLE (', currentRole, ') Permissions: ', JSON.stringify(_acl));
     }
 
     /**
@@ -66,7 +74,9 @@ module.exports = function protector(schema, options) {
                 var gotRules = null, inRules = null, role = null, localRules = null;
                 // this is a new document, does the user have create permission?
                 if (caller.isNew) {
-
+                    if(checkAcl('create').denied){
+                        return _denied();
+                    }
                     gotRules = getRules(collection);
                     inRules = (typeof gotRules !== "undefined") ? gotRules : [];
 
@@ -89,7 +99,9 @@ module.exports = function protector(schema, options) {
                 }
                 // this document is being updated, does the user have update permission?
                 else {
-
+                    if(checkAcl('update').denied){
+                        return _denied();
+                    }
                     gotRules = getRules(collection);
                     inRules = (typeof gotRules !== "undefined") ? gotRules : [];
 
@@ -137,21 +149,29 @@ module.exports = function protector(schema, options) {
         return {
 
             find: function (args, callback) {
-
-                return _find(args, callback);
-
+                try {
+                    return _find(args, callback);
+                } catch(e){
+                    callback(e);
+                }
             },
             findOne: function (args, callback) {
-
-                return _findOne(args, callback);
-
+                try{
+                    return _findOne(args, callback);
+                } catch(e){
+                    callback(e);
+                }
             },
             save: function (fn) {
                 console.log('here');
                 return true;
             },
             remove: function (args, callback) {
-                return _delete(args, callback);
+                try {
+                    return _delete(args, callback);
+                } catch(e){
+                    callback(e);
+                }
             }
 
         };
@@ -224,32 +244,67 @@ module.exports = function protector(schema, options) {
         var role = (typeof currentRole !== "undefined") ? currentRole : "";
 
         var localRules = getRulesForRoleForMethod(inRules, role, allowName);
+        /**
+         * Skipped checked acl if admin user
+         */
+        if('admin' === currentRole){
+            console.log('SKIPPED CHECKED ACL => ', JSON.stringify({fields: localRules.properties, crit: crit}));
+            return {fields: localRules.properties, crit: crit};
+        }
 
         var acl = checkAcl(allowName);
-
+        console.log("DENIED ACL (", allowName, ")", JSON.stringify(acl), ' FROM => ', JSON.stringify(_acl));
         if(acl.denied) return _denied();
 
+
         if (!localRules) {
+            console.log("DENIED ACL => ", "NOT RULES");
             return false;
         }
 
         if (typeof localRules.where !== "undefined") {
 
-            switch (acl.allow){
+            switch (acl.permission.allow){
                 case 'all':
-
+                case '*':
+                    //Skip this checked
                     break;
                 case 'own':
+                case 'owner':
+                    console.log('CHECK PERMISSION INDEX OF >> ', collection, ' is ', collection in _permissions);
+                    if(collection in _permissions){
 
-                    if(_permissions.indexOf(collection) != -1){
-                        if(_permissions[collection].indexOf(protectFilter.value) === -1){
+                        if(!_.isEmpty(protectFilter) && collection in protectFilter && _permissions[collection].indexOf(protectFilter[collection]) === -1){
+                            console.log('DENIED ACL COMPARE USING LIST OF >> ', collection);
                             _denied();
                         }
+
+                        var tmp = _permissions[collection];
+
+                        if('_id' in crit){
+                            if(crit._id.hasOwnProperty('$in')){
+
+                                crit._id['$in'].forEach(function(id){
+                                    tmp.push(id);
+                                });
+
+                            } else {
+                                tmp.push(crit._id);
+                            }
+
+                            delete crit._id;
+                        }
+                        crit._id = { $in: tmp };
+
+                    } else {
+                        console.log('DENIED ACL LIST OWN NOT SET >> ', collection, ' ', JSON.stringify(_permissions));
+                        _denied();
                     }
                     break;
 
                 case 'none':
                 default:
+                    console.log("DENIED ACL => ", "PERMISSION NONE => ", acl.allow);
                     _denied();
                     break;
             }
@@ -292,7 +347,12 @@ module.exports = function protector(schema, options) {
         if (localRules.properties.hasOwnProperty('*')) {
             localRules.properties = {};
         }
-        return {fields: localRules.properties, crit: crit};
+
+        var criteria = {fields: localRules.properties, crit: crit};
+
+        console.log('ACL CRITERIA => ', JSON.stringify(criteria), ' RULES: ', JSON.stringify(localRules));
+
+        return criteria;
     };
 
     /**
@@ -322,7 +382,7 @@ module.exports = function protector(schema, options) {
 
             if (typeof callback === "function") {
 
-                callback('Unauthorized');
+                callback(_errorMessage);
 
             } else {
                 // this is pretty hacky
@@ -330,13 +390,13 @@ module.exports = function protector(schema, options) {
                     populate: function (args) {
                         return {
                             exec: function (callback) {
-                                callback('Unauthorized');
+                                callback(_errorMessage);
                             }
                         }
                     },
                     exec: function (callback) {
 
-                        callback('Unauthorized');
+                        callback(_errorMessage);
                     }
                 }
 
@@ -372,7 +432,7 @@ module.exports = function protector(schema, options) {
 
             if (typeof callback === "function") {
 
-                callback('Unauthorized');
+                callback(_errorMessage);
 
             } else {
                 // this is pretty hacky
@@ -380,13 +440,13 @@ module.exports = function protector(schema, options) {
                     populate: function (args) {
                         return {
                             exec: function (callback) {
-                                callback('Unauthorized');
+                                callback(_errorMessage);
                             }
                         }
                     },
                     exec: function (callback) {
 
-                        callback('Unauthorized');
+                        callback(_errorMessage);
                     }
                 }
 
@@ -419,14 +479,14 @@ module.exports = function protector(schema, options) {
 
             if (typeof callback === "function") {
 
-                callback('Unauthorized');
+                callback(_errorMessage);
 
             } else {
                 // this is pretty hacky
                 return {
                     exec: function (callback) {
 
-                        callback('Unauthorized');
+                        callback(_errorMessage);
                     }
                 }
 
@@ -440,7 +500,7 @@ module.exports = function protector(schema, options) {
  * @private
  */
 function _denied () {
-    throw new mongoose.Error("Unauthorized");
+    throw new mongoose.Error(_errorMessage);
 }
 /**
  *
@@ -449,17 +509,29 @@ function _denied () {
  */
 function checkAcl(method){
 
+
     if(!_acl) return {
         denied: true,
         permission: null
     };
 
+    if(currentRole === 'admin'){
+        return {
+            denied: false,
+            permission: {
+                allow: 'all',
+                operation: '*'
+            }
+        };
+    }
 
     var operation = [ '*', method ];
 
-    _acl.forEach(function (acl) {
+    var i = 0, acl = null;
 
-        if(operation.indexOf(acl.operation) !== false){
+    do {
+        acl = _acl[i];
+        if(operation.indexOf(acl.operation) !== -1){
 
             return {
                 denied: false,
@@ -467,7 +539,8 @@ function checkAcl(method){
             };
 
         }
-    });
+        i++;
+    } while(i < _acl.length);
 
     return {
         denied: true,
