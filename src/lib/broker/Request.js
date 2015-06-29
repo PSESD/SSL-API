@@ -105,8 +105,8 @@ Request.prototype = {
             qsParseOptions: { sep: ';'},
             strictSSL: false
         };
-        console.log("SEND DATA TO HZ");
-        console.dir(options);
+        //console.log("SEND DATA TO HZ");
+        //console.dir(options);
         return request.get(options, callback || function (error, response, body) {
             if(error){
                 console.log('error: ', error);

@@ -9,6 +9,7 @@ var BaseController = require('./BaseController');
 var _ = require('underscore');
 var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
+var utils = require('../../lib/utils'), cache = utils.cache();
 
 var ObjectId = mongoose.Types.ObjectId;
 
@@ -48,30 +49,49 @@ StudentController.getStudentsBackpack = function (req, res) {
                     personnelId: organization.personnelId,  
                     authorizedEntityId: organization.authorizedEntityId
                 });
+                var key = [student.district_student_id, student.school_district, organization.externalServiceId, organization.personnelId, organization.authorizedEntityId].join('_');
+                cache.get(key, function(err, result){
 
-                var request = brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
+                    utils.log(err);
 
+                    console.log('RESULT: ', result);
 
-                    if (error) {
-                        return res.errJson(error);
-                    }
+                    if(!result){
+                        console.log("GET FROM SERVER");
+                        brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
 
-                    if (!body) {
-                        return res.errJson('Data not found');
-                    }
-                    if (response && response.statusCode == '200') {
-                        parseString(body, { explicitArray: false }, function (err, result) {
-                            var json = result.sre;
-                            delete json['$'];
-                            res.okJson(json);
+                            if (error) {
+                                return res.errJson(error);
+                            }
+
+                            if (!body) {
+                                return res.errJson('Data not found');
+                            }
+                            if (response && response.statusCode == '200') {
+                                parseString(body, { explicitArray: false }, function (err, result) {
+                                    var json = result.sre;
+                                    delete json['$'];
+                                    cache.set(key, json, function(err){
+
+                                        utils.log(err);
+
+                                        res.okJson(json);
+                                    });
+
+                                });
+                            } else {
+                                parseString(body, { explicitArray: false }, function (err, result) {
+                                    var json = (result && 'error' in result) ? result.error.message : 'Error not response';
+                                    res.errJson(json);
+                                });
+                            }
                         });
                     } else {
-                        parseString(body, { explicitArray: false }, function (err, result) {
-                            var json = result ? result.Error : 'Error not response';
-                            res.errJson(json);
-                        });
+                        console.log("GET FROM CACHE");
+                        res.okJson(result);
                     }
                 });
+
             });
             
         });

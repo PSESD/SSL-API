@@ -103,7 +103,8 @@ describe('All-Test', function () {
     var studentData = {
         "first_name": "Abraham",
         "last_name": "Tester",
-        "district_student_id": "1111111111",
+        "district_student_id": "9999999999",
+        "school_district": "highline",
         "programs": [],
         "addresses": []
     };
@@ -690,16 +691,17 @@ describe('All-Test', function () {
         });
 
 
-        //it('GET /:organizationId/students/:studentId/backpack', function (done) {
-        //   request(api_endpoint)
-        //       .get('/'+organizationId+'/students/'+studentId+'/backpack')
-        //       .set('authorization', tokenType + ' ' + token)
-        //       .expect(function (res) {
-        //           console.log(res.body);
-        //       })
-        //       .expect(200)
-        //       .end(done);
-        //});
+        it('GET /:organizationId/students/:studentId/backpack', function (done) {
+           console.log(api_endpoint+'/'+organizationId+'/students/'+studentId+'/backpack', ' ', tokenType + ' ' + token);
+           request(api_endpoint)
+               .get('/'+organizationId+'/students/'+studentId+'/backpack')
+               .set('authorization', tokenType + ' ' + token)
+               .expect(function (res) {
+                   console.log(res.body);
+               })
+               .expect(200)
+               .end(done);
+        });
 
         it('POST /:organizationId/students/:studentId/programs', function (done) {
             http_build_query(studentProgramData);
