@@ -37,6 +37,7 @@ describe( 'OAuth2', function () {
     } );
 
     before( function (done) {
+        //done();
         clearDB( done );
     } );
 
@@ -152,31 +153,34 @@ describe( 'OAuth2', function () {
 
     } );
 
-    it( 'use refresh token to get a token', function (done) {
-
-        var rfParam = {
-            grant_type  : 'refresh_token',
-            refresh_token: refreshToken
-        };
-
-        var out = [];
-        Object.keys(rfParam).forEach(function(key) {
-            out.push(key+'='+encodeURIComponent(rfParam[key]));
-        });
-        console.log(url+'/api/oauth2/token', out.join("&"));
-
-        request( url ).post( '/api/oauth2/token' )
-            .auth( 'client', secretCode )
-            .expect( 'Content-Type', /json/ ).type( 'form' )
-            .send( rfParam )
-            .type( 'urlencoded' )
-            .expect( 200 )
-            .expect( function (res) {
-                console.dir(res.body);
-            } )
-            .end( done );
-
-    } );
+    //it( 'use refresh token to get a token', function (done) {
+    //
+    //    var rfParam = {
+    //        grant_type  : 'refresh_token',
+    //        refresh_token: refreshToken
+    //    };
+    //
+    //    var out = [];
+    //    Object.keys(rfParam).forEach(function(key) {
+    //        out.push(key+'='+encodeURIComponent(rfParam[key]));
+    //    });
+    //    console.log(url+'/api/oauth2/token', out.join("&"));
+    //
+    //    request( url ).post( '/api/oauth2/token' )
+    //        .auth( 'client', secretCode )
+    //        .expect( 'Content-Type', /json/ ).type( 'form' )
+    //        .send( rfParam )
+    //        .type( 'urlencoded' )
+    //        .expect( 200 )
+    //        .expect( function (res) {
+    //            token = res.body.access_token;
+    //            refreshToken = res.body.refresh_token;
+    //            tokenType = res.body.token_type;
+    //            console.log('Refresh-Url: ' + api_endpoint + '/user', 'authorization: ' + tokenType + ' ' + token);
+    //        } )
+    //        .end( done );
+    //
+    //} );
 
     var newUser = {
         email: 'support@upwardstech.com',
@@ -212,7 +216,7 @@ describe( 'OAuth2', function () {
 
     newUser.first_name = 'CV.';
 
-    it( 'update new user', function (done) {
+    it( 'update existing user', function (done) {
         request(api_endpoint)
             .put('/user')
             .set('authorization', tokenType + ' ' + token)

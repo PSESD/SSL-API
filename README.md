@@ -14,6 +14,42 @@ The URL used when authenticating a user is`http://<domain>:<port>/api/oauth2/aut
 
 You need to have installed Node.js and MongoDB
 
+Another Tools:
+#####- Mandrill [link](https://mandrillapp.com) 
+Email  service for send mail. Below example in config file: 
+
+    
+      "mandrill": {
+            "api_key": "<api_key>"
+        }
+
+#####- Rollbar [link](https://rollbar.com) 
+Logger service. The application need token. Below example in config file: 
+   
+      "rollbar": {
+            "access_token": "<rollbar_token>"
+        }
+
+#####- Redis [link](http://redis.io) 
+Cache adapter. Below example in config file: 
+   
+      "cache": {
+            "adapter": "memory",
+            "backup": "redis",
+            "redis": {
+                "host": "localhost",
+                "port": "6379",
+                "db": 0,
+                "ttl": 86400
+            },
+            "memory": {
+                "max": 100,
+                "ttl": 60
+            }
+        }
+
+
+
 ## Installation
 
 
@@ -38,36 +74,78 @@ The following examples configuration in JSON format.
     $ vi src/config/development.json
 
     {
-      "host": "<domain>",
-      "token": {
-        "expires_in": 3600
-      },
-      "db": {
-    	"mongo": {
-    	  "host": "<mongodb host>",
-    	  "name": "<mongodb name>"
-    	}
-      },
-      "session": {
-    	"secret" : "<secret>",
-    	"saveUninitialized": true,
-    	"resave": true
-      },
-      /**
-       * Cross Domain Setting
-       */
-      "cross": {
-    	"enable": true,
-    	"allow_origin" : null, // default: "*",
-    	"allow_headers" : null// default: Origin, X-Requested-With, Content-Type, Accept
-      },
-      "salt": "<salt>",
-      /**
-       * Logger
-       */
-      "rollbar": {
-    	"access_token" : "<rollbar token>"
-      }
+        "host": "<host_name>",
+        "api": {
+            "url": "https://api.***.com"
+        },
+        "auth": {
+            "url": "https://auth.***.com"
+        },
+        "token": {
+            "expires_in": 3600
+        },
+        "db": {
+            "mongo": {
+                "host": "<mongodb host>",
+                "name": "<mongodb name>"
+            }
+        },
+        "session": {
+            "secret": "<secret>",
+            "saveUninitialized": true,
+            "resave": true
+        },
+    
+        "mandrill": {
+            "api_key": "<api_key>"
+        },
+        "hz": {
+            "hzUri": "<hzUri>",
+            "hzSessionToken": "<hzSessionToken>",
+            "hzSharedSecret": "<hzSharedSecret>",
+            "object": "<object>",
+            "service": "<service>",
+            "contextId": "CBO",
+            "validation-url": "<validation-url>",
+            "validation-service": "<validation-service?",
+            "serviceType": "OBJECT",
+            "requestType": "IMMEDIATE",
+            "requestAction": "QUERY",
+            "messageType": "REQUEST",
+            "objectType": "<objectType>",
+            "prsBaseUri": "<prsBaseUri>",
+            "prsSessionToken": "<prsSessionToken>",
+            "prsSharedSecret": "<prsSharedSecret>"
+        },
+        "cross": {
+            "enable": true,
+            /** default: "*" */
+            "allow_origin": "*",
+            "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept",
+            "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
+        },
+        "salt": "1f3f365ffdf4eb0777899420f0aca20a_test",
+        "rollbar": {
+            "access_token": "<rollbar_token>"
+        },
+        "aws": {
+            "aws_access_key_id":"",
+            "aws_secret_access_key":""
+        },
+        "cache": {
+            "adapter": "memory",
+            "backup": "redis",
+            "redis": {
+                "host": "localhost",
+                "port": "6379",
+                "db": 0,
+                "ttl": 86400
+            },
+            "memory": {
+                "max": 100,
+                "ttl": 60
+            }
+        }
     }
 
 **Edit config overrides for production deployment:**
@@ -75,36 +153,78 @@ The following examples configuration in JSON format.
     $ vi src/config/production.json
 
     {
-          "host": "<domain>",
-          "token": {
-            "expires_in": 3600
-          },
-          "db": {
-        	"mongo": {
-        	  "host": "<mongodb host>",
-        	  "name": "<mongodb name>"
-        	}
-          },
-          "session": {
-        	"secret" : "<secret>",
-        	"saveUninitialized": true,
-        	"resave": true
-          },
-          /**
-           * Cross Domain Setting
-           */
-          "cross": {
-        	"enable": true,
-        	"allow_origin" : null, // default: "*",
-        	"allow_headers" : null// default: Origin, X-Requested-With, Content-Type, Accept
-          },
-          "salt": "<salt>",
-          /**
-           * Logger
-           */
-          "rollbar": {
-        	"access_token" : "<rollbar token>"
-          }
+            "host": "<host_name>",
+            "api": {
+                "url": "https://api.***.com"
+            },
+            "auth": {
+                "url": "https://auth.***.com"
+            },
+            "token": {
+                "expires_in": 3600
+            },
+            "db": {
+                "mongo": {
+                    "host": "<mongodb host>",
+                    "name": "<mongodb name>"
+                }
+            },
+            "session": {
+                "secret": "<secret>",
+                "saveUninitialized": true,
+                "resave": true
+            },
+        
+            "mandrill": {
+                "api_key": "<api_key>"
+            },
+            "hz": {
+                "hzUri": "<hzUri>",
+                "hzSessionToken": "<hzSessionToken>",
+                "hzSharedSecret": "<hzSharedSecret>",
+                "object": "<object>",
+                "service": "<service>",
+                "contextId": "CBO",
+                "validation-url": "<validation-url>",
+                "validation-service": "<validation-service?",
+                "serviceType": "OBJECT",
+                "requestType": "IMMEDIATE",
+                "requestAction": "QUERY",
+                "messageType": "REQUEST",
+                "objectType": "<objectType>",
+                "prsBaseUri": "<prsBaseUri>",
+                "prsSessionToken": "<prsSessionToken>",
+                "prsSharedSecret": "<prsSharedSecret>"
+            },
+            "cross": {
+                "enable": true,
+                /** default: "*" */
+                "allow_origin": "*",
+                "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept",
+                "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
+            },
+            "salt": "1f3f365ffdf4eb0777899420f0aca20a_test",
+            "rollbar": {
+                "access_token": "<rollbar_token>"
+            },
+            "aws": {
+                "aws_access_key_id":"",
+                "aws_secret_access_key":""
+            },
+            "cache": {
+                "adapter": "memory",
+                "backup": "redis",
+                "redis": {
+                    "host": "localhost",
+                    "port": "6379",
+                    "db": 0,
+                    "ttl": 86400
+                },
+                "memory": {
+                    "max": 100,
+                    "ttl": 60
+                }
+            }
         }
 
 **Use configs in your code:**

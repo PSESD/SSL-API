@@ -2,9 +2,48 @@
  * Created by zaenal on 12/05/15.
  */
 var crypto = require('crypto');
-var saltStatic = require('config').get('salt');
+var config = require('config');
+var rollbar = require('rollbar');
+var saltStatic = config.get('salt');
+var cacheManager = require('cache-manager');
+/**
+ *
+ * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
+ */
 var utils = {
+    /**
+     *
+     * @returns cache-manager
+     */
+    cache: function(){
+        var cache = config.get('cache');
+        var caches = [];
+        var options = {};
+        var getCache = function(name) {
+            switch (name) {
+                case 'redis':
+                    var redisStore = require('cache-manager-redis');
+                    options = {
+                        store: redisStore,
+                        host: cache.redis.host,
+                        port: cache.redis.port,
+                        ttl: cache.redis.ttl
+                    };
+                    return cacheManager.caching(options);
+                case 'memory':
+                case 'memcache':
+                    options = {};
+                    options = cache[name];
+                    options.store = name;
+                    return cacheManager.caching(options);
+            }
+        };
 
+        caches.push(getCache(cache.adapter));
+        caches.push(getCache(cache.backup));
+
+        return cacheManager.multiCaching(caches);
+    },
     /**
      * Return a unique identifier with the given `len`.
      *
@@ -87,6 +126,19 @@ var utils = {
 
         return String(str)
             .replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
+    },
+    /**
+     * Logging to API
+     */
+    log: function(message, type, callback){
+        var rollbarAccessToken = config.get('rollbar.access_token');
+        if(message instanceof Error){
+            message = message.stack.split("\n");
+        }
+        if(rollbarAccessToken){
+            rollbar.reportMessage(message, type || 'info', callback);
+        }
+        console.log(message);
     }
 
 };
