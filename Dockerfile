@@ -13,7 +13,7 @@ ENV NODE_CONFIG_DIR /src/config
 
 # Install Required Packages
 RUN apt-get update && apt-get -y upgrade
-RUN apt-get -y install curl unzip git wget vim nginx nodejs npm python-setuptools redis-server
+RUN apt-get -y install curl unzip git wget vim nginx nodejs npm python-setuptools
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 
 # Setup Nginx
@@ -35,11 +35,9 @@ RUN npm install
 RUN /usr/bin/easy_install supervisor
 RUN /usr/bin/easy_install supervisor-stdout
 RUN /usr/bin/easy_install superlance
-ADD /config/redis.conf /etc/redis/redis.conf
 ADD /config/supervisord.conf /etc/supervisord.conf
 
 # Publish port
-EXPOSE 443 6379
+EXPOSE 443
 
 CMD ["/usr/local/bin/supervisord","-n"]
-
