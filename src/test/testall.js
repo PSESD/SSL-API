@@ -752,7 +752,7 @@ describe('All-Test', function () {
                     studentProgramId = res.body.info.programs[0]._id;
                     assert.ok(studentProgramId);
                 })
-                //.expect(200)
+                .expect(200)
                 .end(done);
         });
 
