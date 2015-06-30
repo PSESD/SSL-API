@@ -10,10 +10,11 @@ var uuid = require('node-uuid');
 
 var CryptoJS = require("crypto-js");
 
-function Request(env) {
+function Request(options, env) {
     if(!config.has('hz')){
         throw new Error("config HZ not found!");
     }
+    options = options || {};
     var hz = config.get('hz');
     this.env = env || 'dev';
     this.config = hz;
@@ -24,10 +25,12 @@ function Request(env) {
     this.headers.messageId = null;
     this.headers.externalServiceId = hz.externalServiceId;
     this.headers.Accept = 'application/xml';
-    this.headers.personnelId = hz.personnelId;
+    if(options.personnelId) {
+        this.headers.personnelId = options.personnelId;
+    }
     this.headers.districtStudentId = null;
-    this.headers.authorizedEntityId = hz.authorizedEntityId;
-    this.headers.externalServiceId = hz.externalServiceId;
+    this.headers.authorizedEntityId = options.authorizedEntityId;
+    this.headers.externalServiceId = options.externalServiceId;
     this.headers.requestAction = hz.requestAction;
     this.headers.messageType = hz.messageType;
     this.headers["Content-Type"] = "application/xml";
@@ -102,8 +105,8 @@ Request.prototype = {
             qsParseOptions: { sep: ';'},
             strictSSL: false
         };
-        console.log("SEND DATA TO HZ");
-        console.dir(options);
+        //console.log("SEND DATA TO HZ");
+        //console.dir(options);
         return request.get(options, callback || function (error, response, body) {
             if(error){
                 console.log('error: ', error);
@@ -125,6 +128,12 @@ Request.prototype = {
      * @returns {*|request}
      */
     createRequestProvider: function(districtStudentId, zoneId, callback){
+        if(!districtStudentId){
+
+            if(!callback) return;
+
+            return callback('District student id was not set', null, null);
+        }
         var url = '/requestProvider/' + this.config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+this.config.contextId;
         this.addHeader( 'districtStudentId', districtStudentId );
         return this.create(url, 'GET', callback);
