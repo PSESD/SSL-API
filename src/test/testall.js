@@ -153,20 +153,6 @@ describe('All-Test', function () {
         clearDB(done);
     });
 
-    //describe('Cleanup', function() {
-
-    //it('clean up all data test', function(done){
-    //    request(api_endpoint).get('/users/cleanup')
-    //        .send('email=' + newUser.email)
-    //        .expect(200)
-    //        .expect(function (res) {
-    //            console.dir(res.body);
-    //        })
-    //        .end(done);
-    //
-    //});
-
-    //});
     describe('Oauth2', function () {
         it('should create a new user', function (done) {
             request(url).post('/api/users')
@@ -277,8 +263,6 @@ describe('All-Test', function () {
                 .end(done);
 
         });
-
-
     });
 
     describe('API-User', function () {
@@ -296,18 +280,7 @@ describe('All-Test', function () {
 
         });
 
-        it('DELETE /user', function (done) {
-            request(api_endpoint)
-                .delete('/user')
-                .set('authorization', tokenType + ' ' + token)
-                .send({email: newUser.email})
-                .expect(function (res) {
-                    //assert.equal(res, { success: true });
-                })
-                .expect(200)
-                .end(done);
 
-        });
 
         it('POST /user 1', function (done) {
             request(api_endpoint)
@@ -388,6 +361,20 @@ describe('All-Test', function () {
                     assert.equal(newUser.email, res.body.info.email);
                     assert.equal(newUser.last_name, res.body.info.last_name);
                     assert.equal(newUser.first_name, res.body.info.first_name);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('DELETE /user', function (done) {
+            request(api_endpoint)
+                .delete('/user')
+                .set('authorization', tokenType + ' ' + token)
+                .send({email: newUser.email})
+                .expect(function (res) {
+                    console.log({email: newUser.email});
+                    assert.equal(true, res.body.success, res.body.message);
                 })
                 .expect(200)
                 .end(done);
@@ -691,13 +678,13 @@ describe('All-Test', function () {
         });
 
 
-        it('GET /:organizationId/students/:studentId/backpack', function (done) {
-           console.log(api_endpoint+'/'+organizationId+'/students/'+studentId+'/backpack', ' ', tokenType + ' ' + token);
+        it('GET /:organizationId/students/:studentId/xsre', function (done) {
+           console.log(api_endpoint+'/'+organizationId+'/students/'+studentId+'/xsre', ' ', tokenType + ' ' + token);
            request(api_endpoint)
-               .get('/'+organizationId+'/students/'+studentId+'/backpack')
+               .get('/'+organizationId+'/students/'+studentId+'/xsre')
                .set('authorization', tokenType + ' ' + token)
                .expect(function (res) {
-                   console.log(res.body);
+                   assert.ok(res.body._links);
                })
                .expect(200)
                .end(done);
@@ -727,7 +714,6 @@ describe('All-Test', function () {
                 .get('/' + organizationId + '/students/' + studentId + '/programs')
                 .set('authorization', tokenType + ' ' + token)
                 .expect(function (res) {
-                    //console.log('%j', res.body);
                     assert.equal(studentProgramData.cohort, res.body.data[0].cohort);
                     assert.equal(studentProgramId, res.body.data[0]._id);
                 })
@@ -776,31 +762,31 @@ describe('All-Test', function () {
         /**
          * Delete All Data Test Here
          */
-        //it('DELETE /:organizationId/students/:studentId', function (done) {
-        //    request(api_endpoint)
-        //        .delete('/'+organizationId+'/students/'+studentId)
-        //        .set('authorization', tokenType + ' ' + token)
-        //        .expect(function (res) {
-        //            if(!res.body.success) console.log('%j', res.body);
-        //            assert.equal(true, res.body.success);
-        //        })
-        //        .expect(200)
-        //        .end(done);
-        //
-        //});
-        //
-        //it('DELETE /:organizationId/programs/:programId', function (done) {
-        //    request(api_endpoint)
-        //        .delete('/'+organizationId+'/programs/'+programId)
-        //        .set('authorization', tokenType + ' ' + token)
-        //        .expect(function (res) {
-        //            if(!res.body.success) console.log('%j', res.body);
-        //            assert.equal(true, res.body.success);
-        //        })
-        //        .expect(200)
-        //        .end(done);
-        //
-        //});
+        it('DELETE /:organizationId/students/:studentId', function (done) {
+            request(api_endpoint)
+                .delete('/'+organizationId+'/students/'+studentId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('DELETE /:organizationId/programs/:programId', function (done) {
+            request(api_endpoint)
+                .delete('/'+organizationId+'/programs/'+programId)
+                .set('authorization', tokenType + ' ' + token)
+                .expect(function (res) {
+                    if(!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
 
     });
 

@@ -2,6 +2,8 @@
  * Created by zaenal on 21/05/15.
  */
 var User = require('../models/User');
+var Client = require('../models/Client');
+var Code = require('../models/Code');
 var BaseController = require('./BaseController');
 var util = require('util');
 var extend = util._extend;

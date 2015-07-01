@@ -75,7 +75,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .put(auth.isBearerAuthenticated, studentCtr.putStudentById)
         .delete(auth.isBearerAuthenticated, studentCtr.deleteStudentById);
 
-    router.route('/:organizationId/students/:studentId/backpack').get(auth.isBearerAuthenticated, studentCtr.getStudentsBackpack);
+    router.route('/:organizationId/students/:studentId/xsre').get(auth.isBearerAuthenticated, studentCtr.getStudentsBackpack);
 
 
     router.route('/:organizationId/students/:studentId/programs')
@@ -94,7 +94,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
      * Only for development
      */
     if(Api.env !== 'production') {
-        router.get('/:organizationId/students/:studentId/backpack-skip', studentCtr.getStudentsBackpack);
+        router.get('/:organizationId/students/:studentId/xsre-skip', studentCtr.getStudentsBackpack);
         router.get('/dummy/test', Api.controller('DummyController').index);
     }
 

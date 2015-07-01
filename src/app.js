@@ -10,6 +10,7 @@ var methodOverride = require('method-override');
 var port = process.env.PORT || 4000;
 var config = require('config');
 var AWS = require('aws-sdk');
+var hal = require("hal");
 
 var rollbarAccessToken = config.get('rollbar.access_token');
 
@@ -135,6 +136,7 @@ Api.prototype.configureExpress = function(db) {
     // Use the passport package in our application
     app.use(passport.initialize());
 
+    //app.use(hal.middleware);
 
     // Use express session support since OAuth2orize requires it
     //app.use(session({
@@ -144,12 +146,17 @@ Api.prototype.configureExpress = function(db) {
     //}));
 
     app.use(function(req, res, next){
-        res.okJson = function (message, data) {
+        var resource = null;
+        res.okJson = function (message, data, key, collection) {
             /**
              * If message is object will direct return
              */
             if(_.isObject(message)){
-                return res.json(message);
+                if(typeof message.toJSON === 'function') {
+                    message = message.toJSON();
+                }
+                resource = new hal.Resource(message, req.originalUrl);
+                return res.json(resource.toJSON());
             }
             /**
              * populate response
@@ -159,18 +166,34 @@ Api.prototype.configureExpress = function(db) {
             if(message){
                 response.message = message;
             }
+
             if(data){
                 if(_.isArray(data)) {
                     response.total = data.length;
-                    response.data = data;
+                    if(key){
+                        response[key] = data;
+                    } else {
+                        response.data = data;
+                    }
                 } else {
-                    response.info = data;
+                    if(key) {
+                        response[key] = data;
+                    } else {
+                        response.info = data;
+                    }
                 }
             }
-            return res.json(response);
+            resource = new hal.Resource(response, req.originalUrl);
+            if(typeof collection === 'function'){
+                resource = collection(resource);
+            }
+            return res.json(resource.toJSON());
         };
+
         res.errJson = function (err) {
-            return res.json({success: false, error: err});
+            var response = {success: false, error: err};
+            resource = new hal.Resource(response, req.originalUrl);
+            return res.json(resource.toJSON());
         };
         next();
     });
