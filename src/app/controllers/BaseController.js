@@ -34,9 +34,6 @@ BaseController.prototype.crud = function(idName) {
 
             var orgid = req.user.organizationId;
 
-            //if(orgid.length === 0){
-            //    return true;
-            //}
 
             return orgid.indexOf(req.params.organizationId);
         },

@@ -74,12 +74,11 @@ UserController.save = function (req, res) {
     if(req.body.email){
         crit = { email: req.body.email };
     }
-    //req.app.get('log')(crit);
 
     User.findOne(crit, function (err, obj) {
-        if (err) {
-            return res.errJson(err);
-        }
+        if (err) return res.errJson(err);
+
+        if(!obj) return res.errJson('User not found');
 
         for (var prop in req.body) {
             obj[prop] = req.body[prop];

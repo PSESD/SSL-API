@@ -9,14 +9,14 @@ var _ = require('underscore');
 var methodOverride = require('method-override');
 var port = process.env.PORT || 4000;
 var config = require('config');
-var AWS = require('aws-sdk');
-var hal = require("hal");
+var hal = require('hal');
 
 var rollbarAccessToken = config.get('rollbar.access_token');
 
 if(rollbarAccessToken) {
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
+    rollbar.handleUncaughtExceptions(rollbarAccessToken, {});
 }
 function Api(){
     var self = this;
@@ -26,7 +26,6 @@ function Api(){
     self.routeDir = self.baseDir + '/app/routes';
     self.libDir = self.baseDir + '/lib';
     self.config = config;
-    //console.log('NODE_ENV: ' + self.config.util.getEnv('NODE_ENV'));
     self.mongo = mongoose;
 
     self.env = app.get('env');
@@ -99,12 +98,13 @@ Api.prototype.registerRoute = function(cb){
  * Connect to database
  */
 Api.prototype.connectDb = function() {
+    var self = this;
     var dbUri = 'mongodb://'+this.config.get('db.mongo.host')+'/'+this.config.get('db.mongo.name');
-    console.log("[%s] DB URI: " + dbUri, app.get('env'));
-    this.mongo.connect(dbUri);
-    if(config.has('aws')){
 
-    }
+    this.mongo.connect(dbUri);
+    this.mongo.connection.once('open', function (callback) {
+        console.log("[%s] DB URI: " + dbUri, app.get('env'));
+    });
     //this.mongo.set('debug', app.get('env') === 'test');
     this.configureExpress(this.db);
     
@@ -117,7 +117,7 @@ Api.prototype.migrate = function(){
         //var populateCbo = require('./scripts/populate-cbo');
         //populateCbo.run();
     }
-}
+};
 /**
  * Config Express and Register Route
  * @param db
@@ -127,6 +127,7 @@ Api.prototype.configureExpress = function(db) {
     app.set('api', self);
 
     app.set('log', require('./lib/utils').log);
+
     app.use(bodyParser.urlencoded({ extended: true }));
 
     app.use(bodyParser.json());
@@ -136,14 +137,13 @@ Api.prototype.configureExpress = function(db) {
     // Use the passport package in our application
     app.use(passport.initialize());
 
-    //app.use(hal.middleware);
 
     // Use express session support since OAuth2orize requires it
-    //app.use(session({
-    //  secret: self.config.get('session.secret'),
-    //  saveUninitialized: self.config.get('session.saveUninitialized'),
-    //  resave: self.config.get('session.resave')
-    //}));
+    app.use(session({
+      secret: self.config.get('session.secret'),
+      saveUninitialized: self.config.get('session.saveUninitialized'),
+      resave: self.config.get('session.resave')
+    }));
 
     app.use(function(req, res, next){
         var resource = null;
@@ -246,19 +246,14 @@ Api.prototype.stop = function(err) {
  */
 Api.errorStack = function(ex){
 
-    var err = ex.stack.split("\n");
-    console.log(err);
     if(rollbarAccessToken) {
-        rollbar.reportMessage(err, 'error', function (err) {
-            process.exit(1);
-        });
+        rollbar.handleError(ex);
     }
 
-}
+};
 
 try {
     new Api();
 } catch(e){
     Api.errorStack(e);
-
 }

@@ -373,7 +373,6 @@ describe('All-Test', function () {
                 .set('authorization', tokenType + ' ' + token)
                 .send({email: newUser.email})
                 .expect(function (res) {
-                    console.log({email: newUser.email});
                     assert.equal(true, res.body.success, res.body.message);
                 })
                 .expect(200)
