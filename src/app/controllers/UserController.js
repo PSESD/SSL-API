@@ -8,7 +8,6 @@ var BaseController = require('./BaseController');
 var util = require('util');
 var extend = util._extend;
 var _ = require('underscore');
-
 var UserController = new BaseController(User).crud();
 /**
  * Get Current User Login
@@ -16,12 +15,15 @@ var UserController = new BaseController(User).crud();
  * @param res
  */
 UserController.get = function (req, res) {
+
     User.findOne({email: req.user.email}, function (err, obj) {
-        if (err) {
-            return res.errJson(err);
-        }
+
+        if (err) return res.errJson(err);
+
         res.okJson(obj);
+
     });
+
 };
 
 /**
@@ -30,37 +32,43 @@ UserController.get = function (req, res) {
  * @param res
  */
 UserController.deleteByEmail = function (req, res) {
+
     var model = User;
+
     var cb = function (userId, req) {
 
         model.remove({
             _id: userId
         }, function (err, obj) {
-            if (err) {
-                return res.errJson(err);
-            }
+
+            if (err) return res.errJson(err);
 
             Client.remove({userId: userId}, function (err) {
-                if (err) {
-                    return res.errJson(err);
-                }
+
+                if (err) return res.errJson(err);
+
                 Code.remove({userId: userId}, function (err) {
-                    if (err) {
-                        return res.errJson(err);
-                    }
+
+                    if (err) return res.errJson(err);
+
                 });
+
             });
 
             res.okJson('Successfully deleted');
+
         });
+
     };
 
     User.findOne({email: req.body.email}, function (err, user) {
+
         if (err) return res.errJson(err);
 
         if(!user) return res.errJson('User not found');
 
         cb(user._id, req);
+
     });
 
 };
@@ -70,72 +78,80 @@ UserController.deleteByEmail = function (req, res) {
  * @param res
  */
 UserController.save = function (req, res) {
+
     var crit = {_id: req.user._id};
-    if(req.body.email){
-        crit = { email: req.body.email };
-    }
+
+    if(req.body.email) crit = { email: req.body.email };
 
     User.findOne(crit, function (err, obj) {
+
         if (err) return res.errJson(err);
 
         if(!obj) return res.errJson('User not found');
 
         for (var prop in req.body) {
-            obj[prop] = req.body[prop];
-        }
 
+            obj[prop] = req.body[prop];
+
+        }
         // set update time and update by user
         obj.last_updated = new Date();
+
         obj.last_updated_by = req.user.userId;
 
         obj.save(function (err) {
-            if (err) {
-                return res.errJson(err);
-            }
+
+            if (err) return res.errJson(err);
 
             res.okJson('Successfully updated!', obj);
+
         });
+
     });
+
 };
 
-UserController.addRole = function(){
+UserController.addRole = function(req, res){
 
-    if(!req.body.email){
-        return res.errJson('User not found');
-    }
+    if(!req.body.email) return res.errJson('User not found');
 
     var crit = { email: req.body.email };
 
     User.findOne(crit, function (err, obj) {
-        if (err) {
-            return res.errJson(err);
-        }
+
+        if (err) return res.errJson(err);
 
         for (var prop in req.body) {
-            obj[prop] = req.body[prop];
-        }
 
+            obj[prop] = req.body[prop];
+
+        }
         // set update time and update by user
         obj.last_updated = new Date();
+
         obj.last_updated_by = req.user.userId;
 
         obj.save(function (err) {
-            if (err) {
-                return res.errJson(err);
-            }
+
+            if (err) return res.errJson(err);
 
             res.okJson('Successfully updated!', obj);
+
         });
+
     });
+
 };
 
 
 
 UserController.getRole = function(){
+
     return res.okJson(null, [
             { role: 'admin', description: 'Have access to all students in a CBO' },
             { role: 'case-worker', description: 'Some case workers only have access to the students in their permission list, some other have access to all students.' }
     ]);
+
 };
 /**
  *
@@ -143,14 +159,21 @@ UserController.getRole = function(){
  * @param res
  */
 UserController.cleanAll = function(req, res){
+
     var email = req.body.email || req.query.email;
+
     var emails = [ 'test@test.com', 'support@upwardstech.com'];
+
     if(!email || emails.indexOf(email) === -1) return res.errJson('Mandatory parameters was empty');
 
     User.findOne({ email: email }, function(err, user){
+
         if(err) return res.errJson(err);
+
         User.removeDeep(user._id, function(err){ console.log(err);});
+
         res.okJson('Done');
+
     });
 
 };

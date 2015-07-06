@@ -7,9 +7,12 @@ var StudentProgram = require('../models/StudentProgram');
 var StudentProgramSchema = require('../models/schema/StudentProgram');
 var Program = require('../models/Program');
 var User = require('../models/User');
+var Tag = require('../models/Tag');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
+var natural = require('natural'),
+    tokenizer = new natural.WordTokenizer();
 
 
 var StudentProgramController = new BaseController(StudentProgram).crud();
@@ -27,7 +30,7 @@ StudentProgramController.getByStudentId = function (req, res) {
 
     var cb = function(){
 
-        Student.findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
+        Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
             if(err) return res.errJson(err);
 
@@ -47,26 +50,38 @@ StudentProgramController.getByStudentId = function (req, res) {
 StudentProgramController.addByStudentId = function (req, res) {
 
     var orgId = req.params.organizationId;
+
     var stdId = req.params.studentId;
 
     var cb = function(){
+
         var studentProgram = {};
 
         if(req.body.programId) studentProgram.program = ObjectId(req.body.programId);
-        if(req.body.cohort) studentProgram.cohort = req.body.cohort;
+
+        if(req.body.cohort) studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+
         if(req.body.active) studentProgram.active = (req.body.active === 'true');
+
         if(req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+
         if(req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+
         studentProgram.created = new Date();
+
         studentProgram.creator = req.user.userId;
+
         studentProgram.last_updated = new Date();
+
         studentProgram.last_updated_by = req.user.userId;
 
         if(_.isEmpty(studentProgram)) {
+
             return res.errJson('POST parameter is empty!');
+
         }
 
-        Student.findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
+        Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
             if(err) return res.errJson(err);
 
@@ -74,20 +89,16 @@ StudentProgramController.addByStudentId = function (req, res) {
 
             student.programs.push(studentProgram);
 
-
-            //var subdoc = student.programs[0];
-            //
-            //if(!subdoc.isNew){
-            //    return res.errJson('Student program failed to add because is duplicate or error');
-            //}
             // set update time and update by user
             student.last_updated = new Date();
+
             student.last_updated_by = req.user.userId;
 
             student.save(function(err){
 
                 if(err) return res.errJson(err);
 
+                Tag.addTag(ObjectId(orgId), studentProgram.cohort);
 
                 res.okJson('Student Program successfully add', student);
             });
@@ -103,12 +114,14 @@ StudentProgramController.addByStudentId = function (req, res) {
  * @param res
  */
 StudentProgramController.getByProgramId = function (req, res) {
+
     var orgId = req.params.organizationId;
+
     var proId = req.params.programId;
 
     var cb = function(){
 
-        Student.find({ organization: ObjectId(orgId), programs: { $elemMatch: { program: ObjectId(proId) } } }, function(err, students){
+        Student.protect(req.user.role, null, req.user).find({ organization: ObjectId(orgId), programs: { $elemMatch: { program: ObjectId(proId) } } }, function(err, students){
 
             if(err) return res.errJson(err);
 
@@ -126,28 +139,42 @@ StudentProgramController.getByProgramId = function (req, res) {
  * @param res
  */
 StudentProgramController.addByProgramId = function(req, res){
+
     var orgId = req.params.organizationId;
+
     var proId = req.params.programId;
 
     var stdId = req.body.studentId;
 
     var cb = function(){
+
         var studentProgram = {};
+
         if(proId) studentProgram.program = ObjectId(proId);
-        if(req.body.cohort) studentProgram.cohort = req.body.cohort;
+
+        if(req.body.cohort) studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+
         if(req.body.active) studentProgram.active = (req.body.active === 'true');
+
         if(req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+
         if(req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+
         studentProgram.created = new Date();
+
         studentProgram.creator = req.user.userId;
+
         studentProgram.last_updated = new Date();
+
         studentProgram.last_updated_by = req.user.userId;
 
         if(!stdId || _.isEmpty(studentProgram)) {
+
             return res.errJson('POST parameter is empty!');
+
         }
 
-        Student.findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
+        Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
             if(err) return res.errJson(err);
 
@@ -155,22 +182,184 @@ StudentProgramController.addByProgramId = function(req, res){
 
             student.programs.push(studentProgram);
 
-
-            //var subdoc = student.programs[0];
-
-            //if(!subdoc.isNew){
-            //    return res.errJson('Student program failed to add because is duplicate or error');
-            //}
             // set update time and update by user
             student.last_updated = new Date();
+
             student.last_updated_by = req.user.userId;
 
             student.save(function(err){
 
                 if(err) return res.errJson(err);
 
-
                 res.okJson('Student Program successfully add', student);
+
+            });
+
+        });
+    };
+
+    StudentProgramController.grant(req, res, cb);
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentProgramController.getStudentById = function(req, res){
+
+    var orgId = req.params.organizationId;
+
+    var proId = req.params.programId;
+
+    var stdId = req.body.studentId;
+
+    var crit  = {
+        organization: ObjectId(orgId),
+        programs: { $elemMatch: { program: ObjectId(proId) } },
+        _id: ObjectId(stdId)
+    };
+
+    var cb = function(){
+
+        Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function (err, student) {
+
+            if (err) return res.errJson(err);
+            /**
+             * If student is empty from database
+             */
+            if (!student) return res.errJson('The student not found in database');
+
+            res.okJson(student);
+
+        });
+    };
+
+    StudentProgramController.grant(req, res, cb);
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentProgramController.putStudentById = function(req, res){
+
+    var orgId = req.params.organizationId;
+
+    var proId = req.params.programId;
+
+    var stdId = req.body.studentId;
+
+    var crit  = {
+        organization: ObjectId(orgId),
+        programs: { $elemMatch: { program: ObjectId(proId) } },
+        _id: ObjectId(stdId)
+    };
+
+    var cb = function(){
+
+        Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
+
+            if(err) return res.errJson(err);
+
+            if(!student) return res.errJson('Data not found');
+
+
+            var programs = [];
+
+            var studentProgram = {};
+
+            for (var i = 0; i < student.programs.length; i++) {
+
+                if (proId !== (student.programs[i].program + '')) {
+
+                    programs.push(student.programs[i]);
+
+                } else {
+
+                    studentProgram = student.programs[i];
+
+                    if (proId) studentProgram.program = ObjectId(proId);
+
+                    if (req.body.cohort) studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+
+                    if (req.body.active) studentProgram.active = (req.body.active === 'true');
+
+                    if (req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+
+                    if (req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+
+                    studentProgram.last_updated = new Date();
+
+                    studentProgram.last_updated_by = req.user.userId;
+
+                    programs.push(studentProgram);
+
+                }
+            }
+
+            if (_.isEmpty(studentProgram)) {
+
+                return res.errJson('POST parameter is empty!');
+
+            }
+
+            Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: Date.now, last_updated_by: req.user.userId }, function (err, updated) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Update success');
+
+            });
+
+        });
+    };
+
+    StudentProgramController.grant(req, res, cb);
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentProgramController.deleteStudentById = function(req, res){
+
+    var orgId = req.params.organizationId;
+
+    var proId = req.params.programId;
+
+    var stdId = req.body.studentId;
+
+    var crit  = {
+        organization: ObjectId(orgId),
+        programs: { $elemMatch: { program: ObjectId(proId) } },
+        _id: ObjectId(stdId)
+    };
+
+    var cb = function(){
+
+        Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
+
+            if(err) return res.errJson(err);
+
+            if(!student) return res.errJson('Data not found');
+
+            var programs = [];
+
+            for (var i = 0; i < student.programs.length; i++) {
+
+                if (proId !== (student.programs[i].program + '')) {
+
+                    programs.push(student.programs[i]);
+
+                }
+            }
+
+            Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: Date.now, last_updated_by: req.user.userId }, function (err, updated) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Delete success');
+
             });
 
         });

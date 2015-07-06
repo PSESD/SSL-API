@@ -10,10 +10,7 @@ var _ = require('underscore');
 var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache();
-
 var ObjectId = mongoose.Types.ObjectId;
-
-
 var StudentController = new BaseController(Student).crud();
 
 /**
@@ -25,6 +22,7 @@ var StudentController = new BaseController(Student).crud();
 StudentController.getStudentsBackpack = function (req, res) {
 
     var cb = function() {
+
         var orgId = ObjectId(req.params.organizationId);
 
         var studentId = ObjectId(req.params.studentId);
@@ -49,47 +47,60 @@ StudentController.getStudentsBackpack = function (req, res) {
                     personnelId: organization.personnelId,  
                     authorizedEntityId: organization.authorizedEntityId
                 });
+
                 var key = [student.district_student_id, student.school_district, organization.externalServiceId, organization.personnelId, organization.authorizedEntityId].join('_');
+
                 cache.get(key, function(err, result){
 
-                    utils.log(err);
-
-                    console.log('RESULT: ', result);
+                    if(err) utils.log(err);
 
                     if(!result){
+
                         console.log("GET FROM SERVER");
+
                         brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
 
-                            if (error) {
-                                return res.errJson(error);
-                            }
+                            if (error)  return res.errJson(error);
 
-                            if (!body) {
-                                return res.errJson('Data not found');
-                            }
+                            if (!body) return res.errJson('Data not found');
+
                             if (response && response.statusCode == '200') {
+
                                 parseString(body, { explicitArray: false }, function (err, result) {
+
                                     var json = result.sre;
+
                                     delete json['$'];
+
                                     cache.set(key, json, function(err){
 
                                         utils.log(err);
 
                                         res.okJson(json);
+
                                     });
 
                                 });
+
                             } else {
+
                                 parseString(body, { explicitArray: false }, function (err, result) {
+
                                     var json = (result && 'error' in result) ? result.error.message : 'Error not response';
+
                                     res.errJson(json);
+
                                 });
                             }
                         });
                     } else {
+
                         console.log("GET FROM CACHE");
+
                         res.okJson(result);
+
                     }
+
                 });
 
             });
@@ -98,6 +109,7 @@ StudentController.getStudentsBackpack = function (req, res) {
     };
 
     StudentController.grant(req, res, cb);
+
 };
 /**
  * Get all student in organization
@@ -107,6 +119,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 StudentController.getStudents = function (req, res) {
 
     var cb = function() {
+
         var orgId = ObjectId(req.params.organizationId);
 
         Student.protect(req.user.role, null, req.user).find({organization: orgId}, function (err, students) {
@@ -114,10 +127,12 @@ StudentController.getStudents = function (req, res) {
             if (err) return res.errJson(err);
 
             res.okJson(null, students);
+
         });
     };
 
     StudentController.grant(req, res, cb);
+
 };
 /**
  *
@@ -129,12 +144,15 @@ StudentController.createByOrgId = function (req, res) {
     var cb = function() {
         var obj = new Student(req.body);
 
-        obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
+        obj.organization = ObjectId(req.params.organizationId);
 
         // set update time and update by user
         obj.created = new Date();
+
         obj.creator = req.user.userId;
+
         obj.last_updated = new Date();
+
         obj.last_updated_by = req.user.userId;
 
         User.findOne({ _id: req.user._id }, function(err, user){
@@ -143,7 +161,6 @@ StudentController.createByOrgId = function (req, res) {
 
             if(!user) return res.errJson('User not update successfully');
 
-
             obj.save(function (err) {
 
                 if (err)  return res.errJson(err);
@@ -151,8 +168,11 @@ StudentController.createByOrgId = function (req, res) {
                 _.each(user.permissions, function(permission, key){
 
                     if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
                         user.permissions[key].students.push(obj._id);
+
                     }
+
                 });
 
                 user.save(function(err){
@@ -160,6 +180,7 @@ StudentController.createByOrgId = function (req, res) {
                     if (err)  return res.errJson(err);
 
                     res.okJson('Successfully Added', obj);
+
                 });
 
             });
@@ -169,6 +190,7 @@ StudentController.createByOrgId = function (req, res) {
     };
 
     StudentController.grant(req, res, cb);
+
 };
 /**
  * Get student organization by id
@@ -178,8 +200,11 @@ StudentController.createByOrgId = function (req, res) {
 StudentController.getStudentById = function (req, res) {
 
     var cb = function() {
+
         var orgId = req.params.organizationId;
+
         var studentId = ObjectId(req.params.studentId);
+
         Student.protect(req.user.role, { students: studentId }, req.user).findOne({organization: ObjectId(orgId), _id: studentId}, function (err, student) {
 
             if (err) return res.errJson(err);
@@ -189,7 +214,9 @@ StudentController.getStudentById = function (req, res) {
             if (!student) return res.errJson('The student not found in database');
 
             res.okJson(student);
+
         });
+
     };
 
     StudentController.grant(req, res, cb);
@@ -202,7 +229,9 @@ StudentController.getStudentById = function (req, res) {
 StudentController.deleteStudentById = function (req, res) {
 
     var cb = function() {
+
         var orgId = req.params.organizationId;
+
         var studentId = ObjectId(req.params.studentId);
 
         Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
@@ -216,10 +245,15 @@ StudentController.deleteStudentById = function (req, res) {
                 if(!user) return res.errJson('User not update successfully');
 
                 _.each(user.permissions, function(permission, key){
+
                     var indexOf = permission.students.indexOf(ObjectId(req.params.studentId));
+
                     if(permission.organization.toString() === orgId && indexOf !== -1){
+
                         delete user.permissions[key].students[indexOf];
+
                     }
+
                 });
 
                 user.save(function(err){
@@ -227,13 +261,17 @@ StudentController.deleteStudentById = function (req, res) {
                     if (err)  return res.errJson(err);
 
                     res.okJson('Successfully deleted');
+
                 });
 
             });
+
         });
+
     };
 
     StudentController.grant(req, res, cb);
+
 };
 /**
  *
@@ -243,7 +281,9 @@ StudentController.deleteStudentById = function (req, res) {
 StudentController.putStudentById = function(req, res){
 
     var cb = function () {
+
         var studentId = ObjectId(req.params.studentId);
+
         Student.protect(req.user.role, { students: studentId }, req.user).findOne({_id: studentId, organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
             if (err)  return res.errJson(err);
@@ -261,14 +301,12 @@ StudentController.putStudentById = function(req, res){
             }
             // set update time and update by user
             obj.last_updated = new Date();
+
             obj.last_updated_by = req.user.userId;
 
             obj.save(function (err) {
 
-                if (err) {
-
-                    return res.errJson(err);
-                }
+                if (err) return res.errJson(err);
 
                 res.okJson('Successfully updated!', obj);
 
@@ -279,6 +317,260 @@ StudentController.putStudentById = function(req, res){
     };
 
     StudentController.grant(req, res, cb);
+
+};
+
+StudentController.getByUserId = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var user            = req.user;
+
+    User.findOne({ _id: ObjectId(currentUserId)}, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        var cb = function(){
+
+            Student.protect(currUser.role, null, currUser).find({ organization: ObjectId(organizationId) }, function (err, students) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson(null, students);
+
+            });
+
+        };
+
+        StudentController.grant(req, res, cb, {
+            user: user,
+            organizationId: organizationId,
+            onCheck: function(isMatch){
+                return isMatch && user.isAdmin();
+            }
+        });
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.postByUserId = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var user            = req.user;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        var cb = function(){
+
+            var obj = new Student(req.body);
+
+            obj.organization = ObjectId(organizationId);
+
+            // set update time and update by user
+            obj.created = new Date();
+
+            obj.creator = req.user.userId;
+
+            obj.last_updated = new Date();
+
+            obj.last_updated_by = req.user.userId;
+
+            obj.save(function (err) {
+
+                if (err)  return res.errJson(err);
+
+                _.each(currUser.permissions, function(permission, key){
+
+                    if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
+                        currUser.permissions[key].students.push(obj._id);
+
+                    }
+
+                });
+
+                currUser.save(function(err){
+
+                    if (err)  return res.errJson(err);
+
+                    res.okJson('Successfully Added', obj);
+                });
+
+            });
+
+        };
+
+        StudentController.grant(req, res, cb, {
+            user: user,
+            organizationId: organizationId,
+            onCheck: function(isMatch){
+                return isMatch && user.isAdmin();
+            }
+        });
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.getStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var user            = req.user;
+
+    var studentId       = req.params.studentId;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        var cb = function(){
+
+            Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).findOne({ _id: studentId, organization: ObjectId(req.params.organizationId) }, function (err, students) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson(null, students);
+
+            });
+
+        };
+
+        StudentController.grant(req, res, cb, {
+            user: user,
+            organizationId: organizationId,
+            onCheck: function(isMatch){
+                return isMatch && user.isAdmin();
+            }
+        });
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.putStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var user            = req.user;
+
+    var studentId       = ObjectId(req.params.studentId);
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        var cb = function(){
+
+            Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).findOne({ _id: studentId, organization: ObjectId(req.params.organizationId) }, function (err, obj) {
+
+                if (err)  return res.errJson(err);
+
+                if (!obj) return res.errJson('Data not found');
+
+                for (var prop in req.body) {
+
+                    if(prop in obj) {
+
+                        obj[prop] = req.body[prop];
+
+                    }
+
+                }
+                // set update time and update by user
+                obj.last_updated = new Date();
+
+                obj.last_updated_by = req.user.userId;
+
+                obj.save(function (err) {
+
+                    if (err) return res.errJson(err);
+
+                    res.okJson('Successfully updated!', obj);
+
+                });
+
+            });
+
+        };
+
+        StudentController.grant(req, res, cb, {
+            user: user,
+            organizationId: organizationId,
+            onCheck: function(isMatch){
+                return isMatch && user.isAdmin();
+            }
+        });
+    });
+
+};
+
+StudentController.deleteStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var user            = req.user;
+
+    var studentId       = req.params.studentId;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        var cb = function(){
+
+            Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).remove({ _id: studentId, organization: ObjectId(organizationId) }, function (err) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Delete success');
+
+            });
+
+        };
+
+        StudentController.grant(req, res, cb, {
+            user: user,
+            organizationId: organizationId,
+            onCheck: function(isMatch){
+                return isMatch && user.isAdmin();
+            }
+        });
+    });
+
 };
 /**
  *
