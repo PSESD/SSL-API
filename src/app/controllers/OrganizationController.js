@@ -19,7 +19,7 @@ OrganizationController.get = function (req, res) {
 
     var user = req.user;
 
-    var crit = req.query.url ? {url: req.query.url} : {};
+    var crit = Organization.crit(req.query);
 
     var orgs = user.organizationId;
 
@@ -49,7 +49,7 @@ OrganizationController.get = function (req, res) {
  */
 OrganizationController.find = function (req, res) {
 
-    var crit = req.query.url ? {url: req.query.url} : {};
+    var crit = Organization.crit(req.query);
 
     crit._id = req.params.organizationId;
 
@@ -75,7 +75,7 @@ OrganizationController.find = function (req, res) {
  */
 OrganizationController.profile = function (req, res) {
 
-    var crit = req.query.url ? {url: req.query.url} : {};
+    var crit = Organization.crit(req.query);
 
     crit._id = req.params.organizationId;
 
@@ -293,7 +293,11 @@ OrganizationController.allProgram = function (req, res) {
 
     var cb = function () {
 
-        Program.find({organization: ObjectId(req.params.organizationId)}, function (err, objs) {
+        var crit = Program.crit(req.query, ['organization']);
+
+        crit.organization = ObjectId(req.params.organizationId);
+
+        Program.find(crit, function (err, objs) {
 
             if (err)  return res.errJson(err);
 
@@ -356,7 +360,13 @@ OrganizationController.getProgram = function (req, res) {
 
     var cb = function () {
 
-        Program.findOne({_id: ObjectId(req.params.programId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
+        var crit = Program.crit(req.query, ['_id', 'organization']);
+
+        crit._id = ObjectId(req.params.programId);
+
+        crit.organization = ObjectId(req.params.organizationId);
+
+        Program.findOne(crit, function (err, obj) {
 
             if (err)  return res.errJson(err);
 

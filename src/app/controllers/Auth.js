@@ -8,6 +8,7 @@ var Token = require('../models/Token');
 var tokenHash = require('../../lib/utils').tokenHash;
 
 passport.use(new BasicStrategy(
+    
   function(username, password, callback) {
 
     User.findOne({ email: username }, function (err, user) {
@@ -29,19 +30,24 @@ passport.use(new BasicStrategy(
         return callback(null, user);
 
       });
+
     });
+
   }
+
 ));
 
 
 passport.use(new BearerStrategy(
+
   function(accessToken, callback) {
 
     var accessTokenHash = tokenHash(accessToken);
 
     Token.findOne({ token: accessTokenHash }, function (err, token) {
 
-      if (err)  return callback(err);
+      if (err) return callback(err);
+
       // No token found
       if (!token) return callback(null, false);
 
@@ -65,14 +71,18 @@ passport.use(new BearerStrategy(
           callback(null, user, { scope: '*' });
 
         });
+
       }
 
     });
+
   }
+
 ));
 
 /**
  * Middleware function for check authorize
  */
 exports.isAuthenticated = passport.authenticate(['basic', 'bearer'], { session : false });
+
 exports.isBearerAuthenticated = passport.authenticate('bearer', { session: false });

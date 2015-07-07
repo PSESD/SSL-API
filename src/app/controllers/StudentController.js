@@ -122,13 +122,71 @@ StudentController.getStudents = function (req, res) {
 
         var orgId = ObjectId(req.params.organizationId);
 
-        Student.protect(req.user.role, null, req.user).find({organization: orgId}, function (err, students) {
+        var crit = Student.crit(req.query, ['organization']);
+
+        crit.organization = orgId;
+
+        Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
 
             if (err) return res.errJson(err);
 
             res.okJson(null, students);
 
         });
+
+    };
+
+    StudentController.grant(req, res, cb);
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.getStudentNotAssigns = function (req, res) {
+
+    var cb = function() {
+
+        var orgId = ObjectId(req.params.organizationId);
+
+        var query = User.find({ permissions: { $elemMatch: { organization: orgId } }});
+
+        var crit = Student.crit(req.query, ['organization', '_id']);
+
+        crit.organization = orgId;
+
+        query.exec(function(err, users){
+
+            var students = [];
+
+            users.forEach(function(user){
+
+                user.permissions.forEach(function(permission){
+
+                    permission.students.forEach(function(student){
+
+                        if(students.indexOf(student) === -1) students.push(student);
+
+                    });
+
+                });
+
+            });
+
+            crit._id = { $nin: students };
+
+            console.log('NOT_ASSIGN %j', crit);
+
+            Student.find(crit, function (err, students) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson(null, students);
+
+            });
+        });
+
     };
 
     StudentController.grant(req, res, cb);
@@ -205,7 +263,13 @@ StudentController.getStudentById = function (req, res) {
 
         var studentId = ObjectId(req.params.studentId);
 
-        Student.protect(req.user.role, { students: studentId }, req.user).findOne({organization: ObjectId(orgId), _id: studentId}, function (err, student) {
+        var crit = Student.crit(req.query, ['_id', 'organization']);
+
+        crit.organization = ObjectId(orgId);
+
+        crit._id = studentId;
+
+        Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
 
             if (err) return res.errJson(err);
             /**

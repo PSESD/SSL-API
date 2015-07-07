@@ -16,7 +16,11 @@ var UserController = new BaseController(User).crud();
  */
 UserController.get = function (req, res) {
 
-    User.findOne({email: req.user.email}, function (err, obj) {
+    var crit = User.crit(req.query, ['email']);
+
+    crit.email = req.user.email;
+
+    User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
 

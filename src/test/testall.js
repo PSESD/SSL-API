@@ -694,6 +694,30 @@ describe('All-Test', function () {
                .end(done);
         });
 
+        it('GET /:organizationId/xsre/districts', function (done) {
+            console.log(api_endpoint+'/'+organizationId+'/xsre/districts', ' ', grantToken);
+            request(api_endpoint)
+                .get('/'+organizationId+'/xsre/districts')
+                .set('authorization', grantToken)
+                .expect(function (res) {
+                    assert.ok(res.body._links);
+                })
+                .expect(200)
+                .end(done);
+        });
+
+        it('GET /:organizationId/students/not-assign', function (done) {
+            console.log(api_endpoint+'/'+organizationId+'/students/not-assign', ' ', grantToken);
+            request(api_endpoint)
+                .get('/'+organizationId+'/students/not-assign')
+                .set('authorization', grantToken)
+                .expect(function (res) {
+                    assert.ok(res.body._links);
+                })
+                .expect(200)
+                .end(done);
+        });
+
         it('POST /:organizationId/students/:studentId/programs', function (done) {
             http_build_query(studentProgramData);
             request(api_endpoint)

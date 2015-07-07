@@ -18,6 +18,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	var tagCtr = Api.controller('TagController');
 	var indexCtr = Api.controller('Index');
     var studentProgramCtr = Api.controller('StudentProgramController');
+    var prsCtr = Api.controller('PRSController');
 	var auth = Api.controller('Auth');
 
 	router.get('/', indexCtr.index);
@@ -67,11 +68,13 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, organizationCtr.deleteProgram)
     ;
 
-
-
     router.route('/:organizationId/students')
           .post(auth.isBearerAuthenticated, studentCtr.createByOrgId)
           .get(auth.isBearerAuthenticated, studentCtr.getStudents);
+
+
+    router.route('/:organizationId/students/not-assign')
+        .get(auth.isBearerAuthenticated, studentCtr.getStudentNotAssigns);
 
     router.route('/:organizationId/students/:studentId')
         .get(auth.isBearerAuthenticated, studentCtr.getStudentById)
@@ -119,7 +122,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, studentProgramCtr.deleteStudentById)
     ;
 
-
+    router.get('/:organizationId/xsre/districts', prsCtr.getDistricts);
 
     /**
      * Only for development

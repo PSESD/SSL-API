@@ -132,6 +132,8 @@ TagController.putTagById = function(req, res){
 
         var tagId = ObjectId(req.params.tagId);
 
+
+
         Tag.findOne({ _id: tagId, organization: ObjectId(req.params.organizationId) }, function (err, obj) {
 
             if (err)  return res.errJson(err);

@@ -34,7 +34,7 @@ BaseController.prototype.crud = function(idName) {
 
             if('user' in options && options.user instanceof User){
 
-                currentUser = user;
+                currentUser = options.user;
 
             }
 
@@ -49,14 +49,14 @@ BaseController.prototype.crud = function(idName) {
                 organizationId = options.organizationId;
 
             }
-
+            console.log("ORGH", organizationId);
             if(!organizationId) return false;
 
             var orgid = currentUser.organizationId;
 
             if('onCheck' in options && typeof options.onCheck === 'function'){
 
-                return options.onCheck(orgid.indexOf(organizationId));
+                return options.onCheck(orgid.indexOf(organizationId) !== -1);
 
             }
 

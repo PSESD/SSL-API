@@ -12,6 +12,7 @@
  */
 // Load required packages
 var mongoose = require('mongoose');
+var moment = require('moment');
 var StudentProgram = require('./schema/StudentProgram');
 var Address = require('./schema/Address');
 
@@ -34,9 +35,94 @@ var StudentSchema = new mongoose.Schema({
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
+
+
+/**
+ *
+ * @param values
+ * @param exclude
+ * @returns {{}}
+ */
+StudentSchema.statics.crit = function(values, exclude){
+    exclude = exclude || [];
+    var criteria = {};
+    /**
+     * Find match
+     */
+    [
+        '_id', 'first_name', 'middle_name', 'last_name', 'organization',
+        'district_student_id', 'school_district', 'middle_name'
+    ].forEach(function(iterator){
+
+        if(iterator in values && exclude.indexOf(iterator) === -1){
+
+            criteria[iterator] = values[iterator];
+
+        }
+    });
+
+
+
+    /**
+     * Find Match Element
+     */
+    var isStartDate = false, isEndDate = false;
+
+    ['cohort', 'active', 'participation_start_date', 'participation_end_date'].forEach(function(iterator){
+
+        if(iterator in values && exclude.indexOf(iterator) === -1){
+
+            switch (iterator){
+
+                case 'participation_end_date':
+
+                    criteria.programs.$elemMatch.participation_end_date = moment(values[iterator]).toDate();
+                    isEndDate = true;
+                    break;
+
+                case 'participation_start_date':
+
+                    criteria.programs.$elemMatch.participation_start_date = moment(values[iterator]).toDate();
+                    isStartDate = true;
+                    break;
+
+                case 'cohort':
+
+                    criteria.programs.$elemMatch.cohort = { $in: values[iterator] };
+                    break;
+
+                case 'active':
+
+                    criteria.programs.$elemMatch.active = values[iterator] ? true : false;
+                    break;
+
+                default :
+
+                    criteria[iterator] = { $in : values[iterator] };
+                    break;
+            }
+
+        }
+
+    });
+
+    if(isStartDate && isEndDate){
+
+        criteria.programs.$elemMatch.participation_start_date = { $gte : criteria.programs.$elemMatch.participation_start_date };
+
+        criteria.programs.$elemMatch.participation_end_date = { $lte : criteria.programs.$elemMatch.participation_end_date };
+
+    }
+
+    return criteria;
+
+};
+
 StudentSchema.plugin(require('../../lib/protector'));
 // Export the Mongoose model
 var Student = mongoose.model('Student', StudentSchema);
+
+
 Student.setRules([
     {
         role: {
