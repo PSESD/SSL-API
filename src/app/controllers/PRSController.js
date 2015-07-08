@@ -25,7 +25,7 @@ PRSController.getDistricts = function (req, res) {
 
         var brokerRequest = new Request();
 
-        var key = [student.district_student_id, student.school_district, organization.externalServiceId, organization.personnelId, organization.authorizedEntityId].join('_');
+        var key = ['getDistricts', req.params.organizationId].join('_');
 
         cache.get(key, function(err, result){
 
@@ -63,6 +63,7 @@ PRSController.getDistricts = function (req, res) {
 
                         parseString(body, { explicitArray: false }, function (err, result) {
 
+                            console.log(result);
                             var json = (result && 'error' in result) ? result.error.message : 'Error not response';
 
                             res.errJson(json);

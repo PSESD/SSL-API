@@ -148,6 +148,20 @@ Request.prototype = {
     prsBaseUri: function(uri, callback){
         var url = this.config.prsBaseUri + '/' + uri;
 
+        delete this.headers.messageId;
+        delete this.headers.externalServiceId;
+        delete this.headers.requestAction;
+        delete this.headers.messageType;
+        delete this.headers.requestType;
+        delete this.headers.serviceType;
+        delete this.headers.strictSSL;
+        delete this.headers.qsParseOptions;
+        delete this.headers.objectType;
+        delete this.headers.districtStudentId;
+
+        var timestamp = this.headers.timestamp = this.getTimezone();
+        this.headers.Authorization = 'SIF_HMACSHA256 ' + this.generatePRSAuthToken(timestamp);
+
         return this.create(url, 'GET', callback);
     },
     /**
@@ -159,11 +173,13 @@ Request.prototype = {
      */
     create: function (url, method, callback) {
 
-        this.headers.messageId = this.generateUUID();
 
-        var timestamp = this.headers.timestamp = this.getTimezone();
-
-        this.headers.Authorization = 'SIF_HMACSHA256 ' + this.generateHZAuthToken(timestamp);
+        if('Authorization' in this.headers){
+            //skip
+        } else {
+            var timestamp = this.headers.timestamp = this.getTimezone();
+            this.headers.Authorization = 'SIF_HMACSHA256 ' + this.generateHZAuthToken(timestamp);
+        }
 
         var options = {
             url: this.url + url,
@@ -173,7 +189,7 @@ Request.prototype = {
             strictSSL: false
         };
 
-        //console.dir(options);
+        console.dir(options);
 
         return request.get(options, callback || function (error, response, body) {
 
@@ -219,6 +235,7 @@ Request.prototype = {
         var url = '/requestProvider/' + this.config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+this.config.contextId;
 
         this.addHeader( 'districtStudentId', districtStudentId );
+        this.headers.messageId = this.generateUUID();
 
         return this.create(url, 'GET', callback);
 
@@ -253,6 +270,24 @@ Request.prototype = {
         var valToHash = sessionToken + ":" + timestamp;
 
         var secret = this.config.hzSharedSecret;
+
+        var hash = CryptoJS.HmacSHA256(valToHash, secret).toString(CryptoJS.enc.Base64);
+
+        return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(sessionToken + ":" + hash));
+
+    },
+    /**
+     *
+     * @param timestamp
+     * @returns {*|string}
+     */
+    generatePRSAuthToken: function(timestamp){
+
+        var sessionToken = this.config.prsSessionToken;
+
+        var valToHash = sessionToken + ":" + timestamp;
+
+        var secret = this.config.prsSharedSecret;
 
         var hash = CryptoJS.HmacSHA256(valToHash, secret).toString(CryptoJS.enc.Base64);
 

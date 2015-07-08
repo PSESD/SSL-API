@@ -122,7 +122,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, studentProgramCtr.deleteStudentById)
     ;
 
-    router.get('/:organizationId/xsre/districts', prsCtr.getDistricts);
+    router.route('/:organizationId/xsre/districts').get(auth.isBearerAuthenticated, prsCtr.getDistricts);
 
     /**
      * Only for development

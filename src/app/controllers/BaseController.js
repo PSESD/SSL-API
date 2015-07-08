@@ -49,7 +49,7 @@ BaseController.prototype.crud = function(idName) {
                 organizationId = options.organizationId;
 
             }
-            console.log("ORGH", organizationId);
+
             if(!organizationId) return false;
 
             var orgid = currentUser.organizationId;
