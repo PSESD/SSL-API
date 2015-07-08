@@ -146,8 +146,10 @@ Request.prototype = {
      * @returns {*|request}
      */
     prsBaseUri: function(uri, callback){
+
         var url = this.config.prsBaseUri + '/' + uri;
 
+        this.url = "";
         delete this.headers.messageId;
         delete this.headers.externalServiceId;
         delete this.headers.requestAction;

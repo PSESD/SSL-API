@@ -41,11 +41,13 @@ PRSController.getDistricts = function (req, res) {
 
                     if (!body) return res.errJson('Data not found');
 
+                    console.log('Response %j', response);
+
                     if (response && response.statusCode == '200') {
 
                         parseString(body, { explicitArray: false }, function (err, result) {
 
-                            var json = result.sre;
+                            var json = result.ArrayOfDistrictSummary;
 
                             delete json['$'];
 
@@ -63,7 +65,6 @@ PRSController.getDistricts = function (req, res) {
 
                         parseString(body, { explicitArray: false }, function (err, result) {
 
-                            console.log(result);
                             var json = (result && 'error' in result) ? result.error.message : 'Error not response';
 
                             res.errJson(json);
