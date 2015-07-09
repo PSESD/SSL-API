@@ -98,15 +98,16 @@ describe('All-Test', function () {
         "description": null,
         "website": "fc.org",
         "url": "fc.cbo.upward.st",
-        "externalServiceId": 2,
-        "personnelId": 3,
-        "authorizedEntityId": 1
+        "externalServiceId": 5,
+        "personnelId": 1,
+        "authorizedEntityId": 2
     };
 
     var studentData = {
         "first_name": "Abraham",
         "last_name": "Tester",
-        "district_student_id": "9999999999",
+        //"district_student_id": "9999999999",
+        "district_student_id": "xsreSample1",
         "school_district": "highline",
         "programs": [],
         "addresses": []

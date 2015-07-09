@@ -35,13 +35,11 @@ PRSController.getDistricts = function (req, res) {
 
                 console.log("GET FROM SERVER");
 
-                brokerRequest.prsBaseUri('districts', function (error, response, body) {
+                brokerRequest.createPsr('districts', function (error, response, body) {
 
                     if (error)  return res.errJson(error);
 
                     if (!body) return res.errJson('Data not found');
-
-                    console.log('Response %j', response);
 
                     if (response && response.statusCode == '200') {
 

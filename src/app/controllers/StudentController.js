@@ -58,7 +58,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         console.log("GET FROM SERVER");
 
-                        brokerRequest.createRequestProvider(student.district_student_id, student.school_district, function (error, response, body) {
+                        brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
                             if (error)  return res.errJson(error);
 
@@ -68,7 +68,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 parseString(body, { explicitArray: false }, function (err, result) {
 
-                                    var json = result.sre;
+                                    var json = result.xSre;
 
                                     delete json['$'];
 

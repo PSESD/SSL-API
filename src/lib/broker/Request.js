@@ -16,67 +16,19 @@ var CryptoJS = require("crypto-js");
  */
 function Request(options, env) {
 
-    if(!config.has('hz')){
+    if(!config.has('hzb')){
 
         throw new Error("config HZ not found!");
 
     }
 
-    options = options || {};
+    this.options = options || {};
 
-    var hz = config.get('hz');
+    this.config = config.get('hzb');
 
     this.env = env || 'dev';
 
-    this.config = hz;
-
     this.headers = {};
-
-    this.headers.serviceType = hz.serviceType;
-
-    this.headers.requestType = hz.requestType;
-
-    this.headers.timestamp = null;
-
-    this.headers.messageId = null;
-
-    this.headers.externalServiceId = hz.externalServiceId;
-
-    this.headers.Accept = 'application/xml';
-
-    if(options.personnelId) {
-
-        this.headers.personnelId = options.personnelId;
-
-    }
-
-    this.headers.districtStudentId = null;
-
-    if(options.authorizedEntityId) {
-
-        this.headers.authorizedEntityId = options.authorizedEntityId;
-
-    }
-
-    if(options.externalServiceId) {
-
-        this.headers.externalServiceId = options.externalServiceId;
-
-    }
-
-    this.headers.requestAction = hz.requestAction;
-
-    this.headers.messageType = hz.messageType;
-
-    this.headers["Content-Type"] = "application/xml";
-
-    this.headers.Authorization = null;
-
-    this.headers.objectType = hz.objectType;
-
-    this.queryParameter = { contextId: hz.contextId };
-
-    this.url = hz.hzUri;
 
 }
 
@@ -139,52 +91,61 @@ Request.prototype = {
         return this.headers;
 
     },
+
     /**
      *
-     * @param uri
-     * @param callback
-     * @returns {*|request}
-     */
-    prsBaseUri: function(uri, callback){
-
-        var url = this.config.prsBaseUri + '/' + uri;
-
-        this.url = "";
-        delete this.headers.messageId;
-        delete this.headers.externalServiceId;
-        delete this.headers.requestAction;
-        delete this.headers.messageType;
-        delete this.headers.requestType;
-        delete this.headers.serviceType;
-        delete this.headers.strictSSL;
-        delete this.headers.qsParseOptions;
-        delete this.headers.objectType;
-        delete this.headers.districtStudentId;
-
-        var timestamp = this.headers.timestamp = this.getTimezone();
-        this.headers.Authorization = 'SIF_HMACSHA256 ' + this.generatePRSAuthToken(timestamp);
-
-        return this.create(url, 'GET', callback);
-    },
-    /**
-     *
+     * @param what
      * @param url
      * @param method
      * @param callback
-     * @returns request
+     * @returns {*}
      */
-    create: function (url, method, callback) {
-
+    create: function (what, url, method, callback) {
+        var config = this.config[what];
 
         if('Authorization' in this.headers){
             //skip
         } else {
             var timestamp = this.headers.timestamp = this.getTimezone();
-            this.headers.Authorization = 'SIF_HMACSHA256 ' + this.generateHZAuthToken(timestamp);
+
+            var token = '';
+
+            switch ( what ){
+
+                case 'sre':
+
+                    token = this.generateSREAuthToken(timestamp);
+                    break;
+
+                case 'xsre':
+
+                    token = this.generateXSREAuthToken(timestamp);
+                    break;
+
+                case 'prs':
+
+                    token = this.generatePRSAuthToken(timestamp);
+                    break;
+
+                default:
+
+                    throw new Error('Unable to generate token');
+
+            }
+            this.headers.Authorization = 'SIF_HMACSHA256 ' + token;
+        }
+
+        var self = this;
+
+        if('headers' in config) {
+
+            for (var name in config.headers) {
+                self.addHeader(name, config.headers[name]);
+            }
         }
 
         var options = {
-            url: this.url + url,
+            url: config.url + url,
             method: method || 'GET',
             headers: this.getHeaders(),
             qsParseOptions: { sep: ';'},
@@ -225,8 +186,25 @@ Request.prototype = {
      * @param callback
      * @returns {*|request}
      */
-    createRequestProvider: function(districtStudentId, zoneId, callback){
+    createSre: function(districtStudentId, zoneId, callback){
 
+        if(this.options.personnelId) {
+
+            this.headers.personnelId = this.options.personnelId;
+
+        }
+
+        if(this.options.authorizedEntityId) {
+
+            this.headers.authorizedEntityId = this.options.authorizedEntityId;
+
+        }
+
+        if(this.options.externalServiceId) {
+
+            this.headers.externalServiceId = this.options.externalServiceId;
+
+        }
         if(!districtStudentId){
 
             if(!callback) return;
@@ -234,12 +212,74 @@ Request.prototype = {
             return callback('District student id was not set', null, null);
 
         }
-        var url = '/requestProvider/' + this.config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+this.config.contextId;
+
+        var config = this.config.sre;
+
+        var url = '/requestProvider/' + config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+ config.contextId;
 
         this.addHeader( 'districtStudentId', districtStudentId );
-        this.headers.messageId = this.generateUUID();
 
-        return this.create(url, 'GET', callback);
+        this.addHeader('messageId', this.generateUUID());
+
+        return this.create('sre', url, 'GET', callback);
+
+    },
+    /**
+     *
+     * @param districtStudentId
+     * @param zoneId
+     * @param callback
+     * @returns {*|request}
+     */
+    createXsre: function(districtStudentId, zoneId, callback){
+
+        if(this.options.personnelId) {
+
+            this.headers.personnelId = this.options.personnelId;
+
+        }
+
+        if(this.options.authorizedEntityId) {
+
+            this.headers.authorizedEntityId = this.options.authorizedEntityId;
+
+        }
+
+        if(this.options.externalServiceId) {
+
+            this.headers.externalServiceId = this.options.externalServiceId;
+
+        }
+        if(!districtStudentId){
+
+            if(!callback) return;
+
+            return callback('District student id was not set', null, null);
+
+        }
+
+        var config = this.config.xsre;
+
+        var url = '/requestProvider/' + config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+ config.contextId;
+
+        this.addHeader( 'districtStudentId', districtStudentId );
+
+        this.addHeader('messageId', this.generateUUID());
+
+        return this.create('xsre', url, 'GET', callback);
+
+    },
+    /**
+     *
+     * @param uri
+     * @param callback
+     * @returns {*|request}
+     */
+    createPsr: function(uri, callback){
+
+        var url = '/' + uri;
+
+        return this.create('prs', url, 'GET', callback);
 
     },
     /**
@@ -263,21 +303,50 @@ Request.prototype = {
     /**
      *
      * @param timestamp
+     * @param sessionToken
+     * @param secret
      * @returns {*|string}
+     * @private
      */
-    generateHZAuthToken: function(timestamp){
-
-        var sessionToken = this.config.hzSessionToken;
+    _generateAuthToken: function(timestamp, sessionToken, secret){
 
         var valToHash = sessionToken + ":" + timestamp;
-
-        var secret = this.config.hzSharedSecret;
 
         var hash = CryptoJS.HmacSHA256(valToHash, secret).toString(CryptoJS.enc.Base64);
 
         return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(sessionToken + ":" + hash));
+    },
+
+    /**
+     *
+     * @param timestamp
+     * @returns {*|string}
+     */
+    generateSREAuthToken: function(timestamp){
+
+        var sessionToken = this.config.sre.sessionToken;
+
+        var secret = this.config.sre.sharedSecret;
+
+        return this._generateAuthToken(timestamp, sessionToken, secret);
 
     },
+
+    /**
+     *
+     * @param timestamp
+     * @returns {*|string}
+     */
+    generateXSREAuthToken: function(timestamp){
+
+        var sessionToken = this.config.xsre.sessionToken;
+
+        var secret = this.config.xsre.sharedSecret;
+
+        return this._generateAuthToken(timestamp, sessionToken, secret);
+
+    },
+
     /**
      *
      * @param timestamp
@@ -285,15 +354,11 @@ Request.prototype = {
      */
     generatePRSAuthToken: function(timestamp){
 
-        var sessionToken = this.config.prsSessionToken;
+        var sessionToken = this.config.prs.sessionToken;
 
-        var valToHash = sessionToken + ":" + timestamp;
+        var secret = this.config.prs.sharedSecret;
 
-        var secret = this.config.prsSharedSecret;
-
-        var hash = CryptoJS.HmacSHA256(valToHash, secret).toString(CryptoJS.enc.Base64);
-
-        return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(sessionToken + ":" + hash));
+        return this._generateAuthToken(timestamp, sessionToken, secret);
 
     }
 };
