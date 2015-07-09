@@ -12,6 +12,7 @@ var Permission = require('./Permission');
 var UserPermissionSchema   = new mongoose.Schema({
     organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', required: true },
     students: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Student' } ],
+    grant: [ { type: String, index: true } ],
     permissions: [ Permission ]
 });
 

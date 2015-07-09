@@ -126,6 +126,14 @@ var Student = mongoose.model('Student', StudentSchema);
 Student.setRules([
     {
         role: {
+            name: 'superadmin',
+            allow: {
+                "*": "*"
+            }
+        }
+    },
+    {
+        role: {
             name: 'admin',
             allow: {
                 "*": "*"

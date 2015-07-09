@@ -40,6 +40,8 @@ BaseController.prototype.crud = function(idName) {
 
             if(!currentUser) return false;
 
+            if(currentUser.isSuperAdmin()) return true;
+
             if(typeof req.params.organizationId === undefined) return false;
 
             var organizationId = req.params.organizationId;
@@ -54,13 +56,24 @@ BaseController.prototype.crud = function(idName) {
 
             var orgid = currentUser.organizationId;
 
+            var isMatch = orgid.indexOf(organizationId + '') !== -1;
+
+            console.log(
+                'USER: ' + JSON.stringify(currentUser.email),
+                'USER ORG: ' + JSON.stringify(orgid),
+                'CURR ORG: ' + JSON.stringify(organizationId),
+                'TYPEOF ORG: ' + (typeof organizationId),
+                'MATCH: ' + isMatch
+
+            );
+
             if('onCheck' in options && typeof options.onCheck === 'function'){
 
-                return options.onCheck(orgid.indexOf(organizationId) !== -1);
+                return options.onCheck(isMatch);
 
             }
 
-            return orgid.indexOf(organizationId);
+            return isMatch;
 
         },
         /**

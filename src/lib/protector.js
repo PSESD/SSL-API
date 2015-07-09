@@ -111,7 +111,7 @@ module.exports = function protector(schema, options) {
 
                         } else {
 
-                            throw new mongoose.Error("Unauthorized");
+                            _denied();
 
                         }
                     }
@@ -673,7 +673,7 @@ function checkAcl(method){
         permission: null
     };
 
-    if(currentRole === 'admin'){
+    if(currentRole === 'admin' || currentRole === 'superadmin'){
 
         return {
             denied: false,

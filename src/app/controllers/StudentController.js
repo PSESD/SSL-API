@@ -219,7 +219,7 @@ StudentController.createByOrgId = function (req, res) {
 
             if(!user) return res.errJson('User not update successfully');
 
-            obj.save(function (err) {
+            obj.protect(req.user.role, null, req.user).save(function (err) {
 
                 if (err)  return res.errJson(err);
 
@@ -368,7 +368,7 @@ StudentController.putStudentById = function(req, res){
 
             obj.last_updated_by = req.user.userId;
 
-            obj.save(function (err) {
+            obj.protect(req.user.role, null, req.user).save(function (err) {
 
                 if (err) return res.errJson(err);
 
@@ -414,7 +414,7 @@ StudentController.getByUserId = function(req, res){
             user: user,
             organizationId: organizationId,
             onCheck: function(isMatch){
-                return isMatch && user.isAdmin();
+                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
             }
         });
     });
@@ -483,7 +483,7 @@ StudentController.postByUserId = function(req, res){
             user: user,
             organizationId: organizationId,
             onCheck: function(isMatch){
-                return isMatch && user.isAdmin();
+                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
             }
         });
     });
@@ -526,7 +526,7 @@ StudentController.getStudentUserById = function(req, res){
             user: user,
             organizationId: organizationId,
             onCheck: function(isMatch){
-                return isMatch && user.isAdmin();
+                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
             }
         });
     });
@@ -591,7 +591,7 @@ StudentController.putStudentUserById = function(req, res){
             user: user,
             organizationId: organizationId,
             onCheck: function(isMatch){
-                return isMatch && user.isAdmin();
+                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
             }
         });
     });
@@ -630,7 +630,7 @@ StudentController.deleteStudentUserById = function(req, res){
             user: user,
             organizationId: organizationId,
             onCheck: function(isMatch){
-                return isMatch && user.isAdmin();
+                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
             }
         });
     });

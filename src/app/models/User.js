@@ -115,6 +115,13 @@ UserSchema.methods.isAdmin = function(){
   return 'admin' === this.role;
 };
 /**
+ *
+ * @returns {boolean}
+ */
+UserSchema.methods.isSuperAdmin = function(){
+    return 'superadmin' === this.role;
+};
+/**
  * If current user is case worker
  * @returns {boolean}
  */
@@ -153,7 +160,7 @@ UserSchema.virtual('organizationId').get(function(){
   if(this.permissions.length > 0){
       
       this.permissions.forEach(function(organization){
-          _id.push(organization.organization);
+          _id.push(organization.organization.toString());
       });
   }
   return _id;

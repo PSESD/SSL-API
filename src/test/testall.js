@@ -163,6 +163,7 @@ describe('All-Test', function () {
                 .send('email=' + email)
                 .send('password=' + password)
                 .send('last_name=test')
+                .send('role=superadmin')
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .expect(function (res) {
