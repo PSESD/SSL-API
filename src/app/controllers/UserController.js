@@ -96,6 +96,12 @@ UserController.save = function (req, res) {
         delete req.body.email;
     }
 
+    if(req.user.isAdmin()){
+        ['role', 'is_special_case_worker'].forEach(function(name){
+           if(name in req.body) delete req.body[name];
+        });
+    }
+
     User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
