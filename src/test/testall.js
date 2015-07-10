@@ -125,7 +125,7 @@ describe('All-Test', function () {
         email: 'support@upwardstech.com',
         password: 'demo',
         last_name: 'Upwardstech',
-        is_special_case_worker: true,
+        is_special_case_worker: false,
         role: 'case-worker'
     };
 
@@ -455,13 +455,13 @@ describe('All-Test', function () {
          */
         it('POST /:organizationId/users permissions', function (done) {
             [userId2, userId3, userId4].forEach(function (userID) {
-                var allow = 'none';
-                //if (userID == userId3) {
-                //    allow = 'own';
-                //}
-                //if (userID == userId4) {
-                //    allow = 'none';
-                //}
+                var allow = 'all';
+                if (userID == userId3) {
+                    allow = 'own';
+                }
+                if (userID == userId4) {
+                    allow = 'none';
+                }
                 permissions[userID] = {
                     organization: organizationId,
                     userId: userID,
@@ -511,6 +511,21 @@ describe('All-Test', function () {
                     req.end(function(){});
                 }
             });
+        });
+
+        it('PUT /user user 3 to special case-worker', function (done) {
+            newUser3.is_special_case_worker = true;
+            request(api_endpoint)
+                .put('/user')
+                .set('authorization', grantToken)
+                .send(newUser3)
+                .expect(function (res) {
+                    if (!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
         });
 
         it('GET /:organizationId/users', function (done) {

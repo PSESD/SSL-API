@@ -112,29 +112,27 @@ UserController.save = function (req, res) {
 
         obj.last_updated_by = req.user.userId;
 
+        if(obj.isCaseWorker()) {
+
+            var allow = obj.isSpecialCaseWorker() ? 'all' : 'own';
+
+            for (var i = 0; i < obj.permissions.length; i++) {
+
+
+                for (var j = 0; j < obj.permissions[i].permissions.length; j++) {
+
+                    obj.permissions[i].permissions[j].allow = allow;
+
+                }
+
+            }
+        }
+
         obj.save(function (err) {
 
             if (err) return res.errJson(err);
 
-            if(obj.isCaseWorker()){
-                var allow = obj.isSpecialCaseWorker() ? 'all': 'own';
-                User.findOneAndUpdate({ _id: obj._id, "permissions.$.permissions.$.allow": { $exists: true } }, {
-                    $set: {
-                        "permissions.$.permissions.$.allow":allow
-                    }
-                }, function(err, user){
-
-                    if (err) return res.errJson(err);
-
-                    res.okJson('Successfully updated!', user);
-
-                });
-
-            } else {
-
-                res.okJson('Successfully updated!', obj);
-
-            }
+            res.okJson('Successfully updated!', obj);
 
         });
 
