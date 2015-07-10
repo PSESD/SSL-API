@@ -91,7 +91,7 @@ BaseController.prototype.crud = function(idName) {
 
             } else {
 
-                res.errJson("Permission denied!");
+                res.errUnauthorized();
 
             }
         },

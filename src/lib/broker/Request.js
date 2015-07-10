@@ -152,7 +152,7 @@ Request.prototype = {
             strictSSL: false
         };
 
-        console.dir(options);
+        //console.dir(options);
 
         return request.get(options, callback || function (error, response, body) {
 

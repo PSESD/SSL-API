@@ -36,6 +36,11 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, userCtr.deleteByEmail)
     ;
 
+    router.route('/user/role')
+        .put(auth.isBearerAuthenticated, userCtr.setRole)
+        .get(auth.isBearerAuthenticated, userCtr.getRole)
+    ;
+
 
 
     router.route('/organizations')

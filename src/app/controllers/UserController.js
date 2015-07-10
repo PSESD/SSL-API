@@ -37,6 +37,8 @@ UserController.get = function (req, res) {
  */
 UserController.deleteByEmail = function (req, res) {
 
+    if(!req.user.isAdmin()) return res.errUnauthorized();
+
     var model = User;
 
     var cb = function (userId, req) {
@@ -65,6 +67,8 @@ UserController.deleteByEmail = function (req, res) {
 
     };
 
+    if(req.body.email === req.user.email) return res.errUnauthorized();
+
     User.findOne({email: req.body.email}, function (err, user) {
 
         if (err) return res.errJson(err);
@@ -83,9 +87,14 @@ UserController.deleteByEmail = function (req, res) {
  */
 UserController.save = function (req, res) {
 
+    if(!req.user.isAdmin()) return res.errUnauthorized();
+
     var crit = {_id: req.user._id};
 
-    if(req.body.email) crit = { email: req.body.email };
+    if(req.body.email && req.user.isAdmin()){
+        crit = { email: req.body.email };
+        delete req.body.email;
+    }
 
     User.findOne(crit, function (err, obj) {
 
@@ -107,7 +116,25 @@ UserController.save = function (req, res) {
 
             if (err) return res.errJson(err);
 
-            res.okJson('Successfully updated!', obj);
+            if(obj.isCaseWorker()){
+                var allow = obj.isSpecialCaseWorker() ? 'all': 'own';
+                User.findOneAndUpdate({ _id: obj._id, "permissions.$.permissions.$.allow": { $exists: true } }, {
+                    $set: {
+                        "permissions.$.permissions.$.allow":allow
+                    }
+                }, function(err, user){
+
+                    if (err) return res.errJson(err);
+
+                    res.okJson('Successfully updated!', user);
+
+                });
+
+            } else {
+
+                res.okJson('Successfully updated!', obj);
+
+            }
 
         });
 
@@ -115,21 +142,21 @@ UserController.save = function (req, res) {
 
 };
 
-UserController.addRole = function(req, res){
+UserController.setRole = function(req, res){
 
-    if(!req.body.email) return res.errJson('User not found');
+    if(!req.user.isAdmin()) return res.errUnauthorized();
 
-    var crit = { email: req.body.email };
+    var crit = { _id: req.user._id };
+    if(req.body.email && req.user.isAdmin()){
+        crit = { email: req.body.email };
+        delete req.body.email;
+    }
 
     User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
 
-        for (var prop in req.body) {
-
-            obj[prop] = req.body[prop];
-
-        }
+        obj.role = req.body.role;
         // set update time and update by user
         obj.last_updated = new Date();
 
@@ -152,7 +179,8 @@ UserController.addRole = function(req, res){
 UserController.getRole = function(){
 
     return res.okJson(null, [
-            { role: 'admin', description: 'Have access to all students in a CBO' },
+            { role: 'superadmin', description: 'Have access to all system in a CBO ' },
+            { role: 'admin', description: 'Have access to all students in a CBO in their organization permission' },
             { role: 'case-worker', description: 'Some case workers only have access to the students in their permission list, some other have access to all students.' }
     ]);
 

@@ -124,25 +124,33 @@ describe('All-Test', function () {
     var newUser = {
         email: 'support@upwardstech.com',
         password: 'demo',
-        last_name: 'Upwardstech'
+        last_name: 'Upwardstech',
+        is_special_case_worker: true,
+        role: 'case-worker'
     };
 
     var newUser2 = {
-        email: 'support2@upwardstech.com',
+        email: 'admin@upwardstech.com',
         password: 'demo',
-        last_name: 'Upwardstech2'
+        last_name: 'Upwardstech2',
+        is_special_case_worker: false,
+        role: 'admin'
     };
 
     var newUser3 = {
         email: 'support3@upwardstech.com',
         password: 'demo',
-        last_name: 'Upwardstech3'
+        last_name: 'Upwardstech3',
+        is_special_case_worker: false,
+        role: 'case-worker'
     };
 
     var newUser4 = {
         email: 'support4@upwardstech.com',
         password: 'demo',
-        last_name: 'Upwardstech4'
+        last_name: 'Upwardstech4',
+        is_special_case_worker: false,
+        role: 'case-worker'
     };
 
 
@@ -364,9 +372,6 @@ describe('All-Test', function () {
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
-                    assert.equal(newUser.email, res.body.info.email);
-                    assert.equal(newUser.last_name, res.body.info.last_name);
-                    assert.equal(newUser.first_name, res.body.info.first_name);
                 })
                 .expect(200)
                 .end(done);
@@ -450,13 +455,13 @@ describe('All-Test', function () {
          */
         it('POST /:organizationId/users permissions', function (done) {
             [userId2, userId3, userId4].forEach(function (userID) {
-                var allow = 'all';
-                if (userID == userId3) {
-                    allow = 'own';
-                }
-                if (userID == userId4) {
-                    allow = 'none';
-                }
+                var allow = 'none';
+                //if (userID == userId3) {
+                //    allow = 'own';
+                //}
+                //if (userID == userId4) {
+                //    allow = 'none';
+                //}
                 permissions[userID] = {
                     organization: organizationId,
                     userId: userID,
@@ -650,6 +655,7 @@ describe('All-Test', function () {
                 .set('authorization', grantToken)
                 .send(studentData)
                 .expect(function (res) {
+                    //console.log('STUDENT RESPONSE %j', res);
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     assert.equal(studentData.district_student_id, res.body.info.district_student_id);

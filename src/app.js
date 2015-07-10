@@ -208,6 +208,14 @@ Api.prototype.configureExpress = function (db) {
     app.use(function (req, res, next) {
 
         var resource = null;
+        /**
+         *
+         * @param rstatus
+         */
+        res.errUnauthorized = function(rstatus){
+            res.statusCode = rstatus || 401;
+            return res.end('Unauthorized');
+        };
 
         res.okJson = function (message, data, key, collection) {
             /**
@@ -284,6 +292,8 @@ Api.prototype.configureExpress = function (db) {
         };
 
         res.errJson = function (err) {
+
+            if(err === 'Access Denied' || err === 'Permission Denied') return res.errUnauthorized();
 
             var response = { success: false, error: err };
 

@@ -86,10 +86,22 @@ module.exports = function protector(schema, options) {
             save: function (args) {
 
                 var gotRules = null, inRules = null, role = null, localRules = null;
+
+                var _localDenied = function(){
+                    if ("function" === typeof args) {
+
+                        args(_errorMessage);
+
+                    } else {
+
+                        _denied();
+
+                    }
+                };
                 // this is a new document, does the user have create permission?
                 if (caller.isNew) {
 
-                    if(checkAcl('create').denied) return _denied();
+                    if(checkAcl('create').denied) return _localDenied();
 
                     gotRules = getRules(collection);
 
@@ -105,22 +117,14 @@ module.exports = function protector(schema, options) {
 
                     } else {
 
-                        if ("function" == typeof args) {
-
-                            args("Unauthorized");
-
-                        } else {
-
-                            _denied();
-
-                        }
+                        _localDenied();
                     }
 
                 }
                 // this document is being updated, does the user have update permission?
                 else {
 
-                    if(checkAcl('update').denied) return _denied();
+                    if(checkAcl('update').denied) return _localDenied();
 
                     gotRules = getRules(collection);
 
@@ -136,15 +140,7 @@ module.exports = function protector(schema, options) {
 
                     } else {
 
-                        if ("function" == typeof args) {
-
-                            args("Unauthorized");
-
-                        } else {
-
-                            _denied();
-
-                        }
+                        _localDenied();
 
                     }
 
@@ -330,9 +326,15 @@ module.exports = function protector(schema, options) {
 
         var acl = checkAcl(allowName);
 
-        console.log("ACCESS-DENIED (", allowName, ")", JSON.stringify(acl), ' FROM => ', JSON.stringify(_acl));
+        console.log("DATA ACL (", allowName, ")", JSON.stringify(acl), ' FROM => ', JSON.stringify(_acl));
 
-        if(acl.denied) return _denied();
+        if(acl.denied){
+
+            console.log("ACCESS-DENIED => ", "ACL-DENIED");
+
+            return _denied();
+
+        }
 
 
         if (!localRules) {
@@ -658,7 +660,7 @@ module.exports = function protector(schema, options) {
  */
 function _denied () {
 
-    throw new mongoose.Error(_errorMessage);
+    throw new Error(_errorMessage);
 
 }
 /**

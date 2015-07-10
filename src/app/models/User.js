@@ -31,6 +31,7 @@ var UserSchema = new mongoose.Schema({
         default: Date.now
     },
     role: { type: String, default: 'case-worker' },
+    is_special_case_worker: { type: Boolean, default: false, index: true },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
@@ -112,7 +113,7 @@ UserSchema.methods.encryptAuthCode = function (code) {
  * @returns {boolean}
  */
 UserSchema.methods.isAdmin = function(){
-  return 'admin' === this.role;
+  return 'admin' === this.role || this.isSuperAdmin();
 };
 /**
  *
@@ -120,6 +121,13 @@ UserSchema.methods.isAdmin = function(){
  */
 UserSchema.methods.isSuperAdmin = function(){
     return 'superadmin' === this.role;
+};
+/**
+ *
+ * @returns {UserSchema.is_special_case_worker|{type, default, index}}
+ */
+UserSchema.methods.isSpecialCaseWorker = function(){
+    return this.is_special_case_worker;
 };
 /**
  * If current user is case worker

@@ -174,7 +174,7 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
             });
 
-            crit._id = { $nin: students };
+            if(students.length > 0) crit._id = { $nin: students };
 
             console.log('NOT_ASSIGN %j', crit);
 

@@ -179,7 +179,11 @@ OrganizationController.getUser = function (req, res) {
 
     };
 
-    OrganizationController.grant(req, res, cb);
+    OrganizationController.grant(req, res, cb, {
+        onCheck: function(isMatch){
+            return isMatch && req.user.isAdmin();
+        }
+    });
 
 };
 /**
@@ -236,7 +240,11 @@ OrganizationController.postUser = function (req, res) {
         });
     };
 
-    OrganizationController.grant(req, res, cb);
+    OrganizationController.grant(req, res, cb, {
+        onCheck: function(isMatch){
+            return isMatch && req.user.isAdmin();
+        }
+    });
 
 };
 /**
@@ -281,35 +289,14 @@ OrganizationController.putUser = function (req, res) {
 
     };
 
-    OrganizationController.grant(req, res, cb);
+    OrganizationController.grant(req, res, cb, {
+        onCheck: function(isMatch){
+            return isMatch && req.user.isAdmin();
+        }
+    });
 
 };
-/**
- *
- * @param req
- * @param res
- */
-OrganizationController.allProgram = function (req, res) {
 
-    var cb = function () {
-
-        var crit = Program.crit(req.query, ['organization']);
-
-        crit.organization = ObjectId(req.params.organizationId);
-
-        Program.find(crit, function (err, objs) {
-
-            if (err)  return res.errJson(err);
-
-            res.okJson(null, objs);
-
-        });
-
-    };
-
-    OrganizationController.grant(req, res, cb);
-
-};
 /**
  *
  * @param req
@@ -347,10 +334,39 @@ OrganizationController.deleteUser = function (req, res) {
         });
     };
 
+    OrganizationController.grant(req, res, cb, {
+        onCheck: function(isMatch){
+            return isMatch && req.user.isAdmin();
+        }
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.allProgram = function (req, res) {
+
+    var cb = function () {
+
+        var crit = Program.crit(req.query, ['organization']);
+
+        crit.organization = ObjectId(req.params.organizationId);
+
+        Program.find(crit, function (err, objs) {
+
+            if (err)  return res.errJson(err);
+
+            res.okJson(null, objs);
+
+        });
+
+    };
+
     OrganizationController.grant(req, res, cb);
 
 };
-
 /**
  *
  * @param req
