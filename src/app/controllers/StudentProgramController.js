@@ -303,7 +303,7 @@ StudentProgramController.putStudentById = function(req, res){
 
             }
 
-            Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: Date.now, last_updated_by: req.user.userId }, function (err, updated) {
+            Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
                 if (err) return res.errJson(err);
 
@@ -354,7 +354,7 @@ StudentProgramController.deleteStudentById = function(req, res){
                 }
             }
 
-            Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: Date.now, last_updated_by: req.user.userId }, function (err, updated) {
+            Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
                 if (err) return res.errJson(err);
 

@@ -324,7 +324,7 @@ OrganizationController.deleteUser = function (req, res) {
                 }
             }
 
-            User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: Date.now, last_updated_by: req.user.userId }, function (err, updated) {
+            User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
                 if (err) return res.errJson(err);
 
