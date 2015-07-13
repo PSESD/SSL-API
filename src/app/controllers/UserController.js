@@ -85,6 +85,46 @@ UserController.deleteByEmail = function (req, res) {
  * @param req
  * @param res
  */
+UserController.updateAccount = function (req, res) {
+
+    var crit = { _id: req.user._id };
+
+    User.findOne(crit, function (err, obj) {
+
+        if (err) return res.errJson(err);
+
+        if(!obj) return res.errJson('User not found');
+
+        ['role', 'is_special_case_worker', 'email'].forEach(function(name){
+            if(name in req.body) delete req.body[name];
+        });
+
+        for (var prop in req.body) {
+
+            obj[prop] = req.body[prop];
+
+        }
+        // set update time and update by user
+        obj.last_updated = new Date();
+
+        obj.last_updated_by = req.user.userId;
+
+        obj.save(function (err) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson('Successfully updated!', obj);
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
 UserController.save = function (req, res) {
 
     if(!req.user.isAdmin()) return res.errUnauthorized();
@@ -96,17 +136,20 @@ UserController.save = function (req, res) {
         delete req.body.email;
     }
 
-    if(req.user.isAdmin()){
-        ['role', 'is_special_case_worker'].forEach(function(name){
-           if(name in req.body) delete req.body[name];
-        });
-    }
-
     User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
 
         if(!obj) return res.errJson('User not found');
+
+        /**
+         * Filter if user downgrade here role
+         */
+        if(req.user._id === obj._id && req.user.isAdmin()){
+            ['role', 'is_special_case_worker'].forEach(function(name){
+                if(name in req.body) delete req.body[name];
+            });
+        }
 
         for (var prop in req.body) {
 
@@ -150,17 +193,34 @@ UserController.setRole = function(req, res){
 
     if(!req.user.isAdmin()) return res.errUnauthorized();
 
-    var crit = { _id: req.user._id };
-    if(req.body.email && req.user.isAdmin()){
-        crit = { email: req.body.email };
-        delete req.body.email;
-    }
+    var crit = { _id: req.params.userId };
+
 
     User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
 
-        obj.role = req.body.role;
+        ['role', 'is_special_case_worker', 'email'].forEach(function(name){
+            if(name in req.body) obj[name] = req.body[name];
+        });
+
+        if(obj.isCaseWorker()) {
+
+            var allow = obj.isSpecialCaseWorker() ? 'all' : 'own';
+
+            for (var i = 0; i < obj.permissions.length; i++) {
+
+
+                for (var j = 0; j < obj.permissions[i].permissions.length; j++) {
+
+                    obj.permissions[i].permissions[j].allow = allow;
+
+                }
+
+            }
+        }
+
+
         // set update time and update by user
         obj.last_updated = new Date();
 

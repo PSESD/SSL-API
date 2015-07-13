@@ -36,12 +36,13 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, userCtr.deleteByEmail)
     ;
 
-    router.route('/user/role')
+    router.route('/user/role/:userId')
         .put(auth.isBearerAuthenticated, userCtr.setRole)
         .get(auth.isBearerAuthenticated, userCtr.getRole)
     ;
 
-
+    router.route('/user/myaccount')
+        .put(auth.isBearerAuthenticated, userCtr.updateAccount);
 
     router.route('/organizations')
         .post(auth.isBearerAuthenticated, organizationCtr.create)
