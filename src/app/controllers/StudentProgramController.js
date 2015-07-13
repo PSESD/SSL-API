@@ -211,7 +211,7 @@ StudentProgramController.getStudentById = function(req, res){
 
     var proId = req.params.programId;
 
-    var stdId = req.body.studentId;
+    var stdId = req.params.studentId;
 
     var crit  = {
         organization: ObjectId(orgId),
@@ -247,7 +247,7 @@ StudentProgramController.putStudentById = function(req, res){
 
     var proId = req.params.programId;
 
-    var stdId = req.body.studentId;
+    var stdId = req.params.studentId;
 
     var crit  = {
         organization: ObjectId(orgId),
@@ -327,7 +327,7 @@ StudentProgramController.deleteStudentById = function(req, res){
 
     var proId = req.params.programId;
 
-    var stdId = req.body.studentId;
+    var stdId = req.params.studentId;
 
     var crit  = {
         organization: ObjectId(orgId),

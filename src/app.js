@@ -213,7 +213,7 @@ Api.prototype.configureExpress = function (db) {
          * @param rstatus
          */
         res.errUnauthorized = function(rstatus){
-            res.statusCode = rstatus || 401;
+            res.statusCode = rstatus || 403;
             return res.end('Unauthorized');
         };
 
