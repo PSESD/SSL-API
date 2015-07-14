@@ -8,7 +8,6 @@ var User = require('../models/User');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
-
 var OrganizationController = new BaseController(Organization).crud('organizationId');
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -17,19 +16,29 @@ var OrganizationController = new BaseController(Organization).crud('organization
  * @returns {*}
  */
 OrganizationController.get = function (req, res) {
+
     var user = req.user;
-    var crit = req.query.url ? {url: req.query.url} : {};
+
+    var crit = Organization.crit(req.query);
+
     var orgs = user.organizationId;
 
     if (orgs.length > 0) {
-        crit._id = {$in: orgs};
+
+        crit._id = { $in: orgs };
+
     } else {
+
         return res.okJson(null, []);
+
     }
-    //console.log('ORG CRIT: %j', crit);
+
     Organization.find(crit, function (err, orgs) {
+
         if (err) return res.errJson(err);
+
         res.okJson(null, orgs);
+
     });
 
 };
@@ -40,14 +49,18 @@ OrganizationController.get = function (req, res) {
  */
 OrganizationController.find = function (req, res) {
 
-    var crit = req.query.url ? {url: req.query.url} : {};
+    var crit = Organization.crit(req.query);
 
     crit._id = req.params.organizationId;
 
     var cb = function () {
+
         Organization.findOne(crit, function (err, org) {
+
             if (err) return res.errJson(err);
+
             res.okJson(org);
+
         });
     };
 
@@ -61,18 +74,25 @@ OrganizationController.find = function (req, res) {
  * @param res
  */
 OrganizationController.profile = function (req, res) {
-    var crit = req.query.url ? {url: req.query.url} : {};
+
+    var crit = Organization.crit(req.query);
 
     crit._id = req.params.organizationId;
 
     var cb = function () {
+
         Organization.findOne(crit, function (err, org) {
+
             if (err) return res.errJson(err);
+
             res.okJson(org);
+
         });
+
     };
 
     OrganizationController.grant(req, res, cb);
+
 };
 /**
  * General information and setup of an organization.
@@ -80,7 +100,9 @@ OrganizationController.profile = function (req, res) {
  * @param res
  */
 OrganizationController.updateProfile = function(req, res){
+
     var cb = function () {
+
         Organization.findOne({_id: ObjectId(req.params.organizationId)}, function (err, obj) {
 
             if (err)  return res.errJson(err);
@@ -88,25 +110,30 @@ OrganizationController.updateProfile = function(req, res){
             if (!obj) return res.errJson('Data not found');
 
             for (var prop in req.body) {
+
                 if (prop in obj) {
+
                     obj[prop] = req.body[prop];
+
                 }
             }
             // set update time and update by user
             obj.last_updated = new Date();
+
             obj.last_updated_by = req.user.userId;
             // save the movie
             obj.save(function (err) {
-                if (err) {
-                    return res.errJson(err);
-                }
+
+                if (err) return res.errJson(err);
 
                 res.okJson('Successfully updated!', obj);
+
             });
         });
     };
 
     OrganizationController.grant(req, res, cb);
+
 };
 /**
  * Find all users by org id
@@ -140,11 +167,8 @@ OrganizationController.getUser = function (req, res) {
     var cb = function () {
 
         User.findOne({
-
             _id: ObjectId(req.params.userId),
-
             permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
-
         }, function (err, user) {
 
             if (err) return res.errJson(err);
@@ -155,7 +179,12 @@ OrganizationController.getUser = function (req, res) {
 
     };
 
-    OrganizationController.grant(req, res, cb);
+    OrganizationController.grant(req, res, cb, {
+        onCheck: function(isMatch){
+            return isMatch && req.user.isAdmin();
+        }
+    });
+
 };
 /**
  *
@@ -165,23 +194,28 @@ OrganizationController.getUser = function (req, res) {
 OrganizationController.postUser = function (req, res) {
 
     var cb = function() {
+
         var orgId = req.params.organizationId;
+
         var userId = req.body.userId;
 
         var permissions = {};
 
         if (req.body.organization) permissions.organization = ObjectId(req.body.organization);
+
         permissions.students = req.body.students || [];
+
         permissions.permissions = req.body.permissions || [];
 
         permissions.created = new Date();
+
         permissions.creator = req.user.userId;
+
         permissions.last_updated = new Date();
+
         permissions.last_updated_by = req.user.userId;
 
-        if (_.isEmpty(permissions)) {
-            return res.errJson('POST parameter is empty!');
-        }
+        if (_.isEmpty(permissions)) return res.errJson('POST parameter is empty!');
 
         User.findOne({_id: ObjectId(userId)}, function (err, user) {
 
@@ -190,24 +224,28 @@ OrganizationController.postUser = function (req, res) {
             if (!user) return res.errJson('User data not found');
 
             user.permissions.push(permissions);
-
-
             // set update time and update by user
             user.last_updated = new Date();
+
             user.last_updated_by = req.user.userId;
 
             user.save(function (err) {
 
                 if (err) return res.errJson(err);
 
-
                 res.okJson('Organization successfully add to User', user);
+
             });
 
         });
     };
 
-    OrganizationController.grant(req, res, cb);
+    OrganizationController.grant(req, res, cb, {
+        onCheck: function(isMatch){
+            return isMatch && req.user.isAdmin();
+        }
+    });
+
 };
 /**
  *
@@ -215,6 +253,7 @@ OrganizationController.postUser = function (req, res) {
  * @param res
  */
 OrganizationController.putUser = function (req, res) {
+
     var cb = function () {
 
         User.findOne({_id: ObjectId(req.params.userId)}, function (err, obj) {
@@ -235,14 +274,12 @@ OrganizationController.putUser = function (req, res) {
 
             // set update time and update by user
             obj.last_updated = new Date();
+
             obj.last_updated_by = req.user.userId;
 
             obj.save(function (err) {
 
-                if (err) {
-
-                    return res.errJson(err);
-                }
+                if (err) return res.errJson(err);
 
                 res.okJson('Successfully updated!', obj);
 
@@ -252,28 +289,14 @@ OrganizationController.putUser = function (req, res) {
 
     };
 
-    OrganizationController.grant(req, res, cb);
+    OrganizationController.grant(req, res, cb, {
+        onCheck: function(isMatch){
+            return isMatch && req.user.isAdmin();
+        }
+    });
+
 };
-/**
- *
- * @param req
- * @param res
- */
-OrganizationController.allProgram = function (req, res) {
 
-    var cb = function () {
-
-            Program.find({organization: ObjectId(req.params.organizationId)}, function (err, objs) {
-
-                if (err)  return res.errJson(err);
-
-                res.okJson(null, objs);
-            });
-
-    };
-
-    OrganizationController.grant(req, res, cb);
-};
 /**
  *
  * @param req
@@ -300,7 +323,8 @@ OrganizationController.deleteUser = function (req, res) {
 
                 }
             }
-            User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: Date.now, last_updated_by: req.user.userId }, function (err, updated) {
+
+            User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
                 if (err) return res.errJson(err);
 
@@ -310,9 +334,39 @@ OrganizationController.deleteUser = function (req, res) {
         });
     };
 
-    OrganizationController.grant(req, res, cb);
-};
+    OrganizationController.grant(req, res, cb, {
+        onCheck: function(isMatch){
+            return isMatch && req.user.isAdmin();
+        }
+    });
 
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.allProgram = function (req, res) {
+
+    var cb = function () {
+
+        var crit = Program.crit(req.query, ['organization']);
+
+        crit.organization = ObjectId(req.params.organizationId);
+
+        Program.find(crit, function (err, objs) {
+
+            if (err)  return res.errJson(err);
+
+            res.okJson(null, objs);
+
+        });
+
+    };
+
+    OrganizationController.grant(req, res, cb);
+
+};
 /**
  *
  * @param req
@@ -322,7 +376,13 @@ OrganizationController.getProgram = function (req, res) {
 
     var cb = function () {
 
-        Program.findOne({_id: ObjectId(req.params.programId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
+        var crit = Program.crit(req.query, ['_id', 'organization']);
+
+        crit._id = ObjectId(req.params.programId);
+
+        crit.organization = ObjectId(req.params.organizationId);
+
+        Program.findOne(crit, function (err, obj) {
 
             if (err)  return res.errJson(err);
 
@@ -335,6 +395,7 @@ OrganizationController.getProgram = function (req, res) {
     };
 
     OrganizationController.grant(req, res, cb);
+
 };
 /**
  *
@@ -350,17 +411,16 @@ OrganizationController.postProgram = function (req, res) {
         obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
         // set update time and update by user
         obj.created = new Date();
+
         obj.creator = req.user.userId;
+
         obj.last_updated = new Date();
+
         obj.last_updated_by = req.user.userId;
 
         obj.save(function (err) {
 
-            if (err) {
-
-                return res.errJson(err);
-
-            }
+            if (err) return res.errJson(err);
 
             res.okJson('Successfully Added', obj);
 
@@ -369,6 +429,7 @@ OrganizationController.postProgram = function (req, res) {
     };
 
     OrganizationController.grant(req, res, cb);
+
 };
 /**
  *
@@ -397,14 +458,12 @@ OrganizationController.putProgram = function (req, res) {
 
             // set update time and update by user
             obj.last_updated = new Date();
+
             obj.last_updated_by = req.user.userId;
 
             obj.save(function (err) {
 
-                if (err) {
-
-                    return res.errJson(err);
-                }
+                if (err) return res.errJson(err);
 
                 res.okJson('Successfully updated!', obj);
 
@@ -415,6 +474,7 @@ OrganizationController.putProgram = function (req, res) {
     };
 
     OrganizationController.grant(req, res, cb);
+
 };
 /**
  *
@@ -430,11 +490,7 @@ OrganizationController.deleteProgram = function (req, res) {
             organization: ObjectId(req.params.organizationId)
         }, function (err, obj) {
 
-            if (err) {
-
-                return res.errJson(err);
-
-            }
+            if (err) return res.errJson(err);
 
             res.okJson('Successfully deleted');
 
@@ -443,6 +499,7 @@ OrganizationController.deleteProgram = function (req, res) {
     };
 
     OrganizationController.grant(req, res, cb);
+
 };
 /**
  *

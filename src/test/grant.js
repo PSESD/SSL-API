@@ -34,6 +34,7 @@ describe( 'OAuth2', function () {
     before( function (done) {
         if (mongoose.connection.db) return done();
         mongoose.connect( dbUri, done );
+
     } );
 
     it( 'add and remove user permission', function (done) {

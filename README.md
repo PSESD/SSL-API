@@ -99,23 +99,56 @@ The following examples configuration in JSON format.
         "mandrill": {
             "api_key": "<api_key>"
         },
-        "hz": {
-            "hzUri": "<hzUri>",
-            "hzSessionToken": "<hzSessionToken>",
-            "hzSharedSecret": "<hzSharedSecret>",
-            "object": "<object>",
-            "service": "<service>",
-            "contextId": "CBO",
-            "validation-url": "<validation-url>",
-            "validation-service": "<validation-service?",
-            "serviceType": "OBJECT",
-            "requestType": "IMMEDIATE",
-            "requestAction": "QUERY",
-            "messageType": "REQUEST",
-            "objectType": "<objectType>",
-            "prsBaseUri": "<prsBaseUri>",
-            "prsSessionToken": "<prsSessionToken>",
-            "prsSharedSecret": "<prsSharedSecret>"
+        "hzb": {
+            "default": "xsre",
+            "sre": {
+                 "url": "<api end point>",
+                "sessionToken": "<session token>",
+                "sharedSecret": "<secret>",
+                "object": "sres",
+                "service": "sres",
+                "contextId": "CBO",
+                "headers": {
+                    "serviceType": "OBJECT",
+                    "requestType": "IMMEDIATE",
+                    "requestAction": "QUERY",
+                    "messageType": "REQUEST",
+                    "objectType": "sre",
+                    "Accept": "application/xml",
+                    "Content-Type": "application/xml"
+                },
+                "validation-url": "",
+                "validation-service": ""
+            },
+            "xsre": {
+                 "url": "<api end point>",
+                "sessionToken": "<session token>",
+                "sharedSecret": "<secret>",
+                "object": "sres",
+                "service": "sres",
+                "contextId": "DEFAULT",
+                "headers": {
+                    "serviceType": "OBJECT",
+                    "requestType": "IMMEDIATE",
+                    "requestAction": "QUERY",
+                    "messageType": "REQUEST",
+                    "objectType": "xsre",
+                    "Accept": "application/xml",
+                    "Content-Type": "application/xml"
+                },
+                "validation-url": "",
+                "validation-service": ""
+            },
+            "prs": {
+                "url": "<api end point>",
+                "sessionToken": "<session token>",
+                "sharedSecret": "<secret>",
+                "headers": {
+                    "Accept": "application/xml"
+                },
+                "validation-url": "",
+                "validation-service": ""
+            }
         },
         "cross": {
             "enable": true,

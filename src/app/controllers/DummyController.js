@@ -12,10 +12,7 @@ var BaseController = require('./BaseController');
 var _ = require('underscore');
 var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
-
 var ObjectId = mongoose.Types.ObjectId;
-
-
 var DummyController = new BaseController(Student).crud();
 /**
  *
@@ -27,8 +24,11 @@ DummyController.index = function(req, res){
      *
      */
     Student.findOne().exec(function(err, std){
+
         var studentId = std._id;
+
         var orgId = std.organization;
+
         User.findOne({email: req.query.email || req.body.email }, function(err, user){
 
             if(err) return res.errJson(err);

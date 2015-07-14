@@ -22,35 +22,77 @@ BaseController.prototype.crud = function(idName) {
         /**
          *
          * @param req
+         * @param options
          * @returns {*}
+         * @private
          */
-        _checkPermission: function(req){
+        _checkPermission: function(req, options){
 
-            if(!req.user) return false;
+            var currentUser = req.user;
+
+            if(!_.isObject(options)) options = {};
+
+            if('user' in options && options.user instanceof User){
+
+                currentUser = options.user;
+
+            }
+
+            if(!currentUser) return false;
+
+            if(currentUser.isSuperAdmin()) return true;
 
             if(typeof req.params.organizationId === undefined) return false;
 
-            if(!req.params.organizationId) return false;
+            var organizationId = req.params.organizationId;
 
-            var orgid = req.user.organizationId;
+            if('organizationId' in options && String.valueOf(options.organizationId).length > 0){
 
-            //if(orgid.length === 0){
-            //    return true;
-            //}
+                organizationId = options.organizationId;
 
-            return orgid.indexOf(req.params.organizationId);
+            }
+
+            if(!organizationId) return false;
+
+            var orgid = currentUser.organizationId;
+
+            var isMatch = orgid.indexOf(organizationId + '') !== -1;
+
+            console.log(
+                'USER: ' + JSON.stringify(currentUser.email),
+                'USER ORG: ' + JSON.stringify(orgid),
+                'CURR ORG: ' + JSON.stringify(organizationId),
+                'TYPEOF ORG: ' + (typeof organizationId),
+                'MATCH: ' + isMatch
+
+            );
+
+            if('onCheck' in options && typeof options.onCheck === 'function'){
+
+                return options.onCheck(isMatch);
+
+            }
+
+            return isMatch;
+
         },
         /**
          *
          * @param req
          * @param res
          * @param callback
+         * @param options
          */
-        grant: function(req, res, callback){
-            if(this._checkPermission(req)){
+        grant: function(req, res, callback, options){
+
+            if(this._checkPermission(req, options)){
+
                 callback();
+
             } else {
-                res.errJson("Permission denied!");
+
+                res.errUnauthorized();
+
             }
         },
         /**
@@ -61,18 +103,24 @@ BaseController.prototype.crud = function(idName) {
         create: function (req, res) {
 
             var newModel = self.model;
+
             var obj = new newModel(req.body);
+
             // set update time and update by user
             if(!obj.created) obj.created = new Date();
+
             if(!obj.creator) obj.creator = req.user.userId;
+
             if(!obj.last_updated) obj.last_updated = new Date();
+
             if(!obj.last_updated_by) obj.last_updated_by = req.user.userId;
 
             obj.save(function (err) {
-                if (err) {
-                    return res.errJson(err);
-                }
+
+                if (err)  return res.errJson(err);
+
                 return res.okJson('Successfully Added', obj);
+
             });
         },
         /**
@@ -83,27 +131,31 @@ BaseController.prototype.crud = function(idName) {
         save: function (req, res) {
 
             self.model.findOne({ _id: ObjectId(req.params[id]) }, function (err, obj) {
-                if (err) {
-                    return res.errJson(err);
-                }
+
+                if (err)  return res.errJson(err);
 
                 if(!obj) return res.errJson('Data not found');
 
                 for (var prop in req.body) {
+
                     if(prop in obj) {
+
                         obj[prop] = req.body[prop];
+
                     }
                 }
 
                 if(!obj.last_updated) obj.last_updated = new Date();
+
                 if(!obj.last_updated_by) obj.last_updated_by = req.user.userId;
+
                 // save the movie
                 obj.save(function (err) {
-                    if (err) {
-                        return res.errJson(err);
-                    }
+
+                    if (err)  return res.errJson(err);
 
                     res.okJson('Successfully updated!', obj);
+
                 });
             });
         },
@@ -113,11 +165,13 @@ BaseController.prototype.crud = function(idName) {
          * @param res
          */
         get: function (req, res) {
+
             self.model.findOne({ _id: ObjectId(req.params[id]) }, function (err, obj) {
-                if (err) {
-                    return res.errJson(err);
-                }
+
+                if (err)  return res.errJson(err);
+
                 res.json(obj);
+
             });
         },
         /**
@@ -126,11 +180,13 @@ BaseController.prototype.crud = function(idName) {
          * @param res
          */
         all: function (req, res) {
+
             self.model.find(function (err, objs) {
-                if (err) {
-                    return res.errJson(err);
-                }
+
+                if (err)  return res.errJson(err);
+
                 res.json(objs);
+
             });
         },
         /**
@@ -142,14 +198,17 @@ BaseController.prototype.crud = function(idName) {
             self.model.remove({
                 _id: ObjectId(req.params[id])
             }, function (err, obj) {
-                if (err) {
-                    return res.errJson(err);
-                }
+
+                if (err)  return res.errJson(err);
 
                 res.okJson('Successfully deleted');
+
             });
         }
     }
 };
-
+/**
+ *
+ * @type {BaseController}
+ */
 module.exports = BaseController;

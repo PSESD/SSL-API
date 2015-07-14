@@ -2,11 +2,12 @@
  * Created by zaenal on 21/05/15.
  */
 var User = require('../models/User');
+var Client = require('../models/Client');
+var Code = require('../models/Code');
 var BaseController = require('./BaseController');
 var util = require('util');
 var extend = util._extend;
 var _ = require('underscore');
-
 var UserController = new BaseController(User).crud();
 /**
  * Get Current User Login
@@ -14,12 +15,19 @@ var UserController = new BaseController(User).crud();
  * @param res
  */
 UserController.get = function (req, res) {
-    User.findOne({email: req.user.email}, function (err, obj) {
-        if (err) {
-            return res.errJson(err);
-        }
+
+    var crit = User.crit(req.query, ['email']);
+
+    crit.email = req.user.email;
+
+    User.findOne(crit, function (err, obj) {
+
+        if (err) return res.errJson(err);
+
         res.okJson(obj);
+
     });
+
 };
 
 /**
@@ -28,38 +36,136 @@ UserController.get = function (req, res) {
  * @param res
  */
 UserController.deleteByEmail = function (req, res) {
+
+    if(!req.user.isAdmin()) return res.errUnauthorized();
+
     var model = User;
+
     var cb = function (userId, req) {
 
         model.remove({
             _id: userId
         }, function (err, obj) {
-            if (err) {
-                return res.errJson(err);
-            }
+
+            if (err) return res.errJson(err);
 
             Client.remove({userId: userId}, function (err) {
-                if (err) {
-                    return res.errJson(err);
-                }
+
+                if (err) return res.errJson(err);
+
                 Code.remove({userId: userId}, function (err) {
-                    if (err) {
-                        return res.errJson(err);
-                    }
+
+                    if (err) return res.errJson(err);
+
                 });
+
             });
 
             res.okJson('Successfully deleted');
+
         });
+
     };
 
+    if(req.body.email === req.user.email) return res.errUnauthorized();
+
     User.findOne({email: req.body.email}, function (err, user) {
+
         if (err) return res.errJson(err);
 
         if(!user) return res.errJson('User not found');
 
         cb(user._id, req);
+
     });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.updateAccount = function (req, res) {
+
+    var crit = { _id: req.user._id };
+
+    User.findOne(crit, function (err, obj) {
+
+        if (err) return res.errJson(err);
+
+        if(!obj) return res.errJson('User not found');
+
+        ['role', 'is_special_case_worker', 'email'].forEach(function(name){
+            if(name in req.body) delete req.body[name];
+        });
+
+        for (var prop in req.body) {
+
+            obj[prop] = req.body[prop];
+
+        }
+        // set update time and update by user
+        obj.last_updated = new Date();
+
+        obj.last_updated_by = req.user.userId;
+
+        obj.save(function (err) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson('Successfully updated!', obj);
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param role
+ * @param is_special
+ * @param permissions
+ * @returns {*}
+ * @private
+ */
+UserController._checkRole = function(role, is_special, permissions){
+
+    if(permissions.length === 0){
+        switch ( role ){
+            case 'admin':
+            case 'superadmin':
+                permissions.push(
+                    {
+                        "model" : "Student",
+                        "allow" : "all",
+                        "operation" : "*"
+                    }
+                );
+                break;
+            case 'case-worker':
+                var allow = is_special ? 'all' : 'own';
+                permissions = [{
+                    model: 'Student',
+                    operation: 'read',
+                    allow: allow
+                }, {
+                    model: 'Student',
+                    operation: 'create',
+                    allow: allow
+                }, {
+                    model: 'Student',
+                    operation: 'update',
+                    allow: allow
+                }, {
+                    model: 'Student',
+                    operation: 'delete',
+                    allow: allow
+                }];
+                break;
+        }
+    }
+
+    return permissions;
 
 };
 /**
@@ -68,73 +174,132 @@ UserController.deleteByEmail = function (req, res) {
  * @param res
  */
 UserController.save = function (req, res) {
+
+    if(!req.user.isAdmin()) return res.errUnauthorized();
+
     var crit = {_id: req.user._id};
-    if(req.body.email){
+
+    if(req.body.email && req.user.isAdmin()){
         crit = { email: req.body.email };
+        delete req.body.email;
     }
-    //req.app.get('log')(crit);
 
     User.findOne(crit, function (err, obj) {
-        if (err) {
-            return res.errJson(err);
+
+        if (err) return res.errJson(err);
+
+        if(!obj) return res.errJson('User not found');
+
+        /**
+         * Filter if user downgrade here role
+         */
+        if(req.user._id === obj._id && req.user.isAdmin()){
+
+            var role = req.body.role;
+
+            if(role === 'case-worker') return req.errJson("Admin never be able to downgrade itself to a case worker");
+
         }
 
         for (var prop in req.body) {
-            obj[prop] = req.body[prop];
-        }
 
+            obj[prop] = req.body[prop];
+
+        }
         // set update time and update by user
         obj.last_updated = new Date();
+
         obj.last_updated_by = req.user.userId;
 
-        obj.save(function (err) {
-            if (err) {
-                return res.errJson(err);
+        if(obj.isCaseWorker()) {
+
+            var allow = obj.isSpecialCaseWorker() ? 'all' : 'own';
+
+            for (var i = 0; i < obj.permissions.length; i++) {
+
+                obj.permissions[i].permissions = UserController._checkRole(obj.role, obj.isSpecialCaseWorker(), obj.permissions[i].permissions);
+
+                for (var j = 0; j < obj.permissions[i].permissions.length; j++) {
+
+                    obj.permissions[i].permissions[j].allow = allow;
+
+                }
+
             }
+        }
+
+        obj.save(function (err) {
+
+            if (err) return res.errJson(err);
 
             res.okJson('Successfully updated!', obj);
+
         });
+
     });
+
 };
 
-UserController.addRole = function(){
+UserController.setRole = function(req, res){
 
-    if(!req.body.email){
-        return res.errJson('User not found');
-    }
+    if(!req.user.isAdmin()) return res.errUnauthorized();
 
-    var crit = { email: req.body.email };
+    var crit = { _id: req.params.userId };
+
 
     User.findOne(crit, function (err, obj) {
-        if (err) {
-            return res.errJson(err);
+
+        if (err) return res.errJson(err);
+
+        ['role', 'is_special_case_worker', 'email'].forEach(function(name){
+            if(name in req.body) obj[name] = req.body[name];
+        });
+
+        if(obj.isCaseWorker()) {
+
+            var allow = obj.isSpecialCaseWorker() ? 'all' : 'own';
+
+            for (var i = 0; i < obj.permissions.length; i++) {
+
+                obj.permissions[i].permissions = UserController._checkRole(obj.role, obj.isSpecialCaseWorker(), obj.permissions[i].permissions);
+
+                for (var j = 0; j < obj.permissions[i].permissions.length; j++) {
+
+                    obj.permissions[i].permissions[j].allow = allow;
+
+                }
+
+            }
         }
 
-        for (var prop in req.body) {
-            obj[prop] = req.body[prop];
-        }
 
         // set update time and update by user
         obj.last_updated = new Date();
+
         obj.last_updated_by = req.user.userId;
 
         obj.save(function (err) {
-            if (err) {
-                return res.errJson(err);
-            }
+
+            if (err) return res.errJson(err);
 
             res.okJson('Successfully updated!', obj);
+
         });
+
     });
+
 };
 
 
 
 UserController.getRole = function(){
+
     return res.okJson(null, [
-            { role: 'admin', description: 'Have access to all students in a CBO' },
+            { role: 'superadmin', description: 'Have access to all system in a CBO ' },
+            { role: 'admin', description: 'Have access to all students in a CBO in their organization permission' },
             { role: 'case-worker', description: 'Some case workers only have access to the students in their permission list, some other have access to all students.' }
     ]);
+
 };
 /**
  *
@@ -142,14 +307,21 @@ UserController.getRole = function(){
  * @param res
  */
 UserController.cleanAll = function(req, res){
+
     var email = req.body.email || req.query.email;
+
     var emails = [ 'test@test.com', 'support@upwardstech.com'];
+
     if(!email || emails.indexOf(email) === -1) return res.errJson('Mandatory parameters was empty');
 
     User.findOne({ email: email }, function(err, user){
+
         if(err) return res.errJson(err);
+
         User.removeDeep(user._id, function(err){ console.log(err);});
+
         res.okJson('Done');
+
     });
 
 };

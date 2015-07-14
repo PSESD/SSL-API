@@ -15,8 +15,10 @@ Rest.prototype.handleRoutes= function(router, Api) {
 	var organizationCtr = Api.controller('OrganizationController');
 
 	var studentCtr = Api.controller('StudentController');
+	var tagCtr = Api.controller('TagController');
 	var indexCtr = Api.controller('Index');
     var studentProgramCtr = Api.controller('StudentProgramController');
+    var prsCtr = Api.controller('PRSController');
 	var auth = Api.controller('Auth');
 
 	router.get('/', indexCtr.index);
@@ -33,6 +35,14 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .post(auth.isBearerAuthenticated, userCtr.create)
         .delete(auth.isBearerAuthenticated, userCtr.deleteByEmail)
     ;
+
+    router.route('/user/role/:userId')
+        .put(auth.isBearerAuthenticated, userCtr.setRole)
+        .get(auth.isBearerAuthenticated, userCtr.getRole)
+    ;
+
+    router.route('/user/myaccount')
+        .put(auth.isBearerAuthenticated, userCtr.updateAccount);
 
     router.route('/organizations')
         .post(auth.isBearerAuthenticated, organizationCtr.create)
@@ -64,18 +74,42 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, organizationCtr.deleteProgram)
     ;
 
-
-
     router.route('/:organizationId/students')
           .post(auth.isBearerAuthenticated, studentCtr.createByOrgId)
           .get(auth.isBearerAuthenticated, studentCtr.getStudents);
+
+
+    router.route('/:organizationId/students/not-assign')
+        .get(auth.isBearerAuthenticated, studentCtr.getStudentNotAssigns);
 
     router.route('/:organizationId/students/:studentId')
         .get(auth.isBearerAuthenticated, studentCtr.getStudentById)
         .put(auth.isBearerAuthenticated, studentCtr.putStudentById)
         .delete(auth.isBearerAuthenticated, studentCtr.deleteStudentById);
 
-    router.route('/:organizationId/students/:studentId/backpack').get(auth.isBearerAuthenticated, studentCtr.getStudentsBackpack);
+    router.route('/:organizationId/users/:userId/students')
+        .get(auth.isBearerAuthenticated, studentCtr.getByUserId)
+        .post(auth.isBearerAuthenticated, studentCtr.postByUserId)
+    ;
+
+    router.route('/:organizationId/users/:userId/students/:studentId')
+        .get(auth.isBearerAuthenticated, studentCtr.getStudentUserById)
+        .put(auth.isBearerAuthenticated, studentCtr.putStudentUserById)
+        .delete(auth.isBearerAuthenticated, studentCtr.deleteStudentUserById)
+    ;
+    /**
+     * Tag route
+     */
+    router.route('/:organizationId/tags')
+        .post(auth.isBearerAuthenticated, tagCtr.createByOrgId)
+        .get(auth.isBearerAuthenticated, tagCtr.getTags);
+
+    router.route('/:organizationId/tags/:tagId')
+        .get(auth.isBearerAuthenticated, tagCtr.getTagById)
+        .put(auth.isBearerAuthenticated, tagCtr.putTagById)
+        .delete(auth.isBearerAuthenticated, tagCtr.deleteTagById);
+
+    router.route('/:organizationId/students/:studentId/xsre').get(auth.isBearerAuthenticated, studentCtr.getStudentsBackpack);
 
 
     router.route('/:organizationId/students/:studentId/programs')
@@ -88,13 +122,19 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .post(auth.isBearerAuthenticated, studentProgramCtr.addByProgramId)
     ;
 
+    router.route('/:organizationId/programs/:programId/students/:studentId')
+        .get(auth.isBearerAuthenticated, studentProgramCtr.getStudentById)
+        .put(auth.isBearerAuthenticated, studentProgramCtr.putStudentById)
+        .delete(auth.isBearerAuthenticated, studentProgramCtr.deleteStudentById)
+    ;
 
+    router.route('/:organizationId/xsre/districts').get(auth.isBearerAuthenticated, prsCtr.getDistricts);
 
     /**
      * Only for development
      */
     if(Api.env !== 'production') {
-        router.get('/:organizationId/students/:studentId/backpack-skip', studentCtr.getStudentsBackpack);
+        router.get('/:organizationId/students/:studentId/xsre-skip', studentCtr.getStudentsBackpack);
         router.get('/dummy/test', Api.controller('DummyController').index);
     }
 
