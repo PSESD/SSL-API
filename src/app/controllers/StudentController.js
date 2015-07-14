@@ -555,7 +555,7 @@ StudentController.putStudentUserById = function(req, res){
 
         var cb = function(){
 
-            Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).findOne({ _id: studentId, organization: ObjectId(req.params.organizationId) }, function (err, obj) {
+            Student.findOne({ _id: studentId, organization: ObjectId(req.params.organizationId) }, function (err, obj) {
 
                 if (err)  return res.errJson(err);
 
@@ -579,7 +579,24 @@ StudentController.putStudentUserById = function(req, res){
 
                     if (err) return res.errJson(err);
 
-                    res.okJson('Successfully updated!', obj);
+                    _.each(currUser.permissions, function(permission, key){
+
+                        if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
+                            currUser.permissions[key].students.push(obj._id);
+
+                        }
+
+                    });
+
+                    currUser.save(function(err){
+
+                        if (err)  return res.errJson(err);
+
+                        res.okJson('Successfully Updated!', obj);
+
+                    });
+
 
                 });
 
@@ -616,11 +633,26 @@ StudentController.deleteStudentUserById = function(req, res){
 
         var cb = function(){
 
-            Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).remove({ _id: studentId, organization: ObjectId(organizationId) }, function (err) {
+            Student.remove({ _id: studentId, organization: ObjectId(organizationId) }, function (err) {
 
                 if (err) return res.errJson(err);
 
-                res.okJson('Delete success');
+                _.each(currUser.permissions, function(permission, key){
+
+                    if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) !== -1){
+
+                        delete currUser.permissions[key].students[permission.students.indexOf(obj._id)];
+
+                    }
+
+                });
+
+                currUser.save(function(err){
+
+                    if (err)  return res.errJson(err);
+
+                    res.okJson('Successfully Deleted!', obj);
+                });
 
             });
 
