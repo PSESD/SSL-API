@@ -21,6 +21,7 @@ if (rollbarAccessToken) {
     rollbar.handleUncaughtExceptions(rollbarAccessToken, {});
 
 }
+
 /**
  *
  * @constructor
@@ -83,6 +84,7 @@ Api.prototype.controller = function (name, newInstance) {
     }
 
     return obj;
+
 };
 /**
  * load controller
@@ -146,7 +148,6 @@ Api.prototype.registerRoute = function (cb) {
  */
 Api.prototype.connectDb = function () {
 
-    var self = this;
 
     var dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
 
@@ -239,7 +240,7 @@ Api.prototype.configureExpress = function (db) {
              * populate response
              * @type {{success: boolean}}
              */
-            var response = {success: true};
+            var response = { success: true };
 
             if (message) {
 
