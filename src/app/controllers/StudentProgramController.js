@@ -191,6 +191,8 @@ StudentProgramController.addByProgramId = function(req, res){
 
                 if(err) return res.errJson(err);
 
+                Tag.addTag(ObjectId(orgId), studentProgram.cohort);
+
                 res.okJson('Student Program successfully add', student);
 
             });

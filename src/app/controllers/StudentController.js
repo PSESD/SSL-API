@@ -654,6 +654,7 @@ StudentController.deleteStudentUserById = function(req, res){
                     if (err)  return res.errJson(err);
 
                     res.okJson('Successfully Deleted!', student);
+
                 });
 
             });
