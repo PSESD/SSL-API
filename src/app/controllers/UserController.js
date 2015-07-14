@@ -194,9 +194,11 @@ UserController.save = function (req, res) {
          * Filter if user downgrade here role
          */
         if(req.user._id === obj._id && req.user.isAdmin()){
-            ['role', 'is_special_case_worker'].forEach(function(name){
-                if(name in req.body) delete req.body[name];
-            });
+
+            var role = req.body.role;
+
+            if(role === 'case-worker') return req.errJson("Admin never be able to downgrade itself to a case worker");
+
         }
 
         for (var prop in req.body) {
