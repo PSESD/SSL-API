@@ -633,15 +633,17 @@ StudentController.deleteStudentUserById = function(req, res){
 
         var cb = function(){
 
-            Student.remove({ _id: studentId, organization: ObjectId(organizationId) }, function (err) {
+            Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, student) {
 
                 if (err) return res.errJson(err);
 
+                if(!student) return res.errJson('Student not found!');
+
                 _.each(currUser.permissions, function(permission, key){
 
-                    if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) !== -1){
+                    if(permission.organization.toString() === student.organization.toString() && permission.students.indexOf(student._id) !== -1){
 
-                        delete currUser.permissions[key].students[permission.students.indexOf(obj._id)];
+                        delete currUser.permissions[key].students[permission.students.indexOf(student._id)];
 
                     }
 
@@ -651,7 +653,7 @@ StudentController.deleteStudentUserById = function(req, res){
 
                     if (err)  return res.errJson(err);
 
-                    res.okJson('Successfully Deleted!', obj);
+                    res.okJson('Successfully Deleted!', student);
                 });
 
             });
