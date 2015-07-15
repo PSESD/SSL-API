@@ -639,19 +639,35 @@ StudentController.deleteStudentUserById = function(req, res){
 
                 if(!student) return res.errJson('Student not found!');
 
-                _.each(currUser.permissions, function(permission, key){
+                var allpermission = [];
 
-                    if(permission.organization.toString() === student.organization.toString() && permission.students.indexOf(student._id) !== -1){
+                for (var i = 0; i < currUser.permissions.length; i++) {
 
-                        delete currUser.permissions[key].students[permission.students.indexOf(student._id)];
+                    if (student.organization.toString() === (currUser.permissions[i].organization + '')) {
+
+                        var permissionStudents = [];
+
+                        _.each(user.permissions[i].students, function(std, key){
+
+                            if(std.toString() !== student._id.toString){
+
+                                permissionStudents.push(std);
+
+                            }
+
+                        });
+
+                        user.permissions[i].students = permissionStudents;
 
                     }
 
-                });
+                    allpermission.push(user.permissions[i]);
 
-                currUser.save(function(err){
+                }
 
-                    if (err)  return res.errJson(err);
+                User.where({_id: currUser._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
+
+                    if (err) return res.errJson(err);
 
                     res.okJson('Successfully Deleted!', student);
 
