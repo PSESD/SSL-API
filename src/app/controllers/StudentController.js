@@ -647,9 +647,9 @@ StudentController.deleteStudentUserById = function(req, res){
 
                         var permissionStudents = [];
 
-                        _.each(user.permissions[i].students, function(std, key){
+                        _.each(currUser.permissions[i].students, function(std, key){
 
-                            if(std.toString() !== student._id.toString){
+                            if(std.toString() !== student._id.toString()){
 
                                 permissionStudents.push(std);
 
@@ -657,13 +657,14 @@ StudentController.deleteStudentUserById = function(req, res){
 
                         });
 
-                        user.permissions[i].students = permissionStudents;
+                        currUser.permissions[i].students = permissionStudents;
 
                     }
 
-                    allpermission.push(user.permissions[i]);
+                    allpermission.push(currUser.permissions[i]);
 
                 }
+
 
                 User.where({_id: currUser._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 

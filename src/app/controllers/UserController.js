@@ -213,7 +213,7 @@ UserController.save = function (req, res) {
 
         if(obj.isCaseWorker()) {
 
-            var allow = obj.isSpecialCaseWorker() ? 'all' : 'own';
+            var allow = !obj.isSpecialCaseWorker() ? 'all' : 'own';
 
             for (var i = 0; i < obj.permissions.length; i++) {
 
@@ -257,7 +257,7 @@ UserController.setRole = function(req, res){
 
         if(obj.isCaseWorker()) {
 
-            var allow = obj.isSpecialCaseWorker() ? 'all' : 'own';
+            var allow = !obj.isSpecialCaseWorker() ? 'all' : 'own';
 
             for (var i = 0; i < obj.permissions.length; i++) {
 
