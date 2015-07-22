@@ -120,54 +120,7 @@ UserController.updateAccount = function (req, res) {
     });
 
 };
-/**
- *
- * @param role
- * @param is_special
- * @param permissions
- * @returns {*}
- * @private
- */
-UserController._checkRole = function(role, is_special, permissions){
 
-    if(permissions.length === 0){
-        switch ( role ){
-            case 'admin':
-            case 'superadmin':
-                permissions.push(
-                    {
-                        "model" : "Student",
-                        "allow" : "all",
-                        "operation" : "*"
-                    }
-                );
-                break;
-            case 'case-worker':
-                var allow = is_special ? 'all' : 'own';
-                permissions = [{
-                    model: 'Student',
-                    operation: 'read',
-                    allow: allow
-                }, {
-                    model: 'Student',
-                    operation: 'create',
-                    allow: allow
-                }, {
-                    model: 'Student',
-                    operation: 'update',
-                    allow: allow
-                }, {
-                    model: 'Student',
-                    operation: 'delete',
-                    allow: allow
-                }];
-                break;
-        }
-    }
-
-    return permissions;
-
-};
 /**
  *
  * @param req
@@ -206,29 +159,9 @@ UserController.save = function (req, res) {
             obj[prop] = req.body[prop];
 
         }
-        // set update time and update by user
-        obj.last_updated = new Date();
 
-        obj.last_updated_by = req.user.userId;
 
-        if(obj.isCaseWorker()) {
-
-            var allow = !obj.isSpecialCaseWorker() ? 'all' : 'own';
-
-            for (var i = 0; i < obj.permissions.length; i++) {
-
-                obj.permissions[i].permissions = UserController._checkRole(obj.role, obj.isSpecialCaseWorker(), obj.permissions[i].permissions);
-
-                for (var j = 0; j < obj.permissions[i].permissions.length; j++) {
-
-                    obj.permissions[i].permissions[j].allow = allow;
-
-                }
-
-            }
-        }
-
-        obj.save(function (err) {
+        obj.saveWithRole(req.user, req.params.organizationId, function (err) {
 
             if (err) return res.errJson(err);
 
@@ -239,7 +172,11 @@ UserController.save = function (req, res) {
     });
 
 };
-
+/**
+ *
+ * @param req
+ * @param res
+ */
 UserController.setRole = function(req, res){
 
     if(!req.user.isAdmin()) return res.errUnauthorized();
@@ -255,30 +192,7 @@ UserController.setRole = function(req, res){
             if(name in req.body) obj[name] = req.body[name];
         });
 
-        if(obj.isCaseWorker()) {
-
-            var allow = !obj.isSpecialCaseWorker() ? 'all' : 'own';
-
-            for (var i = 0; i < obj.permissions.length; i++) {
-
-                obj.permissions[i].permissions = UserController._checkRole(obj.role, obj.isSpecialCaseWorker(), obj.permissions[i].permissions);
-
-                for (var j = 0; j < obj.permissions[i].permissions.length; j++) {
-
-                    obj.permissions[i].permissions[j].allow = allow;
-
-                }
-
-            }
-        }
-
-
-        // set update time and update by user
-        obj.last_updated = new Date();
-
-        obj.last_updated_by = req.user.userId;
-
-        obj.save(function (err) {
+        obj.saveWithRole(req.user, req.params.organizationId, function (err) {
 
             if (err) return res.errJson(err);
 
