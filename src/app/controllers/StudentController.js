@@ -12,6 +12,7 @@ var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache();
 var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
+var hal = require('hal');
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -34,6 +35,71 @@ StudentController.getStudentsBackpack = function (req, res) {
              * If student is empty from database
              */
             if (!student) return res.errJson('The student not found in database');
+            /**
+             *
+             * @param results
+             */
+            function embeds(results){
+
+                var crit = {
+                    role: 'case-worker',
+                    $or: [
+                        {
+                            permissions: {
+                                $elemMatch: {
+                                    organization: orgId,
+                                    students: studentId
+                                }
+                            }
+                        },
+                        {
+                            is_special_case_worker: false
+                        }
+                    ]
+                };
+                User.find(crit, function(err, users){
+
+                    if(err) return res.errJson(err);
+
+                    if(!users) users = [];
+
+                    var resource = new hal.Resource(results, req.originalUrl);
+
+                    var embedsUsers = [];
+
+                    var embedsPrograms = [];
+
+                    _.each(users, function(user){
+
+                        var fullname = [];
+
+                        if(user.first_name) fullname.push(user.first_name);
+                        if(user.middle_name) fullname.push(user.middle_name);
+                        if(user.last_name) fullname.push(user.last_name);
+
+                        embedsUsers.push(new hal.Resource({
+                            id: user._id.toString(),
+                            email: user.email,
+                            fullname: fullname.join(' ')
+                        }, '/'+orgId+'/users/'+user._id));
+
+                    });
+
+                    _.each(student.programs, function(program){
+
+                        embedsPrograms.push(new hal.Resource(program.toObject()));
+
+                    });
+
+
+                    resource.embed('users', embedsUsers);
+
+                    resource.embed('programs', embedsPrograms);
+
+                    res.json(resource.toJSON());
+
+                });
+            }
 
             Organization.findOne({ _id: orgId }, function(err, organization){
                 if (err) return res.errJson(err);
@@ -76,7 +142,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                         utils.log(err);
 
-                                        res.okJson(json);
+                                        embeds(json);
 
                                     });
 
@@ -97,7 +163,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         console.log("GET FROM CACHE");
 
-                        res.okJson(result);
+                        embeds(result);
 
                     }
 

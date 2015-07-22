@@ -711,6 +711,7 @@ describe('All-Test', function () {
                .get('/'+organizationId+'/students/'+studentId+'/xsre')
                .set('authorization', grantToken)
                .expect(function (res) {
+                   console.dir(res.body);
                    assert.ok(res.body._links);
                })
                .expect(200)
