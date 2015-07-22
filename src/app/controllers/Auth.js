@@ -85,4 +85,8 @@ passport.use(new BearerStrategy(
  */
 exports.isAuthenticated = passport.authenticate(['basic', 'bearer'], { session : false });
 
+exports.hasPermission = Access.hasAccess;
+
+exports.isAdmin = Access.isAdmin;
+
 exports.isBearerAuthenticated = passport.authenticate('bearer', { session: false });

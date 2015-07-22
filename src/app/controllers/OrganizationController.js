@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var Organization = require('../models/Organization');
 var Program = require('../models/Program');
 var User = require('../models/User');
+var Access = require('../access/access').getInstance();
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
@@ -90,6 +91,9 @@ OrganizationController.profile = function (req, res) {
         });
 
     };
+
+    console.log('---------------------------- Access User: ', Access.user);
+    console.log('---------------------------- Access OrgId: ', Access.organizationId);
 
     OrganizationController.grant(req, res, cb);
 
