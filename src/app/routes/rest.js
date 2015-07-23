@@ -94,9 +94,9 @@ Rest.prototype.handleRoutes= function(router, Api) {
     ;
 
     router.route('/:organizationId/users/:userId/students/:studentId')
-        .get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.getStudentUserById)
-        .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.putStudentUserById)
-        .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.deleteStudentUserById)
+        .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentUserById)
+        .put(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.putStudentUserById)
+        .delete(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteStudentUserById)
     ;
     /**
      * Tag route
