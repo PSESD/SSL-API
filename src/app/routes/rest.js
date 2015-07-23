@@ -34,11 +34,11 @@ Rest.prototype.handleRoutes= function(router, Api) {
 		.get(auth.isBearerAuthenticated, userCtr.get)
         .put(auth.isBearerAuthenticated, userCtr.save)
         .post(auth.isBearerAuthenticated, userCtr.create)
-        .delete(auth.isBearerAuthenticated, auth.isAdmin, userCtr.deleteByEmail)
+        .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.deleteByEmail)
     ;
 
     router.route('/user/role/:userId')
-        .put(auth.isBearerAuthenticated, auth.isAdmin, userCtr.setRole)
+        .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.setRole)
         .get(auth.isBearerAuthenticated, userCtr.getRole)
     ;
 
