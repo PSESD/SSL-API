@@ -96,8 +96,8 @@ describe('All-Test', function () {
             }
         ],
         "description": null,
-        "website": "fc.org",
-        "url": "fc.cbo.upward.st",
+        "website": "localhost:4000",
+        "url": "localhost:4000",
         "externalServiceId": 5,
         "personnelId": 1,
         "authorizedEntityId": 2
@@ -288,6 +288,7 @@ describe('All-Test', function () {
                 .get('/user')
                 .set('authorization', grantToken)
                 .expect(function (res) {
+                    console.log(res.body);
                     assert.equal(email, res.body.email);
                 })
                 .expect(200)
@@ -296,10 +297,11 @@ describe('All-Test', function () {
         });
 
         it('POST /organizations', function (done) {
-            http_build_query(orgData);
+            http_build_query(orgData, api_endpoint + '/organizations', grantToken);
             request(api_endpoint)
                 .post('/organizations')
                 .set('authorization', grantToken)
+                .set('host', 'fc.cbo.upward.st')
                 .send(orgData)
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
@@ -574,6 +576,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .get('/organizations')
                 .set('authorization', grantToken)
+                .set('origin', 'http://fc.cbo.upward.st')
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);

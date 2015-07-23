@@ -7,6 +7,7 @@ var Program = require('../models/Program');
 var User = require('../models/User');
 var Access = require('../access/access').getInstance();
 var BaseController = require('./BaseController');
+var php = require('phpjs');
 var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
 var OrganizationController = new BaseController(Organization).crud('organizationId');
@@ -18,23 +19,7 @@ var OrganizationController = new BaseController(Organization).crud('organization
  */
 OrganizationController.get = function (req, res) {
 
-    var user = req.user;
-
-    var crit = Organization.crit(req.query);
-
-    var orgs = user.organizationId;
-
-    if (orgs.length > 0) {
-
-        crit._id = { $in: orgs };
-
-    } else {
-
-        return res.okJson(null, []);
-
-    }
-
-    Organization.find(crit, function (err, orgs) {
+    Organization.find({ _id: req.organization._id }, function (err, orgs) {
 
         if (err) return res.errJson(err);
 
