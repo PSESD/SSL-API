@@ -301,7 +301,6 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .post('/organizations')
                 .set('authorization', grantToken)
-                .set('host', 'fc.cbo.upward.st')
                 .send(orgData)
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);

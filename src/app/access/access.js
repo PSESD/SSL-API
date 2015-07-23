@@ -169,7 +169,7 @@ Access.hasAccess = function(req, res, next){
 
         if(!organization) {
 
-            console.log('Dont have "Organization not found" and skip by middleware');
+            console.log('Dont have "Organization not found" and skip by middleware => ', crit);
 
             return res.errUnauthorized();
 
