@@ -21,94 +21,89 @@ var StudentController = new BaseController(Student).crud();
  */
 StudentController.getStudentsBackpack = function (req, res) {
 
-    var cb = function() {
+    var orgId = ObjectId(req.params.organizationId);
 
-        var orgId = ObjectId(req.params.organizationId);
+    var studentId = ObjectId(req.params.studentId);
 
-        var studentId = ObjectId(req.params.studentId);
+    Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-        Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
+        if (err) return res.errJson(err);
+        /**
+         * If student is empty from database
+         */
+        if (!student) return res.errJson('The student not found in database');
 
+        Organization.findOne({ _id: orgId }, function(err, organization){
             if (err) return res.errJson(err);
             /**
              * If student is empty from database
              */
-            if (!student) return res.errJson('The student not found in database');
+            if (!student) return res.errJson('The organization not found in database');
 
-            Organization.findOne({ _id: orgId }, function(err, organization){
-                if (err) return res.errJson(err);
-                /**
-                 * If student is empty from database
-                 */
-                if (!student) return res.errJson('The organization not found in database');
+            var brokerRequest = new Request({
+                externalServiceId: organization.externalServiceId,
+                personnelId: organization.personnelId,
+                authorizedEntityId: organization.authorizedEntityId
+            });
 
-                var brokerRequest = new Request({ 
-                    externalServiceId: organization.externalServiceId,  
-                    personnelId: organization.personnelId,  
-                    authorizedEntityId: organization.authorizedEntityId
-                });
+            var key = [student.district_student_id, student.school_district, organization.externalServiceId, organization.personnelId, organization.authorizedEntityId].join('_');
 
-                var key = [student.district_student_id, student.school_district, organization.externalServiceId, organization.personnelId, organization.authorizedEntityId].join('_');
+            cache.get(key, function(err, result){
 
-                cache.get(key, function(err, result){
+                if(err) utils.log(err);
 
-                    if(err) utils.log(err);
+                if(!result){
 
-                    if(!result){
+                    console.log("GET FROM SERVER");
 
-                        console.log("GET FROM SERVER");
+                    brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
-                        brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
+                        if (error)  return res.errJson(error);
 
-                            if (error)  return res.errJson(error);
+                        if (!body) return res.errJson('Data not found');
 
-                            if (!body) return res.errJson('Data not found');
+                        if (response && response.statusCode == '200') {
 
-                            if (response && response.statusCode == '200') {
+                            parseString(body, { explicitArray: false }, function (err, result) {
 
-                                parseString(body, { explicitArray: false }, function (err, result) {
+                                var json = result.xSre;
 
-                                    var json = result.xSre;
+                                delete json['$'];
 
-                                    delete json['$'];
+                                cache.set(key, json, function(err){
 
-                                    cache.set(key, json, function(err){
+                                    utils.log(err);
 
-                                        utils.log(err);
-
-                                        res.okJson(json);
-
-                                    });
+                                    res.okJson(json);
 
                                 });
 
-                            } else {
+                            });
 
-                                parseString(body, { explicitArray: false }, function (err, result) {
+                        } else {
 
-                                    var json = (result && 'error' in result) ? result.error.message : 'Error not response';
+                            parseString(body, { explicitArray: false }, function (err, result) {
 
-                                    res.errJson(json);
+                                var json = (result && 'error' in result) ? result.error.message : 'Error not response';
 
-                                });
-                            }
-                        });
-                    } else {
+                                res.errJson(json);
 
-                        console.log("GET FROM CACHE");
+                            });
+                        }
+                    });
+                } else {
 
-                        res.okJson(result);
+                    console.log("GET FROM CACHE");
 
-                    }
+                    res.okJson(result);
 
-                });
+                }
 
             });
-            
-        });
-    };
 
-    StudentController.grant(req, res, cb);
+        });
+
+    });
 
 };
 /**
@@ -118,25 +113,19 @@ StudentController.getStudentsBackpack = function (req, res) {
  */
 StudentController.getStudents = function (req, res) {
 
-    var cb = function() {
+    var orgId = ObjectId(req.params.organizationId);
 
-        var orgId = ObjectId(req.params.organizationId);
+    var crit = Student.crit(req.query, ['organization']);
 
-        var crit = Student.crit(req.query, ['organization']);
+    crit.organization = orgId;
 
-        crit.organization = orgId;
+    Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
 
-        Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
+        if (err) return res.errJson(err);
 
-            if (err) return res.errJson(err);
+        res.okJson(null, students);
 
-            res.okJson(null, students);
-
-        });
-
-    };
-
-    StudentController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -146,50 +135,42 @@ StudentController.getStudents = function (req, res) {
  */
 StudentController.getStudentNotAssigns = function (req, res) {
 
-    var cb = function() {
+    var orgId = ObjectId(req.params.organizationId);
 
-        var orgId = ObjectId(req.params.organizationId);
+    var query = User.find({ permissions: { $elemMatch: { organization: orgId } }});
 
-        var query = User.find({ permissions: { $elemMatch: { organization: orgId } }});
+    var crit = Student.crit(req.query, ['organization', '_id']);
 
-        var crit = Student.crit(req.query, ['organization', '_id']);
+    crit.organization = orgId;
 
-        crit.organization = orgId;
+    query.exec(function(err, users){
 
-        query.exec(function(err, users){
+        var students = [];
 
-            var students = [];
+        users.forEach(function(user){
 
-            users.forEach(function(user){
+            user.permissions.forEach(function(permission){
 
-                user.permissions.forEach(function(permission){
+                permission.students.forEach(function(student){
 
-                    permission.students.forEach(function(student){
-
-                        if(students.indexOf(student) === -1) students.push(student);
-
-                    });
+                    if(students.indexOf(student) === -1) students.push(student);
 
                 });
 
             });
 
-            if(students.length > 0) crit._id = { $nin: students };
-
-            console.log('NOT_ASSIGN %j', crit);
-
-            Student.find(crit, function (err, students) {
-
-                if (err) return res.errJson(err);
-
-                res.okJson(null, students);
-
-            });
         });
 
-    };
+        if(students.length > 0) crit._id = { $nin: students };
 
-    StudentController.grant(req, res, cb);
+        Student.find(crit, function (err, students) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson(null, students);
+
+        });
+    });
 
 };
 /**
@@ -199,55 +180,50 @@ StudentController.getStudentNotAssigns = function (req, res) {
  */
 StudentController.createByOrgId = function (req, res) {
 
-    var cb = function() {
-        var obj = new Student(req.body);
+    var obj = new Student(req.body);
 
-        obj.organization = ObjectId(req.params.organizationId);
+    obj.organization = ObjectId(req.params.organizationId);
 
-        // set update time and update by user
-        obj.created = new Date();
+    // set update time and update by user
+    obj.created = new Date();
 
-        obj.creator = req.user.userId;
+    obj.creator = req.user.userId;
 
-        obj.last_updated = new Date();
+    obj.last_updated = new Date();
 
-        obj.last_updated_by = req.user.userId;
+    obj.last_updated_by = req.user.userId;
 
-        User.findOne({ _id: req.user._id }, function(err, user){
+    User.findOne({ _id: req.user._id }, function(err, user){
 
-            if(err) return res.errJson(err);
+        if(err) return res.errJson(err);
 
-            if(!user) return res.errJson('User not update successfully');
+        if(!user) return res.errJson('User not update successfully');
 
-            obj.protect(req.user.role, null, req.user).save(function (err) {
+        obj.protect(req.user.role, null, req.user).save(function (err) {
+
+            if (err)  return res.errJson(err);
+
+            _.each(user.permissions, function(permission, key){
+
+                if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
+                    user.permissions[key].students.push(obj._id);
+
+                }
+
+            });
+
+            user.save(function(err){
 
                 if (err)  return res.errJson(err);
 
-                _.each(user.permissions, function(permission, key){
-
-                    if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
-
-                        user.permissions[key].students.push(obj._id);
-
-                    }
-
-                });
-
-                user.save(function(err){
-
-                    if (err)  return res.errJson(err);
-
-                    res.okJson('Successfully Added', obj);
-
-                });
+                res.okJson('Successfully Added', obj);
 
             });
 
         });
 
-    };
-
-    StudentController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -257,33 +233,28 @@ StudentController.createByOrgId = function (req, res) {
  */
 StudentController.getStudentById = function (req, res) {
 
-    var cb = function() {
+    var orgId = req.params.organizationId;
 
-        var orgId = req.params.organizationId;
+    var studentId = ObjectId(req.params.studentId);
 
-        var studentId = ObjectId(req.params.studentId);
+    var crit = Student.crit(req.query, ['_id', 'organization']);
 
-        var crit = Student.crit(req.query, ['_id', 'organization']);
+    crit.organization = ObjectId(orgId);
 
-        crit.organization = ObjectId(orgId);
+    crit._id = studentId;
 
-        crit._id = studentId;
+    Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
 
-        Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
+        if (err) return res.errJson(err);
+        /**
+         * If student is empty from database
+         */
+        if (!student) return res.errJson('The student not found in database');
 
-            if (err) return res.errJson(err);
-            /**
-             * If student is empty from database
-             */
-            if (!student) return res.errJson('The student not found in database');
+        res.okJson(student);
 
-            res.okJson(student);
+    });
 
-        });
-
-    };
-
-    StudentController.grant(req, res, cb);
 };
 /**
  *
@@ -292,49 +263,43 @@ StudentController.getStudentById = function (req, res) {
  */
 StudentController.deleteStudentById = function (req, res) {
 
-    var cb = function() {
+    var orgId = req.params.organizationId;
 
-        var orgId = req.params.organizationId;
+    var studentId = ObjectId(req.params.studentId);
 
-        var studentId = ObjectId(req.params.studentId);
+    Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
 
-        Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
+        if (err) return res.errJson(err);
 
-            if (err) return res.errJson(err);
+        User.findOne({ _id: req.user._id }, function(err, user){
 
-            User.findOne({ _id: req.user._id }, function(err, user){
+            if(err) return res.errJson(err);
 
-                if(err) return res.errJson(err);
+            if(!user) return res.errJson('User not update successfully');
 
-                if(!user) return res.errJson('User not update successfully');
+            _.each(user.permissions, function(permission, key){
 
-                _.each(user.permissions, function(permission, key){
+                var indexOf = permission.students.indexOf(ObjectId(req.params.studentId));
 
-                    var indexOf = permission.students.indexOf(ObjectId(req.params.studentId));
+                if(permission.organization.toString() === orgId && indexOf !== -1){
 
-                    if(permission.organization.toString() === orgId && indexOf !== -1){
+                    delete user.permissions[key].students[indexOf];
 
-                        delete user.permissions[key].students[indexOf];
+                }
 
-                    }
+            });
 
-                });
+            user.save(function(err){
 
-                user.save(function(err){
+                if (err)  return res.errJson(err);
 
-                    if (err)  return res.errJson(err);
-
-                    res.okJson('Successfully deleted');
-
-                });
+                res.okJson('Successfully deleted');
 
             });
 
         });
 
-    };
-
-    StudentController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -344,43 +309,37 @@ StudentController.deleteStudentById = function (req, res) {
  */
 StudentController.putStudentById = function(req, res){
 
-    var cb = function () {
+    var studentId = ObjectId(req.params.studentId);
 
-        var studentId = ObjectId(req.params.studentId);
+    Student.protect(req.user.role, { students: studentId }, req.user).findOne({_id: studentId, organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        Student.protect(req.user.role, { students: studentId }, req.user).findOne({_id: studentId, organization: ObjectId(req.params.organizationId)}, function (err, obj) {
+        if (err)  return res.errJson(err);
 
-            if (err)  return res.errJson(err);
+        if (!obj) return res.errJson('Data not found');
 
-            if (!obj) return res.errJson('Data not found');
+        for (var prop in req.body) {
 
-            for (var prop in req.body) {
+            if(prop in obj) {
 
-                if(prop in obj) {
-
-                    obj[prop] = req.body[prop];
-
-                }
+                obj[prop] = req.body[prop];
 
             }
-            // set update time and update by user
-            obj.last_updated = new Date();
 
-            obj.last_updated_by = req.user.userId;
+        }
+        // set update time and update by user
+        obj.last_updated = new Date();
 
-            obj.protect(req.user.role, null, req.user).save(function (err) {
+        obj.last_updated_by = req.user.userId;
 
-                if (err) return res.errJson(err);
+        obj.protect(req.user.role, null, req.user).save(function (err) {
 
-                res.okJson('Successfully updated!', obj);
+            if (err) return res.errJson(err);
 
-            });
+            res.okJson('Successfully updated!', obj);
 
         });
 
-    };
-
-    StudentController.grant(req, res, cb);
+    });
 
 };
 
@@ -390,33 +349,21 @@ StudentController.getByUserId = function(req, res){
 
     var organizationId  = req.params.organizationId;
 
-    var user            = req.user;
-
     User.findOne({ _id: ObjectId(currentUserId)}, function(err, currUser){
 
         if(err) return res.errJson(err);
 
         if(!currUser) return res.errJson('User not found!');
 
-        var cb = function(){
 
-            Student.protect(currUser.role, null, currUser).find({ organization: ObjectId(organizationId) }, function (err, students) {
+        Student.protect(currUser.role, null, currUser).find({ organization: ObjectId(organizationId) }, function (err, students) {
 
-                if (err) return res.errJson(err);
+            if (err) return res.errJson(err);
 
-                res.okJson(null, students);
+            res.okJson(null, students);
 
-            });
-
-        };
-
-        StudentController.grant(req, res, cb, {
-            user: user,
-            organizationId: organizationId,
-            onCheck: function(isMatch){
-                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
-            }
         });
+
     });
 
 };
@@ -439,24 +386,118 @@ StudentController.postByUserId = function(req, res){
 
         if(!currUser) return res.errJson('User not found!');
 
-        var cb = function(){
+        var obj = new Student(req.body);
 
-            var obj = new Student(req.body);
+        obj.organization = ObjectId(organizationId);
 
-            obj.organization = ObjectId(organizationId);
+        // set update time and update by user
+        obj.created = new Date();
 
+        obj.creator = req.user.userId;
+
+        obj.last_updated = new Date();
+
+        obj.last_updated_by = req.user.userId;
+
+        obj.save(function (err) {
+
+            if (err)  return res.errJson(err);
+
+            _.each(currUser.permissions, function(permission, key){
+
+                if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
+                    currUser.permissions[key].students.push(obj._id);
+
+                }
+
+            });
+
+            currUser.save(function(err){
+
+                if (err)  return res.errJson(err);
+
+                res.okJson('Successfully Added', obj);
+            });
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.getStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var studentId       = req.params.studentId;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+
+        Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, students) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson(null, students);
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.putStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var studentId       = ObjectId(req.params.studentId);
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, obj) {
+
+            if (err)  return res.errJson(err);
+
+            if (!obj) return res.errJson('Data not found');
+
+            for (var prop in req.body) {
+
+                if(prop in obj) {
+
+                    obj[prop] = req.body[prop];
+
+                }
+
+            }
             // set update time and update by user
-            obj.created = new Date();
-
-            obj.creator = req.user.userId;
-
             obj.last_updated = new Date();
 
             obj.last_updated_by = req.user.userId;
 
             obj.save(function (err) {
 
-                if (err)  return res.errJson(err);
+                if (err) return res.errJson(err);
 
                 _.each(currUser.permissions, function(permission, key){
 
@@ -472,145 +513,15 @@ StudentController.postByUserId = function(req, res){
 
                     if (err)  return res.errJson(err);
 
-                    res.okJson('Successfully Added', obj);
-                });
-
-            });
-
-        };
-
-        StudentController.grant(req, res, cb, {
-            user: user,
-            organizationId: organizationId,
-            onCheck: function(isMatch){
-                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
-            }
-        });
-    });
-
-};
-/**
- *
- * @param req
- * @param res
- */
-StudentController.getStudentUserById = function(req, res){
-
-    var currentUserId   = req.params.userId;
-
-    var organizationId  = req.params.organizationId;
-
-    var user            = req.user;
-
-    var studentId       = req.params.studentId;
-
-    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
-
-        if(err) return res.errJson(err);
-
-        if(!currUser) return res.errJson('User not found!');
-
-        var cb = function(){
-
-            Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).findOne({ _id: studentId, organization: ObjectId(req.params.organizationId) }, function (err, students) {
-
-                if (err) return res.errJson(err);
-
-                res.okJson(null, students);
-
-            });
-
-        };
-
-        StudentController.grant(req, res, cb, {
-            user: user,
-            organizationId: organizationId,
-            onCheck: function(isMatch){
-                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
-            }
-        });
-    });
-
-};
-/**
- *
- * @param req
- * @param res
- */
-StudentController.putStudentUserById = function(req, res){
-
-    var currentUserId   = req.params.userId;
-
-    var organizationId  = req.params.organizationId;
-
-    var user            = req.user;
-
-    var studentId       = ObjectId(req.params.studentId);
-
-    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
-
-        if(err) return res.errJson(err);
-
-        if(!currUser) return res.errJson('User not found!');
-
-        var cb = function(){
-
-            Student.findOne({ _id: studentId, organization: ObjectId(req.params.organizationId) }, function (err, obj) {
-
-                if (err)  return res.errJson(err);
-
-                if (!obj) return res.errJson('Data not found');
-
-                for (var prop in req.body) {
-
-                    if(prop in obj) {
-
-                        obj[prop] = req.body[prop];
-
-                    }
-
-                }
-                // set update time and update by user
-                obj.last_updated = new Date();
-
-                obj.last_updated_by = req.user.userId;
-
-                obj.save(function (err) {
-
-                    if (err) return res.errJson(err);
-
-                    _.each(currUser.permissions, function(permission, key){
-
-                        if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
-
-                            currUser.permissions[key].students.push(obj._id);
-
-                        }
-
-                    });
-
-                    currUser.save(function(err){
-
-                        if (err)  return res.errJson(err);
-
-                        res.okJson('Successfully Updated!', obj);
-
-                    });
-
+                    res.okJson('Successfully Updated!', obj);
 
                 });
 
+
             });
 
-        };
-
-        StudentController.grant(req, res, cb, {
-            user: user,
-            organizationId: organizationId,
-            onCheck: function(isMatch){
-                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
-            }
         });
+
     });
 
 };
@@ -631,60 +542,48 @@ StudentController.deleteStudentUserById = function(req, res){
 
         if(!currUser) return res.errJson('User not found!');
 
-        var cb = function(){
+        Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, student) {
 
-            Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, student) {
+            if (err) return res.errJson(err);
 
-                if (err) return res.errJson(err);
+            if(!student) return res.errJson('Student not found!');
 
-                if(!student) return res.errJson('Student not found!');
+            var allpermission = [];
 
-                var allpermission = [];
+            for (var i = 0; i < currUser.permissions.length; i++) {
 
-                for (var i = 0; i < currUser.permissions.length; i++) {
+                if (student.organization.toString() === (currUser.permissions[i].organization + '')) {
 
-                    if (student.organization.toString() === (currUser.permissions[i].organization + '')) {
+                    var permissionStudents = [];
 
-                        var permissionStudents = [];
+                    _.each(currUser.permissions[i].students, function(std, key){
 
-                        _.each(currUser.permissions[i].students, function(std, key){
+                        if(std.toString() !== student._id.toString()){
 
-                            if(std.toString() !== student._id.toString()){
+                            permissionStudents.push(std);
 
-                                permissionStudents.push(std);
+                        }
 
-                            }
+                    });
 
-                        });
-
-                        currUser.permissions[i].students = permissionStudents;
-
-                    }
-
-                    allpermission.push(currUser.permissions[i]);
+                    currUser.permissions[i].students = permissionStudents;
 
                 }
 
+                allpermission.push(currUser.permissions[i]);
 
-                User.where({_id: currUser._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
+            }
 
-                    if (err) return res.errJson(err);
+            User.where({_id: currUser._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-                    res.okJson('Successfully Deleted!', student);
+                if (err) return res.errJson(err);
 
-                });
+                res.okJson('Successfully Deleted!', student);
 
             });
 
-        };
-
-        StudentController.grant(req, res, cb, {
-            user: user,
-            organizationId: organizationId,
-            onCheck: function(isMatch){
-                return isMatch && ( user.isAdmin() || user.isSuperAdmin() );
-            }
         });
+
     });
 
 };

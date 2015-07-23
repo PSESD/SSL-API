@@ -2,15 +2,22 @@
  * Created by zaenal on 22/07/15.
  */
 var User = require('./../models/User');
+var Organization = require('./../models/Organization');
+var php = require('phpjs');
+var _ = require('underscore');
+var ObjectId = require('mongoose').Types.ObjectId;
 
 var instance = null;
 /**
  *
  * @constructor
  */
-function Access(){
-    this.user = null;
-    this.organizationId = null;
+function Access(user, organizationId){
+
+    if(user) this.user = user;
+
+    if(organizationId) this.organizationId = organizationId;
+
 }
 /**
  *
@@ -33,7 +40,7 @@ Access.prototype.setOrganizationId = function(organizationId){
  */
 Access.prototype.grant = function(options){
 
-    if(this._checkPermission(options)){
+    if(this.hasPermission(options)){
 
         if('onSuccess' in options && typeof options.onSuccess === 'function'){
 
@@ -58,7 +65,7 @@ Access.prototype.grant = function(options){
  * @returns {*}
  * @private
  */
-Access.prototype._checkPermission = function(options){
+Access.prototype.hasPermission = function(options){
 
     var currentUser = this.user;
 
@@ -109,13 +116,121 @@ Access.prototype._checkPermission = function(options){
     return isMatch;
 
 };
+
+Access.hasAccess = function(req, res, next){
+    /**
+     * Check if there is empty user
+     */
+    if(!req.user){
+
+        console.log('Dont have permission because not "user" and skip by middleware');
+
+        return res.errUnauthorized();
+
+    }
+
+    var crit = {};
+
+    if(req.params.organizationId){
+
+        crit = { _id: ObjectId(req.params.organizationId) };
+
+
+    } else {
+        var parse_url = php.parse_url(req.body.redirect_url), curl = null;
+
+        if (parse_url['host']) {
+
+            curl = parse_url['host'];
+
+        } else {
+
+            curl = parse_url['path'];
+
+        }
+
+        crit = { url: curl };
+
+    }
+
+    Organization.findOne(crit, function(err, organization){
+
+        if(err) {
+
+            res.errJson(err);
+
+            return res.end();
+
+        }
+
+        if(!organization) {
+
+            console.log('Dont have "Organization not found" and skip by middleware');
+
+            return res.errUnauthorized();
+
+        }
+
+        req.organization = organization;
+
+        req.user.orgId = organization._id.toString();
+
+        req.user.getCurrentPermission();
+
+        var access = new Access(req.user, req.user.orgId);
+
+        if(!access.hasPermission()){
+
+            console.log('Dont have "permission" and skip by middleware');
+
+            return res.errUnauthorized();
+
+        }
+
+        next();
+
+    });
+
+};
+
+Access.isAdmin = function(req, res, next){
+
+    /**
+     * Check if there is empty user
+     */
+    if(!req.user){
+
+        console.log('Dont have permission because not "user" and skip by middleware');
+
+        return res.errUnauthorized();
+
+    }
+
+    if(!req.user.isAdmin()){
+
+        console.log('Dont have permission because not "admin user" and skip by middleware');
+
+        return res.errUnauthorized();
+
+    }
+
+    next();
+
+};
 /**
  *
+ * @param user
+ * @param organizationId
  * @returns {*}
  */
-module.exports.getInstance = function(){
+Access.getInstance = function(user, organizationId){
 
-    if(!instance) instance = new Access();
+    if(!instance) instance = new Access(user, organizationId);
 
     return instance;
 };
+/**
+ *
+ * @type {Access}
+ */
+module.exports = Access;

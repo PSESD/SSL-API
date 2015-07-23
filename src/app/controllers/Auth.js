@@ -4,6 +4,7 @@ var BasicStrategy = require('passport-http').BasicStrategy;
 var BearerStrategy = require('passport-http-bearer').Strategy;
 var User = require('../models/User');
 var Client = require('../models/Client');
+var Access = require('../access/access');
 var Token = require('../models/Token');
 var tokenHash = require('../../lib/utils').tokenHash;
 
@@ -85,7 +86,7 @@ passport.use(new BearerStrategy(
  */
 exports.isAuthenticated = passport.authenticate(['basic', 'bearer'], { session : false });
 
-exports.hasPermission = Access.hasAccess;
+exports.hasAccess = Access.hasAccess;
 
 exports.isAdmin = Access.isAdmin;
 
