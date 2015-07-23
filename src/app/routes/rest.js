@@ -89,8 +89,8 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteStudentById);
 
     router.route('/:organizationId/users/:userId/students')
-        .get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.getByUserId)
-        .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.postByUserId)
+        .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getByUserId)
+        .post(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.postByUserId)
     ;
 
     router.route('/:organizationId/users/:userId/students/:studentId')
