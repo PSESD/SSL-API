@@ -126,7 +126,8 @@ describe('All-Test', function () {
         password: 'demo',
         last_name: 'Upwardstech',
         is_special_case_worker: false,
-        role: 'case-worker'
+        role: 'case-worker',
+        is_super_admin: true
     };
 
     var newUser2 = {
@@ -294,106 +295,6 @@ describe('All-Test', function () {
 
         });
 
-
-
-        it('POST /user 1', function (done) {
-            request(api_endpoint)
-                .post('/user')
-                .set('authorization', grantToken)
-                .send(newUser)
-                .expect(function (res) {
-                    assert.equal(true, res.body.success);
-                    assert.equal(newUser.email, res.body.info.email);
-                    assert.equal(newUser.last_name, res.body.info.last_name);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-
-        it('POST /user 2', function (done) {
-            request(api_endpoint)
-                .post('/user')
-                .set('authorization', grantToken)
-                .send(newUser2)
-                .expect(function (res) {
-                    assert.equal(true, res.body.success);
-                    assert.equal(newUser2.email, res.body.info.email);
-                    assert.equal(newUser2.last_name, res.body.info.last_name);
-                    userId2 = res.body.info._id;
-                    assert.ok(userId2);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-
-        it('POST /user 3', function (done) {
-            request(api_endpoint)
-                .post('/user')
-                .set('authorization', grantToken)
-                .send(newUser3)
-                .expect(function (res) {
-                    assert.equal(true, res.body.success);
-                    assert.equal(newUser3.email, res.body.info.email);
-                    assert.equal(newUser3.last_name, res.body.info.last_name);
-                    userId3 = res.body.info._id;
-                    assert.ok(userId3);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-
-        it('POST /user 4', function (done) {
-            request(api_endpoint)
-                .post('/user')
-                .set('authorization', grantToken)
-                .send(newUser4)
-                .expect(function (res) {
-                    assert.equal(true, res.body.success);
-                    assert.equal(newUser4.email, res.body.info.email);
-                    assert.equal(newUser4.last_name, res.body.info.last_name);
-                    userId4 = res.body.info._id;
-                    assert.ok(userId4);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-
-        newUser.first_name = 'CV.';
-
-        it('PUT /user', function (done) {
-            request(api_endpoint)
-                .put('/user')
-                .set('authorization', grantToken)
-                .send(newUser)
-                .expect(function (res) {
-                    if (!res.body.success) console.log('%j', res.body);
-                    assert.equal(true, res.body.success);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-
-        it('DELETE /user', function (done) {
-            request(api_endpoint)
-                .delete('/user')
-                .set('authorization', grantToken)
-                .send({email: newUser.email})
-                .expect(function (res) {
-                    assert.equal(true, res.body.success, res.body.message);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-    });
-
-    describe('API-Organizations', function () {
-
         it('POST /organizations', function (done) {
             http_build_query(orgData);
             request(api_endpoint)
@@ -411,10 +312,102 @@ describe('All-Test', function () {
 
         });
 
+
+
+        it('POST /user 1', function (done) {
+            request(api_endpoint)
+                .post('/user')
+                .set('authorization', grantToken)
+                .send(newUser)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(newUser.email, res.body.info.email);
+                    assert.equal(newUser.last_name, res.body.info.last_name);
+                    assert.equal(newUser.is_super_admin, res.body.info.is_super_admin);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('POST /user 2', function (done) {
+            request(api_endpoint)
+                .post('/user')
+                .set('authorization', grantToken)
+                .send(newUser2)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(newUser2.email, res.body.info.email);
+                    assert.equal(newUser2.last_name, res.body.info.last_name);
+                    assert.equal(false, res.body.info.is_super_admin);
+                    userId2 = res.body.info._id;
+                    assert.ok(userId2);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('POST /user 3', function (done) {
+            request(api_endpoint)
+                .post('/user')
+                .set('authorization', grantToken)
+                .send(newUser3)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(newUser3.email, res.body.info.email);
+                    assert.equal(newUser3.last_name, res.body.info.last_name);
+                    assert.equal(false, res.body.info.is_super_admin);
+                    userId3 = res.body.info._id;
+                    assert.ok(userId3);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('POST /user 4', function (done) {
+            request(api_endpoint)
+                .post('/user')
+                .set('authorization', grantToken)
+                .send(newUser4)
+                .expect(function (res) {
+                    assert.equal(true, res.body.success);
+                    assert.equal(newUser4.email, res.body.info.email);
+                    assert.equal(newUser4.last_name, res.body.info.last_name);
+                    assert.equal(false, res.body.info.is_super_admin);
+                    userId4 = res.body.info._id;
+                    assert.ok(userId4);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+
+        it('PUT /user', function (done) {
+            newUser.first_name = 'CV.';
+
+            http_build_query(newUser, api_endpoint + '/user', grantToken);
+            request(api_endpoint)
+                .put('/user')
+                .set('authorization', grantToken)
+                .send(newUser)
+                .expect(function (res) {
+                    if (!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
         var permissionsData = {
             organization: organizationId,
             userId: userId,
             students: [],
+            role: "admin",
+            is_special_case_worker: false,
             permissions: [{
                 model: 'Student',
                 operation: '*',
@@ -437,7 +430,9 @@ describe('All-Test', function () {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     var permit = res.body.info.permissions[0];
+                    console.log(permit);
                     assert.equal(organizationId, permit.organization);
+                    assert.equal('admin', permit.role);
                     assert.ok(_.isArray(permit.students), 'Student must array');
                     assert.ok(_.isArray(permit.permissions), 'Permission must array');
                     permissionId = permit._id;
@@ -446,6 +441,41 @@ describe('All-Test', function () {
                 .expect(200)
                 .end(done);
         });
+
+        it('PUT /user', function (done) {
+            newUser.is_super_admin = false;
+
+            http_build_query(newUser, api_endpoint + '/user', grantToken);
+            request(api_endpoint)
+                .put('/user')
+                .set('authorization', grantToken)
+                .send(newUser)
+                .expect(function (res) {
+                    if (!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                    assert.equal(newUser.is_super_admin, res.body.info.is_super_admin);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('DELETE /user', function (done) {
+            http_build_query({email: newUser.email}, api_endpoint + '/user', grantToken);
+            request(api_endpoint)
+                .delete('/user')
+                .set('authorization', grantToken)
+                .send({email: newUser.email})
+                .expect(function (res) {
+                    assert.equal(true, res.body.success, res.body.message);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+    });
+
+    describe('API-Organizations', function () {
 
         var permissions = {};
 

@@ -37,8 +37,6 @@ UserController.get = function (req, res) {
  */
 UserController.deleteByEmail = function (req, res) {
 
-    if(!req.user.isAdmin()) return res.errUnauthorized();
-
     var model = User;
 
     var cb = function (userId, req) {
@@ -128,8 +126,6 @@ UserController.updateAccount = function (req, res) {
  */
 UserController.save = function (req, res) {
 
-    if(!req.user.isAdmin()) return res.errUnauthorized();
-
     var crit = {_id: req.user._id};
 
     if(req.body.email && req.user.isAdmin()){
@@ -156,10 +152,11 @@ UserController.save = function (req, res) {
 
         for (var prop in req.body) {
 
+            if('email' === prop) continue;
+
             obj[prop] = req.body[prop];
 
         }
-
 
         obj.saveWithRole(req.user, req.params.organizationId, function (err) {
 
@@ -178,8 +175,6 @@ UserController.save = function (req, res) {
  * @param res
  */
 UserController.setRole = function(req, res){
-
-    if(!req.user.isAdmin()) return res.errUnauthorized();
 
     var crit = { _id: req.params.userId };
 

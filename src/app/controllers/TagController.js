@@ -20,20 +20,16 @@ var TagController = new BaseController(Tag).crud();
  */
 TagController.getTags = function (req, res) {
 
-    var cb = function() {
+    var orgId = ObjectId(req.params.organizationId);
 
-        var orgId = ObjectId(req.params.organizationId);
+    Tag.find({organization: orgId}, function (err, tags) {
 
-        Tag.find({organization: orgId}, function (err, tags) {
+        if (err) return res.errJson(err);
 
-            if (err) return res.errJson(err);
+        res.okJson(null, tags);
 
-            res.okJson(null, tags);
+    });
 
-        });
-    };
-
-    TagController.grant(req, res, cb);
 };
 /**
  *
@@ -42,32 +38,28 @@ TagController.getTags = function (req, res) {
  */
 TagController.createByOrgId = function (req, res) {
 
-    var cb = function() {
 
-        var obj = new Tag(req.body);
+    var obj = new Tag(req.body);
 
-        obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
+    obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
 
-        // set update time and update by user
-        obj.created = new Date();
+    // set update time and update by user
+    obj.created = new Date();
 
-        obj.creator = req.user.userId;
+    obj.creator = req.user.userId;
 
-        obj.last_updated = new Date();
+    obj.last_updated = new Date();
 
-        obj.last_updated_by = req.user.userId;
+    obj.last_updated_by = req.user.userId;
 
-        obj.save(function (err) {
+    obj.save(function (err) {
 
-            if (err)  return res.errJson(err);
+        if (err)  return res.errJson(err);
 
-            res.okJson('Successfully Added', obj);
+        res.okJson('Successfully Added', obj);
 
-        });
+    });
 
-    };
-
-    TagController.grant(req, res, cb);
 };
 /**
  * Get tag organization by id
@@ -76,26 +68,22 @@ TagController.createByOrgId = function (req, res) {
  */
 TagController.getTagById = function (req, res) {
 
-    var cb = function() {
+    var orgId = req.params.organizationId;
 
-        var orgId = req.params.organizationId;
+    var tagId = ObjectId(req.params.tagId);
 
-        var tagId = ObjectId(req.params.tagId);
+    Tag.findOne({ organization: ObjectId(orgId), _id: tagId }, function (err, tag) {
 
-        Tag.findOne({ organization: ObjectId(orgId), _id: tagId }, function (err, tag) {
+        if (err) return res.errJson(err);
+        /**
+         * If tag is empty from database
+         */
+        if (!tag) return res.errJson('The tag not found in database');
 
-            if (err) return res.errJson(err);
-            /**
-             * If tag is empty from database
-             */
-            if (!tag) return res.errJson('The tag not found in database');
+        res.okJson(tag);
 
-            res.okJson(tag);
+    });
 
-        });
-    };
-
-    TagController.grant(req, res, cb);
 };
 /**
  *
@@ -104,22 +92,19 @@ TagController.getTagById = function (req, res) {
  */
 TagController.deleteTagById = function (req, res) {
 
-    var cb = function() {
 
-        var orgId = req.params.organizationId;
+    var orgId = req.params.organizationId;
 
-        var tagId = ObjectId(req.params.tagId);
+    var tagId = ObjectId(req.params.tagId);
 
-        Tag.remove({ organization: ObjectId(orgId), _id: tagId }, function (err, tag) {
+    Tag.remove({ organization: ObjectId(orgId), _id: tagId }, function (err, tag) {
 
-            if (err) return res.errJson(err);
+        if (err) return res.errJson(err);
 
-            res.okJson('Successfully deleted');
+        res.okJson('Successfully deleted');
 
-        });
-    };
+    });
 
-    TagController.grant(req, res, cb);
 };
 /**
  *
@@ -128,45 +113,39 @@ TagController.deleteTagById = function (req, res) {
  */
 TagController.putTagById = function(req, res){
 
-    var cb = function () {
 
-        var tagId = ObjectId(req.params.tagId);
+    var tagId = ObjectId(req.params.tagId);
 
+    Tag.findOne({ _id: tagId, organization: ObjectId(req.params.organizationId) }, function (err, obj) {
 
+        if (err)  return res.errJson(err);
 
-        Tag.findOne({ _id: tagId, organization: ObjectId(req.params.organizationId) }, function (err, obj) {
+        if (!obj) return res.errJson('Data not found');
 
-            if (err)  return res.errJson(err);
+        for (var prop in req.body) {
 
-            if (!obj) return res.errJson('Data not found');
+            if(prop in obj) {
 
-            for (var prop in req.body) {
-
-                if(prop in obj) {
-
-                    obj[prop] = req.body[prop];
-
-                }
+                obj[prop] = req.body[prop];
 
             }
-            // set update time and update by user
-            obj.last_updated = new Date();
 
-            obj.last_updated_by = req.user.userId;
+        }
+        // set update time and update by user
+        obj.last_updated = new Date();
 
-            obj.save(function (err) {
+        obj.last_updated_by = req.user.userId;
 
-                if (err) return res.errJson(err);
+        obj.save(function (err) {
 
-                res.okJson('Successfully updated!', obj);
+            if (err) return res.errJson(err);
 
-            });
+            res.okJson('Successfully updated!', obj);
 
         });
 
-    };
+    });
 
-    TagController.grant(req, res, cb);
 };
 /**
  *
