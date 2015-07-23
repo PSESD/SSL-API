@@ -33,82 +33,85 @@ StudentController.getStudentsBackpack = function (req, res) {
          * If student is empty from database
          */
         if (!student) return res.errJson('The student not found in database');
+        /**
+         *
+         * @param results
+         */
+        function embeds(results){
+
+            var crit = {
+                $or: [
+                    {
+                        permissions: {
+                            $elemMatch: {
+                                organization: orgId,
+                                students: studentId,
+                                role: 'case-worker',
+                                is_special_case_worker: true
+                            }
+                        }
+                    },
+                    {
+                        permissions: {
+                            $elemMatch: {
+                                organization: orgId,
+                                role: 'case-worker',
+                                is_special_case_worker: false
+                            }
+                        }
+                    }
+                ]
+            };
+            User.find(crit, function(err, users){
+
+                if(err) return res.errJson(err);
+
+                if(!users) users = [];
+
+                var resource = new hal.Resource(results, req.originalUrl);
+
+                var embedsUsers = [];
+
+                var embedsPrograms = [];
+
+                _.each(users, function(user){
+
+                    var fullname = [];
+
+                    if(user.first_name) fullname.push(user.first_name);
+                    if(user.middle_name) fullname.push(user.middle_name);
+                    if(user.last_name) fullname.push(user.last_name);
+
+                    embedsUsers.push(new hal.Resource({
+                        id: user._id.toString(),
+                        email: user.email,
+                        fullname: fullname.join(' ')
+                    }, '/'+orgId+'/users/'+user._id));
+
+                });
+
+                _.each(student.programs, function(program){
+
+                    embedsPrograms.push(new hal.Resource(program.toObject()));
+
+                });
+
+
+                resource.embed('users', embedsUsers);
+
+                resource.embed('programs', embedsPrograms);
+
+                res.json(resource.toJSON());
+
+            });
+        }
 
         Organization.findOne({ _id: orgId }, function(err, organization){
             if (err) return res.errJson(err);
             /**
              * If student is empty from database
              */
-<<<<<<< HEAD
-            if (!student) return res.errJson('The student not found in database');
-            /**
-             *
-             * @param results
-             */
-            function embeds(results){
-
-                var crit = {
-                    role: 'case-worker',
-                    $or: [
-                        {
-                            permissions: {
-                                $elemMatch: {
-                                    organization: orgId,
-                                    students: studentId
-                                }
-                            }
-                        },
-                        {
-                            is_special_case_worker: false
-                        }
-                    ]
-                };
-                User.find(crit, function(err, users){
-
-                    if(err) return res.errJson(err);
-
-                    if(!users) users = [];
-
-                    var resource = new hal.Resource(results, req.originalUrl);
-
-                    var embedsUsers = [];
-
-                    var embedsPrograms = [];
-
-                    _.each(users, function(user){
-
-                        var fullname = [];
-
-                        if(user.first_name) fullname.push(user.first_name);
-                        if(user.middle_name) fullname.push(user.middle_name);
-                        if(user.last_name) fullname.push(user.last_name);
-
-                        embedsUsers.push(new hal.Resource({
-                            id: user._id.toString(),
-                            email: user.email,
-                            fullname: fullname.join(' ')
-                        }, '/'+orgId+'/users/'+user._id));
-
-                    });
-
-                    _.each(student.programs, function(program){
-
-                        embedsPrograms.push(new hal.Resource(program.toObject()));
-
-                    });
-
-
-                    resource.embed('users', embedsUsers);
-
-                    resource.embed('programs', embedsPrograms);
-
-                    res.json(resource.toJSON());
-
-                });
-            }
-=======
             if (!student) return res.errJson('The organization not found in database');
->>>>>>> permission_role
 
             var brokerRequest = new Request({
                 externalServiceId: organization.externalServiceId,
@@ -142,13 +145,9 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 cache.set(key, json, function(err){
 
-<<<<<<< HEAD
-                                        embeds(json);
-=======
                                     utils.log(err);
->>>>>>> permission_role
 
-                                    res.okJson(json);
+                                    embeds(json);
 
                                 });
 
@@ -167,13 +166,9 @@ StudentController.getStudentsBackpack = function (req, res) {
                     });
                 } else {
 
-<<<<<<< HEAD
-                        embeds(result);
-=======
                     console.log("GET FROM CACHE");
->>>>>>> permission_role
 
-                    res.okJson(result);
+                    embeds(result);
 
                 }
 
