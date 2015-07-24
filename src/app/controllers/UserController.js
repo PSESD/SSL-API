@@ -2,6 +2,7 @@
  * Created by zaenal on 21/05/15.
  */
 var User = require('../models/User');
+var Student = require('../models/Student');
 var Client = require('../models/Client');
 var Code = require('../models/Code');
 var BaseController = require('./BaseController');
@@ -244,6 +245,261 @@ UserController.cleanAll = function(req, res){
         User.removeDeep(user._id, function(err){ console.log(err);});
 
         res.okJson('Done');
+
+    });
+
+};
+/**
+ * ----------------------- USER STUDENT ------------------------------------
+ */
+UserController.getByUserId = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    User.findOne({ _id: ObjectId(currentUserId)}, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        currUser.getCurrentPermission(organizationId);
+
+        Student.protect(currUser.role, null, currUser).find({ organization: ObjectId(organizationId) }, function (err, students) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson(null, students);
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.postByUserId = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var user            = req.user;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        var obj = new Student(req.body);
+
+        obj.organization = ObjectId(organizationId);
+
+        // set update time and update by user
+        obj.created = new Date();
+
+        obj.creator = req.user.userId;
+
+        obj.last_updated = new Date();
+
+        obj.last_updated_by = req.user.userId;
+
+        obj.save(function (err) {
+
+            if (err)  return res.errJson(err);
+
+            _.each(currUser.permissions, function(permission, key){
+
+                if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
+                    currUser.permissions[key].students.push(obj._id);
+
+                }
+
+            });
+
+            currUser.save(function(err){
+
+                if (err)  return res.errJson(err);
+
+                res.okJson('Successfully Added', obj);
+            });
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.getStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var studentId       = req.params.studentId;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        currUser.getCurrentPermission(organizationId);
+
+        Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, students) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson(null, students);
+
+        });
+
+    });
+
+};
+
+
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.putStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var studentId       = ObjectId(req.params.studentId);
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, obj) {
+
+            if (err)  return res.errJson(err);
+
+            if (!obj) return res.errJson('Data not found');
+
+            for (var prop in req.body) {
+
+                if(prop in obj) {
+
+                    obj[prop] = req.body[prop];
+
+                }
+
+            }
+            // set update time and update by user
+            obj.last_updated = new Date();
+
+            obj.last_updated_by = req.user.userId;
+
+            obj.save(function (err) {
+
+                if (err) return res.errJson(err);
+
+                _.each(currUser.permissions, function(permission, key){
+
+                    if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
+                        currUser.permissions[key].students.push(obj._id);
+
+                    }
+
+                });
+
+                currUser.save(function(err){
+
+                    if (err)  return res.errJson(err);
+
+                    res.okJson('Successfully Updated!', obj);
+
+                });
+
+
+            });
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.deleteStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var user            = req.user;
+
+    var studentId       = req.params.studentId;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, student) {
+
+            if (err) return res.errJson(err);
+
+            if(!student) return res.errJson('Student not found!');
+
+            var allpermission = [];
+
+            for (var i = 0; i < currUser.permissions.length; i++) {
+
+                if (student.organization.toString() === (currUser.permissions[i].organization + '')) {
+
+                    var permissionStudents = [];
+
+                    _.each(currUser.permissions[i].students, function(std, key){
+
+                        if(std.toString() !== student._id.toString()){
+
+                            permissionStudents.push(std);
+
+                        }
+
+                    });
+
+                    currUser.permissions[i].students = permissionStudents;
+
+                }
+
+                allpermission.push(currUser.permissions[i]);
+
+            }
+
+            User.where({_id: currUser._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Successfully Deleted!', student);
+
+            });
+
+        });
 
     });
 
