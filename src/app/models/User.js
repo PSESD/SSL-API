@@ -108,7 +108,7 @@ UserSchema.methods.saveWithRole = function(user, organizationId, role, is_specia
 
     if(role === 'case-worker') {
 
-        var allow = !is_special_case_worker ? 'all' : 'own';
+        var allow = is_special_case_worker ? 'all' : 'own';
 
         for (var i = 0; i < this.permissions.length; i++) {
 

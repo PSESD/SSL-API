@@ -47,7 +47,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                                 organization: orgId,
                                 students: studentId,
                                 role: 'case-worker',
-                                is_special_case_worker: true
+                                is_special_case_worker: false
                             }
                         }
                     },
@@ -56,7 +56,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                             $elemMatch: {
                                 organization: orgId,
                                 role: 'case-worker',
-                                is_special_case_worker: false
+                                is_special_case_worker: true
                             }
                         }
                     }
