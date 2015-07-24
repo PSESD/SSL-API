@@ -1,6 +1,8 @@
 /**
  * Created by zaenal on 21/05/15.
  */
+var mongoose = require('mongoose');
+var ObjectId = mongoose.Types.ObjectId;
 var User = require('../models/User');
 var Student = require('../models/Student');
 var Client = require('../models/Client');
@@ -148,11 +150,11 @@ UserController.save = function (req, res) {
         /**
          * Filter if user downgrade here role
          */
-        if(req.user._id === obj._id && req.user.isAdmin()){
+        if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
 
             role = req.body.role;
 
-            if(role === 'case-worker') return req.errJson("Admin never be able to downgrade itself to a case worker");
+            if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
 
         }
 
@@ -200,6 +202,15 @@ UserController.setRole = function(req, res){
         if(is_special_case_worker === 'true') is_special_case_worker = true;
 
         else if(is_special_case_worker === 'false') is_special_case_worker = false;
+
+        /**
+         * Filter if user downgrade here role
+         */
+        if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
+
+            if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
+
+        }
 
 
         obj.saveWithRole(req.user, req.organization._id, role, is_special_case_worker, function (err) {
