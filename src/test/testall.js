@@ -96,8 +96,8 @@ describe('All-Test', function () {
             }
         ],
         "description": null,
-        "website": "localhost:4000",
-        "url": "localhost:4000",
+        "website": "localhost",
+        "url": "localhost",
         "externalServiceId": 5,
         "personnelId": 1,
         "authorizedEntityId": 2
@@ -403,6 +403,21 @@ describe('All-Test', function () {
 
         });
 
+        it('PUT /user/role/:userId', function (done) {
+            http_build_query({ role: 'admin', is_special_case_worker: false }, api_endpoint + '/user/role/'+userId3, grantToken);
+            request(api_endpoint)
+                .put('/user/role/'+userId3)
+                .set('authorization', grantToken)
+                .send({ role: 'admin', is_special_case_worker: false })
+                .expect(function (res) {
+                    if (!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
         var permissionsData = {
             organization: organizationId,
             userId: userId,
@@ -575,7 +590,6 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .get('/organizations')
                 .set('authorization', grantToken)
-                .set('origin', 'http://fc.cbo.upward.st')
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);

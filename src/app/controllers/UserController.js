@@ -139,26 +139,33 @@ UserController.save = function (req, res) {
 
         if(!obj) return res.errJson('User not found');
 
+        var role = null, is_special_case_worker = null;
+
+        if(req.body.role) role = req.body.role;
+
+        if(req.body.is_special_case_worker) is_special_case_worker = req.body.is_special_case_worker;
         /**
          * Filter if user downgrade here role
          */
         if(req.user._id === obj._id && req.user.isAdmin()){
 
-            var role = req.body.role;
+            role = req.body.role;
 
             if(role === 'case-worker') return req.errJson("Admin never be able to downgrade itself to a case worker");
 
         }
 
+
         for (var prop in req.body) {
 
-            if('email' === prop) continue;
+            if('email' === prop || 'role' === prop || 'is_special_case_worker' === prop) continue;
 
             obj[prop] = req.body[prop];
 
         }
 
-        obj.saveWithRole(req.user, req.params.organizationId, function (err) {
+
+        obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err) {
 
             if (err) return res.errJson(err);
 
@@ -183,11 +190,18 @@ UserController.setRole = function(req, res){
 
         if (err) return res.errJson(err);
 
-        ['role', 'is_special_case_worker', 'email'].forEach(function(name){
-            if(name in req.body) obj[name] = req.body[name];
-        });
+        if(!obj) return res.errJson('User not found');
 
-        obj.saveWithRole(req.user, req.params.organizationId, function (err) {
+        var role = req.body.role;
+
+        var is_special_case_worker = req.body.is_special_case_worker;
+
+        if(is_special_case_worker === 'true') is_special_case_worker = true;
+
+        else if(is_special_case_worker === 'false') is_special_case_worker = false;
+
+
+        obj.saveWithRole(req.user, req.organization._id, role, is_special_case_worker, function (err) {
 
             if (err) return res.errJson(err);
 
@@ -219,7 +233,7 @@ UserController.cleanAll = function(req, res){
 
     var email = req.body.email || req.query.email;
 
-    var emails = [ 'test@test.com', 'support@upwardstech.com'];
+    var emails = [ 'test@test.com', 'support@upwardstech.com' ];
 
     if(!email || emails.indexOf(email) === -1) return res.errJson('Mandatory parameters was empty');
 
