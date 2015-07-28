@@ -11,6 +11,7 @@ var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache();
 var ObjectId = mongoose.Types.ObjectId;
+var slug = require('slug');
 var TagController = new BaseController(Tag).crud();
 
 /**
@@ -42,6 +43,8 @@ TagController.createByOrgId = function (req, res) {
     var obj = new Tag(req.body);
 
     obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
+
+    obj.slug = slug(obj.name);
 
     // set update time and update by user
     obj.created = new Date();
@@ -131,6 +134,9 @@ TagController.putTagById = function(req, res){
             }
 
         }
+
+        obj.slug = slug(obj.name);
+
         // set update time and update by user
         obj.last_updated = new Date();
 
