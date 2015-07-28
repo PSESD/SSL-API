@@ -227,7 +227,8 @@ UserSchema.methods.isAdmin = function(organizationId){
 };
 
 UserSchema.virtual('orgId').set(function(organizationId){
-    this._organizationId = organizationId;
+    if(_.isObject(organizationId)) this._organizationId = organizationId.toString();
+    else this._organizationId = organizationId;
 }).get(function(){
    return this._organizationId;
 });
