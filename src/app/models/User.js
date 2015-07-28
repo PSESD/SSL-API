@@ -8,6 +8,7 @@ var Client = require('./Client');
 var Student = require('./Student');
 var Program = require('./Program');
 var ObjectId = mongoose.Types.ObjectId;
+var _ = require('underscore');
 
 // Define our user schema
 var UserSchema = new mongoose.Schema({
@@ -45,7 +46,7 @@ var UserSchema = new mongoose.Schema({
 UserSchema.methods._checkRole = function(index){
     var role = this._role;
     var is_special = this.isSpecialCaseWorker();
-    var permissions = this.permissions[index];
+    var permissions = this.permissions[index].permissions;
     if(permissions.length === 0){
         switch ( role ){
             case 'admin':
@@ -81,7 +82,7 @@ UserSchema.methods._checkRole = function(index){
         }
     }
 
-    this.permissions[index] = permissions;
+    this.permissions[index].permissions = permissions;
 
 };
 /**
