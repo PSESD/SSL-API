@@ -86,6 +86,25 @@ UserController.deleteByEmail = function (req, res) {
  * @param req
  * @param res
  */
+UserController.myAccount = function (req, res) {
+
+    var crit = { _id: req.user._id };
+
+    User.findOne(crit, function (err, obj) {
+
+        if (err) return res.errJson(err);
+
+        res.okJson(obj);
+
+    });
+
+};
+
+/**
+ *
+ * @param req
+ * @param res
+ */
 UserController.updateAccount = function (req, res) {
 
     var crit = { _id: req.user._id };

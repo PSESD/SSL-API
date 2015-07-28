@@ -369,6 +369,8 @@ module.exports = function protector(schema, options) {
 
                         var tmp = _permissions[collection];
 
+                        console.log('LIST OF ', collection, ' is ', tmp);
+
                         if('_id' in crit){
 
                             if(crit._id.hasOwnProperty('$in')){
@@ -386,9 +388,14 @@ module.exports = function protector(schema, options) {
                             }
 
                             delete crit._id;
+
                         }
 
-                        crit._id = { $in: tmp };
+                        if(tmp.length > 0) {
+
+                            crit._id = {$in: tmp};
+
+                        }
 
                     } else {
 

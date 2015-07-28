@@ -43,7 +43,9 @@ Rest.prototype.handleRoutes= function(router, Api) {
     ;
 
     router.route('/user/myaccount')
-        .put(auth.isBearerAuthenticated, userCtr.updateAccount);
+        .get(auth.isBearerAuthenticated, userCtr.myAccount)
+        .put(auth.isBearerAuthenticated, userCtr.updateAccount)
+    ;
 
     router.route('/organizations')
         .post(auth.isBearerAuthenticated, auth.isAdmin, organizationCtr.create)
