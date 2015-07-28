@@ -44,7 +44,7 @@ TagController.createByOrgId = function (req, res) {
 
     obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
 
-    obj.slug = slug(obj.name);
+    obj.slug = slug(obj.name+'');
 
     // set update time and update by user
     obj.created = new Date();
