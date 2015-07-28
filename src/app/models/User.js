@@ -43,7 +43,7 @@ var UserSchema = new mongoose.Schema({
  * @private
  */
 UserSchema.methods._checkRole = function(index){
-    var role = this.role;
+    var role = this._role;
     var is_special = this.isSpecialCaseWorker();
     var permissions = this.permissions[index];
     if(permissions.length === 0){
