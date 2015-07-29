@@ -350,23 +350,38 @@ OrganizationController.getProgram = function (req, res) {
  */
 OrganizationController.postProgram = function (req, res) {
 
-    var obj = new Program(req.body);
+    var orgId = ObjectId(req.params.organizationId);
 
-    obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
-    // set update time and update by user
-    obj.created = new Date();
+    Program.findOne({ name: req.body.name, organization: orgId }, function(err, obj){
 
-    obj.creator = req.user.userId;
+        if(err) return res.errJson(err);
 
-    obj.last_updated = new Date();
+        if(!obj){
 
-    obj.last_updated_by = req.user.userId;
+            obj = new Program(req.body);
 
-    obj.save(function (err) {
+            // set update time and update by user
+            obj.created = new Date();
 
-        if (err) return res.errJson(err);
+            obj.creator = req.user.userId;
 
-        res.okJson('Successfully Added', obj);
+            obj.organization = orgId;
+
+        } else {
+
+            obj.last_updated = new Date();
+
+            obj.last_updated_by = req.user.userId;
+
+        }
+
+        obj.save(function (err) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson('Successfully Added', obj);
+
+        });
 
     });
 
