@@ -127,7 +127,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 if(!result){
 
-                    console.log("GET FROM SERVER");
+                    //console.log("GET FROM SERVER");
 
                     brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
@@ -166,7 +166,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                     });
                 } else {
 
-                    console.log("GET FROM CACHE");
+                    //console.log("GET FROM CACHE");
 
                     embeds(result);
 

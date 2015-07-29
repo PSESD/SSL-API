@@ -283,24 +283,12 @@ describe('All-Test', function () {
     describe('API-User', function () {
 
 
-        it('GET /user', function (done) {
-            request(api_endpoint)
-                .get('/user')
-                .set('authorization', grantToken)
-                .expect(function (res) {
-                    console.log(res.body);
-                    assert.equal(email, res.body.email);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-
         it('POST /organizations', function (done) {
             http_build_query(orgData, api_endpoint + '/organizations', grantToken);
             request(api_endpoint)
                 .post('/organizations')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(orgData)
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
@@ -313,12 +301,28 @@ describe('All-Test', function () {
 
         });
 
+        it('GET /user', function (done) {
+            http_build_query({}, api_endpoint + '/user', grantToken);
+            request(api_endpoint)
+                .get('/user')
+                .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
+                .expect(function (res) {
+                    console.log(res.body);
+                    assert.equal(email, res.body.email);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
 
 
         it('POST /user 1', function (done) {
             request(api_endpoint)
                 .post('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser)
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
@@ -335,6 +339,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .post('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser2)
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
@@ -353,6 +358,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .post('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser3)
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
@@ -371,6 +377,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .post('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser4)
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
@@ -393,6 +400,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .put('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser)
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
@@ -408,6 +416,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .put('/user/role/'+userId3)
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send({ role: 'admin', is_special_case_worker: false })
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
@@ -465,6 +474,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .put('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser)
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
@@ -481,6 +491,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .delete('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send({email: newUser.email})
                 .expect(function (res) {
                     assert.equal(true, res.body.success, res.body.message);
@@ -564,6 +575,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .put('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser3)
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
@@ -590,6 +602,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .get('/organizations')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);

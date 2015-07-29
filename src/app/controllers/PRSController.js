@@ -71,7 +71,7 @@ PRSController.getDistricts = function (req, res) {
             });
         } else {
 
-            console.log("GET FROM CACHE");
+            //console.log("GET FROM CACHE");
 
             res.okJson(result);
 

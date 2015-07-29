@@ -31,9 +31,9 @@ Rest.prototype.handleRoutes= function(router, Api) {
 
 
 	router.route('/user')
-		.get(auth.isBearerAuthenticated, userCtr.get)
-        .put(auth.isBearerAuthenticated, userCtr.save)
-        .post(auth.isBearerAuthenticated, userCtr.create)
+		.get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.get)
+        .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.save)
+        .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.create)
         .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.deleteByEmail)
     ;
 
@@ -104,13 +104,13 @@ Rest.prototype.handleRoutes= function(router, Api) {
      * Tag route
      */
     router.route('/:organizationId/tags')
-        .post(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.createByOrgId)
-        .get(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTags);
+        .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.createByOrgId)
+        .get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.getTags);
 
     router.route('/:organizationId/tags/:tagId')
-        .get(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTagById)
-        .put(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.putTagById)
-        .delete(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.deleteTagById);
+        .get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.getTagById)
+        .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.putTagById)
+        .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.deleteTagById);
 
     router.route('/:organizationId/students/:studentId/xsre').get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentsBackpack);
 

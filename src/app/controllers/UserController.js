@@ -207,7 +207,6 @@ UserController.setRole = function(req, res){
 
     var crit = { _id: req.params.userId };
 
-
     User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
