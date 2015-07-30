@@ -3,6 +3,7 @@
  */
 var mongoose = require('mongoose');
 var Student = require('../models/Student');
+var Program = require('../models/Program');
 var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
@@ -90,18 +91,54 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 });
 
+                var programsId = {};
+
+                var programId = [];
+
                 _.each(student.programs, function(program){
 
-                    embedsPrograms.push(new hal.Resource(program.toObject()));
+                    programsId[program.program.toString()] = program.toObject();
+
+                    programId.push(program.program);
 
                 });
 
+                if(!_.isEmpty(programsId)){
 
-                resource.embed('users', embedsUsers);
+                    Program.find({ _id: { $in: programId } }, function(err, programs){
 
-                resource.embed('programs', embedsPrograms);
+                        if(err) return res.errJson(err);
 
-                res.json(resource.toJSON());
+                        _.each(programs, function(program){
+
+                            if(program._id.toString() in programsId){
+
+                                programsId[program._id.toString()].program_name = program.name;
+
+                                embedsPrograms.push(new hal.Resource(programsId[program._id.toString()]));
+
+                            }
+
+
+                        });
+
+                        resource.embed('users', embedsUsers);
+
+                        resource.embed('programs', embedsPrograms);
+
+                        res.json(resource.toJSON());
+
+                    });
+
+
+                } else {
+
+                    resource.embed('users', embedsUsers);
+
+                    resource.embed('programs', embedsPrograms);
+
+                    res.json(resource.toJSON());
+                }
 
             });
         }
