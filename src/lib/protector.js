@@ -715,6 +715,15 @@ function checkAcl(method){
 
         acl = _acl[i];
 
+        if(_.isEmpty(acl)){
+
+            return {
+                denied: false,
+                permission: acl
+            };
+
+        }
+
         if(operation.indexOf(acl.operation) !== -1){
 
             return {
