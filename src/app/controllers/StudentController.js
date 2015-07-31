@@ -63,6 +63,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                     }
                 ]
             };
+
             User.find(crit, function(err, users){
 
                 if(err) return res.errJson(err);
