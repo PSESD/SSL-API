@@ -230,6 +230,19 @@ OrganizationController.postUser = function (req, res) {
  */
 OrganizationController.putUser = function (req, res) {
 
+    if('password' in req.body){
+
+        if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+
+            return res.errJson('Password didn\'t match');
+
+        } else if(!req.body.password){
+
+            delete req.body.password;
+
+        }
+
+    }
 
     User.findOne({_id: ObjectId(req.params.userId)}, function (err, obj) {
 
@@ -237,15 +250,12 @@ OrganizationController.putUser = function (req, res) {
 
         if (!obj) return res.errJson('Data not found');
 
-        for (var prop in req.body) {
 
-            if(prop in obj) {
+        ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
-                obj[prop] = req.body[prop];
+            if(prop in req.body) obj[prop] = req.body[prop];
 
-            }
-
-        }
+        });
 
         // set update time and update by user
         obj.last_updated = new Date();

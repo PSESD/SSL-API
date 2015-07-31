@@ -55,7 +55,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
 
     router.route('/:organizationId/profile')
         .get(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.profile)
-        .put(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.updateProfile);
+        .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.updateProfile);
 
     router.route('/:organizationId/users')
         .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.postUser)

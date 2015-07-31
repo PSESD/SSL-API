@@ -113,7 +113,7 @@ describe('All-Test', function () {
         "addresses": []
     };
 
-    var userId, userId2, userId3, userId4, studentId, studentProgramId, studentProgramData = {
+    var userId,userId1, userId2, userId3, userId4, studentId, studentProgramId, studentProgramData = {
         programId: null,
         active: true, // Whether the student is currently active in the program or not.
         participation_start_date: new Date(Date.parse('May 8, 2015')).toString(),
@@ -329,6 +329,8 @@ describe('All-Test', function () {
                     assert.equal(newUser.email, res.body.info.email);
                     assert.equal(newUser.last_name, res.body.info.last_name);
                     assert.equal(newUser.is_super_admin, res.body.info.is_super_admin);
+                    userId1 = res.body.info._id;
+                    assert.ok(userId1);
                 })
                 .expect(200)
                 .end(done);
@@ -393,12 +395,12 @@ describe('All-Test', function () {
         });
 
 
-        it('PUT /user', function (done) {
+        it('PUT /:organizationId/users/:userId', function (done) {
             newUser.first_name = 'CV.';
 
-            http_build_query(newUser, api_endpoint + '/user', grantToken);
+            http_build_query(newUser, api_endpoint + '/'+organizationId+'/users/'+userId1, grantToken);
             request(api_endpoint)
-                .put('/user')
+                .put('/'+organizationId+'/users/'+userId1)
                 .set('authorization', grantToken)
                 .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser)
@@ -467,12 +469,12 @@ describe('All-Test', function () {
                 .end(done);
         });
 
-        it('PUT /user', function (done) {
+        it('PUT /:organizationId/users/:userId', function (done) {
             newUser.is_super_admin = false;
 
-            http_build_query(newUser, api_endpoint + '/user', grantToken);
+            http_build_query(newUser, api_endpoint + '/'+organizationId+'/users/'+userId1, grantToken);
             request(api_endpoint)
-                .put('/user')
+                .put( '/'+organizationId+'/users/'+userId1)
                 .set('authorization', grantToken)
                 .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser)
@@ -570,10 +572,11 @@ describe('All-Test', function () {
             });
         });
 
-        it('PUT /user user 3 to special case-worker', function (done) {
+        it('PUT /:organizationId/users/:userId user 3 to special case-worker', function (done) {
             newUser3.is_special_case_worker = true;
+            http_build_query(newUser3, api_endpoint + '/'+organizationId+'/users/'+userId3, grantToken);
             request(api_endpoint)
-                .put('/user')
+                .put('/'+organizationId+'/users/'+userId3)
                 .set('authorization', grantToken)
                 .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser3)

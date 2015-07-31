@@ -109,21 +109,31 @@ UserController.updateAccount = function (req, res) {
 
     var crit = { _id: req.user._id };
 
+    if('password' in req.body){
+
+        if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+
+            return res.errJson('Password didn\'t match');
+
+        } else if(!req.body.password){
+
+            delete req.body.password;
+
+        }
+
+    }
+
     User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
 
         if(!obj) return res.errJson('User not found');
 
-        ['role', 'is_special_case_worker', 'email'].forEach(function(name){
-            if(name in req.body) delete req.body[name];
+        ["first_name", "middle_name", "last_name", "password"].forEach(function(prop){
+
+            if(prop in req.body) obj[prop] = req.body[prop];
+
         });
-
-        for (var prop in req.body) {
-
-            obj[prop] = req.body[prop];
-
-        }
         // set update time and update by user
         obj.last_updated = new Date();
 
@@ -155,6 +165,20 @@ UserController.save = function (req, res) {
         delete req.body.email;
     }
 
+    if('password' in req.body){
+
+        if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+
+            return res.errJson('Password didn\'t match');
+
+        } else if(!req.body.password){
+
+            delete req.body.password;
+
+        }
+
+    }
+
     User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
@@ -177,14 +201,11 @@ UserController.save = function (req, res) {
 
         }
 
+        ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
-        for (var prop in req.body) {
+            if(prop in req.body) obj[prop] = req.body[prop];
 
-            if('email' === prop || 'role' === prop || 'is_special_case_worker' === prop) continue;
-
-            obj[prop] = req.body[prop];
-
-        }
+        });
 
 
         obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err) {

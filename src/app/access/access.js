@@ -181,7 +181,7 @@ Access.hasAccess = function(req, res, next){
 
         if(!organization) {
 
-            log('Dont have "Organization not found" and skip by middleware => ', crit);
+            log('Dont have "Organization not found" and skip by middleware => ' + JSON.stringify(crit));
 
             return res.errUnauthorized();
 
