@@ -83,7 +83,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
 
 
     router.route('/:organizationId/students/not-assign')
-        .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentNotAssigns);
+        .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.getStudentNotAssigns);
 
     router.route('/:organizationId/students/:studentId')
         .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentById)

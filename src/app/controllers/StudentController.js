@@ -14,6 +14,7 @@ var utils = require('../../lib/utils'), cache = utils.cache();
 var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
+var php = require('phpjs');
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -27,6 +28,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     var studentId = ObjectId(req.params.studentId);
 
+
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
         if (err) return res.errJson(err);
@@ -37,8 +39,117 @@ StudentController.getStudentsBackpack = function (req, res) {
         /**
          *
          * @param results
+         * @returns {Array}
+         */
+        function getAttendanceBehaviors(results){
+
+            var attendanceBehaviors = [];
+
+            var behaviorDefault = {
+                weekStart: "",
+                weekEnd: "",
+                havePeriods: false,
+                deltaChange: "0%", //Calculated from total this week (attendance - last week attendance) / last week attendance
+                weekData: []
+            };
+
+            var attendance = results.attendance;
+
+            var totalLastWeekAttendance = 0;
+
+            for(var i = 0; i < attendance.summaries.summary.length; i++){
+
+                var summary = attendance.summaries.summary[i];
+
+                var behavior = behaviorDefault, totalAttandance = 0;
+
+                behavior.weekStart = summary.startDate._;
+
+                behavior.weekEnd = php.date('m/d/Y', php.strtotime('+'+summary.daysAbsent+' days', php.strtotime(behavior.weekStart)));
+
+                attendance.events.event.forEach(function(event){
+
+                    var weekDate = {
+                        date: "",
+                        attendance: "0%", //Calculated from total non present/total period
+                        periods: [],
+                        behaviors: []
+                    };
+
+                    weekDate.date = event.calendarEventDate;
+
+                    var total = 0;
+
+                    if('timeTablePeriod' in event){
+
+                        behavior.havePeriods = true;
+
+                        for(var j = 0; j < event.timeTablePeriod; j++){
+
+                            var period = {
+                                name: 'Period ' + timeTablePeriod[j]
+                            };
+
+                            period.status = event.attendanceStatus[j];
+
+                            if(period.status === 'P'){
+
+                                total++;
+
+                            }
+
+                            weekDate.periods.push(period);
+
+                        }
+
+                    }
+
+                    var percent = total === 0 ? 0 : (Math.round(total / weekDate.periods.length) * 100);
+
+                    weekDate.attendance = percent + '%';
+
+                    totalAttandance += percent;
+
+                    behavior.weekData.push(weekDate);
+
+                });
+
+                if(attendanceBehaviors.length === 0){
+
+                    totalLastWeekAttendance = totalAttandance;
+
+                } else {
+
+                    totalLastWeekAttendance = parseInt(attendanceBehaviors[attendanceBehaviors.length -1].deltaChange);
+
+                }
+
+                var deltaChange = totalAttandance === 0 ? 0 : (Math.round(totalAttandance / totalLastWeekAttendance) * 100);
+
+                behavior.deltaChange = deltaChange + '%';
+
+                totalAttandance = 0;
+
+                attendanceBehaviors.push(behavior);
+
+            }
+
+            return attendanceBehaviors;
+
+        }
+        /**
+         *
+         * @param results
          */
         function embeds(results){
+
+            if(!_.isArray(results.attendance.summaries.summary)){
+
+                results.attendance.summaries.summary = [ results.attendance.summaries.summary ];
+
+            }
+
+            results.attendanceBehaviors = getAttendanceBehaviors(results);
 
             var crit = {
                 $or: [
@@ -157,6 +268,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                 authorizedEntityId: organization.authorizedEntityId
             });
 
+
             var key = [student.district_student_id, student.school_district, organization.externalServiceId, organization.personnelId, organization.authorizedEntityId].join('_');
 
             cache.get(key, function(err, result){
@@ -248,7 +360,15 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
     var orgId = ObjectId(req.params.organizationId);
 
-    var query = User.find({ permissions: { $elemMatch: { organization: orgId } }});
+    var where = { permissions: { $elemMatch: { organization: orgId } }};
+
+    if(req.body.userId){
+
+        where._id = ObjectId(req.body.userId);
+
+    }
+
+    var query = User.find(where);
 
     var crit = Student.crit(req.query, ['organization', '_id']);
 
@@ -258,19 +378,37 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
         var students = [];
 
+        var showEmpty = true;
+
         users.forEach(function(user){
 
             user.permissions.forEach(function(permission){
 
-                permission.students.forEach(function(student){
+                if(permission.organization.toString() === orgId.toString()) {
 
-                    if(students.indexOf(student) === -1) students.push(student);
+                    if (permission.role === 'case-worker' && permission.is_special_case_worker === false) {
 
-                });
+                        showEmpty = false;
+
+                        permission.students.forEach(function (student) {
+
+                            if (students.indexOf(student) === -1) students.push(student);
+
+                        });
+
+                    }
+
+                }
 
             });
 
         });
+
+        if(showEmpty === true){
+
+            return res.okJson(null, []);
+
+        }
 
         if(students.length > 0) crit._id = { $nin: students };
 
@@ -281,6 +419,7 @@ StudentController.getStudentNotAssigns = function (req, res) {
             res.okJson(null, students);
 
         });
+
     });
 
 };

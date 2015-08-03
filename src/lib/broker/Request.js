@@ -35,6 +35,7 @@ function Request(options, env) {
 Request.prototype = {
 
     constructor: Request,
+
     /**
      *
      * @param params
@@ -44,6 +45,7 @@ Request.prototype = {
         this.queryParameter = params;
 
     },
+
     /**
      *
      * @param param
@@ -54,6 +56,7 @@ Request.prototype = {
         this.queryParameter[param] = val;
 
     },
+
     /**
      *
      * @returns {{contextId: string}|*}
@@ -63,6 +66,7 @@ Request.prototype = {
         return this.queryParameter;
 
     },
+
     /**
      *
      * @param headers
@@ -72,6 +76,7 @@ Request.prototype = {
         this.headers = headers;
 
     },
+
     /**
      *
      * @param key
@@ -101,11 +106,15 @@ Request.prototype = {
      * @returns {*}
      */
     create: function (what, url, method, callback) {
+
         var config = this.config[what];
 
         if('Authorization' in this.headers){
+
             //skip
+
         } else {
+
             var timestamp = this.headers.timestamp = this.getTimezone();
 
             var token = '';
@@ -140,7 +149,9 @@ Request.prototype = {
         if('headers' in config) {
 
             for (var name in config.headers) {
+
                 self.addHeader(name, config.headers[name]);
+
             }
         }
 
@@ -179,6 +190,7 @@ Request.prototype = {
         });
 
     },
+
     /**
      *
      * @param districtStudentId
@@ -205,6 +217,7 @@ Request.prototype = {
             this.headers.externalServiceId = this.options.externalServiceId;
 
         }
+
         if(!districtStudentId){
 
             if(!callback) return;
@@ -250,6 +263,7 @@ Request.prototype = {
             this.headers.externalServiceId = this.options.externalServiceId;
 
         }
+
         if(!districtStudentId){
 
             if(!callback) return;
@@ -269,6 +283,7 @@ Request.prototype = {
         return this.create('xsre', url, 'GET', callback);
 
     },
+
     /**
      *
      * @param uri
@@ -282,6 +297,7 @@ Request.prototype = {
         return this.create('prs', url, 'GET', callback);
 
     },
+
     /**
      *
      * @returns {*|ServerResponse}
@@ -291,6 +307,7 @@ Request.prototype = {
         return moment().utc().format("YYYY-MM-DDThh:mm:ss.SSSZZ");
 
     },
+
     /**
      *
      * @returns {*}
@@ -300,6 +317,7 @@ Request.prototype = {
         return uuid.v1();
 
     },
+
     /**
      *
      * @param timestamp
@@ -315,6 +333,7 @@ Request.prototype = {
         var hash = CryptoJS.HmacSHA256(valToHash, secret).toString(CryptoJS.enc.Base64);
 
         return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(sessionToken + ":" + hash));
+
     },
 
     /**
@@ -361,6 +380,7 @@ Request.prototype = {
         return this._generateAuthToken(timestamp, sessionToken, secret);
 
     }
+
 };
 
 /**
