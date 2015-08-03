@@ -80,11 +80,11 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     var total = 0;
 
-                    if('timeTablePeriod' in event){
+                    if('timeTablePeriod' in event && _.isArray(event.timeTablePeriod)){
 
                         behavior.havePeriods = true;
 
-                        for(var j = 0; j < event.timeTablePeriod; j++){
+                        for(var j = 0; j < event.timeTablePeriod.length; j++){
 
                             var period = {
                                 name: 'Period ' + timeTablePeriod[j]
