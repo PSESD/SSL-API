@@ -114,7 +114,7 @@ StudentProgramController.getByProgramId = function (req, res) {
 
     var proId = req.params.programId;
 
-    Student.protect(req.user.role, null, req.user).find({ organization: ObjectId(orgId), programs: { $elemMatch: { program: ObjectId(proId) } } }, function(err, students){
+    Student.protect(req.user.role, { onlyAssign: true }, req.user).find({ organization: ObjectId(orgId), programs: { $elemMatch: { program: ObjectId(proId) } } }, function(err, students){
 
         if(err) return res.errJson(err);
 

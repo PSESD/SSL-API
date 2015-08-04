@@ -153,30 +153,6 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             results.attendanceBehaviors = getAttendanceBehaviors(results);
 
-            //var crit = {
-            //    $or: [
-            //        {
-            //            permissions: {
-            //                $elemMatch: {
-            //                    organization: orgId,
-            //                    students: studentId,
-            //                    role: 'case-worker',
-            //                    is_special_case_worker: false
-            //                }
-            //            }
-            //        },
-            //        {
-            //            permissions: {
-            //                $elemMatch: {
-            //                    organization: orgId,
-            //                    role: 'case-worker',
-            //                    is_special_case_worker: true
-            //                }
-            //            }
-            //        }
-            //    ]
-            //};
-
             var crit = {
                 permissions: {
                     $elemMatch: {
@@ -399,7 +375,7 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
                 if(permission.organization.toString() === orgId.toString()) {
 
-                    if (permission.role === 'case-worker' && permission.is_special_case_worker === false) {
+                    //if (permission.role === 'case-worker' && permission.is_special_case_worker === false) {
 
                         showEmpty = false;
 
@@ -409,7 +385,7 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
                         });
 
-                    }
+                    //}
 
                 }
 

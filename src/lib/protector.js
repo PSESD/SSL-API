@@ -78,6 +78,8 @@ module.exports = function protector(schema, options) {
      */
     function setFilter(_protectFilter){
 
+        onlyAssign = false;
+
         protectFilter = _protectFilter || {};
 
         if('onlyAssign' in protectFilter){
