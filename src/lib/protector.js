@@ -14,6 +14,7 @@ var _permissions;
 var _is_special_case_worker;
 var _acl;
 var _errorMessage = 'Access Denied';
+var onlyAssign = false;
 
 module.exports = function protector(schema, options) {
     /**
@@ -73,6 +74,23 @@ module.exports = function protector(schema, options) {
 
     /**
      *
+     * @param _protectFilter
+     */
+    function setFilter(_protectFilter){
+
+        protectFilter = _protectFilter || {};
+
+        if('onlyAssign' in protectFilter){
+
+            onlyAssign = protectFilter.onlyAssign ? true : false;
+
+            delete protectFilter.onlyAssign;
+
+        }
+    }
+
+    /**
+     *
      * @param req
      * @param _protectFilter
      * @param user
@@ -86,7 +104,7 @@ module.exports = function protector(schema, options) {
 
         collection = this.collection.name;
 
-        protectFilter = _protectFilter || {};
+        setFilter(_protectFilter);
 
         setUser(user, collection);
 
@@ -184,7 +202,7 @@ module.exports = function protector(schema, options) {
 
         collection = this.collection.name;
 
-        protectFilter = _protectFilter || {};
+        setFilter(_protectFilter);
 
         setUser(user, collection);
 
@@ -364,13 +382,22 @@ module.exports = function protector(schema, options) {
 
         if (typeof localRules.where !== "undefined") {
 
-            switch (acl.permission.allow){
+            var isAllow = acl.permission.allow;
+
+            if(onlyAssign === true){
+
+                isAllow = 'assign';
+
+            }
+
+            switch (isAllow){
                 case 'all':
                 case '*':
                     //Skip this checked
                     break;
                 case 'own':
                 case 'owner':
+                case 'assign':
 
                     console.log('CHECK PERMISSION INDEX OF >> ', collection, ' is ', collection in _permissions);
 

@@ -92,7 +92,9 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                             period.status = event.attendanceStatus[j];
 
-                            if(period.status === 'P'){
+                            if (period.status !== 'P') {
+
+                            } else {
 
                                 total++;
 

@@ -316,7 +316,7 @@ UserController.getByUserId = function(req, res){
 
         currUser.getCurrentPermission(organizationId);
 
-        Student.protect(currUser.role, null, currUser).find({ organization: ObjectId(organizationId) }, function (err, students) {
+        Student.protect(currUser.role, { onlyAssign: true }, currUser).find({ organization: ObjectId(organizationId) }, function (err, students) {
 
             if (err) return res.errJson(err);
 
