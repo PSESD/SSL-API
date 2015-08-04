@@ -291,6 +291,8 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                             parseString(body, { explicitArray: false }, function (err, result) {
 
+                                if(err) return res.errJson(err);
+
                                 var json = result.xSre;
 
                                 delete json['$'];

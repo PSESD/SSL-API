@@ -507,7 +507,7 @@ module.exports = function protector(schema, options) {
 
         var criteria = {fields: localRules.properties, crit: crit};
 
-        console.log('ACL CRITERIA => ', JSON.stringify(criteria), ' RULES: ', JSON.stringify(localRules));
+        console.log('ACL CRITERIA ('+isAllow+') => ', JSON.stringify(criteria), ' RULES: ', JSON.stringify(localRules));
 
         return criteria;
 
