@@ -351,7 +351,7 @@ module.exports = function protector(schema, options) {
         /**
          * Skipped checked acl if admin user
          */
-        if('admin' === currentRole){
+        if('admin' === currentRole && !onlyAssign){
 
             //console.log('SKIPPED CHECKED ACL => ', JSON.stringify({fields: localRules.properties, crit: crit}));
 
