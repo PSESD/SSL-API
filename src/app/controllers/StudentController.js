@@ -153,28 +153,37 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             results.attendanceBehaviors = getAttendanceBehaviors(results);
 
+            //var crit = {
+            //    $or: [
+            //        {
+            //            permissions: {
+            //                $elemMatch: {
+            //                    organization: orgId,
+            //                    students: studentId,
+            //                    role: 'case-worker',
+            //                    is_special_case_worker: false
+            //                }
+            //            }
+            //        },
+            //        {
+            //            permissions: {
+            //                $elemMatch: {
+            //                    organization: orgId,
+            //                    role: 'case-worker',
+            //                    is_special_case_worker: true
+            //                }
+            //            }
+            //        }
+            //    ]
+            //};
+
             var crit = {
-                $or: [
-                    {
-                        permissions: {
-                            $elemMatch: {
-                                organization: orgId,
-                                students: studentId,
-                                role: 'case-worker',
-                                is_special_case_worker: false
-                            }
-                        }
-                    },
-                    {
-                        permissions: {
-                            $elemMatch: {
-                                organization: orgId,
-                                role: 'case-worker',
-                                is_special_case_worker: true
-                            }
-                        }
+                permissions: {
+                    $elemMatch: {
+                        organization: orgId,
+                        students: studentId
                     }
-                ]
+                }
             };
 
             User.find(crit, function(err, users){
