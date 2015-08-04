@@ -96,8 +96,8 @@ describe('All-Test', function () {
             }
         ],
         "description": null,
-        "website": "fc.org",
-        "url": "fc.cbo.upward.st",
+        "website": "localhost",
+        "url": "localhost",
         "externalServiceId": 5,
         "personnelId": 1,
         "authorizedEntityId": 2
@@ -113,7 +113,7 @@ describe('All-Test', function () {
         "addresses": []
     };
 
-    var userId, userId2, userId3, userId4, studentId, studentProgramId, studentProgramData = {
+    var userId,userId1, userId2, userId3, userId4, studentId, studentProgramId, studentProgramData = {
         programId: null,
         active: true, // Whether the student is currently active in the program or not.
         participation_start_date: new Date(Date.parse('May 8, 2015')).toString(),
@@ -126,7 +126,8 @@ describe('All-Test', function () {
         password: 'demo',
         last_name: 'Upwardstech',
         is_special_case_worker: false,
-        role: 'case-worker'
+        role: 'case-worker',
+        is_super_admin: true
     };
 
     var newUser2 = {
@@ -282,11 +283,32 @@ describe('All-Test', function () {
     describe('API-User', function () {
 
 
+        it('POST /organizations', function (done) {
+            http_build_query(orgData, api_endpoint + '/organizations', grantToken);
+            request(api_endpoint)
+                .post('/organizations')
+                .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
+                .send(orgData)
+                .expect(function (res) {
+                    if (!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                    assert.equal(orgData.name, res.body.info.name);
+                    organizationId = res.body.info._id;
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
         it('GET /user', function (done) {
+            http_build_query({}, api_endpoint + '/user', grantToken);
             request(api_endpoint)
                 .get('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .expect(function (res) {
+                    console.log(res.body);
                     assert.equal(email, res.body.email);
                 })
                 .expect(200)
@@ -300,11 +322,15 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .post('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser)
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
                     assert.equal(newUser.email, res.body.info.email);
                     assert.equal(newUser.last_name, res.body.info.last_name);
+                    assert.equal(newUser.is_super_admin, res.body.info.is_super_admin);
+                    userId1 = res.body.info._id;
+                    assert.ok(userId1);
                 })
                 .expect(200)
                 .end(done);
@@ -315,11 +341,13 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .post('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser2)
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
                     assert.equal(newUser2.email, res.body.info.email);
                     assert.equal(newUser2.last_name, res.body.info.last_name);
+                    assert.equal(false, res.body.info.is_super_admin);
                     userId2 = res.body.info._id;
                     assert.ok(userId2);
                 })
@@ -332,11 +360,13 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .post('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser3)
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
                     assert.equal(newUser3.email, res.body.info.email);
                     assert.equal(newUser3.last_name, res.body.info.last_name);
+                    assert.equal(false, res.body.info.is_super_admin);
                     userId3 = res.body.info._id;
                     assert.ok(userId3);
                 })
@@ -349,11 +379,13 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .post('/user')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser4)
                 .expect(function (res) {
                     assert.equal(true, res.body.success);
                     assert.equal(newUser4.email, res.body.info.email);
                     assert.equal(newUser4.last_name, res.body.info.last_name);
+                    assert.equal(false, res.body.info.is_super_admin);
                     userId4 = res.body.info._id;
                     assert.ok(userId4);
                 })
@@ -362,12 +394,15 @@ describe('All-Test', function () {
 
         });
 
-        newUser.first_name = 'CV.';
 
-        it('PUT /user', function (done) {
+        it('PUT /:organizationId/users/:userId', function (done) {
+            newUser.first_name = 'CV.';
+
+            http_build_query(newUser, api_endpoint + '/'+organizationId+'/users/'+userId1, grantToken);
             request(api_endpoint)
-                .put('/user')
+                .put('/'+organizationId+'/users/'+userId1)
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser)
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
@@ -378,33 +413,16 @@ describe('All-Test', function () {
 
         });
 
-        it('DELETE /user', function (done) {
+        it('PUT /user/role/:userId', function (done) {
+            http_build_query({ role: 'admin', is_special_case_worker: false }, api_endpoint + '/user/role/'+userId3, grantToken);
             request(api_endpoint)
-                .delete('/user')
+                .put('/user/role/'+userId3)
                 .set('authorization', grantToken)
-                .send({email: newUser.email})
-                .expect(function (res) {
-                    assert.equal(true, res.body.success, res.body.message);
-                })
-                .expect(200)
-                .end(done);
-
-        });
-    });
-
-    describe('API-Organizations', function () {
-
-        it('POST /organizations', function (done) {
-            http_build_query(orgData);
-            request(api_endpoint)
-                .post('/organizations')
-                .set('authorization', grantToken)
-                .send(orgData)
+                .set('x-cbo-client-url', 'http://localhost:4000')
+                .send({ role: 'admin', is_special_case_worker: false })
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
-                    assert.equal(orgData.name, res.body.info.name);
-                    organizationId = res.body.info._id;
                 })
                 .expect(200)
                 .end(done);
@@ -415,6 +433,8 @@ describe('All-Test', function () {
             organization: organizationId,
             userId: userId,
             students: [],
+            role: "admin",
+            is_special_case_worker: false,
             permissions: [{
                 model: 'Student',
                 operation: '*',
@@ -437,7 +457,9 @@ describe('All-Test', function () {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
                     var permit = res.body.info.permissions[0];
+                    console.log(permit);
                     assert.equal(organizationId, permit.organization);
+                    assert.equal('admin', permit.role);
                     assert.ok(_.isArray(permit.students), 'Student must array');
                     assert.ok(_.isArray(permit.permissions), 'Permission must array');
                     permissionId = permit._id;
@@ -446,6 +468,43 @@ describe('All-Test', function () {
                 .expect(200)
                 .end(done);
         });
+
+        it('PUT /:organizationId/users/:userId', function (done) {
+            newUser.is_super_admin = false;
+
+            http_build_query(newUser, api_endpoint + '/'+organizationId+'/users/'+userId1, grantToken);
+            request(api_endpoint)
+                .put( '/'+organizationId+'/users/'+userId1)
+                .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
+                .send(newUser)
+                .expect(function (res) {
+                    if (!res.body.success) console.log('%j', res.body);
+                    assert.equal(true, res.body.success);
+                    assert.equal(newUser.is_super_admin, res.body.info.is_super_admin);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+
+        it('DELETE /user', function (done) {
+            http_build_query({email: newUser.email}, api_endpoint + '/user', grantToken);
+            request(api_endpoint)
+                .delete('/user')
+                .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
+                .send({email: newUser.email})
+                .expect(function (res) {
+                    assert.equal(true, res.body.success, res.body.message);
+                })
+                .expect(200)
+                .end(done);
+
+        });
+    });
+
+    describe('API-Organizations', function () {
 
         var permissions = {};
 
@@ -513,11 +572,13 @@ describe('All-Test', function () {
             });
         });
 
-        it('PUT /user user 3 to special case-worker', function (done) {
+        it('PUT /:organizationId/users/:userId user 3 to special case-worker', function (done) {
             newUser3.is_special_case_worker = true;
+            http_build_query(newUser3, api_endpoint + '/'+organizationId+'/users/'+userId3, grantToken);
             request(api_endpoint)
-                .put('/user')
+                .put('/'+organizationId+'/users/'+userId3)
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser3)
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
@@ -544,6 +605,7 @@ describe('All-Test', function () {
             request(api_endpoint)
                 .get('/organizations')
                 .set('authorization', grantToken)
+                .set('x-cbo-client-url', 'http://localhost:4000')
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
@@ -711,6 +773,7 @@ describe('All-Test', function () {
                .get('/'+organizationId+'/students/'+studentId+'/xsre')
                .set('authorization', grantToken)
                .expect(function (res) {
+                   console.dir(res.body);
                    assert.ok(res.body._links);
                })
                .expect(200)
@@ -732,13 +795,14 @@ describe('All-Test', function () {
         it('GET /:organizationId/students/not-assign', function (done) {
             console.log(api_endpoint+'/'+organizationId+'/students/not-assign', ' ', grantToken);
             request(api_endpoint)
-                .get('/'+organizationId+'/students/not-assign')
+                .post('/'+organizationId+'/students/not-assign')
                 .set('authorization', grantToken)
                 .expect(function (res) {
                     assert.ok(res.body._links);
                 })
                 .expect(200)
                 .end(done);
+
         });
 
         it('POST /:organizationId/students/:studentId/programs', function (done) {

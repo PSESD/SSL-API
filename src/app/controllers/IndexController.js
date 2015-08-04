@@ -1,7 +1,7 @@
 /**
  * Created by zaenal on 20/05/15.
  */
-var Index = {
+var IndexController = {
 
     index: function(req, res){
 
@@ -14,4 +14,4 @@ var Index = {
  *
  * @type {{index: Function}}
  */
-module.exports = Index;
+module.exports = IndexController;

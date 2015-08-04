@@ -1,7 +1,10 @@
 /**
  * Created by zaenal on 21/05/15.
  */
+var mongoose = require('mongoose');
+var ObjectId = mongoose.Types.ObjectId;
 var User = require('../models/User');
+var Student = require('../models/Student');
 var Client = require('../models/Client');
 var Code = require('../models/Code');
 var BaseController = require('./BaseController');
@@ -36,8 +39,6 @@ UserController.get = function (req, res) {
  * @param res
  */
 UserController.deleteByEmail = function (req, res) {
-
-    if(!req.user.isAdmin()) return res.errUnauthorized();
 
     var model = User;
 
@@ -85,7 +86,7 @@ UserController.deleteByEmail = function (req, res) {
  * @param req
  * @param res
  */
-UserController.updateAccount = function (req, res) {
+UserController.myAccount = function (req, res) {
 
     var crit = { _id: req.user._id };
 
@@ -93,17 +94,46 @@ UserController.updateAccount = function (req, res) {
 
         if (err) return res.errJson(err);
 
-        if(!obj) return res.errJson('User not found');
+        res.okJson(obj);
 
-        ['role', 'is_special_case_worker', 'email'].forEach(function(name){
-            if(name in req.body) delete req.body[name];
-        });
+    });
 
-        for (var prop in req.body) {
+};
 
-            obj[prop] = req.body[prop];
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.updateAccount = function (req, res) {
+
+    var crit = { _id: req.user._id };
+
+    if('password' in req.body){
+
+        if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+
+            return res.errJson('Password didn\'t match');
+
+        } else if(!req.body.password){
+
+            delete req.body.password;
 
         }
+
+    }
+
+    User.findOne(crit, function (err, obj) {
+
+        if (err) return res.errJson(err);
+
+        if(!obj) return res.errJson('User not found');
+
+        ["first_name", "middle_name", "last_name", "password"].forEach(function(prop){
+
+            if(prop in req.body) obj[prop] = req.body[prop];
+
+        });
         // set update time and update by user
         obj.last_updated = new Date();
 
@@ -120,62 +150,13 @@ UserController.updateAccount = function (req, res) {
     });
 
 };
-/**
- *
- * @param role
- * @param is_special
- * @param permissions
- * @returns {*}
- * @private
- */
-UserController._checkRole = function(role, is_special, permissions){
 
-    if(permissions.length === 0){
-        switch ( role ){
-            case 'admin':
-            case 'superadmin':
-                permissions.push(
-                    {
-                        "model" : "Student",
-                        "allow" : "all",
-                        "operation" : "*"
-                    }
-                );
-                break;
-            case 'case-worker':
-                var allow = is_special ? 'all' : 'own';
-                permissions = [{
-                    model: 'Student',
-                    operation: 'read',
-                    allow: allow
-                }, {
-                    model: 'Student',
-                    operation: 'create',
-                    allow: allow
-                }, {
-                    model: 'Student',
-                    operation: 'update',
-                    allow: allow
-                }, {
-                    model: 'Student',
-                    operation: 'delete',
-                    allow: allow
-                }];
-                break;
-        }
-    }
-
-    return permissions;
-
-};
 /**
  *
  * @param req
  * @param res
  */
 UserController.save = function (req, res) {
-
-    if(!req.user.isAdmin()) return res.errUnauthorized();
 
     var crit = {_id: req.user._id};
 
@@ -184,51 +165,50 @@ UserController.save = function (req, res) {
         delete req.body.email;
     }
 
+    if('password' in req.body){
+
+        if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+
+            return res.errJson('Password didn\'t match');
+
+        } else if(!req.body.password){
+
+            delete req.body.password;
+
+        }
+
+    }
+
     User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
 
         if(!obj) return res.errJson('User not found');
 
+        var role = null, is_special_case_worker = null;
+
+        if(req.body.role) role = req.body.role;
+
+        if(req.body.is_special_case_worker) is_special_case_worker = req.body.is_special_case_worker;
         /**
          * Filter if user downgrade here role
          */
-        if(req.user._id === obj._id && req.user.isAdmin()){
+        if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
 
-            var role = req.body.role;
+            role = req.body.role;
 
-            if(role === 'case-worker') return req.errJson("Admin never be able to downgrade itself to a case worker");
-
-        }
-
-        for (var prop in req.body) {
-
-            obj[prop] = req.body[prop];
+            if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
 
         }
-        // set update time and update by user
-        obj.last_updated = new Date();
 
-        obj.last_updated_by = req.user.userId;
+        ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
-        if(obj.isCaseWorker()) {
+            if(prop in req.body) obj[prop] = req.body[prop];
 
-            var allow = obj.isSpecialCaseWorker() ? 'all' : 'own';
+        });
 
-            for (var i = 0; i < obj.permissions.length; i++) {
 
-                obj.permissions[i].permissions = UserController._checkRole(obj.role, obj.isSpecialCaseWorker(), obj.permissions[i].permissions);
-
-                for (var j = 0; j < obj.permissions[i].permissions.length; j++) {
-
-                    obj.permissions[i].permissions[j].allow = allow;
-
-                }
-
-            }
-        }
-
-        obj.save(function (err) {
+        obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err) {
 
             if (err) return res.errJson(err);
 
@@ -239,46 +219,40 @@ UserController.save = function (req, res) {
     });
 
 };
-
+/**
+ *
+ * @param req
+ * @param res
+ */
 UserController.setRole = function(req, res){
 
-    if(!req.user.isAdmin()) return res.errUnauthorized();
-
     var crit = { _id: req.params.userId };
-
 
     User.findOne(crit, function (err, obj) {
 
         if (err) return res.errJson(err);
 
-        ['role', 'is_special_case_worker', 'email'].forEach(function(name){
-            if(name in req.body) obj[name] = req.body[name];
-        });
+        if(!obj) return res.errJson('User not found');
 
-        if(obj.isCaseWorker()) {
+        var role = req.body.role;
 
-            var allow = obj.isSpecialCaseWorker() ? 'all' : 'own';
+        var is_special_case_worker = req.body.is_special_case_worker;
 
-            for (var i = 0; i < obj.permissions.length; i++) {
+        if(is_special_case_worker === 'true') is_special_case_worker = true;
 
-                obj.permissions[i].permissions = UserController._checkRole(obj.role, obj.isSpecialCaseWorker(), obj.permissions[i].permissions);
+        else if(is_special_case_worker === 'false') is_special_case_worker = false;
 
-                for (var j = 0; j < obj.permissions[i].permissions.length; j++) {
+        /**
+         * Filter if user downgrade here role
+         */
+        if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
 
-                    obj.permissions[i].permissions[j].allow = allow;
+            if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
 
-                }
-
-            }
         }
 
 
-        // set update time and update by user
-        obj.last_updated = new Date();
-
-        obj.last_updated_by = req.user.userId;
-
-        obj.save(function (err) {
+        obj.saveWithRole(req.user, req.organization._id, role, is_special_case_worker, function (err) {
 
             if (err) return res.errJson(err);
 
@@ -310,7 +284,7 @@ UserController.cleanAll = function(req, res){
 
     var email = req.body.email || req.query.email;
 
-    var emails = [ 'test@test.com', 'support@upwardstech.com'];
+    var emails = [ 'test@test.com', 'support@upwardstech.com' ];
 
     if(!email || emails.indexOf(email) === -1) return res.errJson('Mandatory parameters was empty');
 
@@ -321,6 +295,261 @@ UserController.cleanAll = function(req, res){
         User.removeDeep(user._id, function(err){ console.log(err);});
 
         res.okJson('Done');
+
+    });
+
+};
+/**
+ * ----------------------- USER STUDENT ------------------------------------
+ */
+UserController.getByUserId = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    User.findOne({ _id: ObjectId(currentUserId)}, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        currUser.getCurrentPermission(organizationId);
+
+        Student.protect(currUser.role, { onlyAssign: true }, currUser).find({ organization: ObjectId(organizationId) }, function (err, students) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson(null, students);
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.postByUserId = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var user            = req.user;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        var obj = new Student(req.body);
+
+        obj.organization = ObjectId(organizationId);
+
+        // set update time and update by user
+        obj.created = new Date();
+
+        obj.creator = req.user.userId;
+
+        obj.last_updated = new Date();
+
+        obj.last_updated_by = req.user.userId;
+
+        obj.save(function (err) {
+
+            if (err)  return res.errJson(err);
+
+            _.each(currUser.permissions, function(permission, key){
+
+                if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
+                    currUser.permissions[key].students.push(obj._id);
+
+                }
+
+            });
+
+            currUser.save(function(err){
+
+                if (err)  return res.errJson(err);
+
+                res.okJson('Successfully Added', obj);
+            });
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.getStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var studentId       = req.params.studentId;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        currUser.getCurrentPermission(organizationId);
+
+        Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, students) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson(null, students);
+
+        });
+
+    });
+
+};
+
+
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.putStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var studentId       = ObjectId(req.params.studentId);
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, obj) {
+
+            if (err)  return res.errJson(err);
+
+            if (!obj) return res.errJson('Data not found');
+
+            for (var prop in req.body) {
+
+                if(prop in obj) {
+
+                    obj[prop] = req.body[prop];
+
+                }
+
+            }
+            // set update time and update by user
+            obj.last_updated = new Date();
+
+            obj.last_updated_by = req.user.userId;
+
+            obj.save(function (err) {
+
+                if (err) return res.errJson(err);
+
+                _.each(currUser.permissions, function(permission, key){
+
+                    if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
+                        currUser.permissions[key].students.push(obj._id);
+
+                    }
+
+                });
+
+                currUser.save(function(err){
+
+                    if (err)  return res.errJson(err);
+
+                    res.okJson('Successfully Updated!', obj);
+
+                });
+
+
+            });
+
+        });
+
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+UserController.deleteStudentUserById = function(req, res){
+
+    var currentUserId   = req.params.userId;
+
+    var organizationId  = req.params.organizationId;
+
+    var user            = req.user;
+
+    var studentId       = req.params.studentId;
+
+    User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
+
+        if(err) return res.errJson(err);
+
+        if(!currUser) return res.errJson('User not found!');
+
+        Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, student) {
+
+            if (err) return res.errJson(err);
+
+            if(!student) return res.errJson('Student not found!');
+
+            var allpermission = [];
+
+            for (var i = 0; i < currUser.permissions.length; i++) {
+
+                if (student.organization.toString() === (currUser.permissions[i].organization + '')) {
+
+                    var permissionStudents = [];
+
+                    _.each(currUser.permissions[i].students, function(std, key){
+
+                        if(std.toString() !== student._id.toString()){
+
+                            permissionStudents.push(std);
+
+                        }
+
+                    });
+
+                    currUser.permissions[i].students = permissionStudents;
+
+                }
+
+                allpermission.push(currUser.permissions[i]);
+
+            }
+
+            User.where({_id: currUser._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Successfully Deleted!', student);
+
+            });
+
+        });
 
     });
 

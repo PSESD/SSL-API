@@ -5,7 +5,9 @@ var mongoose = require('mongoose');
 var Organization = require('../models/Organization');
 var Program = require('../models/Program');
 var User = require('../models/User');
+var Access = require('../access/access').getInstance();
 var BaseController = require('./BaseController');
+var php = require('phpjs');
 var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
 var OrganizationController = new BaseController(Organization).crud('organizationId');
@@ -17,23 +19,7 @@ var OrganizationController = new BaseController(Organization).crud('organization
  */
 OrganizationController.get = function (req, res) {
 
-    var user = req.user;
-
-    var crit = Organization.crit(req.query);
-
-    var orgs = user.organizationId;
-
-    if (orgs.length > 0) {
-
-        crit._id = { $in: orgs };
-
-    } else {
-
-        return res.okJson(null, []);
-
-    }
-
-    Organization.find(crit, function (err, orgs) {
+    Organization.find({ _id: req.organization._id }, function (err, orgs) {
 
         if (err) return res.errJson(err);
 
@@ -53,18 +39,13 @@ OrganizationController.find = function (req, res) {
 
     crit._id = req.params.organizationId;
 
-    var cb = function () {
+    Organization.findOne(crit, function (err, org) {
 
-        Organization.findOne(crit, function (err, org) {
+        if (err) return res.errJson(err);
 
-            if (err) return res.errJson(err);
+        res.okJson(org);
 
-            res.okJson(org);
-
-        });
-    };
-
-    OrganizationController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -79,19 +60,14 @@ OrganizationController.profile = function (req, res) {
 
     crit._id = req.params.organizationId;
 
-    var cb = function () {
 
-        Organization.findOne(crit, function (err, org) {
+    Organization.findOne(crit, function (err, org) {
 
-            if (err) return res.errJson(err);
+        if (err) return res.errJson(err);
 
-            res.okJson(org);
+        res.okJson(org);
 
-        });
-
-    };
-
-    OrganizationController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -101,38 +77,33 @@ OrganizationController.profile = function (req, res) {
  */
 OrganizationController.updateProfile = function(req, res){
 
-    var cb = function () {
+    Organization.findOne({_id: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        Organization.findOne({_id: ObjectId(req.params.organizationId)}, function (err, obj) {
+        if (err)  return res.errJson(err);
 
-            if (err)  return res.errJson(err);
+        if (!obj) return res.errJson('Data not found');
 
-            if (!obj) return res.errJson('Data not found');
+        for (var prop in req.body) {
 
-            for (var prop in req.body) {
+            if (prop in obj) {
 
-                if (prop in obj) {
+                obj[prop] = req.body[prop];
 
-                    obj[prop] = req.body[prop];
-
-                }
             }
-            // set update time and update by user
-            obj.last_updated = new Date();
+        }
+        // set update time and update by user
+        obj.last_updated = new Date();
 
-            obj.last_updated_by = req.user.userId;
-            // save the movie
-            obj.save(function (err) {
+        obj.last_updated_by = req.user.userId;
+        // save the movie
+        obj.save(function (err) {
 
-                if (err) return res.errJson(err);
+            if (err) return res.errJson(err);
 
-                res.okJson('Successfully updated!', obj);
+            res.okJson('Successfully updated!', obj);
 
-            });
         });
-    };
-
-    OrganizationController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -142,19 +113,16 @@ OrganizationController.updateProfile = function(req, res){
  */
 OrganizationController.allUsers = function (req, res) {
 
-    var cb = function () {
 
-        User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
+    User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
 
-            if (err) return res.errJson(err);
+        if (err) return res.errJson(err);
 
-            res.okJson(null, users);
+        res.okJson(null, users);
 
-        });
+    });
 
-    };
 
-    OrganizationController.grant(req, res, cb);
 };
 
 /**
@@ -164,25 +132,16 @@ OrganizationController.allUsers = function (req, res) {
  */
 OrganizationController.getUser = function (req, res) {
 
-    var cb = function () {
 
-        User.findOne({
-            _id: ObjectId(req.params.userId),
-            permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
-        }, function (err, user) {
+    User.findOne({
+        _id: ObjectId(req.params.userId),
+        permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
+    }, function (err, user) {
 
-            if (err) return res.errJson(err);
+        if (err) return res.errJson(err);
 
-            res.okJson(user);
+        res.okJson(user);
 
-        });
-
-    };
-
-    OrganizationController.grant(req, res, cb, {
-        onCheck: function(isMatch){
-            return isMatch && req.user.isAdmin();
-        }
     });
 
 };
@@ -193,57 +152,74 @@ OrganizationController.getUser = function (req, res) {
  */
 OrganizationController.postUser = function (req, res) {
 
-    var cb = function() {
 
-        var orgId = req.params.organizationId;
+    var orgId = req.params.organizationId;
 
-        var userId = req.body.userId;
+    var userId = req.body.userId;
 
-        var permissions = {};
+    var permissions = {};
 
-        if (req.body.organization) permissions.organization = ObjectId(req.body.organization);
+    if (req.body.organization) permissions.organization = ObjectId(req.body.organization);
 
-        permissions.students = req.body.students || [];
+    permissions.students = req.body.students || [];
 
-        permissions.permissions = req.body.permissions || [];
+    permissions.role = req.body.role || 'case-worker';
 
-        permissions.created = new Date();
+    permissions.is_special_case_worker = req.body.is_special_case_worker || false;
 
-        permissions.creator = req.user.userId;
+    permissions.students = req.body.students || [];
 
-        permissions.last_updated = new Date();
+    permissions.permissions = req.body.permissions || [];
 
-        permissions.last_updated_by = req.user.userId;
+    permissions.created = new Date();
 
-        if (_.isEmpty(permissions)) return res.errJson('POST parameter is empty!');
+    permissions.creator = req.user.userId;
 
-        User.findOne({_id: ObjectId(userId)}, function (err, user) {
+    permissions.last_updated = new Date();
+
+    permissions.last_updated_by = req.user.userId;
+
+    if (_.isEmpty(permissions)) return res.errJson('POST parameter is empty!');
+
+    User.findOne({_id: ObjectId(userId)}, function (err, user) {
+
+        if (err) return res.errJson(err);
+
+        if (!user) return res.errJson('User data not found');
+
+        var allpermission = [];
+
+        for (var i = 0; i < user.permissions.length; i++) {
+
+            if (permissions.organization !== (user.permissions[i].organization + '')) {
+
+                allpermission.push(user.permissions[i]);
+
+            } else {
+
+                user.permissions[i].students = permissions.students;
+
+                user.permissions[i].permissions = permissions.permissions;
+
+                allpermission.push(user.permissions[i]);
+
+            }
+        }
+
+        if(allpermission.length === 0) allpermission.push(permissions);
+
+
+
+        User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
             if (err) return res.errJson(err);
 
-            if (!user) return res.errJson('User data not found');
+            user.permissions = allpermission;
 
-            user.permissions.push(permissions);
-            // set update time and update by user
-            user.last_updated = new Date();
-
-            user.last_updated_by = req.user.userId;
-
-            user.save(function (err) {
-
-                if (err) return res.errJson(err);
-
-                res.okJson('Organization successfully add to User', user);
-
-            });
+            res.okJson('Organization successfully add to User', user);
 
         });
-    };
 
-    OrganizationController.grant(req, res, cb, {
-        onCheck: function(isMatch){
-            return isMatch && req.user.isAdmin();
-        }
     });
 
 };
@@ -254,45 +230,46 @@ OrganizationController.postUser = function (req, res) {
  */
 OrganizationController.putUser = function (req, res) {
 
-    var cb = function () {
+    if('password' in req.body){
 
-        User.findOne({_id: ObjectId(req.params.userId)}, function (err, obj) {
+        if('retype_password' in req.body && req.body.password !== req.body.retype_password){
 
-            if (err)  return res.errJson(err);
+            return res.errJson('Password didn\'t match');
 
-            if (!obj) return res.errJson('Data not found');
+        } else if(!req.body.password){
 
-            for (var prop in req.body) {
+            delete req.body.password;
 
-                if(prop in obj) {
+        }
 
-                    obj[prop] = req.body[prop];
+    }
 
-                }
+    User.findOne({_id: ObjectId(req.params.userId)}, function (err, obj) {
 
-            }
+        if (err)  return res.errJson(err);
 
-            // set update time and update by user
-            obj.last_updated = new Date();
+        if (!obj) return res.errJson('Data not found');
 
-            obj.last_updated_by = req.user.userId;
 
-            obj.save(function (err) {
+        ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
-                if (err) return res.errJson(err);
-
-                res.okJson('Successfully updated!', obj);
-
-            });
+            if(prop in req.body) obj[prop] = req.body[prop];
 
         });
 
-    };
+        // set update time and update by user
+        obj.last_updated = new Date();
 
-    OrganizationController.grant(req, res, cb, {
-        onCheck: function(isMatch){
-            return isMatch && req.user.isAdmin();
-        }
+        obj.last_updated_by = req.user.userId;
+
+        obj.saveWithRole(req.user, req.params.organizationId, function (err) {
+
+            if (err) return res.errJson(err);
+
+            res.okJson('Successfully updated!', obj);
+
+        });
+
     });
 
 };
@@ -304,40 +281,31 @@ OrganizationController.putUser = function (req, res) {
  */
 OrganizationController.deleteUser = function (req, res) {
 
-    var cb = function () {
+    User.findOne({_id: ObjectId(req.params.userId)}, function (err, user) {
 
-        User.findOne({_id: ObjectId(req.params.userId)}, function (err, user) {
+        if (err) return res.errJson(err);
+
+
+        if (!user) return res.errJson("User not found");
+
+        var allpermission = [];
+
+        for (var i = 0; i < user.permissions.length; i++) {
+
+            if (req.params.organizationId != (user.permissions[i].organization + '')) {
+
+                allpermission.push(user.permissions[i]);
+
+            }
+        }
+
+        User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
             if (err) return res.errJson(err);
 
+            res.okJson('Delete success');
 
-            if (!user) return res.errJson("User not found");
-
-            var allpermission = [];
-
-            for (var i = 0; i < user.permissions.length; i++) {
-
-                if (req.params.organizationId != (user.permissions[i].organization + '')) {
-
-                    allpermission.push(user.permissions[i]);
-
-                }
-            }
-
-            User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
-
-                if (err) return res.errJson(err);
-
-                res.okJson('Delete success');
-
-            });
         });
-    };
-
-    OrganizationController.grant(req, res, cb, {
-        onCheck: function(isMatch){
-            return isMatch && req.user.isAdmin();
-        }
     });
 
 };
@@ -348,23 +316,17 @@ OrganizationController.deleteUser = function (req, res) {
  */
 OrganizationController.allProgram = function (req, res) {
 
-    var cb = function () {
+    var crit = Program.crit(req.query, ['organization']);
 
-        var crit = Program.crit(req.query, ['organization']);
+    crit.organization = ObjectId(req.params.organizationId);
 
-        crit.organization = ObjectId(req.params.organizationId);
+    Program.find(crit, function (err, objs) {
 
-        Program.find(crit, function (err, objs) {
+        if (err)  return res.errJson(err);
 
-            if (err)  return res.errJson(err);
+        res.okJson(null, objs);
 
-            res.okJson(null, objs);
-
-        });
-
-    };
-
-    OrganizationController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -374,27 +336,21 @@ OrganizationController.allProgram = function (req, res) {
  */
 OrganizationController.getProgram = function (req, res) {
 
-    var cb = function () {
+    var crit = Program.crit(req.query, ['_id', 'organization']);
 
-        var crit = Program.crit(req.query, ['_id', 'organization']);
+    crit._id = ObjectId(req.params.programId);
 
-        crit._id = ObjectId(req.params.programId);
+    crit.organization = ObjectId(req.params.organizationId);
 
-        crit.organization = ObjectId(req.params.organizationId);
+    Program.findOne(crit, function (err, obj) {
 
-        Program.findOne(crit, function (err, obj) {
+        if (err)  return res.errJson(err);
 
-            if (err)  return res.errJson(err);
+        if (!obj) return res.errJson('Data not found');
 
-            if (!obj) return res.errJson('Data not found');
+        res.okJson(obj);
 
-            res.okJson(obj);
-
-        });
-
-    };
-
-    OrganizationController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -404,19 +360,30 @@ OrganizationController.getProgram = function (req, res) {
  */
 OrganizationController.postProgram = function (req, res) {
 
-    var cb = function () {
+    var orgId = ObjectId(req.params.organizationId);
 
-        var obj = new Program(req.body);
+    Program.findOne({ name: req.body.name, organization: orgId }, function(err, obj){
 
-        obj.organization = mongoose.Types.ObjectId(req.params.organizationId);
-        // set update time and update by user
-        obj.created = new Date();
+        if(err) return res.errJson(err);
 
-        obj.creator = req.user.userId;
+        if(!obj){
 
-        obj.last_updated = new Date();
+            obj = new Program(req.body);
 
-        obj.last_updated_by = req.user.userId;
+            // set update time and update by user
+            obj.created = new Date();
+
+            obj.creator = req.user.userId;
+
+            obj.organization = orgId;
+
+        } else {
+
+            obj.last_updated = new Date();
+
+            obj.last_updated_by = req.user.userId;
+
+        }
 
         obj.save(function (err) {
 
@@ -426,9 +393,7 @@ OrganizationController.postProgram = function (req, res) {
 
         });
 
-    };
-
-    OrganizationController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -438,42 +403,36 @@ OrganizationController.postProgram = function (req, res) {
  */
 OrganizationController.putProgram = function (req, res) {
 
-    var cb = function () {
+    Program.findOne({_id: ObjectId(req.params.programId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        Program.findOne({_id: ObjectId(req.params.programId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
+        if (err)  return res.errJson(err);
 
-            if (err)  return res.errJson(err);
+        if (!obj) return res.errJson('Data not found');
 
-            if (!obj) return res.errJson('Data not found');
+        for (var prop in req.body) {
 
-            for (var prop in req.body) {
+            if(prop in obj) {
 
-                if(prop in obj) {
-
-                    obj[prop] = req.body[prop];
-
-                }
+                obj[prop] = req.body[prop];
 
             }
 
-            // set update time and update by user
-            obj.last_updated = new Date();
+        }
 
-            obj.last_updated_by = req.user.userId;
+        // set update time and update by user
+        obj.last_updated = new Date();
 
-            obj.save(function (err) {
+        obj.last_updated_by = req.user.userId;
 
-                if (err) return res.errJson(err);
+        obj.save(function (err) {
 
-                res.okJson('Successfully updated!', obj);
+            if (err) return res.errJson(err);
 
-            });
+            res.okJson('Successfully updated!', obj);
 
         });
 
-    };
-
-    OrganizationController.grant(req, res, cb);
+    });
 
 };
 /**
@@ -483,22 +442,16 @@ OrganizationController.putProgram = function (req, res) {
  */
 OrganizationController.deleteProgram = function (req, res) {
 
-    var cb = function () {
+    Program.remove({
+        _id: ObjectId(req.params.programId),
+        organization: ObjectId(req.params.organizationId)
+    }, function (err, obj) {
 
-        Program.remove({
-            _id: ObjectId(req.params.programId),
-            organization: ObjectId(req.params.organizationId)
-        }, function (err, obj) {
+        if (err) return res.errJson(err);
 
-            if (err) return res.errJson(err);
+        res.okJson('Successfully deleted');
 
-            res.okJson('Successfully deleted');
-
-        });
-
-    };
-
-    OrganizationController.grant(req, res, cb);
+    });
 
 };
 /**
