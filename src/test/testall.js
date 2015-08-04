@@ -795,7 +795,7 @@ describe('All-Test', function () {
         it('GET /:organizationId/students/not-assign', function (done) {
             console.log(api_endpoint+'/'+organizationId+'/students/not-assign', ' ', grantToken);
             request(api_endpoint)
-                .get('/'+organizationId+'/students/not-assign')
+                .post('/'+organizationId+'/students/not-assign')
                 .set('authorization', grantToken)
                 .expect(function (res) {
                     assert.ok(res.body._links);
