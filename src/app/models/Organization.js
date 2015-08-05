@@ -12,11 +12,46 @@ var OrganizationSchema = new mongoose.Schema({
     website: { type: String }, // The CBO Main Website, not related with the app
     description: { type: String },
     addresses: [ Address ],
+    externalServiceId: { type: Number, required: true },
+    personnelId: { type: Number, required: true },
+    authorizedEntityId: { type: Number, required: true },
     created: { type: Date, required: true, default: Date.now },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     last_updated: { type: Date, required: true, default: Date.now },
     last_updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
+
+
+OrganizationSchema.statics.crit = function(values, exclude){
+    exclude = exclude || [];
+    var criteria = {};
+    /**
+     * Find match
+     */
+    [
+        '_id', 'name', 'url', 'website', 'description',
+        'externalServiceId', 'personnelId', 'authorizedEntityId'
+    ].forEach(function(iterator){
+
+        if(iterator in values && exclude.indexOf(iterator) === -1){
+
+            if(iterator === 'name') {
+
+                values[iterator] = new RegExp(values[iterator], 'i');
+
+            }
+
+            criteria[iterator] = values[iterator];
+
+        }
+    });
+
+    return criteria;
+
+};
+
+
+
 OrganizationSchema.virtual('Id')
 .get(function(){
     return this.id;

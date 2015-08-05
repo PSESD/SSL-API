@@ -292,7 +292,8 @@ var populateCbo = {
 
                                     var userPermission = {
                                         organization: org._id,
-                                        permission: [ { model: 'Student', operation: '*', allow: 'all'} ]
+                                        permissions: [ { model: 'Student', operation: '*', allow: 'all'} ],
+                                        students: []
                                     };
                                     if (err) return console.log(err);
                                     var newProgram = {
