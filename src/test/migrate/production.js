@@ -6,7 +6,7 @@
  */
 'use strict';
 
-process.env.NODE_ENV = 'staging';
+process.env.NODE_ENV = 'production';
 var expect = require('chai').expect;
 var request = require('supertest');
 var cheerio = require('cheerio');
