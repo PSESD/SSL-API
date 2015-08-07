@@ -109,19 +109,27 @@ UserController.updateAccount = function (req, res) {
 
     var crit = { _id: req.user._id };
 
-    if('password' in req.body){
+    //Set reset/change password disabled
+    //if('password' in req.body){
+    //
+    //    if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+    //
+    //        return res.errJson('Password didn\'t match');
+    //
+    //    } else if(!req.body.password){
+    //
+    //        delete req.body.password;
+    //
+    //    }
+    //
+    //}
 
-        if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+    ['password', 'retype_password'].forEach(function(param){
 
-            return res.errJson('Password didn\'t match');
+        if(param in req.body) delete req.body[param];
 
-        } else if(!req.body.password){
+    });
 
-            delete req.body.password;
-
-        }
-
-    }
 
     User.findOne(crit, function (err, obj) {
 
@@ -165,19 +173,25 @@ UserController.save = function (req, res) {
         delete req.body.email;
     }
 
-    if('password' in req.body){
+    //if('password' in req.body){
+    //
+    //    if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+    //
+    //        return res.errJson('Password didn\'t match');
+    //
+    //    } else if(!req.body.password){
+    //
+    //        delete req.body.password;
+    //
+    //    }
+    //
+    //}
 
-        if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+    ['password', 'retype_password'].forEach(function(param){
 
-            return res.errJson('Password didn\'t match');
+        if(param in req.body) delete req.body[param];
 
-        } else if(!req.body.password){
-
-            delete req.body.password;
-
-        }
-
-    }
+    });
 
     User.findOne(crit, function (err, obj) {
 
