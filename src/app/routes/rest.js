@@ -112,7 +112,9 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.putTagById)
         .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.deleteTagById);
 
-    router.route('/:organizationId/students/:studentId/xsre').get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentsBackpack);
+    router.route('/:organizationId/students/:studentId/xsre')
+        .delete(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteCacheStudentsBackpack)
+        .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentsBackpack);
 
 
     router.route('/:organizationId/students/:studentId/programs')
@@ -131,7 +133,9 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.deleteStudentById)
     ;
 
-    router.route('/:organizationId/xsre/districts').get(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.getDistricts);
+    router.route('/:organizationId/xsre/districts')
+        .delete(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.deleteCacheDistricts)
+        .get(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.getDistricts);
 
     /**
      * Only for development
