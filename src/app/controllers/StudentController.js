@@ -149,7 +149,7 @@ StudentController.getStudentsBackpack = function (req, res) {
          */
         function embeds(results, isFromCache){
 
-            res.header('x-cached-sre' , isFromCache ? 1 : 0 );
+            res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
 
             var crit = {
                 permissions: {
