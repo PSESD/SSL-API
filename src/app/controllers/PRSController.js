@@ -9,7 +9,7 @@ var BaseController = require('./BaseController');
 var _ = require('underscore');
 var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
-var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log;
+var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
 var ObjectId = mongoose.Types.ObjectId;
 var PRSController = new BaseController(null).crud();
 
@@ -24,7 +24,7 @@ PRSController.getDistricts = function (req, res) {
 
     var brokerRequest = new Request();
 
-    var key = ['getDistricts', req.params.organizationId].join('_');
+    var key = md5(['getDistricts', req.params.organizationId].join('_'));
 
     cache.get(key, function(err, result){
 
@@ -88,7 +88,7 @@ PRSController.getDistricts = function (req, res) {
  */
 PRSController.deleteCacheDistricts = function (req, res) {
 
-    var key = ['getDistricts', req.params.organizationId].join('_');
+    var key = md5(['getDistricts', req.params.organizationId].join('_'));
 
     cache.del(key, function(err, result){
 
