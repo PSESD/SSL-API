@@ -780,6 +780,19 @@ describe('All-Test', function () {
                .end(done);
         });
 
+        it('DELETE /:organizationId/students/:studentId/xsre', function (done) {
+            console.log(api_endpoint+'/'+organizationId+'/students/'+studentId+'/xsre', ' ', grantToken);
+            request(api_endpoint)
+                .delete('/'+organizationId+'/students/'+studentId+'/xsre')
+                .set('authorization', grantToken)
+                .expect(function (res) {
+                    console.dir(res.body);
+                    assert.ok(res.body.success);
+                })
+                .expect(200)
+                .end(done);
+        });
+
         it('GET /:organizationId/xsre/districts', function (done) {
             console.log(api_endpoint+'/'+organizationId+'/xsre/districts', ' ', grantToken);
             request(api_endpoint)
@@ -789,6 +802,19 @@ describe('All-Test', function () {
                     assert.ok(res.body._links);
                 })
                 .expect(200)
+                .end(done);
+        });
+
+        it('DELETE /:organizationId/xsre/districts', function (done) {
+            console.log(api_endpoint+'/'+organizationId+'/xsre/districts', ' ', grantToken);
+            request(api_endpoint)
+                .delete('/'+organizationId+'/xsre/districts')
+                .set('authorization', grantToken)
+                .expect(function (res){
+                    console.log(res.body);
+                    assert.ok(res.body.success);
+                })
+                //.expect(200)
                 .end(done);
         });
 

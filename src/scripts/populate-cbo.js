@@ -292,12 +292,8 @@ var populateCbo = {
 
                                     var userPermission = {
                                         organization: org._id,
-<<<<<<< HEAD
-                                        permission: [ {operation: '*', allow: true} ]
-=======
                                         permissions: [ { model: 'Student', operation: '*', allow: 'all'} ],
                                         students: []
->>>>>>> staging
                                     };
                                     if (err) return console.log(err);
                                     var newProgram = {
@@ -311,13 +307,8 @@ var populateCbo = {
                                     }, function (err, program) {
                                         if (err) return console.log(err);
                                         if (userPermission) {
-<<<<<<< HEAD
-                                            
-                                            User.findOneAndUpdate({email: user.email}, { $push: { permissions: [userPermission] }}, {safe: true, upsert: true}, function (err, usr) {
-=======
                                             addStudents(org, newProgram);
                                             User.findOneAndUpdate({email: user.email}, { $push: { permissions: userPermission }}, {safe: true, upsert: true}, function (err, usr) {
->>>>>>> staging
                                                if (err) return console.log(err);
                                                done(org);
                                             });
