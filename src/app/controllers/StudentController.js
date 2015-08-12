@@ -284,11 +284,11 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 json.attendanceBehaviors = getAttendanceBehaviors(json);
                                 /**
-                                 * Set to memcached
+                                 * Set to cache
                                  */
                                 cache.set(key, json, function(err){
 
-                                    utils.log(err);
+                                    log(err);
 
                                     embeds(json);
 
@@ -340,6 +340,8 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
          */
         if (!student) return res.errJson('The student not found in database');
 
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district].join('_'));
+
         Organization.findOne({ _id: orgId }, function(err, organization){
 
             if (err) return res.errJson(err);
@@ -347,8 +349,6 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
              * If organization is empty from database
              */
             if (!organization) return res.errJson('The organization not found in database');
-
-            var key = [student.district_student_id, student.school_district, organization.externalServiceId, organization.personnelId, organization.authorizedEntityId].join('_');
 
             cache.del(key, function(err, result){
 
