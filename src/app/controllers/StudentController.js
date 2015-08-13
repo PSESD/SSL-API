@@ -10,7 +10,7 @@ var BaseController = require('./BaseController');
 var _ = require('underscore');
 var Request = require('../../lib/broker/Request');
 var parseString = require('xml2js').parseString;
-var utils = require('../../lib/utils'), cache = utils.cache();
+var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
 var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
@@ -36,6 +36,8 @@ StudentController.getStudentsBackpack = function (req, res) {
          * If student is empty from database
          */
         if (!student) return res.errJson('The student not found in database');
+
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district].join('_'));
         /**
          *
          * @param results
@@ -139,19 +141,15 @@ StudentController.getStudentsBackpack = function (req, res) {
             return attendanceBehaviors;
 
         }
+
         /**
          *
          * @param results
+         * @param isFromCache
          */
-        function embeds(results){
+        function embeds(results, isFromCache){
 
-            if(!_.isArray(results.attendance.summaries.summary)){
-
-                results.attendance.summaries.summary = [ results.attendance.summaries.summary ];
-
-            }
-
-            results.attendanceBehaviors = getAttendanceBehaviors(results);
+            res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
 
             var crit = {
                 permissions: {
@@ -243,11 +241,12 @@ StudentController.getStudentsBackpack = function (req, res) {
         }
 
         Organization.findOne({ _id: orgId }, function(err, organization){
+
             if (err) return res.errJson(err);
             /**
-             * If student is empty from database
+             * If organization is empty from database
              */
-            if (!student) return res.errJson('The organization not found in database');
+            if (!organization) return res.errJson('The organization not found in database');
 
             var brokerRequest = new Request({
                 externalServiceId: organization.externalServiceId,
@@ -255,16 +254,11 @@ StudentController.getStudentsBackpack = function (req, res) {
                 authorizedEntityId: organization.authorizedEntityId
             });
 
-
-            var key = [student.district_student_id, student.school_district, organization.externalServiceId, organization.personnelId, organization.authorizedEntityId].join('_');
-
             cache.get(key, function(err, result){
 
-                if(err) utils.log(err);
+                if(err) log(err);
 
                 if(!result){
-
-                    //console.log("GET FROM SERVER");
 
                     brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
@@ -282,9 +276,19 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 delete json['$'];
 
+                                if(!_.isArray(json.attendance.summaries.summary)){
+
+                                    json.attendance.summaries.summary = [ json.attendance.summaries.summary ];
+
+                                }
+
+                                json.attendanceBehaviors = getAttendanceBehaviors(json);
+                                /**
+                                 * Set to cache
+                                 */
                                 cache.set(key, json, function(err){
 
-                                    utils.log(err);
+                                    log(err);
 
                                     embeds(json);
 
@@ -303,11 +307,10 @@ StudentController.getStudentsBackpack = function (req, res) {
                             });
                         }
                     });
+
                 } else {
 
-                    //console.log("GET FROM CACHE");
-
-                    embeds(result);
+                    embeds(result, 1);
 
                 }
 
@@ -317,6 +320,52 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     });
 
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentController.deleteCacheStudentsBackpack = function(req, res){
+
+    var orgId = ObjectId(req.params.organizationId);
+
+    var studentId = ObjectId(req.params.studentId);
+
+    Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
+
+        if (err) return res.errJson(err);
+        /**
+         * If student is empty from database
+         */
+        if (!student) return res.errJson('The student not found in database');
+
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district].join('_'));
+
+        Organization.findOne({ _id: orgId }, function(err, organization){
+
+            if (err) return res.errJson(err);
+            /**
+             * If organization is empty from database
+             */
+            if (!organization) return res.errJson('The organization not found in database');
+
+            cache.del(key, function(err, result){
+
+                if (err){
+
+                    log(err, 'error');
+
+                    return res.errJson('Delete cache error');
+
+                }
+
+                res.okJson('Delete cache successfully');
+
+            });
+        });
+
+    });
 };
 /**
  * Get all student in organization
