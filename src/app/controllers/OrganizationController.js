@@ -257,24 +257,57 @@ OrganizationController.putUser = function (req, res) {
         if (!obj) return res.errJson('Data not found');
 
 
+        // set update time and update by user
+        obj.last_updated = new Date();
+
+        obj.last_updated_by = req.user.userId;
+
+        var role = null, is_special_case_worker = null;
+
         ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
             if(prop in req.body) obj[prop] = req.body[prop];
 
         });
 
-        // set update time and update by user
-        obj.last_updated = new Date();
+        if(req.body.role && req.body.is_special_case_worker){
 
-        obj.last_updated_by = req.user.userId;
+            role = req.body.role;
 
-        obj.saveWithRole(req.user, req.params.organizationId, function (err) {
+            is_special_case_worker = req.body.is_special_case_worker;
 
-            if (err) return res.errJson(err);
+            if(is_special_case_worker === 'true') is_special_case_worker = true;
 
-            res.okJson('Successfully updated!', obj);
+            else if(is_special_case_worker === 'false') is_special_case_worker = false;
 
-        });
+            /**
+             * Filter if user downgrade here role
+             */
+            if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
+
+                if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
+
+            }
+
+            obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Successfully updated!', obj);
+
+            });
+
+        } else {
+
+            obj.saveWithRole(req.user, req.params.organizationId, function (err) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Successfully updated!', obj);
+
+            });
+
+        }
 
     });
 

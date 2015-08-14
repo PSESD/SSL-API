@@ -193,8 +193,6 @@ UserController.save = function (req, res) {
          */
         if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
 
-            role = req.body.role;
-
             if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
 
         }
