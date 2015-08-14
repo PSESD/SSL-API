@@ -470,7 +470,6 @@ UserSchema.method('toJSON', function(){
     var user = this.toObject();
     delete user.salt;
     delete user.hashedPassword;
-    delete user.permissions;
     delete user.allPermissions;
     delete user.hashedForgotPasswordExpire;
     delete user.__v;

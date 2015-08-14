@@ -118,7 +118,23 @@ OrganizationController.allUsers = function (req, res) {
 
         if (err) return res.errJson(err);
 
-        res.okJson(null, users);
+        var tmp = [];
+
+        users.forEach(function(user){
+
+            var obj = user.toJSON();
+
+            if(obj._id.toString() !== req.user._id.toString()){
+
+                delete obj.permissions;
+
+            }
+
+            tmp.push(obj);
+
+        });
+
+        res.okJson(null, tmp);
 
     });
 
@@ -140,7 +156,17 @@ OrganizationController.getUser = function (req, res) {
 
         if (err) return res.errJson(err);
 
-        res.okJson(user);
+        if(!user) return res.errJson('User not found!');
+
+        var obj = user.toJSON();
+
+        if(obj._id.toString() !== req.params.userId){
+
+            delete obj.permissions;
+
+        }
+
+        res.okJson(obj);
 
     });
 
