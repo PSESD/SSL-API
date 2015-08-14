@@ -27,28 +27,20 @@ Rest.prototype.handleRoutes= function(router, Api) {
         res.send('OK');
     });
 
-    router.get('/users/cleanup', userCtr.cleanAll);
-
-
 	router.route('/user')
-		.get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.get)
-        .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.save)
-        .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.create)
-        .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.deleteByEmail)
+		.get(auth.isBearerAuthenticated, auth.hasAccess, userCtr.get)
+        .put(auth.isBearerAuthenticated, auth.hasAccess, userCtr.save)
     ;
 
-    router.route('/user/role/:userId')
-        .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.setRole)
-        .get(auth.isBearerAuthenticated, userCtr.getRole)
-    ;
+    //router.route('/user/role/:userId')
+    //    .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.setRole)
+    //    .get(auth.isBearerAuthenticated, userCtr.getRole)
+    //;
 
-    router.route('/user/myaccount')
-        .get(auth.isBearerAuthenticated, userCtr.myAccount)
-        .put(auth.isBearerAuthenticated, userCtr.updateAccount)
-    ;
 
     router.route('/organizations')
-        .post(auth.isBearerAuthenticated, auth.isAdmin, organizationCtr.create)
+        //disabled for now and only available on stage or dev
+        //.post(auth.isBearerAuthenticated, auth.isAdmin, organizationCtr.create)
         .get(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.get);
 
     router.route('/:organizationId').get(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.find);
@@ -82,8 +74,8 @@ Rest.prototype.handleRoutes= function(router, Api) {
           .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudents);
 
 
-    router.route('/:organizationId/students/not-assign')
-        .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.getStudentNotAssigns);
+    //router.route('/:organizationId/students/not-assign')
+    //    .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.getStudentNotAssigns);
 
     router.route('/:organizationId/students/:studentId')
         .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentById)
@@ -104,13 +96,13 @@ Rest.prototype.handleRoutes= function(router, Api) {
      * Tag route
      */
     router.route('/:organizationId/tags')
-        .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.createByOrgId)
-        .get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.getTags);
+        .post(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.createByOrgId)
+        .get(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTags);
 
     router.route('/:organizationId/tags/:tagId')
-        .get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.getTagById)
-        .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.putTagById)
-        .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, tagCtr.deleteTagById);
+        .get(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTagById)
+        .put(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.putTagById)
+        .delete(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.deleteTagById);
 
     router.route('/:organizationId/students/:studentId/xsre')
         .delete(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteCacheStudentsBackpack)
@@ -133,9 +125,9 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.deleteStudentById)
     ;
 
-    router.route('/:organizationId/xsre/districts')
-        .delete(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.deleteCacheDistricts)
-        .get(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.getDistricts);
+    //router.route('/:organizationId/districts')
+    //    .delete(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.deleteCacheDistricts)
+    //    .get(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.getDistricts);
 
     /**
      * Only for development
@@ -143,6 +135,12 @@ Rest.prototype.handleRoutes= function(router, Api) {
     if(Api.env !== 'production') {
         router.get('/:organizationId/students/:studentId/xsre-skip', studentCtr.getStudentsBackpack);
         router.get('/dummy/test', Api.controller('DummyController').index);
+        router.get('/users/cleanup', userCtr.cleanAll);
+        router.route('/organizations').post(auth.isBearerAuthenticated, auth.isAdmin, organizationCtr.create);
+        router.route('/user')
+            .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.create)
+            .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.deleteByEmail)
+        ;
     }
 
 

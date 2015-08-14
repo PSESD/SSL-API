@@ -413,10 +413,10 @@ describe('All-Test', function () {
 
         });
 
-        it('PUT /user/role/:userId', function (done) {
-            http_build_query({ role: 'admin', is_special_case_worker: false }, api_endpoint + '/user/role/'+userId3, grantToken);
+        it('PUT /:organizatioId/users/:userId', function (done) {
+            http_build_query({ role: 'admin', is_special_case_worker: false }, api_endpoint+ '/' +organizationId+ '/users/'+userId3, grantToken);
             request(api_endpoint)
-                .put('/user/role/'+userId3)
+                .put('/' +organizationId+ '/users/'+userId3)
                 .set('authorization', grantToken)
                 .set('x-cbo-client-url', 'http://localhost:4000')
                 .send({ role: 'admin', is_special_case_worker: false })
@@ -793,35 +793,35 @@ describe('All-Test', function () {
                 .end(done);
         });
 
-        it('GET /:organizationId/xsre/districts', function (done) {
-            console.log(api_endpoint+'/'+organizationId+'/xsre/districts', ' ', grantToken);
-            request(api_endpoint)
-                .get('/'+organizationId+'/xsre/districts')
-                .set('authorization', grantToken)
-                .expect(function (res) {
-                    assert.ok(res.body._links);
-                })
-                .expect(200)
-                .end(done);
-        });
+        //it('GET /:organizationId/districts', function (done) {
+        //    console.log(api_endpoint+'/'+organizationId+'/districts', ' ', grantToken);
+        //    request(api_endpoint)
+        //        .get('/'+organizationId+'/districts')
+        //        .set('authorization', grantToken)
+        //        .expect(function (res) {
+        //            assert.ok(res.body._links);
+        //        })
+        //        .expect(200)
+        //        .end(done);
+        //});
 
-        it('DELETE /:organizationId/xsre/districts', function (done) {
-            console.log(api_endpoint+'/'+organizationId+'/xsre/districts', ' ', grantToken);
-            request(api_endpoint)
-                .delete('/'+organizationId+'/xsre/districts')
-                .set('authorization', grantToken)
-                .expect(function (res){
-                    console.log(res.body);
-                    assert.ok(res.body.success);
-                })
-                //.expect(200)
-                .end(done);
-        });
+        //it('DELETE /:organizationId/districts', function (done) {
+        //    console.log(api_endpoint+'/'+organizationId+'/districts', ' ', grantToken);
+        //    request(api_endpoint)
+        //        .delete('/'+organizationId+'/districts')
+        //        .set('authorization', grantToken)
+        //        .expect(function (res){
+        //            console.log(res.body);
+        //            assert.ok(res.body.success);
+        //        })
+        //        //.expect(200)
+        //        .end(done);
+        //});
 
-        it('GET /:organizationId/students/not-assign', function (done) {
-            console.log(api_endpoint+'/'+organizationId+'/students/not-assign', ' ', grantToken);
+        it('GET /:organizationId/users/:userId/students?unassigned=true', function (done) {
+            console.log(api_endpoint+'/'+organizationId+'/users/'+userId3+'/students?unassigned=true', ' ', grantToken);
             request(api_endpoint)
-                .post('/'+organizationId+'/students/not-assign')
+                .post('/'+organizationId+'/users/'+userId3+'/students?unassigned=true')
                 .set('authorization', grantToken)
                 .expect(function (res) {
                     assert.ok(res.body._links);
