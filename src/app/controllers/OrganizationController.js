@@ -164,12 +164,6 @@ OrganizationController.getUser = function (req, res) {
 
         var obj = user.toJSON();
 
-        if(obj._id.toString() !== req.params.userId){
-
-            delete obj.permissions;
-
-        }
-
         res.okJson(obj);
 
     });
