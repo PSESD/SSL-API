@@ -122,6 +122,8 @@ OrganizationController.allUsers = function (req, res) {
 
         users.forEach(function(user){
 
+            user.getCurrentPermission(req.params.organizationId);
+
             var obj = user.toJSON();
 
             if(obj._id.toString() !== req.user._id.toString()){
@@ -157,6 +159,8 @@ OrganizationController.getUser = function (req, res) {
         if (err) return res.errJson(err);
 
         if(!user) return res.errJson('User not found!');
+
+        user.getCurrentPermission(req.params.organizationId);
 
         var obj = user.toJSON();
 
