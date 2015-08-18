@@ -328,7 +328,6 @@ describe('All-Test', function () {
                     assert.equal(true, res.body.success);
                     assert.equal(newUser.email, res.body.info.email);
                     assert.equal(newUser.last_name, res.body.info.last_name);
-                    assert.equal(newUser.is_super_admin, res.body.info.is_super_admin);
                     userId1 = res.body.info._id;
                     assert.ok(userId1);
                 })
@@ -347,7 +346,6 @@ describe('All-Test', function () {
                     assert.equal(true, res.body.success);
                     assert.equal(newUser2.email, res.body.info.email);
                     assert.equal(newUser2.last_name, res.body.info.last_name);
-                    assert.equal(false, res.body.info.is_super_admin);
                     userId2 = res.body.info._id;
                     assert.ok(userId2);
                 })
@@ -366,7 +364,6 @@ describe('All-Test', function () {
                     assert.equal(true, res.body.success);
                     assert.equal(newUser3.email, res.body.info.email);
                     assert.equal(newUser3.last_name, res.body.info.last_name);
-                    assert.equal(false, res.body.info.is_super_admin);
                     userId3 = res.body.info._id;
                     assert.ok(userId3);
                 })
@@ -385,7 +382,6 @@ describe('All-Test', function () {
                     assert.equal(true, res.body.success);
                     assert.equal(newUser4.email, res.body.info.email);
                     assert.equal(newUser4.last_name, res.body.info.last_name);
-                    assert.equal(false, res.body.info.is_super_admin);
                     userId4 = res.body.info._id;
                     assert.ok(userId4);
                 })
@@ -456,12 +452,12 @@ describe('All-Test', function () {
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
-                    var permit = res.body.info.permissions[0];
-                    console.log(permit);
-                    assert.equal(organizationId, permit.organization);
-                    assert.equal('admin', permit.role);
-                    assert.ok(_.isArray(permit.students), 'Student must array');
-                    assert.ok(_.isArray(permit.permissions), 'Permission must array');
+                    var permit = res.body.info.allPermissionsByOrganization;
+                    //console.log(res.body.info);
+                    assert.equal(organizationId, res.body.info.orgId);
+                    assert.equal('admin', res.body.info.role);
+                    assert.ok(_.isArray(res.body.info.allStudentsByOrganization), 'Student must array');
+                    assert.ok(_.isObject(res.body.info.allPermissionsByOrganization), 'Permission must array');
                     permissionId = permit._id;
                     assert.ok(permissionId);
                 })
@@ -481,7 +477,6 @@ describe('All-Test', function () {
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
-                    assert.equal(newUser.is_super_admin, res.body.info.is_super_admin);
                 })
                 .expect(200)
                 .end(done);
@@ -554,10 +549,10 @@ describe('All-Test', function () {
                     .expect(function (res) {
                         if (!res.body.success) console.log('%j', res.body);
                         assert.equal(true, res.body.success);
-                        var permit = res.body.info.permissions[0];
-                        assert.equal(organizationId, permit.organization);
-                        assert.ok(_.isArray(permit.students), 'Student must array');
-                        assert.ok(_.isArray(permit.permissions), 'Permission must array');
+                        var permit = res.body.info.allPermissionsByOrganization;
+                        assert.equal(organizationId, res.body.info.orgId);
+                        assert.ok(_.isArray(res.body.info.allStudentsByOrganization), 'Student must array');
+                        assert.ok(_.isObject(res.body.info.allPermissionsByOrganization), 'Permission must array');
                         permissions[userID].id = permit._id;
                         assert.ok(permissions[userID].id);
                     })

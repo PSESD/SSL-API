@@ -240,6 +240,8 @@ OrganizationController.postUser = function (req, res) {
 
             user.permissions = allpermission;
 
+            user.getCurrentPermission(orgId);
+
             res.okJson('Organization successfully add to User', user);
 
         });
