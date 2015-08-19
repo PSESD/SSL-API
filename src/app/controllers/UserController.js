@@ -197,20 +197,35 @@ UserController.save = function (req, res) {
 
         }
 
+        if('is_super_admin' in req.body && user.isAdmin()) delete req.body.is_super_admin;
+
+
         ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
             if(prop in req.body) obj[prop] = req.body[prop];
 
         });
 
+        if(!user.isAdmin()){
 
-        obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err, user) {
+            obj.saveWithRole(req.user, req.params.organizationId, function (err, user) {
 
-            if (err) return res.errJson(err);
+                if (err) return res.errJson(err);
 
-            res.okJson('Successfully updated!', user);
+                res.okJson('Successfully updated!', user);
 
-        });
+            });
+
+        } else {
+
+            obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err, user) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Successfully updated!', user);
+
+            });
+        }
 
     });
 
