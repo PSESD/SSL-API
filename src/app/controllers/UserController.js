@@ -197,7 +197,7 @@ UserController.save = function (req, res) {
 
         }
 
-        if('is_super_admin' in req.body && user.isAdmin()) delete req.body.is_super_admin;
+        if('is_super_admin' in req.body && obj.isAdmin()) delete req.body.is_super_admin;
 
 
         ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
@@ -206,7 +206,7 @@ UserController.save = function (req, res) {
 
         });
 
-        if(!user.isAdmin()){
+        if(!obj.isAdmin()){
 
             obj.saveWithRole(req.user, req.params.organizationId, function (err, user) {
 
