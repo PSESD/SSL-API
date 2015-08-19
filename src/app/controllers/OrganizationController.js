@@ -315,21 +315,21 @@ OrganizationController.putUser = function (req, res) {
 
             }
 
-            obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err) {
+            obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err, user) {
 
                 if (err) return res.errJson(err);
 
-                res.okJson('Successfully updated!', obj);
+                res.okJson('Successfully updated!', user);
 
             });
 
         } else {
 
-            obj.saveWithRole(req.user, req.params.organizationId, function (err) {
+            obj.saveWithRole(req.user, req.params.organizationId, function (err, user) {
 
                 if (err) return res.errJson(err);
 
-                res.okJson('Successfully updated!', obj);
+                res.okJson('Successfully updated!', user);
 
             });
 
