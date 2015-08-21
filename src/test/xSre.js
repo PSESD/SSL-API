@@ -45,77 +45,11 @@ var data = {
                     "schoolName": "Squalicum High School",
                     "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
                 },
-                "calendarEventDate": "9/5/2014",
+                "calendarEventDate": "11/16/2014",
                 "dailyAttendanceStatus": "UnexcusedAbsence",
                 "attendanceEventType": "ClassSectionAttendance",
                 "absentAttendanceCategory": "13297"
-            }, {
-                "school": {
-                    "stateProvinceId": "37501",
-                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
-                    "schoolName": "Squalicum High School",
-                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
-                },
-                "calendarEventDate": "9/26/2014",
-                "dailyAttendanceStatus": "UnexcusedAbsence",
-                "attendanceEventType": "DailyAttendance",
-                "absentAttendanceCategory": "13297"
-            }, {
-                "school": {
-                    "stateProvinceId": "37501",
-                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
-                    "schoolName": "Squalicum High School",
-                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
-                },
-                "calendarEventDate": "10/6/2014",
-                "dailyAttendanceStatus": "UnexcusedAbsence",
-                "attendanceEventType": "ClassSectionAttendance",
-                "absentAttendanceCategory": "13297"
-            }, {
-                "school": {
-                    "stateProvinceId": "37501",
-                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
-                    "schoolName": "Squalicum High School",
-                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
-                },
-                "calendarEventDate": "10/9/2014",
-                "dailyAttendanceStatus": "UnexcusedAbsence",
-                "attendanceEventType": "ClassSectionAttendance",
-                "absentAttendanceCategory": "13297"
-            }, {
-                "school": {
-                    "stateProvinceId": "37501",
-                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
-                    "schoolName": "Squalicum High School",
-                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
-                },
-                "calendarEventDate": "10/27/2014",
-                "dailyAttendanceStatus": "ExcusedAbsence",
-                "attendanceEventType": "ClassSectionAttendance",
-                "absentAttendanceCategory": "13297"
-            }, {
-                "school": {
-                    "stateProvinceId": "37501",
-                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
-                    "schoolName": "Squalicum High School",
-                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
-                },
-                "calendarEventDate": "10/29/2014",
-                "dailyAttendanceStatus": "ExcusedAbsence",
-                "attendanceEventType": "DailyAttendance",
-                "absentAttendanceCategory": "13297"
-            }, {
-                "school": {
-                    "stateProvinceId": "37501",
-                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
-                    "schoolName": "Squalicum High School",
-                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
-                },
-                "calendarEventDate": "10/30/2014",
-                "dailyAttendanceStatus": "ExcusedAbsence",
-                "attendanceEventType": "DailyAttendance",
-                "absentAttendanceCategory": "13297"
-            }, {
+            },{
                 "school": {
                     "stateProvinceId": "37501",
                     "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
@@ -169,4 +103,4 @@ var data = {
     }]
 };
 
-console.dir(new Attendance(data).getBehaviors());
+console.log(require('prettyjson').render(new Attendance(data).getBehaviors()));

@@ -124,7 +124,7 @@ moment.fn.weeksTo = function (target, formatString) {
  */
 function Attendance(results){
     this.attendances = results.attendance || null;
-    this.allEvents = [];
+    this.allEvents = {};
     this.minDateCalendar = 0;
     this.maxDateCalendar = 0;
     this.attendanceBehaviors = [];
@@ -190,7 +190,7 @@ Attendance.prototype.getBehaviors = function(){
 
             var obj = {};
 
-            obj[event.calendarEventDate] = {
+           obj = {
                 calendarEventDate: event.calendarEventDate,
                 attendanceValue: event.attendanceValue,
                 attendanceStatus: null,
@@ -207,32 +207,32 @@ Attendance.prototype.getBehaviors = function(){
 
             if('absentAttendanceCategory' in event) {
 
-                obj[event.calendarEventDate].absentAttendanceCategory = parseInt(event.absentAttendanceCategory);
+               obj.absentAttendanceCategory = parseInt(event.absentAttendanceCategory);
 
-                obj[event.calendarEventDate].absentAttendanceCategoryTitle = obj[event.calendarEventDate].absentAttendanceCategory in _this.facets ? _this.facets[obj[event.calendarEventDate].absentAttendanceCategory] : '';
+               obj.absentAttendanceCategoryTitle =obj.absentAttendanceCategory in _this.facets ? _this.facets[obj.absentAttendanceCategory] : '';
 
             }
 
             if('presentAttendanceCategory' in event) {
 
-                obj[event.calendarEventDate].presentAttendanceCategory = parseInt(event.presentAttendanceCategory);
+               obj.presentAttendanceCategory = parseInt(event.presentAttendanceCategory);
 
-                obj[event.calendarEventDate].presentAttendanceCategoryTitle = obj[event.calendarEventDate].presentAttendanceCategory in _this.facets ? _this.facets[obj[event.calendarEventDate].presentAttendanceCategory] : '';
+               obj.presentAttendanceCategoryTitle =obj.presentAttendanceCategory in _this.facets ? _this.facets[obj.presentAttendanceCategory] : '';
 
             }
 
             if('attendanceEventType' in event) {
 
-                obj[event.calendarEventDate].attendanceEventType = event.attendanceEventType;
+               obj.attendanceEventType = event.attendanceEventType;
 
-                obj[event.calendarEventDate].attendanceEventTypeTitle = event.attendanceEventType in _this.facets ? _this.facets[event.attendanceEventType] : '';
+               obj.attendanceEventTypeTitle = event.attendanceEventType in _this.facets ? _this.facets[event.attendanceEventType] : '';
             }
 
             if('dailyAttendanceStatus' in event) {
 
-                obj[event.calendarEventDate].attendanceStatus = event.dailyAttendanceStatus;
+               obj.attendanceStatus = event.dailyAttendanceStatus;
 
-                obj[event.calendarEventDate].attendanceStatusTitle = event.dailyAttendanceStatus in _this.facets ? _this.facets[event.dailyAttendanceStatus] : '';
+               obj.attendanceStatusTitle = event.dailyAttendanceStatus in _this.facets ? _this.facets[event.dailyAttendanceStatus] : '';
 
             }
 
@@ -244,7 +244,7 @@ Attendance.prototype.getBehaviors = function(){
 
 
 
-            _this.allEvents.push(obj);
+            _this.allEvents[event.calendarEventDate] = obj;
 
         }
 
@@ -324,10 +324,6 @@ Attendance.prototype.getBehaviors = function(){
         if(lastWeeklyChange !== 'N/A'){
 
             behavior.weeklyChange = Math.ceil( weeklyChange / lastWeeklyChange ) * 100 ;
-
-        } else {
-
-            behavior.weeklyChange = Math.ceil( weeklyChange  ) * 100 ;
 
         }
 
