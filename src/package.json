@@ -25,6 +25,7 @@
     "mocha": "^2.2.4",
     "mocha-mongoose": "^1.0.4",
     "moment": "^2.10.3",
+    "moment-range": "^2.0.3",
     "mongodb": "^1.4.37",
     "mongoose": "^4.0.2",
     "morgan": "^1.5.2",

@@ -125,9 +125,9 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .delete(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.deleteStudentById)
     ;
 
-    router.route('/:organizationId/districts')
-        .delete(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.deleteCacheDistricts)
-        .get(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.getDistricts);
+    //router.route('/:organizationId/districts')
+    //    .delete(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.deleteCacheDistricts)
+    //    .get(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.getDistricts);
 
     /**
      * Only for development

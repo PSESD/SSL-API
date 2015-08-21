@@ -99,7 +99,8 @@ describe('All-Test', function () {
         "website": "localhost",
         "url": "localhost",
         "externalServiceId": 5,
-        "personnelId": 1,
+        //"personnelId": 1,
+        "personnelId": null,
         "authorizedEntityId": 2
     };
 

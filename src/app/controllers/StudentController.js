@@ -15,6 +15,7 @@ var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
 var php = require('phpjs');
+var Attendance = require('../../lib/attendance');
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -38,109 +39,6 @@ StudentController.getStudentsBackpack = function (req, res) {
         if (!student) return res.errJson('The student not found in database');
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district].join('_'));
-        /**
-         *
-         * @param results
-         * @returns {Array}
-         */
-        function getAttendanceBehaviors(results){
-
-            var attendanceBehaviors = [];
-
-            var behaviorDefault = {
-                weekStart: "",
-                weekEnd: "",
-                havePeriods: false,
-                deltaChange: "0%", //Calculated from total this week (attendance - last week attendance) / last week attendance
-                weekData: []
-            };
-
-            var attendance = results.attendance;
-
-            var totalLastWeekAttendance = 0;
-
-            for(var i = 0; i < attendance.summaries.summary.length; i++){
-
-                var summary = attendance.summaries.summary[i];
-
-                var behavior = behaviorDefault, totalAttandance = 0;
-
-                behavior.weekStart = summary.startDate._;
-
-                behavior.weekEnd = php.date('m/d/Y', php.strtotime('+'+summary.daysAbsent+' days', php.strtotime(behavior.weekStart)));
-
-                attendance.events.event.forEach(function(event){
-
-                    var weekDate = {
-                        date: "",
-                        attendance: "0%", //Calculated from total non present/total period
-                        periods: [],
-                        behaviors: []
-                    };
-
-                    weekDate.date = event.calendarEventDate;
-
-                    var total = 0;
-
-                    if('timeTablePeriod' in event && _.isArray(event.timeTablePeriod)){
-
-                        behavior.havePeriods = true;
-
-                        for(var j = 0; j < event.timeTablePeriod.length; j++){
-
-                            var period = {
-                                name: 'Period ' + timeTablePeriod[j]
-                            };
-
-                            period.status = event.attendanceStatus[j];
-
-                            if (period.status !== 'P') {
-
-                            } else {
-
-                                total++;
-
-                            }
-
-                            weekDate.periods.push(period);
-
-                        }
-
-                    }
-
-                    var percent = total === 0 ? 0 : (Math.round(total / weekDate.periods.length) * 100);
-
-                    weekDate.attendance = percent + '%';
-
-                    totalAttandance += percent;
-
-                    behavior.weekData.push(weekDate);
-
-                });
-
-                if(attendanceBehaviors.length === 0){
-
-                    totalLastWeekAttendance = totalAttandance;
-
-                } else {
-
-                    totalLastWeekAttendance = parseInt(attendanceBehaviors[attendanceBehaviors.length -1].deltaChange);
-
-                }
-
-                var deltaChange = totalAttandance === 0 ? 0 : (Math.round(totalAttandance / totalLastWeekAttendance) * 100);
-
-                behavior.deltaChange = deltaChange + '%';
-
-                totalAttandance = 0;
-
-                attendanceBehaviors.push(behavior);
-
-            }
-
-            return attendanceBehaviors;
-
-        }
 
         /**
          *
@@ -264,7 +162,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         if (error)  return res.errJson(error);
 
-                        if (!body) return res.errJson('Data not found');
+                        if (!body) return res.errJson('Data not found in database xsre');
 
                         if (response && response.statusCode == '200') {
 
@@ -276,13 +174,13 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 delete json['$'];
 
-                                if(!_.isArray(json.attendance.summaries.summary)){
+                                //if(!_.isArray(json.attendance.summaries.summary)){
+                                //
+                                //    json.attendance.summaries.summary = [ json.attendance.summaries.summary ];
+                                //
+                                //}
 
-                                    json.attendance.summaries.summary = [ json.attendance.summaries.summary ];
-
-                                }
-
-                                json.attendanceBehaviors = getAttendanceBehaviors(json);
+                                json.attendanceBehaviors = new Attendance(json).getBehaviors();
                                 /**
                                  * Set to cache
                                  */
