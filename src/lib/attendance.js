@@ -259,44 +259,79 @@ Attendance.prototype.getBehaviors = function(){
 
     var behavior = {};
 
+    var maxDay = 5;
+
+    var lastWeeklyChange = 100;
+
+    var weeklyChange = 0;
+
     _this.weeks.forEach(function(week){
 
         var ikey = week.startString + ' - ' + week.endString;
 
-        var e = week.startString in _this.allEvents ? _this.allEvents[week.startString] : null;
+        weeklyChange = 0;
 
         behavior = {
             weekDate: ikey,
-            m: 'N/A',
-            t: 'N/A',
-            w: 'N/A',
-            th: 'N/A',
-            f: 'N/A',
+            summary: [
+                { value: 'N/A', event: null },
+                { value: 'N/A', event: null },
+                { value: 'N/A', event: null },
+                { value: 'N/A', event: null },
+                { value: 'N/A', event: null }
+            ],
             weeklyChange: 'N/A',
-            periods : [],
-            event: e
+            periods : []
         };
 
-        if(e !== null){
+        week.daysOfWeek.forEach(function(day){
 
-            if(behavior.attendanceStatus === 'DailyAttendance'){
+            var dayString = day.format('MM/DD/YYYY');
 
-                switch (behavior.attendanceEventType.toLowerCase()){
+            var nday = day.day();
 
-                    case 'present':
+            if(nday > maxDay) return;
 
-                        break;
+            var e = dayString in _this.allEvents ? _this.allEvents[dayString] : null;
 
-                    case 'absence':
+            behavior.summary[nday].event = e;
 
-                        break;
+            if(e !== null){
+
+                if(e.attendanceStatus === 'DailyAttendance'){
+
+                    if (e.attendanceEventType.toLowerCase() === 'present') {
+
+                        behavior.summary[nday].value = parseInt(e.attendanceValue);
+
+
+                    } else if(e.attendanceEventType.toLowerCase().indexOf('absence')){
+
+                        behavior.summary[nday].value = (1 - parseInt(e.attendanceValue)) * 100;
+
+                    }
 
                 }
 
+                if(typeof behavior.summary[nday].value === 'integer') weeklyChange += behavior.summary[nday].value;
+
             }
 
+        });
+
+        weeklyChange = (weeklyChange / maxDay);
+
+        if(lastWeeklyChange !== 'N/A'){
+
+            behavior.weeklyChange = Math.ceil( weeklyChange / lastWeeklyChange ) * 100 ;
+
+        } else {
+
+            behavior.weeklyChange = Math.ceil( weeklyChange  ) * 100 ;
 
         }
+
+        lastWeeklyChange = behavior.weeklyChange;
 
         var behaviors = {};
 
