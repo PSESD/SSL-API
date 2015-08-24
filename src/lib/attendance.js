@@ -46,8 +46,9 @@ moment.fn.daysOfWeek = function (format) {
     format = format || 'MM/DD/YYYY';
     var s = self.subtract(day, 'days');
     for(var i = 0; i <= 6; i++){
+
         if(i > 0){
-            s = s.add(1, 'days');
+            s = s.clone().add(1, 'days');
         }
         days.push(s.format(format));
         daysObject.push(s);
@@ -274,46 +275,57 @@ Attendance.prototype.getBehaviors = function(){
         behavior = {
             weekDate: ikey,
             summary: [
-                { value: 'N/A', event: null },
-                { value: 'N/A', event: null },
-                { value: 'N/A', event: null },
-                { value: 'N/A', event: null },
-                { value: 'N/A', event: null }
+                { value: 'N/A', event: null, date: 'N/A', periods: [] },
+                { value: 'N/A', event: null, date: 'N/A', periods: [] },
+                { value: 'N/A', event: null, date: 'N/A', periods: [] },
+                { value: 'N/A', event: null, date: 'N/A', periods: [] },
+                { value: 'N/A', event: null, date: 'N/A', periods: [] }
             ],
             weeklyChange: 'N/A',
-            periods : []
+            raw: {}
         };
 
-        week.daysOfWeek.forEach(function(day){
+        _.each(week.daysOfWeek, function(day){
 
             var dayString = day.format('MM/DD/YYYY');
 
-            var nday = day.day();
+            var otherFormat = day.format('MM-DD-YYYY');
 
-            if(nday > maxDay) return;
+            var nday = day.isISO ? day.dayISO() : day.day();
 
-            var e = dayString in _this.allEvents ? _this.allEvents[dayString] : null;
+            //console.log(dayString, nday, behavior.summary[nday], behavior.summary[nday] === undefined); return;
+
+            if(behavior.summary[nday] === undefined) return;
+
+            var e = otherFormat in _this.allEvents ? _this.allEvents[otherFormat] : null;
 
             behavior.summary[nday].event = e;
 
+            behavior.summary[nday].date = dayString;
+
             if(e !== null){
 
-                if(e.attendanceStatus === 'DailyAttendance'){
+                if(e.attendanceEventType === 'DailyAttendance'){
 
-                    if (e.attendanceEventType.toLowerCase() === 'present') {
+                    if (e.absentAttendanceCategory !== null && e.presentAttendanceCategory === null) {
 
-                        behavior.summary[nday].value = parseInt(e.attendanceValue);
+                        behavior.summary[nday].value = parseFloat(e.attendanceValue);
 
+                    } else if(e.presentAttendanceCategory !== null && e.absentAttendanceCategory === null){
 
-                    } else if(e.attendanceEventType.toLowerCase().indexOf('absence')){
-
-                        behavior.summary[nday].value = (1 - parseInt(e.attendanceValue)) * 100;
+                        behavior.summary[nday].value = (1 - parseFloat(e.attendanceValue)) * 100;
 
                     }
 
                 }
 
-                if(typeof behavior.summary[nday].value === 'integer') weeklyChange += behavior.summary[nday].value;
+                if(!isNaN(behavior.summary[nday].value)){
+
+                    weeklyChange += behavior.summary[nday].value;
+
+                    behavior.summary[nday].value = behavior.summary[nday].value + '%';
+
+                }
 
             }
 
@@ -321,9 +333,17 @@ Attendance.prototype.getBehaviors = function(){
 
         weeklyChange = (weeklyChange / maxDay);
 
-        if(lastWeeklyChange !== 'N/A'){
+        behavior.raw.weeklyChange = weeklyChange;
 
-            behavior.weeklyChange = Math.ceil( weeklyChange / lastWeeklyChange ) * 100 ;
+        behavior.raw.lastWeeklyChange = lastWeeklyChange;
+
+        if(lastWeeklyChange !== 'N/A' && lastWeeklyChange > 0){
+
+            behavior.weeklyChange = (weeklyChange / lastWeeklyChange);
+
+        } else {
+
+            behavior.weeklyChange = weeklyChange;
 
         }
 

@@ -45,10 +45,11 @@ var data = {
                     "schoolName": "Squalicum High School",
                     "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
                 },
-                "calendarEventDate": "11/16/2014",
+                "calendarEventDate": "11/11/2014",
                 "dailyAttendanceStatus": "UnexcusedAbsence",
                 "attendanceEventType": "ClassSectionAttendance",
-                "absentAttendanceCategory": "13297"
+                "absentAttendanceCategory": "13297",
+                "attendanceValue": 0.5
             },{
                 "school": {
                     "stateProvinceId": "37501",
@@ -59,7 +60,8 @@ var data = {
                 "calendarEventDate": "11/20/2014",
                 "dailyAttendanceStatus": "ExcusedAbsence",
                 "attendanceEventType": "DailyAttendance",
-                "absentAttendanceCategory": "13297"
+                "presentAttendanceCategory": "13290",
+                "attendanceValue": 0.5
             }, {
                 "school": {
                     "stateProvinceId": "37501",
@@ -70,37 +72,11 @@ var data = {
                 "calendarEventDate": "11/21/2014",
                 "dailyAttendanceStatus": "ExcusedAbsence",
                 "attendanceEventType": "DailyAttendance",
-                "absentAttendanceCategory": "13297"
+                "absentAttendanceCategory": "13297",
+                "attendanceValue": 50
             }]
         }
-    },
-    "attendanceBehaviors": [{
-        "weekStart": "10/27/2014",
-        "weekEnd": "11/05/2014",
-        "havePeriods": false,
-        "deltaChange": "0%",
-        "weekData": [{"date": "9/5/2014", "attendance": "0%", "periods": [], "behaviors": []}, {
-            "date": "9/26/2014",
-            "attendance": "0%",
-            "periods": [],
-            "behaviors": []
-        }, {"date": "10/6/2014", "attendance": "0%", "periods": [], "behaviors": []}, {
-            "date": "10/9/2014",
-            "attendance": "0%",
-            "periods": [],
-            "behaviors": []
-        }, {"date": "10/27/2014", "attendance": "0%", "periods": [], "behaviors": []}, {
-            "date": "10/29/2014",
-            "attendance": "0%",
-            "periods": [],
-            "behaviors": []
-        }, {"date": "10/30/2014", "attendance": "0%", "periods": [], "behaviors": []}, {
-            "date": "11/20/2014",
-            "attendance": "0%",
-            "periods": [],
-            "behaviors": []
-        }, {"date": "11/21/2014", "attendance": "0%", "periods": [], "behaviors": []}]
-    }]
+    }
 };
 
 console.log(require('prettyjson').render(new Attendance(data).getBehaviors()));
