@@ -295,9 +295,28 @@ Attendance.prototype.getBehaviors = function(){
 
         behavior = {
             weekDate: ikey,
-            behaviors: [],
+            summary: {
+                title: behavior.weekDate,
+                M: me.notAvailable,
+                T: me.notAvailable,
+                W: me.notAvailable,
+                TH: me.notAvailable,
+                F: me.notAvailable,
+                weeklyChange: me.notAvailable
+            },
+            details: [],
             weeklyChange: me.notAvailable,
             raw: {}
+        };
+
+        var calendar = {
+            title: behavior.weekDate,
+            M: me.notAvailable,
+            T: me.notAvailable,
+            W: me.notAvailable,
+            TH: me.notAvailable,
+            F: me.notAvailable,
+            weeklyChange: me.notAvailable
         };
 
         _.each(week.daysOfWeek, function(day){
@@ -313,6 +332,8 @@ Attendance.prototype.getBehaviors = function(){
             if(summary[nday] === undefined) return;
 
             summary[nday].date = dayString;
+
+            calendar[summary[nday].name] = dayString;
 
             var allEvents = otherFormat in me.allEvents ? me.allEvents[otherFormat] : [];
 
@@ -338,21 +359,18 @@ Attendance.prototype.getBehaviors = function(){
 
         var columns = [];
 
-        columns.push({
-            title: behavior.weekDate,
-            M: summary[0].value + '%',
-            T: summary[1].value + '%',
-            W: summary[2].value + '%',
-            TH: summary[3].value + '%',
-            F: summary[4].value + '%',
-            weeklyChange: me.notAvailable
-        });
 
         var collects = {};
 
         summary.forEach(function(s){
 
             collects[s.name] = s;
+
+            if(s.name in behavior.summary && !isNaN(s.value)){
+
+                behavior.summary[s.name] = s.value + '%';
+
+            }
 
             if(maxPeriod < s.periods.length) {
 
@@ -369,6 +387,8 @@ Attendance.prototype.getBehaviors = function(){
         });
 
         behavior.raw.collects = collects;
+
+        columns.push(calendar);
 
         for(var p = 0; p < maxPeriod; p++){
 
@@ -409,7 +429,7 @@ Attendance.prototype.getBehaviors = function(){
 
         }
 
-        behavior.behaviors = columns;
+        behavior.details = columns;
 
         behavior.raw.weeklyChange = weeklyChange;
 
@@ -429,7 +449,7 @@ Attendance.prototype.getBehaviors = function(){
 
         lastWeeklyChange = behavior.weeklyChange;
 
-        behavior.behaviors[0].weeklyChange = lastWeeklyChange;
+        behavior.summary.weeklyChange = lastWeeklyChange;
 
         delete behavior.raw;
 
