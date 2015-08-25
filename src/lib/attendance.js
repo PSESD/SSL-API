@@ -429,6 +429,10 @@ Attendance.prototype.getBehaviors = function(){
 
         lastWeeklyChange = behavior.weeklyChange;
 
+        behavior.behaviors[0].weeklyChange = lastWeeklyChange;
+
+        delete behavior.raw;
+
         var behaviors = {};
 
         behaviors[ikey] = behavior;
