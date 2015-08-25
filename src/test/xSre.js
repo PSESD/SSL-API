@@ -38,7 +38,8 @@ var data = {
             }]
         },
         "events": {
-            "event": [{
+            "event": [
+             {
                 "school": {
                     "stateProvinceId": "37501",
                     "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
@@ -49,8 +50,64 @@ var data = {
                 "dailyAttendanceStatus": "UnexcusedAbsence",
                 "attendanceEventType": "ClassSectionAttendance",
                 "absentAttendanceCategory": "13297",
+                "attendanceValue": 0.1,
+                "timeTablePeriod": 1
+            },
+            {
+                "school": {
+                    "stateProvinceId": "37501",
+                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
+                    "schoolName": "Squalicum High School",
+                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
+                },
+                "calendarEventDate": "11/11/2014",
+                "dailyAttendanceStatus": "Present",
+                "attendanceEventType": "ClassSectionAttendance",
+                "absentAttendanceCategory": "13297",
+                "attendanceValue": 0.2,
+                "timeTablePeriod": 2
+            },
+            {
+                "school": {
+                    "stateProvinceId": "37501",
+                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
+                    "schoolName": "Squalicum High School",
+                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
+                },
+                "calendarEventDate": "11/11/2014",
+                "dailyAttendanceStatus": "ExcusedAbsence",
+                "attendanceEventType": "ClassSectionAttendance",
+                "absentAttendanceCategory": "13297",
+                "attendanceValue": 0.3,
+                "timeTablePeriod": 3
+            },
+            {
+                "school": {
+                    "stateProvinceId": "37501",
+                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
+                    "schoolName": "Squalicum High School",
+                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
+                },
+                "calendarEventDate": "11/11/2014",
+                "dailyAttendanceStatus": "Tardy",
+                "attendanceEventType": "ClassSectionAttendance",
+                "absentAttendanceCategory": "13297",
+                "attendanceValue": 0.4
+            },
+            {
+                "school": {
+                    "stateProvinceId": "37501",
+                    "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
+                    "schoolName": "Squalicum High School",
+                    "phoneNumber": {"phoneNumberType": "Work", "number": "3606766471", "primaryIndicator": "true"}
+                },
+                "calendarEventDate": "11/11/2014",
+                "dailyAttendanceStatus": "EarlyDeparture",
+                "attendanceEventType": "ClassSectionAttendance",
+                "absentAttendanceCategory": "13297",
                 "attendanceValue": 0.5
-            },{
+            },
+            {
                 "school": {
                     "stateProvinceId": "37501",
                     "otherIds": {"otherId": {"type": "NCES", "id": "02693"}},
@@ -73,10 +130,12 @@ var data = {
                 "dailyAttendanceStatus": "ExcusedAbsence",
                 "attendanceEventType": "DailyAttendance",
                 "absentAttendanceCategory": "13297",
-                "attendanceValue": 50
-            }]
+                "attendanceValue": 0.9
+            }
+            ]
         }
     }
 };
 
 console.log(require('prettyjson').render(new Attendance(data).getBehaviors()));
+//new Attendance(data).getBehaviors();

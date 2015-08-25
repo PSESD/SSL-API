@@ -132,6 +132,8 @@ function Attendance(results){
     this.allDates = [];
     this.weeks = [];
 
+    this.notAvailable = 'N/A';
+
     this.facets = {
         13297: 'Disciplinary action, not receiving instruction',
         13299: 'Family activity',
@@ -175,13 +177,13 @@ function Attendance(results){
  */
 Attendance.prototype.getBehaviors = function(){
 
-    var _this = this;
+    var me = this;
 
-    if(!_this.attendances) return attendanceBehaviors;
+    if(!me.attendances) return attendanceBehaviors;
 
     var mm = null;
 
-    _this.attendances.events.event.forEach(function(event){
+    me.attendances.events.event.forEach(function(event){
 
         mm = moment(new Date(event.calendarEventDate));
 
@@ -201,7 +203,8 @@ Attendance.prototype.getBehaviors = function(){
                 absentAttendanceCategory: null,
                 absentAttendanceCategoryTitle: null,
                 presentAttendanceCategory: null,
-                presentAttendanceCategoryTitle: null
+                presentAttendanceCategoryTitle: null,
+                timeTablePeriod: null
             };
 
             event.calendarEventDateString = event.calendarEventDate;
@@ -210,7 +213,13 @@ Attendance.prototype.getBehaviors = function(){
 
                obj.absentAttendanceCategory = parseInt(event.absentAttendanceCategory);
 
-               obj.absentAttendanceCategoryTitle =obj.absentAttendanceCategory in _this.facets ? _this.facets[obj.absentAttendanceCategory] : '';
+               obj.absentAttendanceCategoryTitle =obj.absentAttendanceCategory in me.facets ? me.facets[obj.absentAttendanceCategory] : '';
+
+            }
+
+            if('timeTablePeriod' in event) {
+
+                obj.timeTablePeriod = parseInt(event.timeTablePeriod);
 
             }
 
@@ -218,7 +227,7 @@ Attendance.prototype.getBehaviors = function(){
 
                obj.presentAttendanceCategory = parseInt(event.presentAttendanceCategory);
 
-               obj.presentAttendanceCategoryTitle =obj.presentAttendanceCategory in _this.facets ? _this.facets[obj.presentAttendanceCategory] : '';
+               obj.presentAttendanceCategoryTitle =obj.presentAttendanceCategory in me.facets ? me.facets[obj.presentAttendanceCategory] : '';
 
             }
 
@@ -226,14 +235,14 @@ Attendance.prototype.getBehaviors = function(){
 
                obj.attendanceEventType = event.attendanceEventType;
 
-               obj.attendanceEventTypeTitle = event.attendanceEventType in _this.facets ? _this.facets[event.attendanceEventType] : '';
+               obj.attendanceEventTypeTitle = event.attendanceEventType in me.facets ? me.facets[event.attendanceEventType] : '';
             }
 
             if('dailyAttendanceStatus' in event) {
 
                obj.attendanceStatus = event.dailyAttendanceStatus;
 
-               obj.attendanceStatusTitle = event.dailyAttendanceStatus in _this.facets ? _this.facets[event.dailyAttendanceStatus] : '';
+               obj.attendanceStatusTitle = event.dailyAttendanceStatus in me.facets ? me.facets[event.dailyAttendanceStatus] : '';
 
             }
 
@@ -241,24 +250,26 @@ Attendance.prototype.getBehaviors = function(){
 
             delete event.school;
 
-            _this.allDates.push(event.calendarEventDateTime);
+            if(me.allDates.indexOf(event.calendarEventDate) === -1) me.allDates.push(event.calendarEventDateTime);
 
+            if(Object.keys(me.allEvents).indexOf(event.calendarEventDate) === -1) me.allEvents[event.calendarEventDate] = [];
 
-
-            _this.allEvents[event.calendarEventDate] = obj;
+            me.allEvents[event.calendarEventDate].push(obj);
 
         }
 
     });
 
-    _this.minDateCalendar = _.min(_this.allDates);
+    me.minDateCalendar = _.min(me.allDates);
 
-    _this.maxDateCalendar = _.max(_this.allDates);
+    me.maxDateCalendar = _.max(me.allDates);
 
-    _this.weeks = moment(_this.minDateCalendar).weeksTo(moment(_this.maxDateCalendar), 'MM/DD/YYYY');
+    me.weeks = moment(me.minDateCalendar).weeksTo(moment(me.maxDateCalendar), 'MM/DD/YYYY');
 
 
     var behavior = {};
+
+    var summary = {};
 
     var maxDay = 5;
 
@@ -266,22 +277,26 @@ Attendance.prototype.getBehaviors = function(){
 
     var weeklyChange = 0;
 
-    _this.weeks.forEach(function(week){
+    me.weeks.forEach(function(week){
 
         var ikey = week.startString + ' - ' + week.endString;
 
         weeklyChange = 0;
 
+        var maxPeriod = 1;
+
+        summary = [
+            { name: 'M', value: me.notAvailable, date: me.notAvailable, periods: [] },
+            { name: 'T', value: me.notAvailable, date: me.notAvailable, periods: [] },
+            { name: 'W', value: me.notAvailable, date: me.notAvailable, periods: [] },
+            { name: 'TH', value: me.notAvailable, date: me.notAvailable, periods: [] },
+            { name: 'F', value: me.notAvailable, date: me.notAvailable, periods: [] }
+        ];
+
         behavior = {
             weekDate: ikey,
-            summary: [
-                { value: 'N/A', event: null, date: 'N/A', periods: [] },
-                { value: 'N/A', event: null, date: 'N/A', periods: [] },
-                { value: 'N/A', event: null, date: 'N/A', periods: [] },
-                { value: 'N/A', event: null, date: 'N/A', periods: [] },
-                { value: 'N/A', event: null, date: 'N/A', periods: [] }
-            ],
-            weeklyChange: 'N/A',
+            behaviors: [],
+            weeklyChange: me.notAvailable,
             raw: {}
         };
 
@@ -295,49 +310,114 @@ Attendance.prototype.getBehaviors = function(){
 
             //console.log(dayString, nday, behavior.summary[nday], behavior.summary[nday] === undefined); return;
 
-            if(behavior.summary[nday] === undefined) return;
+            if(summary[nday] === undefined) return;
 
-            var e = otherFormat in _this.allEvents ? _this.allEvents[otherFormat] : null;
+            summary[nday].date = dayString;
 
-            behavior.summary[nday].event = e;
+            var allEvents = otherFormat in me.allEvents ? me.allEvents[otherFormat] : [];
 
-            behavior.summary[nday].date = dayString;
+            var isDailySet = false;
 
-            if(e !== null){
-
-                if(e.attendanceEventType === 'DailyAttendance'){
-
-                    if (e.absentAttendanceCategory !== null && e.presentAttendanceCategory === null) {
-
-                        behavior.summary[nday].value = parseFloat(e.attendanceValue);
-
-                    } else if(e.presentAttendanceCategory !== null && e.absentAttendanceCategory === null){
-
-                        behavior.summary[nday].value = (1 - parseFloat(e.attendanceValue)) * 100;
-
-                    }
-
+            allEvents.forEach(function(e){
+                if(e.attendanceEventType === 'DailyAttendance' && !isDailySet) {
+                    isDailySet = true;
                 }
+            });
 
-                if(!isNaN(behavior.summary[nday].value)){
+            if(isDailySet){
 
-                    weeklyChange += behavior.summary[nday].value;
+                me.calculateDailyAttendance(behavior, allEvents, nday, day, summary);
 
-                    behavior.summary[nday].value = behavior.summary[nday].value + '%';
+            } else {
 
-                }
+                me.calculateClassSectionAttendance(behavior, allEvents, nday, day, summary);
 
             }
 
         });
 
-        weeklyChange = (weeklyChange / maxDay);
+        var columns = [];
+
+        columns.push({
+            title: behavior.weekDate,
+            M: summary[0].value + '%',
+            T: summary[1].value + '%',
+            W: summary[2].value + '%',
+            TH: summary[3].value + '%',
+            F: summary[4].value + '%',
+            weeklyChange: me.notAvailable
+        });
+
+        var collects = {};
+
+        summary.forEach(function(s){
+
+            collects[s.name] = s;
+
+            if(maxPeriod < s.periods.length) {
+
+                maxPeriod = s.periods.length;
+
+            }
+
+            if(s.value !== me.notAvailable){
+
+                weeklyChange += parseFloat(s.value);
+
+            }
+
+        });
+
+        behavior.raw.collects = collects;
+
+        for(var p = 0; p < maxPeriod; p++){
+
+            var b = {
+                title: me.notAvailable,
+                M: me.notAvailable,
+                T: me.notAvailable,
+                W: me.notAvailable,
+                TH: me.notAvailable,
+                F: me.notAvailable
+            }, title = null;
+
+
+            ['M', 'T', 'W', 'TH', 'F'].forEach(function(column){
+
+                var period = {};
+
+                if((column in collects) && !_.isEmpty(collects[column].periods[p])){
+
+                    period = collects[column].periods[p];
+
+                    b[column] = { value: period.value, event: period.event };
+
+                    if(period.period !== me.notAvailable) title = period.period;
+
+                }
+
+
+            });
+
+            if(b.title === me.notAvailable && title){
+
+                b.title = 'Period ' + title;
+
+            }
+
+            columns.push(b);
+
+        }
+
+        behavior.behaviors = columns;
 
         behavior.raw.weeklyChange = weeklyChange;
 
+        weeklyChange = ((weeklyChange / maxDay) * 100).toFixed(2);
+
         behavior.raw.lastWeeklyChange = lastWeeklyChange;
 
-        if(lastWeeklyChange !== 'N/A' && lastWeeklyChange > 0){
+        if(lastWeeklyChange !== me.notAvailable && lastWeeklyChange > 0){
 
             behavior.weeklyChange = (weeklyChange / lastWeeklyChange);
 
@@ -353,15 +433,60 @@ Attendance.prototype.getBehaviors = function(){
 
         behaviors[ikey] = behavior;
 
-        _this.attendanceBehaviors.push(behaviors);
+        me.attendanceBehaviors.push(behaviors);
 
     });
 
-    _this.attendanceBehaviors.reverse();
+    me.attendanceBehaviors.reverse();
 
-    return _this.attendanceBehaviors;
+    return me.attendanceBehaviors;
 
 };
+Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary){
+    var me = this;
+    var e = events[0];
+    if(e.attendanceStatus.toLowerCase() === 'present'){
+        summary[n].value = parseFloat(e.attendanceValue).toFixed(2);
+    } else {
+        summary[n].value = ((1 - parseFloat(e.attendanceValue)) * 100).toFixed(2);
+    }
+    summary[n].periods.push({
+        period: e.timeTablePeriod ? e.timeTablePeriod : me.notAvailable, value: e.attendanceStatus, event: e
+    });
+
+};
+
+Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary){
+    var me = this;
+    var value = 0;
+    events.forEach(function(e){
+        if('timeTablePeriod' in e && e.timeTablePeriod){
+            summary[n].periods.push({
+                period: e.timeTablePeriod, value: e.attendanceStatus, event: e
+            });
+            value += parseFloat(e.attendanceValue);
+        }
+    });
+
+    if(summary[n].periods.length < 6){
+        for(var i = summary[n].periods.length; i <= 6; i++){
+            summary[n].periods.push({
+                period: me.notAvailable, value: me.notAvailable, event: null
+            })
+        }
+    }
+    if(summary[n].periods.length > 0){
+        summary[n].value = value.toFixed(2);
+    }
+
+};
+/**
+ *
+ * @param message
+ */
+Attendance.prototype.print = function(message){
+    console.log(require('prettyjson').render(message));
+}
 
 /**
  *
