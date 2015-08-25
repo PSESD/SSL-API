@@ -433,11 +433,17 @@ Attendance.prototype.getBehaviors = function(){
 
         behavior.raw.weeklyChange = weeklyChange;
 
-        weeklyChange = ((weeklyChange / maxDay) * 100).toFixed(2);
+        if(weeklyChange === null) weeklyChange = me.notAvailable;
+
+        if(!isNaN(weeklyChange)) {
+
+            weeklyChange = ((weeklyChange / maxDay) * 100).toFixed(2);
+
+        }
 
         behavior.raw.lastWeeklyChange = lastWeeklyChange;
 
-        if(lastWeeklyChange !== me.notAvailable && lastWeeklyChange > 0){
+        if(lastWeeklyChange !== me.notAvailable && lastWeeklyChange > 0 && !isNaN(weeklyChange)){
 
             behavior.weeklyChange = (weeklyChange / lastWeeklyChange);
 
@@ -446,6 +452,8 @@ Attendance.prototype.getBehaviors = function(){
             behavior.weeklyChange = weeklyChange;
 
         }
+
+        if(behavior.weeklyChange === null) behavior.weeklyChange = me.notAvailable;
 
         lastWeeklyChange = behavior.weeklyChange;
 
