@@ -162,9 +162,15 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         if (error)  return res.errJson(error);
 
-                        if (!body) return res.errJson('Data not found in database xsre');
+                        if (!body) {
 
-                        if (response && response.statusCode == '200') {
+                            res.statusCode = response.statusCode || 404;
+
+                            return res.errJson('Data not found in database xsre');
+
+                        }
+
+                        if (response && response.statusCode === '200') {
 
                             parseString(body, { explicitArray: false }, function (err, result) {
 
