@@ -187,6 +187,8 @@ StudentController.getStudentsBackpack = function (req, res) {
                                 //}
 
                                 json.attendanceBehaviors = new Attendance(json).getBehaviors();
+
+                                json.lastUpdated = new Date().toDateString();
                                 /**
                                  * Set to cache
                                  */
