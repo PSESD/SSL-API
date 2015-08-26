@@ -19,9 +19,7 @@ var UserController = new BaseController(User).crud();
  */
 UserController.get = function (req, res) {
 
-    var crit = User.crit(req.query, ['email']);
-
-    crit.email = req.user.email;
+    var crit = { _id: req.user._id };
 
     User.findOne(crit, function (err, obj) {
 
@@ -77,24 +75,6 @@ UserController.deleteByEmail = function (req, res) {
         if(!user) return res.errJson('User not found');
 
         cb(user._id, req);
-
-    });
-
-};
-/**
- *
- * @param req
- * @param res
- */
-UserController.myAccount = function (req, res) {
-
-    var crit = { _id: req.user._id };
-
-    User.findOne(crit, function (err, obj) {
-
-        if (err) return res.errJson(err);
-
-        res.okJson(obj);
 
     });
 
@@ -168,10 +148,10 @@ UserController.save = function (req, res) {
 
     var crit = {_id: req.user._id};
 
-    if(req.body.email && req.user.isAdmin()){
-        crit = { email: req.body.email };
-        delete req.body.email;
-    }
+    //if(req.body.email && req.user.isAdmin()){
+    //    crit = { email: req.body.email };
+    //    delete req.body.email;
+    //}
 
     //if('password' in req.body){
     //
@@ -199,54 +179,6 @@ UserController.save = function (req, res) {
 
         if(!obj) return res.errJson('User not found');
 
-        var role = null, is_special_case_worker = null;
-
-        if(req.body.role) role = req.body.role;
-
-        if(req.body.is_special_case_worker) is_special_case_worker = req.body.is_special_case_worker;
-        /**
-         * Filter if user downgrade here role
-         */
-        if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
-
-            role = req.body.role;
-
-            if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
-
-        }
-
-        ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
-
-            if(prop in req.body) obj[prop] = req.body[prop];
-
-        });
-
-
-        obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err) {
-
-            if (err) return res.errJson(err);
-
-            res.okJson('Successfully updated!', obj);
-
-        });
-
-    });
-
-};
-/**
- *
- * @param req
- * @param res
- */
-UserController.setRole = function(req, res){
-
-    var crit = { _id: req.params.userId };
-
-    User.findOne(crit, function (err, obj) {
-
-        if (err) return res.errJson(err);
-
-        if(!obj) return res.errJson('User not found');
 
         var role = req.body.role;
 
@@ -265,30 +197,95 @@ UserController.setRole = function(req, res){
 
         }
 
+        if('is_super_admin' in req.body && obj.isAdmin()) delete req.body.is_super_admin;
 
-        obj.saveWithRole(req.user, req.organization._id, role, is_special_case_worker, function (err) {
 
-            if (err) return res.errJson(err);
+        ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
-            res.okJson('Successfully updated!', obj);
+            if(prop in req.body) obj[prop] = req.body[prop];
 
         });
+
+        if(!obj.isAdmin()){
+
+            obj.saveWithRole(req.user, req.params.organizationId, function (err, user) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Successfully updated!', user);
+
+            });
+
+        } else {
+
+            obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err, user) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson('Successfully updated!', user);
+
+            });
+        }
 
     });
 
 };
+/**
+ *
+ * @param req
+ * @param res
+ */
+//UserController.setRole = function(req, res){
+//
+//    var crit = { _id: req.params.userId };
+//
+//    User.findOne(crit, function (err, obj) {
+//
+//        if (err) return res.errJson(err);
+//
+//        if(!obj) return res.errJson('User not found');
+//
+//        var role = req.body.role;
+//
+//        var is_special_case_worker = req.body.is_special_case_worker;
+//
+//        if(is_special_case_worker === 'true') is_special_case_worker = true;
+//
+//        else if(is_special_case_worker === 'false') is_special_case_worker = false;
+//
+//        /**
+//         * Filter if user downgrade here role
+//         */
+//        if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
+//
+//            if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
+//
+//        }
+//
+//
+//        obj.saveWithRole(req.user, req.organization._id, role, is_special_case_worker, function (err) {
+//
+//            if (err) return res.errJson(err);
+//
+//            res.okJson('Successfully updated!', obj);
+//
+//        });
+//
+//    });
+//
+//};
 
 
 
-UserController.getRole = function(){
-
-    return res.okJson(null, [
-            { role: 'superadmin', description: 'Have access to all system in a CBO ' },
-            { role: 'admin', description: 'Have access to all students in a CBO in their organization permission' },
-            { role: 'case-worker', description: 'Some case workers only have access to the students in their permission list, some other have access to all students.' }
-    ]);
-
-};
+//UserController.getRole = function(){
+//
+//    return res.okJson(null, [
+//            { role: 'superadmin', description: 'Have access to all system in a CBO ' },
+//            { role: 'admin', description: 'Have access to all students in a CBO in their organization permission' },
+//            { role: 'case-worker', description: 'Some case workers only have access to the students in their permission list, some other have access to all students.' }
+//    ]);
+//
+//};
 /**
  *
  * @param req
@@ -322,23 +319,94 @@ UserController.getByUserId = function(req, res){
 
     var organizationId  = req.params.organizationId;
 
-    User.findOne({ _id: ObjectId(currentUserId)}, function(err, currUser){
+    var unassigned      = req.query.unassigned === 'true' || req.query.unassigned === 1;
 
-        if(err) return res.errJson(err);
+    if(unassigned){
 
-        if(!currUser) return res.errJson('User not found!');
+        var orgId = ObjectId(organizationId);
 
-        currUser.getCurrentPermission(organizationId);
+        var where = { permissions: { $elemMatch: { organization: orgId } }};
 
-        Student.protect(currUser.role, { onlyAssign: true }, currUser).find({ organization: ObjectId(organizationId) }, function (err, students) {
+        if(currentUserId){
 
-            if (err) return res.errJson(err);
+            where._id = ObjectId(currentUserId);
 
-            res.okJson(null, students);
+        }
+
+        var query = User.find(where);
+
+        var crit = Student.crit(req.query, ['organization', '_id']);
+
+        crit.organization = orgId;
+
+        query.exec(function(err, users){
+
+            var students = [];
+
+            var showEmpty = true;
+
+            users.forEach(function(user){
+
+                user.permissions.forEach(function(permission){
+
+                    if(permission.organization.toString() === orgId.toString()) {
+
+                        //if (permission.role === 'case-worker' && permission.is_special_case_worker === false) {
+
+                        showEmpty = false;
+
+                        permission.students.forEach(function (student) {
+
+                            if (students.indexOf(student) === -1) students.push(student);
+
+                        });
+
+                        //}
+
+                    }
+
+                });
+
+            });
+
+            if(showEmpty === true){
+
+                return res.okJson(null, []);
+
+            }
+
+            if(students.length > 0) crit._id = { $nin: students };
+
+            Student.find(crit, function (err, students) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson(null, students);
+
+            });
 
         });
 
-    });
+    } else {
+
+        User.findOne({_id: ObjectId(currentUserId)}, function (err, currUser) {
+
+            if (err) return res.errJson(err);
+
+            if (!currUser) return res.errJson('User not found!');
+
+            currUser.getCurrentPermission(organizationId);
+
+            Student.protect(currUser.role, {onlyAssign: true}, currUser).find({organization: ObjectId(organizationId)}, function (err, students) {
+
+                if (err) return res.errJson(err);
+
+                res.okJson(null, students);
+
+            });
+
+        });
+    }
 
 };
 /**
