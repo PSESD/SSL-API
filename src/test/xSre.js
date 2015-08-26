@@ -2,6 +2,19 @@
  * Created by zaenal on 21/08/15.
  */
 var Attendance = require(__dirname+'/../lib/attendance');
+var xmlFile = __dirname + '/xsre.xml';
+var fs = require('fs');
+var parseString = require('xml2js').parseString;
+var body = fs.readFileSync(xmlFile);
+
+parseString(body, { explicitArray: false }, function (err, result) {
+
+    var json = (result && 'error' in result) ? result.error.message : console.log(result.error);
+
+    console.log(result, json);
+    //res.errJson(json);
+
+});
 
 var data = {
     "_links": {"self": {"href": "/55913fc817aac10c2bbfe1e8/students/55d3e759d099940e006d7206/xsre"}},
@@ -137,5 +150,5 @@ var data = {
     }
 };
 
-console.log(require('prettyjson').render(new Attendance(data).getBehaviors()));
+//console.log(require('prettyjson').render(new Attendance(data).getBehaviors()));
 //new Attendance(data).getBehaviors();

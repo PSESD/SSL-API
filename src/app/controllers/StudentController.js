@@ -170,7 +170,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         }
 
-                        if (response && response.statusCode === '200') {
+                        if (response && response.statusCode === 200) {
 
                             parseString(body, { explicitArray: false }, function (err, result) {
 
