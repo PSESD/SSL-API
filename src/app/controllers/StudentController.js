@@ -186,9 +186,9 @@ StudentController.getStudentsBackpack = function (req, res) {
                                 //
                                 //}
 
-                                json.attendanceBehaviors = new Attendance(json).getBehaviors();
+                                json.attendanceBehaviors = new Attendance(json).getAttendances();
 
-                                json.lastUpdated = new Date().toDateString();
+                                json.lastUpdated = require('moment')().format('MM/DD/YYYY HH:mm:ss');
                                 /**
                                  * Set to cache
                                  */
