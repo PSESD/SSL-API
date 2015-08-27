@@ -294,6 +294,10 @@ Attendance.prototype.getAttendances = function(){
 
     });
 
+    if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
+        me.disciplineIncidents.disciplineIncident = [ me.disciplineIncidents.disciplineIncident ];
+    }
+
     me.disciplineIncidents.disciplineIncident.forEach(function(discipline){
 
         mm = moment(new Date(discipline.incidentDate));
@@ -368,12 +372,12 @@ Attendance.prototype.getAttendances = function(){
             weekDate: ikey,
             summary: {
                 title: behavior.weekDate,
-                M: me.notAvailable,
-                T: me.notAvailable,
-                W: me.notAvailable,
-                TH: me.notAvailable,
-                F: me.notAvailable,
-                weeklyChange: me.notAvailable
+                M: '0.00%',
+                T: '0.00%',
+                W: '0.00%',
+                TH: '0.00%',
+                F: '0.00%',
+                weeklyChange: '0.00%'
             },
             detailColumns: [],
             details: [],
@@ -464,17 +468,13 @@ Attendance.prototype.getAttendances = function(){
 
                 behavior.summary[s.name] = s.value + '%';
 
+                weeklyChange += parseFloat(s.value);
+
             }
 
             if(maxPeriod < s.periods.length) {
 
                 maxPeriod = s.periods.length;
-
-            }
-
-            if(s.value !== me.notAvailable){
-
-                weeklyChange += parseFloat(s.value);
 
             }
 
@@ -574,9 +574,13 @@ Attendance.prototype.getAttendances = function(){
 
         lastWeeklyChange = behavior.weeklyChange;
 
-        if(behavior.weeklyChange !== me.notAvailable) behavior.weeklyChange = parseFloat(behavior.weeklyChange).toFixed(2) + '%';
+        if(!isNaN(behavior.weeklyChange)){
 
-        behavior.summary.weeklyChange = lastWeeklyChange;
+            behavior.weeklyChange = parseFloat(behavior.weeklyChange).toFixed(2) + '%'
+
+        }
+
+        behavior.summary.weeklyChange = behavior.weeklyChange;
 
         delete behavior.raw;
 
