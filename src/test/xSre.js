@@ -42,6 +42,22 @@ var data = {
     "name": {"familyName": "Marvin", "givenName": "Peyton"},
     "localId": "Sample6",
     "demographics": {"races": {"race": {"race": "HispanicLatino"}}, "sex": "Female", "birthDate": "1998-01-30"},
+    "disciplineIncidents": {
+        "disciplineIncident": [
+            {
+                "incidentCategory": 04645,
+                "description": "Mutual participation in an incident involving physical violence, where there is no injury to any person requiring professional medical attention.",
+                "incidentDate": "2014-11-11",
+                "actions": []
+            },
+            {
+                "incidentCategory": 04651,
+                "description": "Mutual participation in an incident involving physical violence, where there is no injury to any person requiring professional medical attention.",
+                "incidentDate": "2014-11-11",
+                "actions": []
+            }
+        ]
+    },
     "attendance": {
         "summaries": {
             "summary": [{
@@ -150,5 +166,5 @@ var data = {
     }
 };
 
-//console.log(require('prettyjson').render(new Attendance(data).getBehaviors()));
-//new Attendance(data).getBehaviors();
+console.log(require('prettyjson').render(new Attendance(data).getAttendances()));
+//new Attendance(data).getAttendances();
