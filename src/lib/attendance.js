@@ -371,7 +371,7 @@ Attendance.prototype.getAttendances = function(){
         behavior = {
             weekDate: ikey,
             summary: {
-                title: behavior.weekDate,
+                title: ikey,
                 M: '0.00%',
                 T: '0.00%',
                 W: '0.00%',
@@ -432,6 +432,7 @@ Attendance.prototype.getAttendances = function(){
             if(otherFormat in me.allDisciplines) {
 
                 behavior.behaviors[ndays[nday]] = me.allDisciplines[otherFormat];
+                console.log('=> ', behavior.behaviors);
 
             }
 
