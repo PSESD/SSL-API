@@ -107,9 +107,7 @@ moment.fn.weeksTo = function (target, formatString) {
             startString: dt.format(formatString),
             endString: end.format(formatString),
             daysOfWeekString: daysOfWeek.toString(),
-            daysOfWeek: daysOfWeek.toObject(),
-            //start: dt,
-            //end: end
+            daysOfWeek: daysOfWeek.toObject()
         };
     }
     result.push(_weekFormat(from));
@@ -225,9 +223,7 @@ Attendance.prototype.getAttendances = function(){
 
             event.calendarEventDateTime = mm.valueOf();
 
-           var obj = {};
-
-           obj = {
+           var obj = {
                 calendarEventDate: event.calendarEventDate,
                 attendanceValue: event.attendanceValue,
                 attendanceStatus: null,
@@ -295,7 +291,9 @@ Attendance.prototype.getAttendances = function(){
     });
 
     if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
+
         me.disciplineIncidents.disciplineIncident = [ me.disciplineIncidents.disciplineIncident ];
+
     }
 
     me.disciplineIncidents.disciplineIncident.forEach(function(discipline){
@@ -308,9 +306,7 @@ Attendance.prototype.getAttendances = function(){
 
             discipline.incidentDateTime = mm.valueOf();
 
-            var obj = {};
-
-            obj = {
+            var obj = {
                 incidentDate: discipline.incidentDate,
                 description: discipline.description,
                 incidentCategory: null,
@@ -432,16 +428,19 @@ Attendance.prototype.getAttendances = function(){
             if(otherFormat in me.allDisciplines) {
 
                 behavior.behaviors[ndays[nday]] = me.allDisciplines[otherFormat];
-                console.log('=> ', behavior.behaviors);
 
             }
 
             var isDailySet = false;
 
             allEvents.forEach(function(e){
+
                 if(e.attendanceEventType === 'DailyAttendance' && !isDailySet) {
+
                     isDailySet = true;
+
                 }
+
             });
 
             if(isDailySet){
@@ -489,11 +488,11 @@ Attendance.prototype.getAttendances = function(){
 
             var b = {
                 title: me.notAvailable,
-                M: me.notAvailable,
-                T: me.notAvailable,
-                W: me.notAvailable,
-                TH: me.notAvailable,
-                F: me.notAvailable
+                M: { value: me.notAvailable, event: null, slug: '' },
+                T: { value: me.notAvailable, event: null, slug: '' },
+                W: { value: me.notAvailable, event: null, slug: '' },
+                TH: { value: me.notAvailable, event: null, slug: '' },
+                F: { value: me.notAvailable, event: null, slug: '' }
             }, title = null;
 
 
@@ -599,7 +598,14 @@ Attendance.prototype.getAttendances = function(){
 
 };
 
-
+/**
+ *
+ * @param behavior
+ * @param events
+ * @param n
+ * @param day
+ * @param summary
+ */
 Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary){
     var me = this;
     var e = events[0];
@@ -625,6 +631,14 @@ Attendance.prototype.slug = function(value){
     return (value+'').toLowerCase().replace('absence', '');
 };
 
+/**
+ *
+ * @param behavior
+ * @param events
+ * @param n
+ * @param day
+ * @param summary
+ */
 Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary){
     var me = this;
     var value = 0;
@@ -655,7 +669,7 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
  */
 Attendance.prototype.print = function(message){
     console.log(require('prettyjson').render(message));
-}
+};
 
 /**
  *

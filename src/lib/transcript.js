@@ -10,6 +10,7 @@ var _ = require('underscore');
  */
 function Transcript(results){
     this.transcriptTerm = results.transcriptTerm || null;
+    this.transcriptTermOther = results.otherTranscriptTerms.transcriptTerm || null;
     this.transcipts = [];
     this.subject = {};
 
@@ -27,11 +28,75 @@ Transcript.prototype.getTranscript = function(){
 
     var me = this;
 
-    if(!me.transcriptTerm) return me.transcipts;
+    if(null !== me.transcriptTerm) {
 
-    _.each(me.transcriptTerm, function(transcript){
-        console.log(transcript);
-    });
+        _.each(me.transcriptTerm, function (transcript) {
+
+            me.processTranscript(transcript);
+
+        });
+
+    }
+
+    if(null !== me.transcriptTermOther) {
+
+        _.each(me.transcriptTermOther, function (transcriptOther) {
+
+
+            _.each(transcriptOther, function(transcript){
+
+                me.processTranscript(transcript);
+
+            });
+
+
+        });
+
+    }
+
+    /**
+     * Verify the data
+     */
+    
+
+    //console.log(me.transcriptTermOther);
+    console.log(me.subject);
+
+
+};
+/**
+ *
+ * @param transcript
+ */
+Transcript.prototype.processTranscript = function(transcript){
+
+    var me = this;
+
+    if (!_.isEmpty(transcript.course)) {
+
+        _.each(transcript.course, function (course) {
+
+
+            if(!course) return;
+
+            if(!course.leaCourseId) return;
+
+            var uniqueId = course.leaCourseId.toString().substr(0,3);
+            var idNumber = course.leaCourseId.toString().substr(3);
+
+            if (Object.keys(me.subject).indexOf(uniqueId) === -1) me.subject[uniqueId] = [];
+
+            me.subject[uniqueId].push({
+                group: uniqueId,
+                id: parseInt(idNumber),
+                courseId: course.leaCourseId,
+                title: course.courseTitle,
+                subject: course.subject
+            });
+
+        });
+
+    }
 
 };
 
