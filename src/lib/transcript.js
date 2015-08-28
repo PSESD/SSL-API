@@ -57,7 +57,7 @@ Transcript.prototype.getTranscript = function(){
     /**
      * Verify the data
      */
-    
+
 
     //console.log(me.transcriptTermOther);
     console.log(me.subject);
