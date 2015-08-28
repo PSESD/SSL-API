@@ -213,7 +213,7 @@ Attendance.prototype.getAttendances = function(){
 
     var me = this;
 
-    if(!me.attendances) return attendanceBehaviors;
+    if(!me.attendances) return me.attendanceBehaviors;
 
     var mm = null;
 
