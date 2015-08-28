@@ -92,7 +92,9 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 _.each(student.programs, function(program){
 
-                    programsId[program.program.toString()] = program.toObject();
+                    if(Object.keys(programsId).indexOf(program.program.toString()) === -1) programsId[program.program.toString()] = [];
+
+                    programsId[program.program.toString()].push(program.toObject());
 
                     programId.push(program.program);
 
@@ -108,12 +110,15 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                             if(program._id.toString() in programsId){
 
-                                programsId[program._id.toString()].program_name = program.name;
+                                programsId[program._id.toString()].forEach(function(prgm){
 
-                                embedsPrograms.push(new hal.Resource(programsId[program._id.toString()]));
+                                    prgm.program_name = program.name;
+
+                                    embedsPrograms.push(new hal.Resource(prgm));
+
+                                });
 
                             }
-
 
                         });
 
