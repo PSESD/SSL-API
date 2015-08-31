@@ -1,7 +1,7 @@
 /**
  * Created by zaenal on 21/08/15.
  */
-var Attendance = require(__dirname+'/../lib/attendance');
+var Attendance = require(__dirname+'/../lib/xsre/attendance');
 
 var data = {
     "_links": {"self": {"href": "/55913fc817aac10c2bbfe1e8/students/55d3e759d099940e006d7206/xsre"}},
@@ -1421,5 +1421,5 @@ data = {
 };
 
 
-//console.log(require('prettyjson').render(new Attendance(data).getAttendances()));
-new Attendance(data).getAttendances();
+console.log(require('prettyjson').render(new Attendance(data).getAttendances()));
+//new Attendance(data).getAttendances();

@@ -1,7 +1,7 @@
 /**
  * Created by zaenal on 27/08/15.
  */
-var Attendance = require(__dirname+'/../lib/attendance');
+var Attendance = require(__dirname+'/../lib/xsre/attendance');
 var xmlFile = __dirname + '/sample1.xml';
 var fs = require('fs');
 var parseString = require('xml2js').parseString;
