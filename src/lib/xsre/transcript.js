@@ -16,6 +16,8 @@ function Transcript(xsre){
 
     this.subject = [];
 
+    this.history = [];
+
     this.course = {};
 
     this.notAvailable = 'N/A';
@@ -66,14 +68,17 @@ Transcript.prototype.getTranscript = function(){
 
     me.subject = _.sortBy(me.subject);
 
+    me.course = _.sortBy(me.course);
+
     _.each(me.course, function(course){
 
         var courseTranscripts = {};
 
+        me.history.push({ schoolName: course.schoolName, schoolYear: course.schoolYear });
+
         if(_.isObject(course.transcripts)) {
 
             _.each(me.subject, function (subject) {
-
 
                 if (Object.keys(course.transcripts).indexOf(subject) === -1) {
 
@@ -94,7 +99,7 @@ Transcript.prototype.getTranscript = function(){
     });
 
     return {
-        history: me.history,
+        history: _.sortBy(me.history, 'schoolYear').reverse(),
         details: me.course,
         credits: me.credits,
         totalCreditsEarned: parseInt(me.totalCreditsEarned),

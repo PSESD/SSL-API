@@ -138,7 +138,7 @@ xSre.prototype.toObject = function(){
 
     json.attendanceBehaviors = this.getAttendanceBehavior().getAttendances();
 
-    json.transcripts = this.getTranscript();
+    json.transcripts = this.getTranscript().getTranscript();
 
     json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss');
 
