@@ -165,7 +165,7 @@ Transcript.prototype.processTranscript = function(transcript){
 
     }
 
-    var key = transcript.schoolYear + ' ' + transcript.session.sessionType, info = {
+    var key = (transcript.schoolYear + ' ' + transcript.session.description).trim(), info = {
         gradeLevel : null,
         schoolYear : transcript.schoolYear,
         schoolName : transcript.school.schoolName,
