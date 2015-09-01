@@ -166,7 +166,7 @@ Transcript.prototype.processTranscript = function(transcript){
     }
 
     var key = (transcript.schoolYear + ' ' + transcript.session.description).trim(), info = {
-        gradeLevel : null,
+        gradeLevel : transcript.gradeLevel,
         schoolYear : transcript.schoolYear,
         schoolName : transcript.school.schoolName,
         session: transcript.session.description,
@@ -201,7 +201,7 @@ Transcript.prototype.processTranscript = function(transcript){
                     courseId: course.leaCourseId,
                     title: course.courseTitle || me.notAvailable,
                     mark: mark,
-                    gradeLevel: course.gradeLevel || me.notAvailable,
+                    gradeLevel: info.gradeLevel || me.notAvailable,
                     creditsEarned: parseFloat(course.creditsEarned),
                     creditsAttempted: parseFloat(course.creditsAttempted)
                 });
