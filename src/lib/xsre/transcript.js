@@ -169,7 +169,7 @@ Transcript.prototype.processTranscript = function(transcript){
         gradeLevel : null,
         schoolYear : transcript.schoolYear,
         schoolName : transcript.school.schoolName,
-        session: transcript.session.sessionType,
+        session: transcript.session.description,
         transcripts: {},
         summary: summary
     };
