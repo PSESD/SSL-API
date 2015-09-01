@@ -209,6 +209,14 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
+            if('attendanceStatus' in event) {
+
+                obj.attendanceStatus = event.attendanceStatus;
+
+                obj.attendanceStatusTitle = event.attendanceStatus in me.facets ? me.facets[event.attendanceStatus] : '';
+
+            }
+
             event.calendarEventDate = mm.format('MM-DD-YYYY');
 
             delete event.school;
@@ -393,6 +401,8 @@ Attendance.prototype.getAttendances = function(){
 
         var collects = {};
 
+        var periodsColumns = [];
+
         summary.forEach(function(s){
 
             collects[s.name] = s;
@@ -405,19 +415,32 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
-            if(maxPeriod < s.periods.length) {
+            if(s.periods.length > 0) {
 
-                maxPeriod = s.periods.length;
+                s.periods.forEach(function(p){
+
+                    if(p.period !== me.notAvailable && periodsColumns.indexOf(p.period) === -1){
+
+                        periodsColumns.push(p.period);
+
+                    }
+
+                })
+
 
             }
 
         });
 
+        periodsColumns = _.sortBy(periodsColumns);
+
+        //console.log(require('prettyjson').render(periodsColumns));return;
+
         behavior.raw.collects = collects;
 
         columns.push(calendar);
 
-        for(var p = 0; p < maxPeriod - 1; p++){
+        periodsColumns.forEach(function(p){
 
             var b = {
                 title: me.notAvailable,
@@ -433,13 +456,19 @@ Attendance.prototype.getAttendances = function(){
 
                 var period = {};
 
-                if((column in collects) && !_.isEmpty(collects[column].periods[p])){
+                if((column in collects) && !_.isEmpty(collects[column].periods)){
 
-                    period = collects[column].periods[p];
+                    collects[column].periods.forEach(function(period){
 
-                    b[column] = { value: period.value, event: period.event, slug: period.slug };
+                        if(p === period.period) {
 
-                    if(period.period !== me.notAvailable) title = period.period;
+                            b[column] = {value: period.value, event: period.event, slug: period.slug};
+
+                            if (period.period !== me.notAvailable) title = period.period;
+
+                        }
+
+                    });
 
                 }
 
@@ -454,7 +483,9 @@ Attendance.prototype.getAttendances = function(){
 
             columns.push(b);
 
-        }
+        });
+
+        //console.log(require('prettyjson').render(columns));return;
 
         behavior.details = columns;
 
