@@ -356,8 +356,6 @@ Attendance.prototype.getAttendances = function(){
                 'F'
             ];
 
-            //console.log(dayString, nday, behavior.summary[nday], behavior.summary[nday] === undefined); return;
-
             if(summary[nday] === undefined) return;
 
             summary[nday].date = dayString;
@@ -434,8 +432,6 @@ Attendance.prototype.getAttendances = function(){
 
         periodsColumns = _.sortBy(periodsColumns);
 
-        //console.log(require('prettyjson').render(periodsColumns));return;
-
         behavior.raw.collects = collects;
 
         columns.push(calendar);
@@ -453,8 +449,6 @@ Attendance.prototype.getAttendances = function(){
 
 
             ['M', 'T', 'W', 'TH', 'F'].forEach(function(column){
-
-                var period = {};
 
                 if((column in collects) && !_.isEmpty(collects[column].periods)){
 
@@ -485,8 +479,6 @@ Attendance.prototype.getAttendances = function(){
 
         });
 
-        //console.log(require('prettyjson').render(columns));return;
-
         behavior.details = columns;
 
         behavior.detailColumns = {
@@ -498,8 +490,6 @@ Attendance.prototype.getAttendances = function(){
             F: [],
             weeklyChange: []
         };
-
-        //console.log(behavior.details);
 
         for(var c = 0; c < columns.length; c++){
 
@@ -581,13 +571,21 @@ Attendance.prototype.getAttendances = function(){
  * @param summary
  */
 Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary){
+
     var me = this;
+
     var e = events[0];
+
     if(e.attendanceStatus.toLowerCase() === 'present'){
+
         summary[n].value = parseFloat(e.attendanceValue).toFixed(2);
+
     } else {
+
         summary[n].value = ((1 - parseFloat(e.attendanceValue)) * 100).toFixed(2);
+
     }
+
     summary[n].periods.push({
         period: e.timeTablePeriod ? e.timeTablePeriod : me.notAvailable, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
     });
@@ -614,26 +612,41 @@ Attendance.prototype.slug = function(value){
  * @param summary
  */
 Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary){
+
     var me = this;
+
     var value = 0;
+
     events.forEach(function(e){
+
         if('timeTablePeriod' in e && e.timeTablePeriod){
+
             summary[n].periods.push({
                 period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
             });
+
             value += parseFloat(e.attendanceValue);
+
         }
+
     });
 
     if(summary[n].periods.length < 6){
+
         for(var i = summary[n].periods.length; i <= 6; i++){
+
             summary[n].periods.push({
                 period: me.notAvailable, value: me.notAvailable, event: null, slug: ''
             })
+
         }
+
     }
+
     if(summary[n].periods.length > 0){
+
         summary[n].value = value.toFixed(2);
+
     }
 
 };
@@ -642,7 +655,9 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
  * @param message
  */
 Attendance.prototype.print = function(message){
+
     console.log(require('prettyjson').render(message));
+
 };
 
 /**
