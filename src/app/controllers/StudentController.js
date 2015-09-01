@@ -15,7 +15,7 @@ var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
 var php = require('phpjs');
-var Attendance = require('../../lib/attendance');
+var xSre = require('../../lib/xsre');
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -181,27 +181,15 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 if(err) return res.errJson(err);
 
-                                var json = result.xSre;
-
-                                delete json['$'];
-
-                                //if(!_.isArray(json.attendance.summaries.summary)){
-                                //
-                                //    json.attendance.summaries.summary = [ json.attendance.summaries.summary ];
-                                //
-                                //}
-
-                                json.attendanceBehaviors = new Attendance(json).getAttendances();
-
-                                json.lastUpdated = require('moment')().format('MM/DD/YYYY HH:mm:ss');
+                                var object = new xSre(result).toObject();
                                 /**
                                  * Set to cache
                                  */
-                                cache.set(key, json, function(err){
+                                cache.set(key, object, function(err){
 
                                     log(err);
 
-                                    embeds(json);
+                                    embeds(object);
 
                                 });
 
