@@ -1,11 +1,10 @@
 /**
- * Created by zaenal on 28/08/15.
+ * Created by zaenal on 01/09/15.
  */
-
 var xSre = require(__dirname+'/../lib/xsre');
 
 var fs = require('fs');
-var xmlFile = __dirname + '/../../../mockhzb/sid/sample6.xml';
+var xmlFile = __dirname + '/../../../mockhzb/sid/sample1.xml';
 var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
     if(err) return console.log(err);
@@ -14,8 +13,8 @@ fs.readFile(xmlFile, function(err, data) {
 
         if(err) return console.log(err);
 
-        //console.log(require('prettyjson').render(new xSre(result).getTranscript().getTranscript()));
-        console.log(require('prettyjson').render(new xSre(result).getTranscript().getTranscript()));
+        //console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().getAttendances()));
+        console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().getAttendances()));
     });
 
 });

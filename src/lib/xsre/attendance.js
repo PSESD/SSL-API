@@ -107,9 +107,7 @@ moment.fn.weeksTo = function (target, formatString) {
             startString: dt.format(formatString),
             endString: end.format(formatString),
             daysOfWeekString: daysOfWeek.toString(),
-            daysOfWeek: daysOfWeek.toObject(),
-            //start: dt,
-            //end: end
+            daysOfWeek: daysOfWeek.toObject()
         };
     }
     result.push(_weekFormat(from));
@@ -120,12 +118,12 @@ moment.fn.weeksTo = function (target, formatString) {
 };
 /**
  *
- * @param results
+ * @param xsre
  * @constructor
  */
-function Attendance(results){
-    this.attendances = results.attendance || null;
-    this.disciplineIncidents = results.disciplineIncidents || { disciplineIncident: [] };
+function Attendance(xsre){
+    this.attendances = xsre.json.attendance || null;
+    this.disciplineIncidents = xsre.json.disciplineIncidents || { disciplineIncident: [] };
     this.allEvents = {};
     this.allDisciplines = {};
     this.minDateCalendar = 0;
@@ -136,74 +134,7 @@ function Attendance(results){
 
     this.notAvailable = 'N/A';
 
-    this.facets = {
-        13297: 'Disciplinary action, not receiving instruction',
-        13299: 'Family activity',
-        13296: 'Family emergency or bereavement',
-        13295: 'Illness, injury, health treatment, or examination',
-        13298: 'Legal or judicial requirement',
-        13293: 'Noninstructional activity recognized by state or school',
-        13294: 'Religious observation',
-        13303: 'Situation unknown',
-        13300: 'Student employment',
-        13302: 'Student is skipping school',
-        13301: 'Transportation not available',
-
-        /**
-         * Present
-         */
-        13290: 'Disciplinary action, receiving instruction',
-        13288: 'In school, regular instructional program',
-        13289: 'Nontraditional school setting, regular instructional program',
-        13291: 'Out of school, regular instructional program activity',
-        13292: 'Out of school, school-approved extracurricular or cocurricular activity',
-        /**
-         * disciplineIncidents
-         */
-        04618: 'Alcohol',
-        04625: 'Arson',
-        04626: 'Attendance Policy Violation',
-        04632: 'Battery',
-        04633: 'Burglary/Breaking and Entering',
-        04634: 'Disorderly Conduct',
-        04635: 'Drugs Excluding Alcohol and Tobacco',
-        04645: 'Fighting',
-        13354: 'Harassment or bullying on the basis of disability',
-        13355: 'Harassment or bullying on the basis of race, color, or national origin',
-        13356: 'Harassment or bullying on the basis of sex',
-        04646: 'Harassment, Nonsexual',
-        04650: 'Harassment, Sexual',
-        04651: 'Homicide',
-        04652: 'Inappropriate Use of Medication',
-        04659: 'Insubordination',
-        04660: 'Kidnapping',
-        04661: 'Obscene Behavior',
-        04669: 'Physical Altercation, Minor',
-        04670: 'Robbery',
-        04671: 'School Threat',
-        04677: 'Sexual Battery (sexual assault)',
-        04678: 'Sexual Offenses, Other (lewd behavior, indecent exposure)',
-        04682: 'Theft',
-        04686: 'Threat/Intimidation',
-        04692: 'Tobacco Possession or Use',
-        04699: 'Trespassing',
-        04700: 'Vandalism',
-        04704: 'Violation of School Rules',
-        04705: 'Weapons Possession',
-        /**
-         * DailyAttendance
-         */
-        'DailyAttendance': 'Daily attendance',
-        'ClassSectionAttendance': 'Class/section attendance',
-        'ProgramAttendance': 'Program attendance',
-        'ExtracurricularAttendance': 'Extracurricular attendance',
-
-        'Present': 'Present',
-        'ExcusedAbsence': 'Not present but is temporarily excused from attendance because the person is: 1) is ill and attendance would endanger his or her health or the health of others; 2) has an immediate family member who is seriously ill or has died; 3) is observing a recognized religious holiday of his or her faith; or 4) is otherwise excused in accordance with policies.',
-        'UnexcusedAbsence': 'Not present without acceptable cause or authorization.',
-        'Tardy': 'Is absent at the time a given schedule when attendance begins but is present before the close of that time period.',
-        'EarlyDeparture': 'Leaves before the official close of the daily session. Reasons may include a special activity for curricular enrichment, doctor\'s appointment, and family emergency. State, local, and school regulations may distinguish excused and unexcused early departures. When officially approved on a regular basis, early departures immediately prior to the close of the session are considered to be released time.'
-    };
+    this.facets = xsre.facets;
 }
 /**
  *
@@ -225,9 +156,7 @@ Attendance.prototype.getAttendances = function(){
 
             event.calendarEventDateTime = mm.valueOf();
 
-           var obj = {};
-
-           obj = {
+           var obj = {
                 calendarEventDate: event.calendarEventDate,
                 attendanceValue: event.attendanceValue,
                 attendanceStatus: null,
@@ -280,6 +209,14 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
+            if('attendanceStatus' in event) {
+
+                obj.attendanceStatus = event.attendanceStatus;
+
+                obj.attendanceStatusTitle = event.attendanceStatus in me.facets ? me.facets[event.attendanceStatus] : '';
+
+            }
+
             event.calendarEventDate = mm.format('MM-DD-YYYY');
 
             delete event.school;
@@ -295,7 +232,9 @@ Attendance.prototype.getAttendances = function(){
     });
 
     if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
+
         me.disciplineIncidents.disciplineIncident = [ me.disciplineIncidents.disciplineIncident ];
+
     }
 
     me.disciplineIncidents.disciplineIncident.forEach(function(discipline){
@@ -308,9 +247,7 @@ Attendance.prototype.getAttendances = function(){
 
             discipline.incidentDateTime = mm.valueOf();
 
-            var obj = {};
-
-            obj = {
+            var obj = {
                 incidentDate: discipline.incidentDate,
                 description: discipline.description,
                 incidentCategory: null,
@@ -419,8 +356,6 @@ Attendance.prototype.getAttendances = function(){
                 'F'
             ];
 
-            //console.log(dayString, nday, behavior.summary[nday], behavior.summary[nday] === undefined); return;
-
             if(summary[nday] === undefined) return;
 
             summary[nday].date = dayString;
@@ -432,16 +367,19 @@ Attendance.prototype.getAttendances = function(){
             if(otherFormat in me.allDisciplines) {
 
                 behavior.behaviors[ndays[nday]] = me.allDisciplines[otherFormat];
-                console.log('=> ', behavior.behaviors);
 
             }
 
             var isDailySet = false;
 
             allEvents.forEach(function(e){
+
                 if(e.attendanceEventType === 'DailyAttendance' && !isDailySet) {
+
                     isDailySet = true;
+
                 }
+
             });
 
             if(isDailySet){
@@ -461,6 +399,8 @@ Attendance.prototype.getAttendances = function(){
 
         var collects = {};
 
+        var periodsColumns = [];
+
         summary.forEach(function(s){
 
             collects[s.name] = s;
@@ -473,41 +413,56 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
-            if(maxPeriod < s.periods.length) {
+            if(s.periods.length > 0) {
 
-                maxPeriod = s.periods.length;
+                s.periods.forEach(function(p){
+
+                    if(p.period !== me.notAvailable && periodsColumns.indexOf(p.period) === -1){
+
+                        periodsColumns.push(p.period);
+
+                    }
+
+                })
+
 
             }
 
         });
 
+        periodsColumns = _.sortBy(periodsColumns);
+
         behavior.raw.collects = collects;
 
         columns.push(calendar);
 
-        for(var p = 0; p < maxPeriod - 1; p++){
+        periodsColumns.forEach(function(p){
 
             var b = {
                 title: me.notAvailable,
-                M: me.notAvailable,
-                T: me.notAvailable,
-                W: me.notAvailable,
-                TH: me.notAvailable,
-                F: me.notAvailable
+                M: { value: me.notAvailable, event: null, slug: '' },
+                T: { value: me.notAvailable, event: null, slug: '' },
+                W: { value: me.notAvailable, event: null, slug: '' },
+                TH: { value: me.notAvailable, event: null, slug: '' },
+                F: { value: me.notAvailable, event: null, slug: '' }
             }, title = null;
 
 
             ['M', 'T', 'W', 'TH', 'F'].forEach(function(column){
 
-                var period = {};
+                if((column in collects) && !_.isEmpty(collects[column].periods)){
 
-                if((column in collects) && !_.isEmpty(collects[column].periods[p])){
+                    collects[column].periods.forEach(function(period){
 
-                    period = collects[column].periods[p];
+                        if(p === period.period) {
 
-                    b[column] = { value: period.value, event: period.event, slug: period.slug };
+                            b[column] = {value: period.value, event: period.event, slug: period.slug};
 
-                    if(period.period !== me.notAvailable) title = period.period;
+                            if (period.period !== me.notAvailable) title = period.period;
+
+                        }
+
+                    });
 
                 }
 
@@ -522,7 +477,7 @@ Attendance.prototype.getAttendances = function(){
 
             columns.push(b);
 
-        }
+        });
 
         behavior.details = columns;
 
@@ -537,6 +492,14 @@ Attendance.prototype.getAttendances = function(){
         };
 
         for(var c = 0; c < columns.length; c++){
+
+            if(columns[c].M.value === me.notAvailable && !columns[c].M.event
+                && columns[c].T.value === me.notAvailable && !columns[c].T.event
+                && columns[c].W.value === me.notAvailable && !columns[c].W.event
+                && columns[c].TH.value === me.notAvailable && !columns[c].TH.event
+                && columns[c].F.value === me.notAvailable && !columns[c].F.event){
+                continue;
+            }
 
             behavior.periods.push(columns[c].title);
             behavior.detailColumns.periods.push(columns[c].title);
@@ -599,15 +562,30 @@ Attendance.prototype.getAttendances = function(){
 
 };
 
-
+/**
+ *
+ * @param behavior
+ * @param events
+ * @param n
+ * @param day
+ * @param summary
+ */
 Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary){
+
     var me = this;
+
     var e = events[0];
+
     if(e.attendanceStatus.toLowerCase() === 'present'){
+
         summary[n].value = parseFloat(e.attendanceValue).toFixed(2);
+
     } else {
+
         summary[n].value = ((1 - parseFloat(e.attendanceValue)) * 100).toFixed(2);
+
     }
+
     summary[n].periods.push({
         period: e.timeTablePeriod ? e.timeTablePeriod : me.notAvailable, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
     });
@@ -625,27 +603,50 @@ Attendance.prototype.slug = function(value){
     return (value+'').toLowerCase().replace('absence', '');
 };
 
+/**
+ *
+ * @param behavior
+ * @param events
+ * @param n
+ * @param day
+ * @param summary
+ */
 Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary){
+
     var me = this;
+
     var value = 0;
+
     events.forEach(function(e){
+
         if('timeTablePeriod' in e && e.timeTablePeriod){
+
             summary[n].periods.push({
                 period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
             });
+
             value += parseFloat(e.attendanceValue);
+
         }
+
     });
 
     if(summary[n].periods.length < 6){
+
         for(var i = summary[n].periods.length; i <= 6; i++){
+
             summary[n].periods.push({
                 period: me.notAvailable, value: me.notAvailable, event: null, slug: ''
             })
+
         }
+
     }
+
     if(summary[n].periods.length > 0){
+
         summary[n].value = value.toFixed(2);
+
     }
 
 };
@@ -654,8 +655,10 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
  * @param message
  */
 Attendance.prototype.print = function(message){
+
     console.log(require('prettyjson').render(message));
-}
+
+};
 
 /**
  *
