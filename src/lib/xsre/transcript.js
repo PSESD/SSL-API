@@ -180,7 +180,6 @@ Transcript.prototype.processTranscript = function(transcript){
 
         _.each(transcript.courses.course, function (course) {
 
-
             if(!course) return;
 
             if(!course.leaCourseId) return;
@@ -195,13 +194,13 @@ Transcript.prototype.processTranscript = function(transcript){
 
                 if(me.subject.indexOf(uniqueStr) === -1) me.subject.push(uniqueStr);
 
-                var grade = course.progressMark || course.finalMarkValue;
+                var mark = course.progressMark || course.finalMarkValue;
 
                 me.course[key].transcripts[uniqueStr].push({
                     cdesId: uniqueId,
                     courseId: course.leaCourseId,
                     title: course.courseTitle || me.notAvailable,
-                    grade: grade,
+                    mark: mark,
                     gradeLevel: course.gradeLevel || me.notAvailable,
                     creditsEarned: parseFloat(course.creditsEarned),
                     creditsAttempted: parseFloat(course.creditsAttempted)
