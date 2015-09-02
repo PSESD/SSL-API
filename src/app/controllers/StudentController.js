@@ -16,6 +16,7 @@ var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
 var php = require('phpjs');
 var xSre = require('../../lib/xsre');
+var async = require('async');
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -278,12 +279,107 @@ StudentController.getStudents = function (req, res) {
     var crit = Student.crit(req.query, ['organization']);
 
     crit.organization = orgId;
+    /**
+     *
+     * @param brokerRequest
+     * @param student
+     * @param callback
+     */
+    var getStudentDetail = function(brokerRequest, student, callback){
 
-    Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
+        var key = md5(['_xsre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
+
+        cache.get(key, function(err, result){
+
+            if(err)  return callback(null, student);
+
+            if(!result){
+
+                brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
+
+                    if (error)  return callback(null, student);
+
+                    if (!body) {
+
+                        res.statusCode = response.statusCode || 404;
+
+                        return callback(null, student);
+
+                    }
+
+                    if (response && response.statusCode === 200) {
+
+                        parseString(body, { explicitArray: false }, function (err, result) {
+
+                            if(err) return res.errJson(err);
+
+                            var object = new xSre(result).getJson();
+
+                            var newObject = student.toObject();
+
+                            newObject.xsre = object;
+
+                            /**
+                             * Set to cache
+                             */
+                            cache.set(key, newObject, function(err){
+
+                                callback(null, newObject);
+
+                            });
+
+                        });
+
+                    }
+                });
+
+            } else {
+
+
+                callback(null, result);
+
+            }
+
+        });
+    };
+
+    Organization.findOne({ _id: orgId }, function(err, organization) {
 
         if (err) return res.errJson(err);
+        /**
+         * If organization is empty from database
+         */
+        if (!organization) return res.errJson('The organization not found in database');
 
-        res.okJson(null, students);
+        var brokerRequest = new Request({
+            externalServiceId: organization.externalServiceId,
+            personnelId: organization.personnelId,
+            authorizedEntityId: organization.authorizedEntityId
+        });
+
+        Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
+
+            if (err) return res.errJson(err);
+
+            var studentsAsync = [];
+
+            students.forEach(function(student){
+
+                studentsAsync.push(function(callback){
+
+                    getStudentDetail(brokerRequest, student, callback);
+
+                });
+
+            });
+
+            async.series(studentsAsync, function(err, students){
+
+                res.okJson(null, students);
+
+            });
+
+        });
 
     });
 
