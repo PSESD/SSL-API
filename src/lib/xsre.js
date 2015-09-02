@@ -123,6 +123,15 @@ xSre.prototype.getTranscript= function(){
  *
  * @returns {*}
  */
+xSre.prototype.getJson = function(){
+
+    return this.json;
+
+};
+/**
+ *
+ * @returns {*}
+ */
 xSre.prototype.getAttendanceBehavior = function(){
 
     return new Attendance(this);
