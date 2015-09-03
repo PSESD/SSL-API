@@ -93,7 +93,7 @@ Transcript.prototype.getTranscript = function(){
 
         if(_.isObject(course.transcripts)) {
 
-            _.each(me.subject, function (subject) {
+            _.each(me.subject, function (subject, i) {
 
                 if (Object.keys(course.transcripts).indexOf(subject) === -1) {
 
@@ -103,9 +103,13 @@ Transcript.prototype.getTranscript = function(){
 
                     courseTranscripts[subject] = course.transcripts[subject];
 
+                    courseTranscripts[subject].index = i;
+
                     courseTranscripts[subject].forEach(function(c){
 
                         subjectObject[subject] += c.creditsAttempted;
+
+                        c.index = i;
 
                     });
 
@@ -197,6 +201,8 @@ Transcript.prototype.processTranscript = function(transcript){
                 var mark = course.progressMark || course.finalMarkValue;
 
                 me.course[key].transcripts[uniqueStr].push({
+                    index: null,
+                    n: me.course[key].transcripts[uniqueStr].length + 1,
                     cdesId: uniqueId,
                     courseId: course.leaCourseId,
                     title: course.courseTitle || me.notAvailable,
