@@ -4,11 +4,14 @@
 var moment = require('moment');
 var Transcript = require(__dirname + '/xsre/transcript');
 var Attendance = require(__dirname + '/xsre/attendance');
+var CodeSet = require(__dirname + '/xsre/codeset');
 /**
  * @constructor
  * @param result
  */
 function xSre(result){
+
+    this.config = new CodeSet().get();
 
     this.json = result.xSre;
 
@@ -79,32 +82,6 @@ function xSre(result){
         'UnexcusedAbsence': 'Not present without acceptable cause or authorization.',
         'Tardy': 'Is absent at the time a given schedule when attendance begins but is present before the close of that time period.',
         'EarlyDeparture': 'Leaves before the official close of the daily session. Reasons may include a special activity for curricular enrichment, doctor\'s appointment, and family emergency. State, local, and school regulations may distinguish excused and unexcused early departures. When officially approved on a regular basis, early departures immediately prior to the close of the session are considered to be released time.'
-    };
-
-    this.cedsId = {
-        '01': 'English Language and Literature',
-        '02': 'Mathematics',
-        '03': 'Life and Physical Sciences',
-        '04': 'Social Sciences and History',
-        '05': 'Fine and Performing Arts',
-        '06': 'Foreign Language and Literature',
-        '07': 'Religious Education and Theology',
-        '08': 'Physical, Health, and Safety Education',
-        '09': 'Military Science',
-        '10': 'Computer and Information Sciences',
-        '11': 'Communication and Audio/Visual Technology',
-        '12': 'Business and Marketing',
-        '13': 'Manufacturing',
-        '14': 'Health Care Sciences',
-        '15': 'Public, Protective, and Government Service',
-        '16': 'Hospitality and Tourism',
-        '17': 'Architecture and Construction',
-        '18': 'Agriculture, Food, and Natural Resources',
-        '19': 'Human Services',
-        '20': 'Transportation, Distribution and Logistics',
-        '21': 'Engineering and Technology',
-        '22': 'Miscellaneous',
-        '23': 'Non-Subject-Specific'
     };
 
     if('$' in this.json) delete this.json['$'];

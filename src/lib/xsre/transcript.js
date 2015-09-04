@@ -33,7 +33,15 @@ function Transcript(xsre){
 
     this.facets = xsre.facets;
 
-    this.csedId = xsre.cedsId;
+    var scedId = {};
+
+    _.each(xsre.config.scedCourseSubjectAreaCode || {}, function(m, key){
+
+        scedId[key] = m.definition;
+
+    });
+
+    this.scedId = scedId;
 
     this.totalCreditsEarned = 0;
 
@@ -128,8 +136,8 @@ Transcript.prototype.getTranscript = function(){
         details: me.course,
         credits: me.credits,
         subject: subjectObject,
-        totalCreditsEarned: parseInt(me.totalCreditsEarned),
-        totalCreditsAttempted: parseInt(me.totalCreditsAttempted),
+        totalCreditsEarned: parseFloat(me.totalCreditsEarned),
+        totalCreditsAttempted: parseFloat(me.totalCreditsAttempted),
         gradeLevel: me.gradeLevel,
         summary: me.summary
     };
@@ -190,9 +198,9 @@ Transcript.prototype.processTranscript = function(transcript){
 
             var uniqueId = course.scedCourseSubjectAreaCode;
 
-            if(uniqueId in me.csedId) {
+            if(uniqueId in me.scedId) {
 
-                var uniqueStr = me.csedId[uniqueId];
+                var uniqueStr = me.scedId[uniqueId];
 
                 if (Object.keys(me.course[key].transcripts).indexOf(uniqueStr) === -1) me.course[key].transcripts[uniqueStr] = [];
 
