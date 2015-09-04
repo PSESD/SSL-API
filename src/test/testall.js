@@ -776,6 +776,19 @@ describe('All-Test', function () {
                .end(done);
         });
 
+        it('GET /:organizationId/students/:studentId/programs/xsre', function (done) {
+            console.log(api_endpoint+'/'+organizationId+'/students/'+studentId+'/programs/xsre', ' ', grantToken);
+            request(api_endpoint)
+                .get('/'+organizationId+'/students/'+studentId+'/programs/xsre')
+                .set('authorization', grantToken)
+                .expect(function (res) {
+                    console.dir(res.body);
+                    //assert.ok(res.body._links);
+                })
+                .expect(200)
+                .end(done);
+        });
+
         it('DELETE /:organizationId/students/:studentId/xsre', function (done) {
             console.log(api_endpoint+'/'+organizationId+'/students/'+studentId+'/xsre', ' ', grantToken);
             request(api_endpoint)

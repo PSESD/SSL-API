@@ -301,8 +301,6 @@ StudentController.getStudents = function (req, res) {
 
                     if (!body) {
 
-                        res.statusCode = response.statusCode || 404;
-
                         return callback(null, student);
 
                     }
