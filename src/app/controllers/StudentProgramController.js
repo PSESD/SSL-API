@@ -4,7 +4,7 @@
 var mongoose = require('mongoose');
 var Student = require('../models/Student');
 var StudentProgram = require('../models/StudentProgram');
-var StudentProgramSchema = require('../models/schema/StudentProgram');
+var Organization = require('../models/Organization');
 var Program = require('../models/Program');
 var User = require('../models/User');
 var Tag = require('../models/Tag');
@@ -13,6 +13,10 @@ var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
 var natural = require('natural'),
     tokenizer = new natural.WordTokenizer();
+
+var xmlParser = require('js2xmlparser');
+var moment = require('moment');
+var config = require('config'), xsreConfig = config.get('hzb').xsre;
 
 
 var StudentProgramController = new BaseController(StudentProgram).crud();
@@ -37,6 +41,136 @@ StudentProgramController.getByStudentId = function (req, res) {
         if(!student) return res.errJson('Data not found');
 
         res.okJson(null, student.programs);
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentProgramController.getByStudentIdXsre = function(req, res){
+
+    var orgId = req.params.organizationId;
+
+    var stdId = req.params.studentId;
+
+    Organization.findOne({ _id: ObjectId(orgId) }, function(err, organization) {
+
+        if (err) return res.errJson(err);
+
+        if (!organization) return res.errJson('Data not found');
+
+        Student.protect(req.user.role, {value: stdId}, req.user).findOne({
+            _id: ObjectId(stdId),
+            organization: ObjectId(orgId)
+        }, function (err, student) {
+
+            if (err) return res.errJson(err);
+
+            if (!student) return res.errJson('Data not found');
+
+            var CBOStudent = {
+                '@': {
+                    id: student._id.toString()
+                },
+                organization: {
+                    '@': {
+                        refId: student.organization.toString()
+                    },
+                    organizationName: organization.name,
+                    externalServiceId: organization.externalServiceId,
+                    personnelId: organization.personnelId,
+                    authorizedEntityId: organization.authorizedEntityId,
+                    districtStudentId: student.district_student_id,
+                    zoneId: student.school_district,
+                    contextId: xsreConfig.contextId
+                },
+
+                studentActivity: [],
+
+                programs: {
+                    activities: {
+                        activity: []
+                    }
+                }
+
+            };
+
+            var programsId = {};
+
+            var programId = [];
+
+            _.each(student.programs, function(program){
+
+                if(Object.keys(programsId).indexOf(program.program.toString()) === -1) programsId[program.program.toString()] = [];
+
+                programsId[program.program.toString()].push(program.toObject());
+
+                programId.push(program.program);
+
+                CBOStudent.programs.activities.activity.push({
+                    studentActivityRefId: program.program.toString(),
+                    startDate: moment(new Date(program.participation_start_date)).format('MM/DD/YYYY'),
+                    endDate:moment(new Date(program.participation_end_date)).format('MM/DD/YYYY'),
+                    active: program.active,
+                    tags: {
+                        tag: program.cohort
+                    }
+
+                });
+
+            });
+
+            if(!_.isEmpty(programsId)){
+
+                Program.find({ _id: { $in: programId } }, function(err, programs){
+
+                    if(err) return res.errJson(err);
+
+                    _.each(programs, function(program){
+
+                        if(program._id.toString() in programsId){
+
+                            programsId[program._id.toString()].forEach(function(prgm){
+
+                                CBOStudent.studentActivity.push({
+                                    '@': {
+                                        refId: program._id.toString()
+                                    },
+                                    title: program.name
+                                });
+
+                            });
+
+                        }
+
+                    });
+
+                    res.set('Content-Type', 'text/xml');
+
+                    res.send(xmlParser('CBOStudent', CBOStudent, {
+                        declaration: {
+                            encoding: 'utf-16'
+                        }
+                    }));
+
+                });
+
+
+            } else {
+
+                res.set('Content-Type', 'text/xml');
+
+                res.send(xmlParser('CBOStudent', CBOStudent, {
+                    declaration: {
+                        encoding: 'utf-16'
+                    }
+                }));
+            }
+
+        });
+
     });
 
 };

@@ -20,6 +20,7 @@
     "express-subdomain": "^1.0.3",
     "fast-csv": "^0.6.0",
     "hal": "^0.1.0",
+    "js2xmlparser": "^1.0.0",
     "mandrill-api": "^1.0.45",
     "method-override": "^2.3.3",
     "mocha": "^2.2.4",
