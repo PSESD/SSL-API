@@ -182,18 +182,13 @@ UserController.save = function (req, res) {
 
         var role = req.body.role;
 
-        var is_special_case_worker = req.body.is_special_case_worker;
-
-        if(is_special_case_worker === 'true') is_special_case_worker = true;
-
-        else if(is_special_case_worker === 'false') is_special_case_worker = false;
 
         /**
          * Filter if user downgrade here role
          */
         if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
 
-            if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
+            if(role.indexOf('case-worker') !== -1) return res.errJson("Admin never be able to downgrade itself to a case worker");
 
         }
 
@@ -218,7 +213,7 @@ UserController.save = function (req, res) {
 
         } else {
 
-            obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err, user) {
+            obj.saveWithRole(req.user, req.params.organizationId, role, function (err, user) {
 
                 if (err) return res.errJson(err);
 
@@ -230,62 +225,6 @@ UserController.save = function (req, res) {
     });
 
 };
-/**
- *
- * @param req
- * @param res
- */
-//UserController.setRole = function(req, res){
-//
-//    var crit = { _id: req.params.userId };
-//
-//    User.findOne(crit, function (err, obj) {
-//
-//        if (err) return res.errJson(err);
-//
-//        if(!obj) return res.errJson('User not found');
-//
-//        var role = req.body.role;
-//
-//        var is_special_case_worker = req.body.is_special_case_worker;
-//
-//        if(is_special_case_worker === 'true') is_special_case_worker = true;
-//
-//        else if(is_special_case_worker === 'false') is_special_case_worker = false;
-//
-//        /**
-//         * Filter if user downgrade here role
-//         */
-//        if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
-//
-//            if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
-//
-//        }
-//
-//
-//        obj.saveWithRole(req.user, req.organization._id, role, is_special_case_worker, function (err) {
-//
-//            if (err) return res.errJson(err);
-//
-//            res.okJson('Successfully updated!', obj);
-//
-//        });
-//
-//    });
-//
-//};
-
-
-
-//UserController.getRole = function(){
-//
-//    return res.okJson(null, [
-//            { role: 'superadmin', description: 'Have access to all system in a CBO ' },
-//            { role: 'admin', description: 'Have access to all students in a CBO in their organization permission' },
-//            { role: 'case-worker', description: 'Some case workers only have access to the students in their permission list, some other have access to all students.' }
-//    ]);
-//
-//};
 /**
  *
  * @param req
@@ -351,7 +290,7 @@ UserController.getByUserId = function(req, res){
 
                     if(permission.organization.toString() === orgId.toString()) {
 
-                        //if (permission.role === 'case-worker' && permission.is_special_case_worker === false) {
+                        //if (permission.role === 'case-worker-restricted') {
 
                         showEmpty = false;
 
