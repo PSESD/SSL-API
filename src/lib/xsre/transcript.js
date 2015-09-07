@@ -35,13 +35,21 @@ function Transcript(xsre){
 
     var scedId = {};
 
-    _.each(xsre.config.scedCourseSubjectAreaCode || {}, function(m, key){
+    var scedSort = [];
 
-        scedId[key] = m.definition;
+    for(var k = 1; k <= 23; k++){
 
-    });
+        var nk = k < 10 ? '0'+k : ''+k;
+
+        scedId[nk] = xsre.config.scedCourseSubjectAreaCode[nk].definition;
+
+        scedSort.push(xsre.config.scedCourseSubjectAreaCode[nk].definition);
+
+    }
 
     this.scedId = scedId;
+
+    this.scedSort = scedSort;
 
     this.totalCreditsEarned = 0;
 
@@ -81,7 +89,19 @@ Transcript.prototype.getTranscript = function(){
      * Verify the data
      */
 
-    me.subject = _.sortBy(me.subject);
+    var subjectModified = [];
+
+    _.each(me.scedSort, function(scedId){
+
+        if(me.subject.indexOf(scedId) !== -1){
+
+            subjectModified.push(scedId);
+
+        }
+
+    });
+
+    me.subject = subjectModified;
 
     me.course = _.sortBy(me.course);
 
