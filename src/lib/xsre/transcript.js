@@ -59,6 +59,8 @@ function Transcript(xsre){
 
     this.totalCreditsAttempted = 0;
 
+    this.info = { totalEarned: 0, totalAttempted: 0, gradeLevel: 0 };
+
 }
 /**
  *
@@ -137,6 +139,9 @@ Transcript.prototype.getTranscript = function(){
 
                         subjectObject[subject] += c.creditsAttempted;
 
+                        me.info.totalAttempted += c.creditsAttempted;
+                        me.info.totalEarned += c.creditsEarned;
+
                         c.index = i;
 
                     });
@@ -159,7 +164,8 @@ Transcript.prototype.getTranscript = function(){
         totalCreditsEarned: parseFloat(me.totalCreditsEarned),
         totalCreditsAttempted: parseFloat(me.totalCreditsAttempted),
         gradeLevel: me.gradeLevel,
-        summary: me.summary
+        summary: me.summary,
+        info: me.info
     };
 };
 /**
@@ -205,6 +211,12 @@ Transcript.prototype.processTranscript = function(transcript){
         transcripts: {},
         summary: summary
     };
+
+    if(parseInt(me.info.gradeLevel) < parseInt(info.gradeLevel)){
+
+        me.info.gradeLevel = info.gradeLevel;
+
+    }
 
     if(Object.keys(me.course).indexOf(key) === -1) me.course[key] = info;
 
