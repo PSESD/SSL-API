@@ -240,6 +240,9 @@ Transcript.prototype.processTranscript = function(transcript){
 
                 var mark = course.progressMark || course.finalMarkValue;
 
+                me.course[key].summary.totalCreditsEarned += parseFloat(course.creditsEarned);
+                me.course[key].summary.termCreditsAttempted += parseFloat(course.creditsAttempted);
+
                 me.course[key].transcripts[uniqueStr].push({
                     index: null,
                     n: me.course[key].transcripts[uniqueStr].length + 1,
