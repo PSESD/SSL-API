@@ -20309,6 +20309,87 @@ module.exports = {
         }
     },
     scedCourseSubjectAreaCode: {
+        '01': {
+            code: '01',
+            source: 'SIF',
+            namespace: 'NA',
+            value: '01',
+            description: 'English Language and Literature',
+            definition: 'English Language and Literature',
+            aliases: null
+        },
+        '02': {
+            code: '02',
+            source: 'SIF',
+            namespace: 'NA',
+            value: '02',
+            description: 'Mathematics',
+            definition: 'Mathematics',
+            aliases: null
+        },
+        '03': {
+            code: '03',
+            source: 'SIF',
+            namespace: 'NA',
+            value: '03',
+            description: 'Life and Physical Sciences',
+            definition: 'Life and Physical Sciences',
+            aliases: null
+        },
+        '04': {
+            code: '04',
+            source: 'SIF',
+            namespace: 'NA',
+            value: '04',
+            description: 'Social Sciences and History',
+            definition: 'Social Sciences and History',
+            aliases: null
+        },
+        '05': {
+            code: '05',
+            source: 'SIF',
+            namespace: 'NA',
+            value: '05',
+            description: 'Fine and Performing Arts',
+            definition: 'Fine and Performing Arts',
+            aliases: null
+        },
+        '06': {
+            code: '06',
+            source: 'SIF',
+            namespace: 'NA',
+            value: '06',
+            description: 'Foreign Language and Literature',
+            definition: 'Foreign Language and Literature',
+            aliases: null
+        },
+        '07': {
+            code: '07',
+            source: 'SIF',
+            namespace: 'NA',
+            value: '07',
+            description: 'Religious Education and Theology',
+            definition: 'Religious Education and Theology',
+            aliases: null
+        },
+        '08': {
+            code: '08',
+            source: 'SIF',
+            namespace: 'NA',
+            value: '08',
+            description: 'Physical, Health, and Safety Education',
+            definition: 'Physical, Health, and Safety Education',
+            aliases: null
+        },
+        '09': {
+            code: '09',
+            source: 'SIF',
+            namespace: 'NA',
+            value: '09',
+            description: 'Military Science',
+            definition: 'Military Science',
+            aliases: null
+        },
         '10': {
             code: '10',
             source: 'SIF',
@@ -20434,88 +20515,8 @@ module.exports = {
             description: 'Non-Subject-Specific',
             definition: 'Non-Subject-Specific',
             aliases: null
-        },
-        '01': {
-            code: '01',
-            source: 'SIF',
-            namespace: 'NA',
-            value: '01',
-            description: 'English Language and Literature',
-            definition: 'English Language and Literature',
-            aliases: null
-        },
-        '02': {
-            code: '02',
-            source: 'SIF',
-            namespace: 'NA',
-            value: '02',
-            description: 'Mathematics',
-            definition: 'Mathematics',
-            aliases: null
-        },
-        '03': {
-            code: '03',
-            source: 'SIF',
-            namespace: 'NA',
-            value: '03',
-            description: 'Life and Physical Sciences',
-            definition: 'Life and Physical Sciences',
-            aliases: null
-        },
-        '04': {
-            code: '04',
-            source: 'SIF',
-            namespace: 'NA',
-            value: '04',
-            description: 'Social Sciences and History',
-            definition: 'Social Sciences and History',
-            aliases: null
-        },
-        '05': {
-            code: '05',
-            source: 'SIF',
-            namespace: 'NA',
-            value: '05',
-            description: 'Fine and Performing Arts',
-            definition: 'Fine and Performing Arts',
-            aliases: null
-        },
-        '06': {
-            code: '06',
-            source: 'SIF',
-            namespace: 'NA',
-            value: '06',
-            description: 'Foreign Language and Literature',
-            definition: 'Foreign Language and Literature',
-            aliases: null
-        },
-        '07': {
-            code: '07',
-            source: 'SIF',
-            namespace: 'NA',
-            value: '07',
-            description: 'Religious Education and Theology',
-            definition: 'Religious Education and Theology',
-            aliases: null
-        },
-        '08': {
-            code: '08',
-            source: 'SIF',
-            namespace: 'NA',
-            value: '08',
-            description: 'Physical, Health, and Safety Education',
-            definition: 'Physical, Health, and Safety Education',
-            aliases: null
-        },
-        '09': {
-            code: '09',
-            source: 'SIF',
-            namespace: 'NA',
-            value: '09',
-            description: 'Military Science',
-            definition: 'Military Science',
-            aliases: null
         }
+
     },
     xAssessmentAccommodationType: {
         '461': {
