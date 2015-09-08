@@ -5,7 +5,7 @@
 var xSre = require(__dirname+'/../lib/xsre');
 
 var fs = require('fs');
-var xmlFile = __dirname + '/../../../mockhzb/sid/sample6.xml';
+var xmlFile = __dirname + '/../../../mockhzb/sid/sample1.xml';
 var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
     if(err) return console.log(err);

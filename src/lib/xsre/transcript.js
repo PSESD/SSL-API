@@ -35,13 +35,21 @@ function Transcript(xsre){
 
     var scedId = {};
 
-    _.each(xsre.config.scedCourseSubjectAreaCode || {}, function(m, key){
+    var scedSort = [];
 
-        scedId[key] = m.definition;
+    for(var k = 1; k <= 23; k++){
 
-    });
+        var nk = k < 10 ? '0'+k : ''+k;
+
+        scedId[nk] = xsre.config.scedCourseSubjectAreaCode[nk].definition;
+
+        scedSort.push(xsre.config.scedCourseSubjectAreaCode[nk].definition);
+
+    }
 
     this.scedId = scedId;
+
+    this.scedSort = scedSort;
 
     this.totalCreditsEarned = 0;
 
@@ -50,6 +58,8 @@ function Transcript(xsre){
     this.credits = 1;
 
     this.totalCreditsAttempted = 0;
+
+    this.info = { totalEarned: 0, totalAttempted: 0, gradeLevel: 0 };
 
 }
 /**
@@ -81,7 +91,19 @@ Transcript.prototype.getTranscript = function(){
      * Verify the data
      */
 
-    me.subject = _.sortBy(me.subject);
+    var subjectModified = [];
+
+    _.each(me.scedSort, function(scedId){
+
+        if(me.subject.indexOf(scedId) !== -1){
+
+            subjectModified.push(scedId);
+
+        }
+
+    });
+
+    me.subject = subjectModified;
 
     me.course = _.sortBy(me.course);
 
@@ -117,6 +139,9 @@ Transcript.prototype.getTranscript = function(){
 
                         subjectObject[subject] += c.creditsAttempted;
 
+                        me.info.totalAttempted += c.creditsAttempted;
+                        me.info.totalEarned += c.creditsEarned;
+
                         c.index = i;
 
                     });
@@ -139,7 +164,8 @@ Transcript.prototype.getTranscript = function(){
         totalCreditsEarned: parseFloat(me.totalCreditsEarned),
         totalCreditsAttempted: parseFloat(me.totalCreditsAttempted),
         gradeLevel: me.gradeLevel,
-        summary: me.summary
+        summary: me.summary,
+        info: me.info
     };
 };
 /**
@@ -186,6 +212,12 @@ Transcript.prototype.processTranscript = function(transcript){
         summary: summary
     };
 
+    if(parseInt(me.info.gradeLevel) < parseInt(info.gradeLevel)){
+
+        me.info.gradeLevel = info.gradeLevel;
+
+    }
+
     if(Object.keys(me.course).indexOf(key) === -1) me.course[key] = info;
 
     if (!_.isEmpty(transcript.courses)) {
@@ -207,6 +239,9 @@ Transcript.prototype.processTranscript = function(transcript){
                 if(me.subject.indexOf(uniqueStr) === -1) me.subject.push(uniqueStr);
 
                 var mark = course.progressMark || course.finalMarkValue;
+
+                me.course[key].summary.totalCreditsEarned += parseFloat(course.creditsEarned);
+                me.course[key].summary.termCreditsAttempted += parseFloat(course.creditsAttempted);
 
                 me.course[key].transcripts[uniqueStr].push({
                     index: null,
