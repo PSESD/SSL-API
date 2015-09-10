@@ -33,11 +33,11 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
         /**
          * If student is empty from database
          */
-        if (!student) return res.errJson('The student not found in database');
+        if (!student) return res.sendError('The student not found in database');
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district].join('_'));
 
@@ -61,7 +61,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             User.find(crit, function(err, users){
 
-                if(err) return res.errJson(err);
+                if(err) return res.sendError(err);
 
                 if(!users) users = [];
 
@@ -105,7 +105,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     Program.find({ _id: { $in: programId } }, function(err, programs){
 
-                        if(err) return res.errJson(err);
+                        if(err) return res.sendError(err);
 
                         _.each(programs, function(program){
 
@@ -146,11 +146,11 @@ StudentController.getStudentsBackpack = function (req, res) {
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
             /**
              * If organization is empty from database
              */
-            if (!organization) return res.errJson('The organization not found in database');
+            if (!organization) return res.sendError('The organization not found in database');
 
             var brokerRequest = new Request({
                 externalServiceId: organization.externalServiceId,
@@ -166,13 +166,13 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
-                        if (error)  return res.errJson(error);
+                        if (error)  return res.sendError(error);
 
                         if (!body) {
 
                             res.statusCode = response.statusCode || 404;
 
-                            return res.errJson('Data not found in database xsre');
+                            return res.sendError('Data not found in database xsre');
 
                         }
 
@@ -180,7 +180,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                             parseString(body, { explicitArray: false }, function (err, result) {
 
-                                if(err) return res.errJson(err);
+                                if(err) return res.sendError(err);
 
                                 var object = new xSre(result).toObject();
                                 /**
@@ -202,7 +202,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 var json = (result && 'error' in result) ? result.error.message : 'Error not response';
 
-                                res.errJson(json);
+                                res.sendError(json);
 
                             });
                         }
@@ -234,21 +234,21 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
         /**
          * If student is empty from database
          */
-        if (!student) return res.errJson('The student not found in database');
+        if (!student) return res.sendError('The student not found in database');
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district].join('_'));
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
             /**
              * If organization is empty from database
              */
-            if (!organization) return res.errJson('The organization not found in database');
+            if (!organization) return res.sendError('The organization not found in database');
 
             cache.del(key, function(err, result){
 
@@ -256,11 +256,11 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
                     log(err, 'error');
 
-                    return res.errJson('Delete cache error');
+                    return res.sendError('Delete cache error');
 
                 }
 
-                res.okJson('Delete cache successfully');
+                res.sendSuccess('Delete cache successfully');
 
             });
         });
@@ -309,7 +309,7 @@ StudentController.getStudents = function (req, res) {
 
                         parseString(body, { explicitArray: false }, function (err, result) {
 
-                            if(err) return res.errJson(err);
+                            if(err) return res.sendError(err);
 
                             var object = new xSre(result).getJson();
 
@@ -343,11 +343,11 @@ StudentController.getStudents = function (req, res) {
 
     Organization.findOne({ _id: orgId }, function(err, organization) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
         /**
          * If organization is empty from database
          */
-        if (!organization) return res.errJson('The organization not found in database');
+        if (!organization) return res.sendError('The organization not found in database');
 
         var brokerRequest = new Request({
             externalServiceId: organization.externalServiceId,
@@ -357,7 +357,7 @@ StudentController.getStudents = function (req, res) {
 
         Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
             var studentsAsync = [];
 
@@ -373,7 +373,7 @@ StudentController.getStudents = function (req, res) {
 
             async.series(studentsAsync, function(err, students){
 
-                res.okJson(null, students);
+                res.sendSuccess(null, students);
 
             });
 
@@ -437,7 +437,7 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
         if(showEmpty === true){
 
-            return res.okJson(null, []);
+            return res.sendSuccess(null, []);
 
         }
 
@@ -445,9 +445,9 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
         Student.find(crit, function (err, students) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson(null, students);
+            res.sendSuccess(null, students);
 
         });
 
@@ -476,13 +476,13 @@ StudentController.createByOrgId = function (req, res) {
 
     User.findOne({ _id: req.user._id }, function(err, user){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
-        if(!user) return res.errJson('User not update successfully');
+        if(!user) return res.sendError('User not update successfully');
 
         obj.protect(req.user.role, null, req.user).save(function (err) {
 
-            if (err)  return res.errJson(err);
+            if (err)  return res.sendError(err);
 
             _.each(user.permissions, function(permission, key){
 
@@ -496,9 +496,9 @@ StudentController.createByOrgId = function (req, res) {
 
             user.save(function(err){
 
-                if (err)  return res.errJson(err);
+                if (err)  return res.sendError(err);
 
-                res.okJson('Successfully Added', obj);
+                res.sendSuccess('Successfully Added', obj);
 
             });
 
@@ -526,13 +526,13 @@ StudentController.getStudentById = function (req, res) {
 
     Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
         /**
          * If student is empty from database
          */
-        if (!student) return res.errJson('The student not found in database');
+        if (!student) return res.sendError('The student not found in database');
 
-        res.okJson(student);
+        res.sendSuccess(student);
 
     });
 
@@ -550,13 +550,13 @@ StudentController.deleteStudentById = function (req, res) {
 
     Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
         User.findOne({ _id: req.user._id }, function(err, user){
 
-            if(err) return res.errJson(err);
+            if(err) return res.sendError(err);
 
-            if(!user) return res.errJson('User not update successfully');
+            if(!user) return res.sendError('User not update successfully');
 
             _.each(user.permissions, function(permission, key){
 
@@ -572,9 +572,9 @@ StudentController.deleteStudentById = function (req, res) {
 
             user.save(function(err){
 
-                if (err)  return res.errJson(err);
+                if (err)  return res.sendError(err);
 
-                res.okJson('Successfully deleted');
+                res.sendSuccess('Successfully deleted');
 
             });
 
@@ -594,9 +594,9 @@ StudentController.putStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: studentId }, req.user).findOne({_id: studentId, organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        if (err)  return res.errJson(err);
+        if (err)  return res.sendError(err);
 
-        if (!obj) return res.errJson('Data not found');
+        if (!obj) return res.sendError('Data not found');
 
         for (var prop in req.body) {
 
@@ -614,9 +614,9 @@ StudentController.putStudentById = function(req, res){
 
         obj.protect(req.user.role, null, req.user).save(function (err) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson('Successfully updated!', obj);
+            res.sendSuccess('Successfully updated!', obj);
 
         });
 

@@ -45,7 +45,8 @@
     "slug": "^0.9.1",
     "supertest": "^0.15.0",
     "underscore": "^1.8.3",
-    "xml2js": "^0.4.9"
+    "xml2js": "^0.4.9",
+    "xmlify": "~1.0.0"
   },
   "devDependencies": {},
   "scripts": {

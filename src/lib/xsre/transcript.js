@@ -10,9 +10,17 @@ var _ = require('underscore');
  */
 function Transcript(xsre){
 
-    this.transcriptTerm = xsre.json.transcriptTerm || null;
+    this.transcriptTerm = null;
 
-    this.transcriptTermOther = xsre.json.otherTranscriptTerms.transcriptTerm || null;
+    this.transcriptTermOther = null;
+
+    if(xsre.json) {
+
+        if(xsre.json.transcriptTerm) this.transcriptTerm = xsre.json.transcriptTerm;
+
+        if(xsre.json.otherTranscriptTerms && xsre.json.otherTranscriptTerms.transcriptTerm) this.transcriptTermOther = xsre.json.otherTranscriptTerms.transcriptTerm;
+
+    }
 
     this.subject = [];
 

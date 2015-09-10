@@ -21,9 +21,11 @@ OrganizationController.get = function (req, res) {
 
     Organization.find({ _id: req.organization._id }, function (err, orgs) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
-        res.okJson(null, orgs);
+        res.xmlKey = 'organizations';
+
+        res.sendSuccess(null, orgs);
 
     });
 
@@ -41,9 +43,9 @@ OrganizationController.find = function (req, res) {
 
     Organization.findOne(crit, function (err, org) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
-        res.okJson(org);
+        res.sendSuccess(org);
 
     });
 
@@ -63,9 +65,9 @@ OrganizationController.profile = function (req, res) {
 
     Organization.findOne(crit, function (err, org) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
-        res.okJson(org);
+        res.sendSuccess(org);
 
     });
 
@@ -79,9 +81,9 @@ OrganizationController.updateProfile = function(req, res){
 
     Organization.findOne({_id: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        if (err)  return res.errJson(err);
+        if (err)  return res.sendError(err);
 
-        if (!obj) return res.errJson('Data not found');
+        if (!obj) return res.sendError('Data not found');
 
         for (var prop in req.body) {
 
@@ -98,9 +100,9 @@ OrganizationController.updateProfile = function(req, res){
         // save the movie
         obj.save(function (err) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson('Successfully updated!', obj);
+            res.sendSuccess('Successfully updated!', obj);
 
         });
     });
@@ -116,7 +118,7 @@ OrganizationController.allUsers = function (req, res) {
 
     User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
         var tmp = [];
 
@@ -136,7 +138,7 @@ OrganizationController.allUsers = function (req, res) {
 
         });
 
-        res.okJson(null, tmp);
+        res.sendSuccess(null, tmp);
 
     });
 
@@ -156,15 +158,15 @@ OrganizationController.getUser = function (req, res) {
         permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
     }, function (err, user) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
-        if(!user) return res.errJson('User not found!');
+        if(!user) return res.sendError('User not found!');
 
         user.getCurrentPermission(req.params.organizationId);
 
         var obj = user.toJSON();
 
-        res.okJson(obj);
+        res.sendSuccess(obj);
 
     });
 
@@ -203,13 +205,13 @@ OrganizationController.postUser = function (req, res) {
 
     permissions.last_updated_by = req.user.userId;
 
-    if (_.isEmpty(permissions)) return res.errJson('POST parameter is empty!');
+    if (_.isEmpty(permissions)) return res.sendError('POST parameter is empty!');
 
     User.findOne({_id: ObjectId(userId)}, function (err, user) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
-        if (!user) return res.errJson('User data not found');
+        if (!user) return res.sendError('User data not found');
 
         var allpermission = [];
 
@@ -236,13 +238,13 @@ OrganizationController.postUser = function (req, res) {
 
         User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
             user.permissions = allpermission;
 
             user.getCurrentPermission(orgId);
 
-            res.okJson('Organization successfully add to User', user);
+            res.sendSuccess('Organization successfully add to User', user);
 
         });
 
@@ -260,7 +262,7 @@ OrganizationController.putUser = function (req, res) {
     //
     //    if('retype_password' in req.body && req.body.password !== req.body.retype_password){
     //
-    //        return res.errJson('Password didn\'t match');
+    //        return res.sendError('Password didn\'t match');
     //
     //    } else if(!req.body.password){
     //
@@ -278,9 +280,9 @@ OrganizationController.putUser = function (req, res) {
 
     User.findOne({_id: ObjectId(req.params.userId)}, function (err, obj) {
 
-        if (err)  return res.errJson(err);
+        if (err)  return res.sendError(err);
 
-        if (!obj) return res.errJson('Data not found');
+        if (!obj) return res.sendError('Data not found');
 
 
         // set update time and update by user
@@ -311,15 +313,15 @@ OrganizationController.putUser = function (req, res) {
              */
             if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
 
-                if(role === 'case-worker') return res.errJson("Admin never be able to downgrade itself to a case worker");
+                if(role === 'case-worker') return res.sendError("Admin never be able to downgrade itself to a case worker");
 
             }
 
             obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err, user) {
 
-                if (err) return res.errJson(err);
+                if (err) return res.sendError(err);
 
-                res.okJson('Successfully updated!', user);
+                res.sendSuccess('Successfully updated!', user);
 
             });
 
@@ -327,9 +329,9 @@ OrganizationController.putUser = function (req, res) {
 
             obj.saveWithRole(req.user, req.params.organizationId, function (err, user) {
 
-                if (err) return res.errJson(err);
+                if (err) return res.sendError(err);
 
-                res.okJson('Successfully updated!', user);
+                res.sendSuccess('Successfully updated!', user);
 
             });
 
@@ -348,10 +350,10 @@ OrganizationController.deleteUser = function (req, res) {
 
     User.findOne({_id: ObjectId(req.params.userId)}, function (err, user) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
 
-        if (!user) return res.errJson("User not found");
+        if (!user) return res.sendError("User not found");
 
         var allpermission = [];
 
@@ -366,9 +368,9 @@ OrganizationController.deleteUser = function (req, res) {
 
         User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson('Delete success');
+            res.sendSuccess('Delete success');
 
         });
     });
@@ -387,9 +389,9 @@ OrganizationController.allProgram = function (req, res) {
 
     Program.find(crit, function (err, objs) {
 
-        if (err)  return res.errJson(err);
+        if (err)  return res.sendError(err);
 
-        res.okJson(null, objs);
+        res.sendSuccess(null, objs);
 
     });
 
@@ -409,11 +411,11 @@ OrganizationController.getProgram = function (req, res) {
 
     Program.findOne(crit, function (err, obj) {
 
-        if (err)  return res.errJson(err);
+        if (err)  return res.sendError(err);
 
-        if (!obj) return res.errJson('Data not found');
+        if (!obj) return res.sendError('Data not found');
 
-        res.okJson(obj);
+        res.sendSuccess(obj);
 
     });
 
@@ -429,7 +431,7 @@ OrganizationController.postProgram = function (req, res) {
 
     Program.findOne({ name: req.body.name, organization: orgId }, function(err, obj){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
         if(!obj){
 
@@ -452,9 +454,9 @@ OrganizationController.postProgram = function (req, res) {
 
         obj.save(function (err) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson('Successfully Added', obj);
+            res.sendSuccess('Successfully Added', obj);
 
         });
 
@@ -470,9 +472,9 @@ OrganizationController.putProgram = function (req, res) {
 
     Program.findOne({_id: ObjectId(req.params.programId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        if (err)  return res.errJson(err);
+        if (err)  return res.sendError(err);
 
-        if (!obj) return res.errJson('Data not found');
+        if (!obj) return res.sendError('Data not found');
 
         for (var prop in req.body) {
 
@@ -491,9 +493,9 @@ OrganizationController.putProgram = function (req, res) {
 
         obj.save(function (err) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson('Successfully updated!', obj);
+            res.sendSuccess('Successfully updated!', obj);
 
         });
 
@@ -512,9 +514,9 @@ OrganizationController.deleteProgram = function (req, res) {
         organization: ObjectId(req.params.organizationId)
     }, function (err, obj) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
-        res.okJson('Successfully deleted');
+        res.sendSuccess('Successfully deleted');
 
     });
 
