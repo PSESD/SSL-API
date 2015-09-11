@@ -265,7 +265,7 @@ Api.prototype.configureExpress = function (db) {
             /**
              * If message is object will direct return
              */
-            //console.log('CLASS: ', res.xmlOptions);
+            //console.log('CLASS: ', message.constructor.name);
 
             if (_.isObject(message)) {
 

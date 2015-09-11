@@ -67,6 +67,8 @@ OrganizationController.profile = function (req, res) {
 
         if (err) return res.sendError(err);
 
+        res.xmlOptions = 'organization';
+
         res.sendSuccess(org);
 
     });
@@ -101,6 +103,8 @@ OrganizationController.updateProfile = function(req, res){
         obj.save(function (err) {
 
             if (err) return res.sendError(err);
+
+            res.xmlOptions = 'organization';
 
             res.sendSuccess('Successfully updated!', obj);
 
@@ -138,6 +142,8 @@ OrganizationController.allUsers = function (req, res) {
 
         });
 
+        res.xmlKey = 'users';
+
         res.sendSuccess(null, tmp);
 
     });
@@ -165,6 +171,8 @@ OrganizationController.getUser = function (req, res) {
         user.getCurrentPermission(req.params.organizationId);
 
         var obj = user.toJSON();
+
+        res.xmlOptions = 'user';
 
         res.sendSuccess(obj);
 
@@ -244,6 +252,8 @@ OrganizationController.postUser = function (req, res) {
 
             user.getCurrentPermission(orgId);
 
+            res.xmlOptions = 'user';
+
             res.sendSuccess('Organization successfully add to User', user);
 
         });
@@ -277,6 +287,8 @@ OrganizationController.putUser = function (req, res) {
         if(param in req.body) delete req.body[param];
 
     });
+
+    res.xmlOptions = 'user';
 
     User.findOne({_id: ObjectId(req.params.userId)}, function (err, obj) {
 
@@ -383,6 +395,8 @@ OrganizationController.deleteUser = function (req, res) {
  */
 OrganizationController.allProgram = function (req, res) {
 
+    res.xmlKey = 'programs';
+
     var crit = Program.crit(req.query, ['organization']);
 
     crit.organization = ObjectId(req.params.organizationId);
@@ -402,6 +416,8 @@ OrganizationController.allProgram = function (req, res) {
  * @param res
  */
 OrganizationController.getProgram = function (req, res) {
+
+    res.xmlOptions = 'program';
 
     var crit = Program.crit(req.query, ['_id', 'organization']);
 
@@ -428,6 +444,8 @@ OrganizationController.getProgram = function (req, res) {
 OrganizationController.postProgram = function (req, res) {
 
     var orgId = ObjectId(req.params.organizationId);
+
+    res.xmlOptions = 'program';
 
     Program.findOne({ name: req.body.name, organization: orgId }, function(err, obj){
 
@@ -469,6 +487,8 @@ OrganizationController.postProgram = function (req, res) {
  * @param res
  */
 OrganizationController.putProgram = function (req, res) {
+
+    res.xmlKey = 'program';
 
     Program.findOne({_id: ObjectId(req.params.programId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 

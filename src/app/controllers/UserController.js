@@ -315,6 +315,8 @@ UserController.cleanAll = function(req, res){
  */
 UserController.getByUserId = function(req, res){
 
+    res.xmlKey = 'students';
+
     var currentUserId   = req.params.userId;
 
     var organizationId  = req.params.organizationId;
@@ -416,6 +418,8 @@ UserController.getByUserId = function(req, res){
  */
 UserController.postByUserId = function(req, res){
 
+    res.xmlOptions = 'student';
+
     var currentUserId   = req.params.userId;
 
     var organizationId  = req.params.organizationId;
@@ -474,6 +478,8 @@ UserController.postByUserId = function(req, res){
  */
 UserController.getStudentUserById = function(req, res){
 
+    res.xmlKey = 'students';
+
     var currentUserId   = req.params.userId;
 
     var organizationId  = req.params.organizationId;
@@ -507,6 +513,8 @@ UserController.getStudentUserById = function(req, res){
  * @param res
  */
 UserController.putStudentUserById = function(req, res){
+
+    res.xmlOptions = 'student';
 
     var currentUserId   = req.params.userId;
 
@@ -627,7 +635,7 @@ UserController.deleteStudentUserById = function(req, res){
 
                 if (err) return res.sendError(err);
 
-                res.sendSuccess('Successfully Deleted!', student);
+                res.sendSuccess('Successfully Deleted!');
 
             });
 

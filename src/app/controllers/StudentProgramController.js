@@ -30,6 +30,8 @@ var StudentProgramController = new BaseController(StudentProgram).crud();
  */
 StudentProgramController.getByStudentId = function (req, res) {
 
+    res.xmlKey = 'studentPrograms';
+
     var orgId = req.params.organizationId;
 
     var stdId = req.params.studentId;
@@ -180,6 +182,8 @@ StudentProgramController.getByStudentIdXsre = function(req, res){
  * @param res
  */
 StudentProgramController.addByStudentId = function (req, res) {
+
+    res.xmlOptions = 'student';
 
     var orgId = req.params.organizationId;
 

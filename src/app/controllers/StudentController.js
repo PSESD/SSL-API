@@ -39,7 +39,7 @@ StudentController.getStudentsBackpack = function (req, res) {
          */
         if (!student) return res.sendError('The student not found in database');
 
-        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district].join('_'));
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
 
         /**
          *
@@ -49,6 +49,8 @@ StudentController.getStudentsBackpack = function (req, res) {
         function embeds(results, isFromCache){
 
             res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
+
+            res.xmlOptions = 'studentDetail';
 
             var crit = {
                 permissions: {
@@ -240,7 +242,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
          */
         if (!student) return res.sendError('The student not found in database');
 
-        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district].join('_'));
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 
@@ -273,6 +275,8 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
  * @param res
  */
 StudentController.getStudents = function (req, res) {
+
+    res.xmlKey = 'students';
 
     var orgId = ObjectId(req.params.organizationId);
 
@@ -461,6 +465,8 @@ StudentController.getStudentNotAssigns = function (req, res) {
  */
 StudentController.createByOrgId = function (req, res) {
 
+    res.xmlKey = 'student';
+
     var obj = new Student(req.body);
 
     obj.organization = ObjectId(req.params.organizationId);
@@ -513,6 +519,8 @@ StudentController.createByOrgId = function (req, res) {
  * @param res
  */
 StudentController.getStudentById = function (req, res) {
+
+    res.xmlOptions = 'student';
 
     var orgId = req.params.organizationId;
 
@@ -589,6 +597,8 @@ StudentController.deleteStudentById = function (req, res) {
  * @param res
  */
 StudentController.putStudentById = function(req, res){
+
+    res.xmlOptions = 'student';
 
     var studentId = ObjectId(req.params.studentId);
 

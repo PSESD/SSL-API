@@ -21,6 +21,8 @@ var TagController = new BaseController(Tag).crud();
  */
 TagController.getTags = function (req, res) {
 
+    res.xmlKey = 'tags';
+
     var orgId = ObjectId(req.params.organizationId);
 
     Tag.find({organization: orgId}, function (err, tags) {
@@ -39,6 +41,7 @@ TagController.getTags = function (req, res) {
  */
 TagController.createByOrgId = function (req, res) {
 
+    res.xmlOptions = 'tag';
 
     var obj = new Tag(req.body);
 
@@ -71,6 +74,8 @@ TagController.createByOrgId = function (req, res) {
  */
 TagController.getTagById = function (req, res) {
 
+    res.xmlOptions = 'tag';
+
     var orgId = req.params.organizationId;
 
     var tagId = ObjectId(req.params.tagId);
@@ -95,7 +100,6 @@ TagController.getTagById = function (req, res) {
  */
 TagController.deleteTagById = function (req, res) {
 
-
     var orgId = req.params.organizationId;
 
     var tagId = ObjectId(req.params.tagId);
@@ -116,6 +120,7 @@ TagController.deleteTagById = function (req, res) {
  */
 TagController.putTagById = function(req, res){
 
+    res.xmlOptions = 'tag';
 
     var tagId = ObjectId(req.params.tagId);
 

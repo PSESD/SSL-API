@@ -115,7 +115,7 @@ Rest.prototype.handleRoutes= function(router, Api) {
         .post(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.addByStudentId)
     ;
 
-    router.route('/:organizationId/students/:studentId/programs/xsre'+format)
+    router.route('/:organizationId/students/:studentId/programs/CBOStudent.xml')
         .get(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByStudentIdXsre)
     ;
 
