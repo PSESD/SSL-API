@@ -322,7 +322,7 @@ OrganizationController.putUser = function (req, res) {
 
             }
 
-            obj.saveWithRole(req.user, req.params.organizationId, role, is_special_case_worker, function (err, user) {
+            obj.saveWithRole(req.user, req.params.organizationId, role, function (err, user) {
 
                 if (err) return res.sendError(err);
 
