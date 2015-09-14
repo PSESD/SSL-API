@@ -42,7 +42,7 @@ PRSController.getDistricts = function (req, res) {
 
                 if (response && response.statusCode == '200') {
 
-                    parseString(body, { explicitArray: false }, function (err, result) {
+                    utils.xml2js(body, function (err, result) {
 
                         var json = result.ArrayOfDistrictSummary;
 
@@ -60,7 +60,7 @@ PRSController.getDistricts = function (req, res) {
 
                 } else {
 
-                    parseString(body, { explicitArray: false }, function (err, result) {
+                    utils.xml2js(body, function (err, result) {
 
                         var json = (result && 'error' in result) ? result.error.message : 'Error not response';
 

@@ -40,7 +40,7 @@ StudentController.getStudentsBackpack = function (req, res) {
         if (!student) return res.sendError('The student not found in database');
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
-
+key = new Date().getTime();
         /**
          *
          * @param results
@@ -50,7 +50,9 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
 
-            res.xmlOptions = 'studentDetail';
+            res.xmlOptions = res.xmlKey = 'studentDetail';
+
+            res.bigXml = true;
 
             var crit = {
                 permissions: {
@@ -129,7 +131,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         resource.embed('programs', embedsPrograms);
 
-                        res.json(resource.toJSON());
+                        res.sendSuccess(null, resource.toJSON());
 
                     });
 
@@ -140,7 +142,8 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     resource.embed('programs', embedsPrograms);
 
-                    res.json(resource.toJSON());
+                    res.sendSuccess(null, resource.toJSON());
+
                 }
 
             });
@@ -180,7 +183,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         if (response && response.statusCode === 200) {
 
-                            parseString(body, { explicitArray: false }, function (err, result) {
+                            utils.xml2js(body, function (err, result) {
 
                                 if(err) return res.sendError(err);
 
@@ -200,7 +203,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         } else {
 
-                            parseString(body, { explicitArray: false }, function (err, result) {
+                            utils.xml2js(body, function (err, result) {
 
                                 var json = (result && 'error' in result) ? result.error.message : 'Error not response';
 
@@ -311,7 +314,7 @@ StudentController.getStudents = function (req, res) {
 
                     if (response && response.statusCode === 200) {
 
-                        parseString(body, { explicitArray: false }, function (err, result) {
+                        utils.xml2js(body, function (err, result) {
 
                             if(err) return res.sendError(err);
 

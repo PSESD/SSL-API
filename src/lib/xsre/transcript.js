@@ -3,6 +3,7 @@
  */
 var moment = require('moment');
 var _ = require('underscore');
+var l = require('lodash');
 /**
  *
  * @param xsre
@@ -101,11 +102,15 @@ Transcript.prototype.getTranscript = function(){
 
     var subjectModified = [];
 
+    var subjectObject = {};
+
     _.each(me.scedSort, function(scedId){
 
         if(me.subject.indexOf(scedId) !== -1){
 
             subjectModified.push(scedId);
+
+            subjectObject[scedId] = 0;
 
         }
 
@@ -113,15 +118,9 @@ Transcript.prototype.getTranscript = function(){
 
     me.subject = subjectModified;
 
+    console.log(me.subject);
+
     me.course = _.sortBy(me.course);
-
-    var subjectObject = {};
-
-    _.each(me.subject, function(s){
-
-        subjectObject[s] = 0;
-
-    });
 
     _.each(me.course, function(course){
 
@@ -164,11 +163,20 @@ Transcript.prototype.getTranscript = function(){
 
     });
 
+    var subjectValues = [];
+
+    _.each(subjectModified, function(s){
+
+        subjectValues.push({ name: s, value: subjectObject[s] });
+
+    });
+
     return {
         history: _.sortBy(me.history, 'schoolYear').reverse(),
         details: me.course,
         credits: me.credits,
-        subject: subjectObject,
+        subject: subjectModified,
+        subjectValues: subjectValues,
         totalCreditsEarned: parseFloat(me.totalCreditsEarned),
         totalCreditsAttempted: parseFloat(me.totalCreditsAttempted),
         gradeLevel: me.gradeLevel,
@@ -211,11 +219,12 @@ Transcript.prototype.processTranscript = function(transcript){
 
     }
 
-    var key = (transcript.schoolYear + ' ' + transcript.session.description).trim(), info = {
+
+    var key = (transcript.schoolYear + ' ' + l.get(transcript, 'session.description')).trim(), info = {
         gradeLevel : transcript.gradeLevel,
         schoolYear : transcript.schoolYear,
-        schoolName : transcript.school.schoolName,
-        session: transcript.session.description,
+        schoolName : l.get(transcript, 'school.schoolName'),
+        session: l.get(transcript, 'session.description'),
         transcripts: {},
         summary: summary
     };
