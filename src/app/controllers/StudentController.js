@@ -421,7 +421,7 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
                 if(permission.organization.toString() === orgId.toString()) {
 
-                    //if (permission.role === 'case-worker' && permission.is_special_case_worker === false) {
+                    //if (permission.role === 'case-worker-restricted') {
 
                         showEmpty = false;
 

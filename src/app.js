@@ -341,12 +341,7 @@ Api.prototype.configureExpress = function (db) {
 
             if(!req.params.format) req.params.format = 'json';
 
-            if(err === 'Access Denied' || err === 'Permission Denied') {
-
-                console.log('Unauthorize cause err "'+err+'"');
-
-                return res.errUnauthorized();
-            }
+            if(err === 'Access Denied' || err === 'Permission Denied') return res.errUnauthorized();
 
             var response = { success: false, error: err };
 

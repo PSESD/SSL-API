@@ -302,7 +302,7 @@ OrganizationController.putUser = function (req, res) {
 
         obj.last_updated_by = req.user.userId;
 
-        var role = null, is_special_case_worker = null;
+        var role = null;
 
         ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
@@ -310,22 +310,15 @@ OrganizationController.putUser = function (req, res) {
 
         });
 
-        if(req.body.role && req.body.is_special_case_worker){
+        if(req.body.role){
 
             role = req.body.role;
-
-            is_special_case_worker = req.body.is_special_case_worker;
-
-            if(is_special_case_worker === 'true') is_special_case_worker = true;
-
-            else if(is_special_case_worker === 'false') is_special_case_worker = false;
-
             /**
              * Filter if user downgrade here role
              */
             if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
 
-                if(role === 'case-worker') return res.sendError("Admin never be able to downgrade itself to a case worker");
+                if(role.indexOf('case-worker') !== -1) return res.sendError("Admin never be able to downgrade itself to a case worker");
 
             }
 
