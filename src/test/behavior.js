@@ -9,7 +9,17 @@ fs.readFile(xmlFile, function(err, data) {
     if(err) return console.log(err);
     var cleanedString = data.toString().replace("\ufeff", "");
     console.log(cleanedString);
-    parseString(cleanedString, { explicitArray: false }, function (err, result) {
+    parseString(cleanedString, {
+
+        normalize: true,
+        explicitArray: false,
+        parseBooleans: true,
+        parseNumbers: true,
+        stripPrefix: true,
+        firstCharLowerCase: true,
+        ignoreAttrs: true
+
+    }, function (err, result) {
 
         if(err) return console.log(err);
 

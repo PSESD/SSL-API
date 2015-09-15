@@ -20,7 +20,7 @@
     "express-subdomain": "^1.0.3",
     "fast-csv": "^0.6.0",
     "hal": "^0.1.0",
-    "js2xmlparser": "^1.0.0",
+    "js2xmlparser": "~1.0.0",
     "mandrill-api": "^1.0.45",
     "method-override": "^2.3.3",
     "mocha": "^2.2.4",
@@ -45,7 +45,11 @@
     "slug": "^0.9.1",
     "supertest": "^0.15.0",
     "underscore": "^1.8.3",
-    "xml2js": "^0.4.9"
+    "xml2js": "^0.4.9",
+    "xmlify": "~1.0.0",
+    "lodash": "~3.10.1",
+    "inflection": "~1.7.1",
+    "xmldom": "~0.1.19"
   },
   "devDependencies": {},
   "scripts": {
