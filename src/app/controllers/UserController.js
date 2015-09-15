@@ -180,7 +180,7 @@ UserController.save = function (req, res) {
         if(!obj) return res.sendError('User not found');
 
 
-        var role = req.body.role;
+        var role = req.body.role + '';
 
 
         /**
