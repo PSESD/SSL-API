@@ -10,7 +10,7 @@ var methodOverride = require('method-override');
 var port = process.env.PORT || 4000;
 var config = require('config');
 var hal = require('hal');
-var xmlify = require('xmlify');
+var xmlify = require('./lib/xmlmodel');
 var utils = require('./lib/utils');
 
 var rollbarAccessToken = config.get('rollbar.access_token');
@@ -241,10 +241,12 @@ Api.prototype.configureExpress = function (db) {
                     return res.json(data);
 
                 case 'xml':
-                    if(res.bigXml){
-                        return res.send(utils.js2xml(data, res.xmlOptions));
-                    }
+                    //if(res.bigXml){
+                    //    return res.send(utils.js2xml(data, res.xmlOptions));
+                    //}
+
                     return res.send(xmlify(data, res.xmlOptions || 'response'));
+
 
             }
 

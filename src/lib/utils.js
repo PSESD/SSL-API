@@ -182,10 +182,19 @@ var utils = {
      * @param options
      */
     js2xml: function(data, options){
-        var builder = new xml2js.Builder(_.extend({
 
-        }, options || {}));
-        return builder.buildObject(data);
+        var root = 'response';
+
+        if(_.isString(options)){
+
+            root = options;
+
+            options = {};
+
+        }
+
+        return require('js2xmlparser')(root, data, options);
+
     },
     /**
      *
