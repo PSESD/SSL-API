@@ -13,7 +13,16 @@ function xSre(result){
 
     this.config = new CodeSet().get();
 
-    this.json = result.xSre;
+    if(result.payload && result.payload.response){
+
+        this.json = result.payload.response.xSre;
+
+    } else {
+
+        this.json = result.xSre;
+
+    }
+
 
     this.facets = {
         13297: 'Disciplinary action, not receiving instruction',

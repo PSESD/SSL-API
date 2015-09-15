@@ -126,8 +126,7 @@ describe('All-Test', function () {
         email: 'support@upwardstech.com',
         password: 'demo',
         last_name: 'Upwardstech',
-        is_special_case_worker: false,
-        role: 'case-worker',
+        role: 'case-worker-restricted',
         is_super_admin: true
     };
 
@@ -135,7 +134,6 @@ describe('All-Test', function () {
         email: 'admin@upwardstech.com',
         password: 'demo',
         last_name: 'Upwardstech2',
-        is_special_case_worker: false,
         role: 'admin'
     };
 
@@ -143,16 +141,14 @@ describe('All-Test', function () {
         email: 'support3@upwardstech.com',
         password: 'demo',
         last_name: 'Upwardstech3',
-        is_special_case_worker: false,
-        role: 'case-worker'
+        role: 'case-worker-restricted'
     };
 
     var newUser4 = {
         email: 'support4@upwardstech.com',
         password: 'demo',
         last_name: 'Upwardstech4',
-        is_special_case_worker: false,
-        role: 'case-worker'
+        role: 'case-worker-restricted'
     };
 
 
@@ -411,12 +407,12 @@ describe('All-Test', function () {
         });
 
         it('PUT /:organizatioId/users/:userId', function (done) {
-            http_build_query({ role: 'admin', is_special_case_worker: false }, api_endpoint+ '/' +organizationId+ '/users/'+userId3, grantToken);
+            http_build_query({ role: 'admin' }, api_endpoint+ '/' +organizationId+ '/users/'+userId3, grantToken);
             request(api_endpoint)
                 .put('/' +organizationId+ '/users/'+userId3)
                 .set('authorization', grantToken)
                 .set('x-cbo-client-url', 'http://localhost:4000')
-                .send({ role: 'admin', is_special_case_worker: false })
+                .send({ role: 'admin' })
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
@@ -431,7 +427,6 @@ describe('All-Test', function () {
             userId: userId,
             students: [],
             role: "admin",
-            is_special_case_worker: false,
             permissions: [{
                 model: 'Student',
                 operation: '*',
@@ -569,7 +564,7 @@ describe('All-Test', function () {
         });
 
         it('PUT /:organizationId/users/:userId user 3 to special case-worker', function (done) {
-            newUser3.is_special_case_worker = true;
+            newUser3.role = 'case-worker-unrestricted';
             http_build_query(newUser3, api_endpoint + '/'+organizationId+'/users/'+userId3, grantToken);
             request(api_endpoint)
                 .put('/'+organizationId+'/users/'+userId3)

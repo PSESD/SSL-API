@@ -10,7 +10,15 @@ var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
     if(err) return console.log(err);
 
-    parseString(data, { explicitArray: false }, function (err, result) {
+    parseString(data, {
+        normalize: true,
+        explicitArray: false,
+        parseBooleans: true,
+        parseNumbers: true,
+        stripPrefix: true,
+        firstCharLowerCase: true,
+        ignoreAttrs: true
+    }, function (err, result) {
 
         if(err) return console.log(err);
 

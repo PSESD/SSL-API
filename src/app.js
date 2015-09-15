@@ -10,6 +10,8 @@ var methodOverride = require('method-override');
 var port = process.env.PORT || 4000;
 var config = require('config');
 var hal = require('hal');
+var xmlify = require('./lib/xmlmodel');
+var utils = require('./lib/utils');
 
 var rollbarAccessToken = config.get('rollbar.access_token');
 
@@ -208,6 +210,7 @@ Api.prototype.configureExpress = function (db) {
 
     app.use(function (req, res, next) {
 
+
         var resource = null;
         /**
          *
@@ -220,11 +223,57 @@ Api.prototype.configureExpress = function (db) {
             return res.end('Unauthorized');
 
         };
+        /**
+         *
+         * @param req
+         * @param res
+         * @param data
+         * @returns {*}
+         */
+        function sendFormat(req, res, data){
 
-        res.okJson = function (message, data, key, collection) {
+            var format = req.params.format;
+
+            switch( format ){
+
+                case 'json':
+
+                    return res.json(data);
+
+                case 'xml':
+                    //if(res.bigXml){
+                    //    return res.send(utils.js2xml(data, res.xmlOptions));
+                    //}
+
+                    return res.send(xmlify(data, res.xmlOptions || 'response'));
+
+
+            }
+
+            return res.send(data);
+
+        }
+
+        res.sendFormat = sendFormat;
+
+
+        res.sendSuccess = function (message, data, key, collection) {
+
+            if(!req.params.format) req.params.format = 'json';
+
+            var format = req.params.format;
+
+            if(format === 'xml' && res.xmlKey && !key){
+
+                key = res.xmlKey;
+
+            }
+
             /**
              * If message is object will direct return
              */
+            //console.log('CLASS: ', message.constructor.name);
+
             if (_.isObject(message)) {
 
                 if (typeof message.toJSON === 'function') {
@@ -235,7 +284,7 @@ Api.prototype.configureExpress = function (db) {
 
                 resource = new hal.Resource(message, req.originalUrl);
 
-                return res.json(resource.toJSON());
+                return sendFormat(req, res, resource.toJSON());
 
             }
 
@@ -291,24 +340,21 @@ Api.prototype.configureExpress = function (db) {
 
             }
 
-            return res.json(resource.toJSON());
+            return sendFormat(req, res, resource.toJSON());
 
         };
 
-        res.errJson = function (err) {
+        res.sendError = function (err) {
 
-            if(err === 'Access Denied' || err === 'Permission Denied') {
+            if(!req.params.format) req.params.format = 'json';
 
-                console.log('Unauthorize cause err "'+err+'"');
-
-                return res.errUnauthorized();
-            }
+            if(err === 'Access Denied' || err === 'Permission Denied') return res.errUnauthorized();
 
             var response = { success: false, error: err };
 
             resource = new hal.Resource(response, req.originalUrl);
 
-            return res.json(resource.toJSON());
+            return sendFormat(req, res, resource.toJSON());
 
         };
 
