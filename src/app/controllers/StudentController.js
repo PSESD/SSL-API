@@ -40,7 +40,7 @@ StudentController.getStudentsBackpack = function (req, res) {
         if (!student) return res.sendError('The student not found in database');
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
-        key = new Date().getTime();
+        //key = new Date().getTime();
         /**
          *
          * @param results
