@@ -273,6 +273,68 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
     });
 };
 /**
+ *
+ * @param brokerRequest
+ * @param student
+ * @param orgId
+ * @param callback
+ */
+StudentController.getStudentDetail = function(brokerRequest, student, orgId, callback){
+
+    var key = md5(['_xsre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
+
+    cache.get(key, function(err, result){
+
+        if(err)  return callback(null, student);
+
+        if(!result){
+
+            brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
+
+                if (error)  return callback(null, student);
+
+                if (!body) {
+
+                    return callback(null, student);
+
+                }
+
+                if (response && response.statusCode === 200) {
+
+                    utils.xml2js(body, function (err, result) {
+
+                        if(err) return res.sendError(err);
+
+                        var object = new xSre(result).getStudentSummary();
+
+                        var newObject = student.toObject();
+
+                        newObject.xsre = object;
+
+                        /**
+                         * Set to cache
+                         */
+                        cache.set(key, newObject, {ttl: 3600}, function(err){
+
+                            callback(null, newObject);
+
+                        });
+
+                    });
+
+                }
+            });
+
+        } else {
+
+
+            callback(null, result);
+
+        }
+
+    });
+};
+/**
  * Get all student in organization
  * @param req
  * @param res
@@ -288,67 +350,7 @@ StudentController.getStudents = function (req, res) {
     var withXsre = parseInt(req.query.xsre) > 0;
 
     crit.organization = orgId;
-    /**
-     *
-     * @param brokerRequest
-     * @param student
-     * @param callback
-     */
-    var getStudentDetail = function(brokerRequest, student, callback){
 
-        var key = md5(['_xsre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
-
-        cache.get(key, function(err, result){
-
-            if(err)  return callback(null, student);
-
-            if(!result){
-
-                brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
-
-                    if (error)  return callback(null, student);
-
-                    if (!body) {
-
-                        return callback(null, student);
-
-                    }
-
-                    if (response && response.statusCode === 200) {
-
-                        utils.xml2js(body, function (err, result) {
-
-                            if(err) return res.sendError(err);
-
-                            var object = new xSre(result).getStudentSummary();
-
-                            var newObject = student.toObject();
-
-                            newObject.xsre = object;
-
-                            /**
-                             * Set to cache
-                             */
-                            cache.set(key, newObject, {ttl: 3600}, function(err){
-
-                                callback(null, newObject);
-
-                            });
-
-                        });
-
-                    }
-                });
-
-            } else {
-
-
-                callback(null, result);
-
-            }
-
-        });
-    };
 
     Organization.findOne({ _id: orgId }, function(err, organization) {
 
@@ -376,7 +378,7 @@ StudentController.getStudents = function (req, res) {
 
                     studentsAsync.push(function (callback) {
 
-                        getStudentDetail(brokerRequest, student, callback);
+                        StudentController.getStudentDetail(brokerRequest, student, orgId, callback);
 
                     });
 
@@ -535,25 +537,55 @@ StudentController.getStudentById = function (req, res) {
 
     res.xmlOptions = 'student';
 
-    var orgId = req.params.organizationId;
+    var orgId = ObjectId(req.params.organizationId);
 
     var studentId = ObjectId(req.params.studentId);
 
     var crit = Student.crit(req.query, ['_id', 'organization']);
 
-    crit.organization = ObjectId(orgId);
+    var withXsre = parseInt(req.query.xsre) > 0;
+
+    crit.organization = orgId;
 
     crit._id = studentId;
 
-    Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
+    Organization.findOne({ _id: orgId }, function(err, organization) {
 
         if (err) return res.sendError(err);
         /**
-         * If student is empty from database
+         * If organization is empty from database
          */
-        if (!student) return res.sendError('The student not found in database');
+        if (!organization) return res.sendError('The organization not found in database');
 
-        res.sendSuccess(student);
+        var brokerRequest = new Request({
+            externalServiceId: organization.externalServiceId,
+            personnelId: organization.personnelId,
+            authorizedEntityId: organization.authorizedEntityId
+        });
+
+        Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
+
+            if (err) return res.sendError(err);
+            /**
+             * If student is empty from database
+             */
+            if (!student) return res.sendError('The student not found in database');
+
+            if(withXsre) {
+
+                StudentController.getStudentDetail(brokerRequest, student, orgId, function(err, student){
+
+                    res.sendSuccess(student);
+
+                });
+
+            } else {
+
+                res.sendSuccess(student);
+
+            }
+
+        });
 
     });
 
