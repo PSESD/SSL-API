@@ -329,7 +329,7 @@ StudentController.getStudents = function (req, res) {
                             /**
                              * Set to cache
                              */
-                            cache.set(key, newObject, function(err){
+                            cache.set(key, newObject, {ttl: 3600}, function(err){
 
                                 callback(null, newObject);
 
