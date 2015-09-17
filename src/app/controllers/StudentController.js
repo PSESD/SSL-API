@@ -285,6 +285,8 @@ StudentController.getStudents = function (req, res) {
 
     var crit = Student.crit(req.query, ['organization']);
 
+    var withXsre = parseInt(req.query.xsre) > 0;
+
     crit.organization = orgId;
     /**
      *
@@ -318,7 +320,7 @@ StudentController.getStudents = function (req, res) {
 
                             if(err) return res.sendError(err);
 
-                            var object = new xSre(result).getJson();
+                            var object = new xSre(result).getStudentSummary();
 
                             var newObject = student.toObject();
 
@@ -327,7 +329,7 @@ StudentController.getStudents = function (req, res) {
                             /**
                              * Set to cache
                              */
-                            cache.set(key, newObject, function(err){
+                            cache.set(key, newObject, {ttl: 3600}, function(err){
 
                                 callback(null, newObject);
 
@@ -366,23 +368,31 @@ StudentController.getStudents = function (req, res) {
 
             if (err) return res.sendError(err);
 
-            var studentsAsync = [];
+            if(withXsre) {
 
-            students.forEach(function(student){
+                var studentsAsync = [];
 
-                studentsAsync.push(function(callback){
+                students.forEach(function (student) {
 
-                    getStudentDetail(brokerRequest, student, callback);
+                    studentsAsync.push(function (callback) {
+
+                        getStudentDetail(brokerRequest, student, callback);
+
+                    });
 
                 });
 
-            });
+                async.series(studentsAsync, function(err, students){
 
-            async.series(studentsAsync, function(err, students){
+                    res.sendSuccess(null, students);
+
+                });
+
+            } else {
 
                 res.sendSuccess(null, students);
 
-            });
+            }
 
         });
 

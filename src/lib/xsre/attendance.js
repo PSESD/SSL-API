@@ -134,6 +134,8 @@ function Attendance(xsre){
 
     this.notAvailable = 'N/A';
 
+    this.currentSummary = null;
+
     this.facets = xsre.facets;
 }
 /**
@@ -648,6 +650,90 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
         summary[n].value = value.toFixed(2);
 
     }
+
+};
+/**
+ *
+ * @returns {number}
+ */
+Attendance.prototype.getCurrentTotalAttendance = function(){
+
+    return this.calculateSummary().attendance;
+
+};
+/**
+ *
+ * @returns {number}
+ */
+Attendance.prototype.getCurrentTotalBehavior = function(){
+
+    return this.calculateSummary().behavior;
+
+};
+/**
+ *
+ * @returns {{attendance: number, behavior: number}|*}
+ */
+Attendance.prototype.calculateSummary = function(){
+
+    if(this.currentSummary !== null){
+
+        return this.currentSummary;
+
+    }
+
+    var me = this;
+
+    var mm = null;
+
+    me.currentSummary = {
+        attendance: 0,
+        behavior: 0
+    };
+
+    var currentYear = moment().format('YYYY');
+
+    if(!_.isArray(me.attendances.events.event)){
+
+        me.attendances.events.event = [ me.attendances.events.event ];
+
+    }
+
+    me.attendances.events.event.forEach(function(event){
+
+        mm = moment(new Date(event.calendarEventDate));
+
+        if(mm.isValid() && mm.format('YYYY') === currentYear) {
+
+            if(me.slug(event.attendanceStatus) === 'excused' || me.slug(event.attendanceStatus) === 'unexcused'){
+
+                me.currentSummary.attendance++;
+
+            }
+
+        }
+
+    });
+
+    if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
+
+        me.disciplineIncidents.disciplineIncident = [ me.disciplineIncidents.disciplineIncident ];
+
+    }
+
+    me.disciplineIncidents.disciplineIncident.forEach(function(discipline){
+
+        mm = moment(new Date(discipline.incidentDate));
+
+        if(mm.isValid() && mm.format('YYYY') === currentYear) {
+
+            me.currentSummary.behavior++;
+
+        }
+
+    });
+
+    return me.currentSummary;
 
 };
 /**
