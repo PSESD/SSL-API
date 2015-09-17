@@ -5,6 +5,7 @@ var moment = require('moment');
 var Transcript = require(__dirname + '/xsre/transcript');
 var Attendance = require(__dirname + '/xsre/attendance');
 var CodeSet = require(__dirname + '/xsre/codeset');
+var _ = require('lodash');
 /**
  * @constructor
  * @param result
@@ -112,6 +113,33 @@ xSre.prototype.getTranscript= function(){
 xSre.prototype.getJson = function(){
 
     return this.json;
+
+};
+
+xSre.prototype.getStudentSummary = function(){
+
+    var summary = {
+        gradeLevel: null,
+        schoolYear: null,
+        schoolName: null,
+        attendance: null,
+        behavior: null,
+        onTrackToGraduate: null
+    };
+
+    var json = this.getJson();
+
+    summary.gradeLevel = _.get(json, 'enrollment.gradeLevel');
+    summary.schoolYear = _.get(json,'enrollment.schoolYear');
+    summary.schoolName = _.get(json,'enrollment.school.schoolName');
+
+    var attendance = this.getAttendanceBehavior();
+
+    summary.attendance = attendance.getCurrentTotalAttendance();
+    summary.behavior = attendance.getCurrentTotalBehavior();
+    summary.onTrackToGraduate = _.get(json, 'transcriptTerm.academicSummary.onTrackToGraduate');
+
+    return summary;
 
 };
 /**
