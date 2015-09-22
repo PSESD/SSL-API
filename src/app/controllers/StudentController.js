@@ -281,7 +281,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
  */
 StudentController.getStudentDetail = function(brokerRequest, student, orgId, callback){
 
-    var key = md5(['_xsre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
+    var key = md5(['_xSre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
 
     cache.get(key, function(err, result){
 
