@@ -160,7 +160,8 @@ Request.prototype = {
             method: method || 'GET',
             headers: this.getHeaders(),
             qsParseOptions: { sep: ';'},
-            strictSSL: false
+            strictSSL: false,
+            timeout: 60000 // timeout 1 minute
         };
 
         //console.dir(options);

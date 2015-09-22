@@ -705,6 +705,12 @@ Attendance.prototype.calculateSummary = function(){
 
         if(mm.isValid() && mm.format('YYYY') === currentYear) {
 
+            if('dailyAttendanceStatus' in event) {
+
+                event.attendanceStatus = event.dailyAttendanceStatus;
+
+            }
+
             if(me.slug(event.attendanceStatus) === 'excused' || me.slug(event.attendanceStatus) === 'unexcused'){
 
                 me.currentSummary.attendance++;
