@@ -4,6 +4,7 @@
 var moment = require('moment');
 var Transcript = require(__dirname + '/xsre/transcript');
 var Attendance = require(__dirname + '/xsre/attendance');
+var Assessment = require(__dirname + '/xsre/assessment');
 var CodeSet = require(__dirname + '/xsre/codeset');
 var _ = require('lodash');
 /**
@@ -151,6 +152,12 @@ xSre.prototype.getAttendanceBehavior = function(){
     return new Attendance(this);
 
 };
+
+xSre.prototype.getAssessment = function(){
+
+    return new Assessment(this);
+
+};
 /**
  *
  * @returns {*}
@@ -162,6 +169,8 @@ xSre.prototype.toObject = function(){
     json.attendanceBehaviors = this.getAttendanceBehavior().getAttendances();
 
     json.transcripts = this.getTranscript().getTranscript();
+
+    json.assessments = this.getAssessment().getAssessment();
 
     json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss');
 
