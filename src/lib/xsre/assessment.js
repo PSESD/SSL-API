@@ -42,20 +42,48 @@ Assessment.prototype.getAssessment = function(){
 
       }
 
-      return me.collections;
+      var collections = [];
+
+      var collectionObjects = {};
+
+      me.collections.forEach(function(collection){
+
+            var key = String(collection.schoolYear);
+
+            if(key in collectionObjects){
+                  collectionObjects[key].maps = collectionObjects[collection.schoolYear].maps.concat(collection.maps);
+                  collectionObjects[key].states = collectionObjects[collection.schoolYear].states.concat(collection.states);
+            } else {
+                  collectionObjects[key] = {
+                        schoolYear: key,
+                        maps: collection.maps,
+                        states: collection.states
+                  };
+            }
+
+      });
+
+      Object.keys(collectionObjects).forEach(function(key){
+
+            collections.push(collectionObjects[key]);
+
+      });
+
+      return _.sortBy(collections, 'schoolYear').reverse();
 };
 /**
  *
- * @param assessment
+ * @param assessments
  */
-Assessment.prototype.processAssessment = function(assessment){
+Assessment.prototype.processAssessment = function(assessments){
 
       var me = this;
 
+      var mm = null;
 
-      if(me.assessments.assessment){
+      if(assessments.assessment && _.isArray(assessments.assessment)){
 
-            me.assessments.assessment.forEach(function(assessment){
+            assessments.assessment.forEach(function(assessment){
 
                   var collectionScoreSets = {
                         schoolYear: null,
@@ -68,133 +96,144 @@ Assessment.prototype.processAssessment = function(assessment){
                   };
 
                   var collectionState = {
-                        Title: null,
-                        SubjectArea: null,
                         TestName: null,
+                        SubjectArea: null,
                         TestAttemptCode: null,
                         TestAttempt: null,
                         Score: null,
                         LevelCode: null,
-                        MetStandard: null
+                        MetStandard: null,
+                        TestSchool: null,
+                        TestGrade: null
                   };
 
                   var collectionMap = {
-                        Title: null,
-                        SubjectArea: null,
                         TestName: null,
+                        SubjectArea: null,
                         RITScore: null,
                         PercentileRank: null,
                         MetTypicalGrowth_LastFall2ThisFall: null,
                         MetTypicalGrowth_LastSpring2ThisSpring: null,
-                        MetTypicalGrowth_LastFall2ThisSpring: null
+                        MetTypicalGrowth_LastFall2ThisSpring: null,
+                        TestSchool: null,
+                        TestGrade: null
                   };
 
-                  if(l.has(assessment, 'scoreSets.scoreSet')){
+                  mm = moment(new Date(assessment.actualStartDateTime));
 
-                        if(!_.isArray(assessment.scoreSets.scoreSet)){
+                  if(mm.isValid()){
 
-                              assessment.scoreSets.scoreSet = [ assessment.scoreSets.scoreSet ];
+                        collectionScoreSets.schoolYear     = mm.format('YYYY');
+                        collectionScoreSets.testSchoolId   = l.get(assessment, 'school.localId', me.notAvailable);
+                        collectionScoreSets.testSchoolName = l.get(assessment, 'school.schoolName', me.notAvailable);
+                        collectionScoreSets.testGrade      = l.get(assessment, 'studentGradeLevel', me.notAvailable);
 
-                        }
+                        if(l.has(assessment, 'scoreSets.scoreSet')){
 
-                        assessment.scoreSets.scoreSet.forEach(function(scoreSet){
+                              if(!_.isArray(assessment.scoreSets.scoreSet)){
 
-                              var attemptCode = l.get(scoreSet, 'attemptCode');
-
-                              var newCollection = null;
-                              /**
-                               * Check if its MAP or STATE
-                               */
-                              if(attemptCode){
-                                    /**
-                                     * STATE HERE
-                                     */
-                                    newCollection = l.assign(collectionState, {
-                                          SubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
-                                          TestName: l.get(scoreSet, 'subTestName'),
-                                          TestAttemptCode: attemptCode,
-                                          TestAttempt: l.has(me.config.xAssessmentAttemptCodeType, attemptCode) ?
-                                                me.config.xAssessmentAttemptCodeType[attemptCode].description : null
-                                    });
-
-                                    if(l.has(scoreSet, 'scores.score')){
-
-                                          scoreSet.scores.score.forEach(function(score){
-
-                                                switch (score.metric){
-                                                      case '03479':
-                                                            newCollection.Score = score.scoreValue;
-                                                            break;
-                                                      case '00503':
-                                                            newCollection.LevelCode = score.scoreValue;
-                                                            break;
-                                                      case '00500':
-                                                            newCollection.MetStandard = score.scoreValue;
-                                                            break;
-                                                }
-
-                                          });
-
-                                    }
-
-                                    collectionScoreSets.states.push(newCollection);
-
-                              } else {
-                                    /**
-                                     * Map Here
-                                     */
-                                    newCollection = l.assign(collectionMap, {
-                                          SubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
-                                          TestName: l.get(scoreSet, 'subTestName')
-                                    });
-
-                                    if(l.has(scoreSet, 'scores.score')){
-
-                                          scoreSet.scores.score.forEach(function(score){
-
-                                                switch (score.metric){
-                                                      case '00506':
-                                                            newCollection.RITScore = score.scoreValue;
-                                                            break;
-                                                      case '00502':
-                                                            newCollection.PercentileRank = score.scoreValue;
-                                                            break;
-                                                      case '03474':
-
-                                                            var scoreValues = String(score.scoreValue).trim().split(' ');
-
-                                                            if(scoreValues.length === 2 && l.has(newCollection, scoreValues[0]) && !_.isEmpty(scoreValues[1])){
-
-                                                                  newCollection[scoreValues[0]] = scoreValues[1].toLowerCase() === 'true' ? 'Yes' : 'No';
-
-                                                            }
-
-                                                            break;
-                                                }
-
-                                          });
-
-                                    }
-
-                                    collectionScoreSets.maps.push(newCollection);
+                                    assessment.scoreSets.scoreSet = [assessment.scoreSets.scoreSet];
 
                               }
 
-                        });
+                              assessment.scoreSets.scoreSet.forEach(function(scoreSet){
+
+                                    var attemptCode = l.get(scoreSet, 'attemptCode');
+
+                                    var newCollection = null;
+                                    /**
+                                     * Check if its MAP or STATE
+                                     */
+                                    if(attemptCode){
+                                          /**
+                                           * STATE HERE
+                                           */
+                                          newCollection = l.assign(collectionState, {
+                                                SubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
+                                                TestName: l.get(scoreSet, 'subTestName'),
+                                                TestAttemptCode: attemptCode,
+                                                TestAttempt: l.has(me.config.xAssessmentAttemptCodeType, attemptCode) ?
+                                                      me.config.xAssessmentAttemptCodeType[attemptCode].description : null,
+                                                TestSchool: collectionScoreSets.testSchoolName,
+                                                TestGrade: collectionScoreSets.testGrade
+                                          });
+
+                                          if(l.has(scoreSet, 'scores.score')){
+
+                                                scoreSet.scores.score.forEach(function(score){
+
+                                                      switch(score.metric){
+                                                            case '03479':
+                                                                  newCollection.Score = score.scoreValue;
+                                                                  break;
+                                                            case '00503':
+                                                                  newCollection.LevelCode = score.scoreValue;
+                                                                  break;
+                                                            case '00500':
+                                                                  newCollection.MetStandard = score.scoreValue;
+                                                                  break;
+                                                      }
+
+                                                });
+
+                                          }
+
+                                          collectionScoreSets.states.push(newCollection);
+
+                                    } else{
+                                          /**
+                                           * Map Here
+                                           */
+                                          newCollection = l.assign(collectionMap, {
+                                                SubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
+                                                TestName: l.get(scoreSet, 'subTestName'),
+                                                TestSchool: collectionScoreSets.testSchoolName,
+                                                TestGrade: collectionScoreSets.testGrade
+                                          });
+
+                                          if(l.has(scoreSet, 'scores.score')){
+
+                                                scoreSet.scores.score.forEach(function(score){
+
+                                                      switch(score.metric){
+                                                            case '00506':
+                                                                  newCollection.RITScore = score.scoreValue;
+                                                                  break;
+                                                            case '00502':
+                                                                  newCollection.PercentileRank = score.scoreValue;
+                                                                  break;
+                                                            case '03474':
+
+                                                                  var scoreValues = String(score.scoreValue).trim().split(' ');
+
+                                                                  if(scoreValues.length === 2 && l.has(newCollection, scoreValues[0]) && !_.isEmpty(scoreValues[1])){
+
+                                                                        newCollection[scoreValues[0]] = scoreValues[1].toLowerCase() === 'true' ? 'Yes' : 'No';
+
+                                                                  }
+
+                                                                  break;
+                                                      }
+
+                                                });
+
+                                          }
+
+                                          collectionScoreSets.maps.push(newCollection);
+
+                                    }
+
+                              });
+
+                        }
+
+                        me.collections.push(collectionScoreSets);
 
                   }
-
-                  collectionScoreSets.schoolYear = null;
-                  collectionScoreSets.testSchoolId = l.get(assessment, 'school.localId', me.notAvailable);
-                  collectionScoreSets.testSchoolName = l.get(assessment, 'school.schoolName', me.notAvailable);
-                  collectionScoreSets.testGrade = l.get(assessment, 'studentGradeLevel', me.notAvailable);
-
-                  me.collections.push(collectionScoreSets);
 
             });
 
       }
-
 
 };
 /**
