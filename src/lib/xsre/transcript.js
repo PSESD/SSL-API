@@ -192,6 +192,12 @@ Transcript.prototype.processTranscript = function(transcript){
 
     var me = this;
 
+    if(!_.isObject(transcript.courses)){
+
+        return;
+
+    }
+
     if(_.isUndefined(transcript.courses.course)){
 
         return ;

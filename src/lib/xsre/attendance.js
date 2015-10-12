@@ -146,6 +146,10 @@ Attendance.prototype.getAttendances = function(){
 
     var me = this;
 
+    if(!_.isObject(me.attendances)) return me.attendanceBehaviors;
+
+    if(!_.isObject(me.attendances.events)) return me.attendanceBehaviors;
+
     if(_.isUndefined(me.attendances.events.event)) return me.attendanceBehaviors;
 
     var mm = null;
@@ -239,7 +243,7 @@ Attendance.prototype.getAttendances = function(){
 
     });
 
-    if(!_.isUndefined(me.disciplineIncidents.disciplineIncident)){
+    if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
 
         if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
 
@@ -702,7 +706,7 @@ Attendance.prototype.calculateSummary = function(){
 
     var currentYear = moment().format('YYYY');
 
-    if(!_.isUndefined(me.attendances.events.event)){
+    if(_.isObject(me.attendances) && _.isObject(me.attendances.events) && !_.isUndefined(me.attendances.events.event)){
 
         if(!_.isArray(me.attendances.events.event)){
 
@@ -734,7 +738,7 @@ Attendance.prototype.calculateSummary = function(){
 
     }
 
-    if(!_.isUndefined(me.disciplineIncidents.disciplineIncident)){
+    if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
 
         if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
 
