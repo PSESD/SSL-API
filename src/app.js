@@ -1,7 +1,13 @@
 var express = require("express");
+var i18n = require("i18n");
 var mongoose = require('mongoose');
-var bodyParser = require("body-parser");
-var app = express();
+var bodyParser  = require("body-parser");
+var cookieParser = require('cookie-parser');
+var csrf = require('csurf');
+var csrfProtection = csrf({ cookie: true });
+var parseForm = bodyParser.urlencoded({ extended: false });
+
+var app  = express();
 var session = require('express-session');
 var passport = require('passport');
 var rollbar = require('rollbar');
@@ -12,7 +18,6 @@ var config = require('config');
 var hal = require('hal');
 var xmlmodel = require('./lib/xmlmodel');
 var utils = require('./lib/utils');
-
 var rollbarAccessToken = config.get('rollbar.access_token');
 
 if (rollbarAccessToken) {
@@ -20,7 +25,7 @@ if (rollbarAccessToken) {
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
 
-    rollbar.handleUncaughtExceptions(rollbarAccessToken, {});
+    rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
 
 }
 
@@ -191,7 +196,11 @@ Api.prototype.configureExpress = function (db) {
 
     app.set('log', require('./lib/utils').log);
 
-    app.use(bodyParser.urlencoded({extended: true}));
+    app.use(bodyParser.urlencoded({ extended: true }));
+
+    app.use(cookieParser());
+
+    app.use(i18n.init);
 
     app.use(bodyParser.json());
 
@@ -398,11 +407,15 @@ Api.prototype.configureExpress = function (db) {
      */
     self.startServer();
 
+    //self.forkingStart();
+
 };
 /**
  * Start Server
  */
 Api.prototype.startServer = function () {
+
+    var me = this;
 
     app.listen(port, function () {
 
@@ -412,12 +425,57 @@ Api.prototype.startServer = function () {
 
 };
 /**
+ * Forking server
+ */
+Api.prototype.forkingStart = function(){
+
+    var me = this;
+
+    var cluster = require('cluster');
+
+    var workers = process.env.WORKERS || require('os').cpus().length;
+
+    if (cluster.isMaster) {
+
+        console.log('start cluster with %s workers', workers);
+
+        for (var i = 0; i < workers; ++i) {
+
+            var worker = cluster.fork().process;
+
+            console.log('worker %s started.', worker.pid);
+
+        }
+
+        cluster.on('exit', function(worker) {
+
+            console.log('worker %s died. restart...', worker.process.pid);
+
+            cluster.fork();
+
+        });
+
+    } else {
+
+        me.startServer();
+
+    }
+
+    process.on('uncaughtException', function (err) {
+
+        console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
+
+        me.stop(err);
+
+    });
+};
+/**
  * Stop Server
  * @param err
  */
 Api.prototype.stop = function (err) {
 
-    console.log("ERROR \n" + err);
+    console.log("ERROR \n" + err.stack);
 
     if (rollbarAccessToken) rollbar.reportMessage("ERROR \n" + err);
 
@@ -438,12 +496,4 @@ Api.errorStack = function (ex) {
 
 };
 
-try {
-
-    new Api();
-
-} catch (e) {
-
-    Api.errorStack(e);
-
-}
+new Api();

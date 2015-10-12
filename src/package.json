@@ -27,8 +27,6 @@
     "mocha-mongoose": "^1.0.4",
     "moment": "^2.10.3",
     "moment-range": "^2.0.3",
-    "mongodb": "^1.4.37",
-    "mongoose": "^4.0.2",
     "morgan": "^1.5.2",
     "natural": "^0.2.1",
     "node-uuid": "^1.4.3",
@@ -49,7 +47,13 @@
     "xmlify": "~1.0.0",
     "lodash": "~3.10.1",
     "inflection": "~1.7.1",
-    "xmldom": "~0.1.19"
+    "xmldom": "~0.1.19",
+    "mongoose": "~4.1.10",
+    "mongodb": "~2.0.45",
+    "express-error-handler": "~1.0.1",
+    "i18n": "~0.5.0",
+    "cookie-parser": "~1.4.0",
+    "csurf": "~1.8.3"
   },
   "devDependencies": {},
   "scripts": {

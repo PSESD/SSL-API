@@ -265,7 +265,13 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
                 }
 
-                res.sendSuccess('Delete cache successfully');
+                key = md5(['_xSre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
+
+                cache.del(key, function(err, result){
+
+                    res.sendSuccess('Delete cache successfully');
+
+                });
 
             });
         });
@@ -285,17 +291,17 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
 
     cache.get(key, function(err, result){
 
-        if(err)  return callback(null, student);
+        if(err)  return callback(null, student, false);
 
         if(!result){
 
             brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
-                if (error)  return callback(null, student);
+                if (error)  return callback(null, student, false);
 
                 if (!body) {
 
-                    return callback(null, student);
+                    return callback(null, student, false);
 
                 }
 
@@ -316,7 +322,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
                          */
                         cache.set(key, newObject, {ttl: 3600}, function(err){
 
-                            callback(null, newObject);
+                            callback(null, newObject, false);
 
                         });
 
@@ -328,7 +334,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
         } else {
 
 
-            callback(null, result);
+            callback(null, result, true);
 
         }
 
@@ -384,7 +390,9 @@ StudentController.getStudents = function (req, res) {
 
                 });
 
-                async.series(studentsAsync, function(err, students){
+                async.series(studentsAsync, function(err, students, isCache){
+
+                    res.header('X-Cached-Sre' , isCache ? 1 : 0 );
 
                     res.sendSuccess(null, students);
 
@@ -573,7 +581,9 @@ StudentController.getStudentById = function (req, res) {
 
             if(withXsre) {
 
-                StudentController.getStudentDetail(brokerRequest, student, orgId, function(err, student){
+                StudentController.getStudentDetail(brokerRequest, student, orgId, function(err, student, isCache){
+
+                    res.header('X-Cached-Sre' , isCache ? 1 : 0 );
 
                     res.sendSuccess(student);
 

@@ -192,6 +192,24 @@ Transcript.prototype.processTranscript = function(transcript){
 
     var me = this;
 
+    if(!_.isObject(transcript.courses)){
+
+        return;
+
+    }
+
+    if(_.isUndefined(transcript.courses.course)){
+
+        return ;
+
+    }
+
+    if(!_.isArray(transcript.courses.course)){
+
+        transcript.courses.course = [ transcript.courses.course ];
+
+    }
+
     var summary = {
         totalCreditsEarned: 0,
         termWeightedGpa: 0,
@@ -237,46 +255,44 @@ Transcript.prototype.processTranscript = function(transcript){
 
     if(Object.keys(me.course).indexOf(key) === -1) me.course[key] = info;
 
-    if (!_.isEmpty(transcript.courses)) {
 
-        _.each(transcript.courses.course, function (course) {
+    _.each(transcript.courses.course, function (course) {
 
-            if(!course) return;
+        if(!course) return;
 
-            if(!course.leaCourseId) return;
+        if(!course.leaCourseId) return;
 
-            var uniqueId = course.scedCourseSubjectAreaCode;
+        var uniqueId = course.scedCourseSubjectAreaCode;
 
-            if(uniqueId in me.scedId) {
+        if(uniqueId in me.scedId) {
 
-                var uniqueStr = me.scedId[uniqueId];
+            var uniqueStr = me.scedId[uniqueId];
 
-                if (Object.keys(me.course[key].transcripts).indexOf(uniqueStr) === -1) me.course[key].transcripts[uniqueStr] = [];
+            if (Object.keys(me.course[key].transcripts).indexOf(uniqueStr) === -1) me.course[key].transcripts[uniqueStr] = [];
 
-                if(me.subject.indexOf(uniqueStr) === -1) me.subject.push(uniqueStr);
+            if(me.subject.indexOf(uniqueStr) === -1) me.subject.push(uniqueStr);
 
-                var mark = course.progressMark || course.finalMarkValue;
+            var mark = course.progressMark || course.finalMarkValue;
 
-                me.course[key].summary.totalCreditsEarned += parseFloat(course.creditsEarned);
-                me.course[key].summary.termCreditsAttempted += parseFloat(course.creditsAttempted);
+            me.course[key].summary.totalCreditsEarned += parseFloat(course.creditsEarned);
+            me.course[key].summary.termCreditsAttempted += parseFloat(course.creditsAttempted);
 
-                me.course[key].transcripts[uniqueStr].push({
-                    index: null,
-                    n: me.course[key].transcripts[uniqueStr].length + 1,
-                    cdesId: uniqueId,
-                    courseId: course.leaCourseId,
-                    title: course.courseTitle || me.notAvailable,
-                    mark: mark,
-                    gradeLevel: info.gradeLevel || me.notAvailable,
-                    creditsEarned: parseFloat(course.creditsEarned),
-                    creditsAttempted: parseFloat(course.creditsAttempted)
-                });
+            me.course[key].transcripts[uniqueStr].push({
+                index: null,
+                n: me.course[key].transcripts[uniqueStr].length + 1,
+                cdesId: uniqueId,
+                courseId: course.leaCourseId,
+                title: course.courseTitle || me.notAvailable,
+                mark: mark,
+                gradeLevel: info.gradeLevel || me.notAvailable,
+                creditsEarned: parseFloat(course.creditsEarned),
+                creditsAttempted: parseFloat(course.creditsAttempted)
+            });
 
-            }
+        }
 
-        });
+    });
 
-    }
 
 };
 
