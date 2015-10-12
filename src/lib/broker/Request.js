@@ -107,8 +107,6 @@ Request.prototype = {
      */
     create: function (what, url, method, callback) {
 
-        var config = this.config[what];
-
         if('Authorization' in this.headers){
 
             //skip
@@ -141,8 +139,12 @@ Request.prototype = {
                     throw new Error('Unable to generate token');
 
             }
+
             this.headers.Authorization = 'SIF_HMACSHA256 ' + token;
+
         }
+
+        var config = this.config[what];
 
         var self = this;
 

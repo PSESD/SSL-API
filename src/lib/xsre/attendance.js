@@ -146,19 +146,29 @@ Attendance.prototype.getAttendances = function(){
 
     var me = this;
 
-    if(!me.attendances) return me.attendanceBehaviors;
+    if(!_.isObject(me.attendances)) return me.attendanceBehaviors;
+
+    if(!_.isObject(me.attendances.events)) return me.attendanceBehaviors;
+
+    if(_.isUndefined(me.attendances.events.event)) return me.attendanceBehaviors;
 
     var mm = null;
+
+    if(!_.isArray(me.attendances.events.event)){
+
+        me.attendances.events.event = [ me.attendances.events.event ];
+
+    }
 
     me.attendances.events.event.forEach(function(event){
 
         mm = moment(new Date(event.calendarEventDate));
 
-        if(mm.isValid()) {
+        if(mm.isValid()){
 
             event.calendarEventDateTime = mm.valueOf();
 
-           var obj = {
+            var obj = {
                 calendarEventDate: event.calendarEventDate,
                 attendanceValue: event.attendanceValue,
                 attendanceStatus: null,
@@ -174,44 +184,44 @@ Attendance.prototype.getAttendances = function(){
 
             event.calendarEventDateString = event.calendarEventDate;
 
-            if('absentAttendanceCategory' in event) {
+            if('absentAttendanceCategory' in event){
 
-               obj.absentAttendanceCategory = parseInt(event.absentAttendanceCategory);
+                obj.absentAttendanceCategory = parseInt(event.absentAttendanceCategory);
 
-               obj.absentAttendanceCategoryTitle = obj.absentAttendanceCategory in me.facets ? me.facets[obj.absentAttendanceCategory] : '';
+                obj.absentAttendanceCategoryTitle = obj.absentAttendanceCategory in me.facets ? me.facets[obj.absentAttendanceCategory] : '';
 
             }
 
-            if('timeTablePeriod' in event) {
+            if('timeTablePeriod' in event){
 
                 obj.timeTablePeriod = parseInt(event.timeTablePeriod);
 
             }
 
-            if('presentAttendanceCategory' in event) {
+            if('presentAttendanceCategory' in event){
 
-               obj.presentAttendanceCategory = parseInt(event.presentAttendanceCategory);
+                obj.presentAttendanceCategory = parseInt(event.presentAttendanceCategory);
 
-               obj.presentAttendanceCategoryTitle = obj.presentAttendanceCategory in me.facets ? me.facets[obj.presentAttendanceCategory] : '';
-
-            }
-
-            if('attendanceEventType' in event) {
-
-               obj.attendanceEventType = event.attendanceEventType;
-
-               obj.attendanceEventTypeTitle = event.attendanceEventType in me.facets ? me.facets[event.attendanceEventType] : '';
-            }
-
-            if('dailyAttendanceStatus' in event) {
-
-               obj.attendanceStatus = event.dailyAttendanceStatus;
-
-               obj.attendanceStatusTitle = event.dailyAttendanceStatus in me.facets ? me.facets[event.dailyAttendanceStatus] : '';
+                obj.presentAttendanceCategoryTitle = obj.presentAttendanceCategory in me.facets ? me.facets[obj.presentAttendanceCategory] : '';
 
             }
 
-            if('attendanceStatus' in event) {
+            if('attendanceEventType' in event){
+
+                obj.attendanceEventType = event.attendanceEventType;
+
+                obj.attendanceEventTypeTitle = event.attendanceEventType in me.facets ? me.facets[event.attendanceEventType] : '';
+            }
+
+            if('dailyAttendanceStatus' in event){
+
+                obj.attendanceStatus = event.dailyAttendanceStatus;
+
+                obj.attendanceStatusTitle = event.dailyAttendanceStatus in me.facets ? me.facets[event.dailyAttendanceStatus] : '';
+
+            }
+
+            if('attendanceStatus' in event){
 
                 obj.attendanceStatus = event.attendanceStatus;
 
@@ -233,46 +243,50 @@ Attendance.prototype.getAttendances = function(){
 
     });
 
-    if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
+    if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
 
-        me.disciplineIncidents.disciplineIncident = [ me.disciplineIncidents.disciplineIncident ];
+        if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
 
-    }
-
-    me.disciplineIncidents.disciplineIncident.forEach(function(discipline){
-
-        mm = moment(new Date(discipline.incidentDate));
-
-        if(mm.isValid()) {
-
-            delete discipline.actions;
-
-            discipline.incidentDateTime = mm.valueOf();
-
-            var obj = {
-                incidentDate: discipline.incidentDate,
-                description: discipline.description,
-                incidentCategory: null,
-                incidentCategoryTitle: null
-            };
-
-            if('incidentCategory' in discipline) {
-
-                obj.incidentCategory = parseInt(discipline.incidentCategory);
-
-                obj.incidentCategoryTitle = obj.incidentCategory in me.facets ? me.facets[obj.incidentCategory] : '';
-
-            }
-
-            discipline.incidentDate = mm.format('MM-DD-YYYY');
-
-            if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1) me.allDisciplines[discipline.incidentDate] = [];
-
-            me.allDisciplines[discipline.incidentDate].push(obj);
+            me.disciplineIncidents.disciplineIncident = [me.disciplineIncidents.disciplineIncident];
 
         }
 
-    });
+        me.disciplineIncidents.disciplineIncident.forEach(function(discipline){
+
+            mm = moment(new Date(discipline.incidentDate));
+
+            if(mm.isValid()){
+
+                delete discipline.actions;
+
+                discipline.incidentDateTime = mm.valueOf();
+
+                var obj = {
+                    incidentDate: discipline.incidentDate,
+                    description: discipline.description,
+                    incidentCategory: null,
+                    incidentCategoryTitle: null
+                };
+
+                if('incidentCategory' in discipline){
+
+                    obj.incidentCategory = parseInt(discipline.incidentCategory);
+
+                    obj.incidentCategoryTitle = obj.incidentCategory in me.facets ? me.facets[obj.incidentCategory] : '';
+
+                }
+
+                discipline.incidentDate = mm.format('MM-DD-YYYY');
+
+                if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1) me.allDisciplines[discipline.incidentDate] = [];
+
+                me.allDisciplines[discipline.incidentDate].push(obj);
+
+            }
+
+        });
+
+    }
 
     me.minDateCalendar = _.min(me.allDates);
 
@@ -397,7 +411,6 @@ Attendance.prototype.getAttendances = function(){
         });
 
         var columns = [];
-
 
         var collects = {};
 
@@ -693,51 +706,59 @@ Attendance.prototype.calculateSummary = function(){
 
     var currentYear = moment().format('YYYY');
 
-    if(!_.isArray(me.attendances.events.event)){
+    if(_.isObject(me.attendances) && _.isObject(me.attendances.events) && !_.isUndefined(me.attendances.events.event)){
 
-        me.attendances.events.event = [ me.attendances.events.event ];
+        if(!_.isArray(me.attendances.events.event)){
 
-    }
-
-    me.attendances.events.event.forEach(function(event){
-
-        mm = moment(new Date(event.calendarEventDate));
-
-        if(mm.isValid() && mm.format('YYYY') === currentYear) {
-
-            if('dailyAttendanceStatus' in event) {
-
-                event.attendanceStatus = event.dailyAttendanceStatus;
-
-            }
-
-            if(me.slug(event.attendanceStatus) === 'excused' || me.slug(event.attendanceStatus) === 'unexcused'){
-
-                me.currentSummary.attendance++;
-
-            }
+            me.attendances.events.event = [me.attendances.events.event];
 
         }
 
-    });
+        me.attendances.events.event.forEach(function(event){
 
-    if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
+            mm = moment(new Date(event.calendarEventDate));
 
-        me.disciplineIncidents.disciplineIncident = [ me.disciplineIncidents.disciplineIncident ];
+            if(mm.isValid() && mm.format('YYYY') === currentYear){
+
+                if('dailyAttendanceStatus' in event){
+
+                    event.attendanceStatus = event.dailyAttendanceStatus;
+
+                }
+
+                if(me.slug(event.attendanceStatus) === 'excused' || me.slug(event.attendanceStatus) === 'unexcused'){
+
+                    me.currentSummary.attendance++;
+
+                }
+
+            }
+
+        });
 
     }
 
-    me.disciplineIncidents.disciplineIncident.forEach(function(discipline){
+    if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
 
-        mm = moment(new Date(discipline.incidentDate));
+        if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
 
-        if(mm.isValid() && mm.format('YYYY') === currentYear) {
-
-            me.currentSummary.behavior++;
+            me.disciplineIncidents.disciplineIncident = [me.disciplineIncidents.disciplineIncident];
 
         }
 
-    });
+        me.disciplineIncidents.disciplineIncident.forEach(function(discipline){
+
+            mm = moment(new Date(discipline.incidentDate));
+
+            if(mm.isValid() && mm.format('YYYY') === currentYear){
+
+                me.currentSummary.behavior++;
+
+            }
+
+        });
+
+    }
 
     return me.currentSummary;
 
