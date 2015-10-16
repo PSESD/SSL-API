@@ -7,11 +7,12 @@ var Attendance = require(__dirname + '/xsre/attendance');
 var Assessment = require(__dirname + '/xsre/assessment');
 var CodeSet = require(__dirname + '/xsre/codeset');
 var _ = require('lodash');
+var pd = require('pretty-data').pd;
 /**
  * @constructor
  * @param result
  */
-function xSre(result){
+function xSre(result, raw){
 
     this.config = new CodeSet().get();
 
@@ -24,6 +25,8 @@ function xSre(result){
         this.json = result.xSre;
 
     }
+
+    this.raw = raw;
 
 
     this.facets = {
@@ -172,7 +175,9 @@ xSre.prototype.toObject = function(){
 
     json.assessments = this.getAssessment().getAssessment();
 
-    json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss');
+    json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss')
+
+    json.raw = pd.xml(this.raw);
 
     return json;
 

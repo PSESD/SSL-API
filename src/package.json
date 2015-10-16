@@ -53,7 +53,8 @@
     "express-error-handler": "~1.0.1",
     "i18n": "~0.5.0",
     "cookie-parser": "~1.4.0",
-    "csurf": "~1.8.3"
+    "csurf": "~1.8.3",
+    "pretty-data": "~0.40.0"
   },
   "devDependencies": {},
   "scripts": {
