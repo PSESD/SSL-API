@@ -4,6 +4,13 @@
 // Load required packages
 var mongoose = require('mongoose');
 var Address = require('./schema/Address');
+var Student = require('./Student');
+var Program = require('./Program');
+var config = require('config'), xsreConfig = config.get('hzb').xsre;
+var _ = require('underscore');
+var xmlParser = require('js2xmlparser');
+var moment = require('moment');
+var ObjectId = mongoose.Types.ObjectId;
 
 // Define our Organization schema
 var OrganizationSchema = new mongoose.Schema({
@@ -77,6 +84,138 @@ OrganizationSchema.statics.findByUser = function(user, crit, done){
         crit._id = { $in: _id };
     }
     this.find(crit, done);
+};
+/**
+ *
+ * @param user
+ * @param orgId
+ * @param stdId
+ * @param callback
+ */
+OrganizationSchema.statics.pushStudent = function(user, orgId, stdId, callback){
+
+    this.findOne({ _id: ObjectId(orgId) }, function(err, organization) {
+
+        if (err) return callback(err);
+
+        if (!organization) return callback('Data not found');
+
+        var cb = function (err, student) {
+
+            if (err) return callback(err);
+
+            if (!student) return callback('Data not found');
+
+            var CBOStudent = {
+                '@': {
+                    id: student._id.toString()
+                },
+                organization: {
+                    '@': {
+                        refId: student.organization.toString()
+                    },
+                    organizationName: organization.name,
+                    externalServiceId: organization.externalServiceId,
+                    personnelId: organization.personnelId,
+                    authorizedEntityId: organization.authorizedEntityId,
+                    districtStudentId: student.district_student_id,
+                    zoneId: student.school_district,
+                    contextId: xsreConfig.contextId
+                },
+
+                studentActivity: [],
+
+                programs: {
+                    activities: {
+                        activity: []
+                    }
+                }
+
+            };
+
+            var programsId = {};
+
+            var programId = [];
+
+            _.each(student.programs, function(program){
+
+                if(Object.keys(programsId).indexOf(program.program.toString()) === -1) programsId[program.program.toString()] = [];
+
+                programsId[program.program.toString()].push(program.toObject());
+
+                programId.push(program.program);
+
+                CBOStudent.programs.activities.activity.push({
+                    studentActivityRefId: program.program.toString(),
+                    startDate: moment(new Date(program.participation_start_date)).format('MM/DD/YYYY'),
+                    endDate:moment(new Date(program.participation_end_date)).format('MM/DD/YYYY'),
+                    active: program.active,
+                    tags: {
+                        tag: program.cohort
+                    }
+
+                });
+
+            });
+
+            if(!_.isEmpty(programsId)){
+
+                Program.find({ _id: { $in: programId } }, function(err, programs){
+
+                    if(err) return callback(err);
+
+                    _.each(programs, function(program){
+
+                        if(program._id.toString() in programsId){
+
+                            programsId[program._id.toString()].forEach(function(prgm){
+
+                                CBOStudent.studentActivity.push({
+                                    '@': {
+                                        refId: program._id.toString()
+                                    },
+                                    title: program.name
+                                });
+
+                            });
+
+                        }
+
+                    });
+
+                    callback(null, xmlParser('CBOStudent', CBOStudent, {
+                        declaration: {
+                            encoding: 'utf-16'
+                        }
+                    }));
+
+                });
+
+
+            } else {
+
+                callback(null, xmlParser('CBOStudent', CBOStudent, {
+                    declaration: {
+                        encoding: 'utf-16'
+                    }
+                }));
+            }
+
+        };
+
+        if(user){
+            Student.protect(user.role, {value: stdId}, user).findOne({
+                _id: ObjectId(stdId),
+                organization: ObjectId(orgId)
+            }, cb);
+        } else {
+            Student.findOne({
+                _id: ObjectId(stdId),
+                organization: ObjectId(orgId)
+            }, cb)
+        }
+
+    });
 };
 
 // Export the Mongoose model

@@ -11,6 +11,7 @@ var pd = require('pretty-data').pd;
 /**
  * @constructor
  * @param result
+ * @param raw
  */
 function xSre(result, raw){
 
@@ -175,7 +176,7 @@ xSre.prototype.toObject = function(){
 
     json.assessments = this.getAssessment().getAssessment();
 
-    json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss')
+    json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss');
 
     json.raw = pd.xml(this.raw);
 
