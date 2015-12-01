@@ -57,121 +57,13 @@ StudentProgramController.getByStudentIdXsre = function(req, res){
 
     var stdId = req.params.studentId;
 
-    Organization.findOne({ _id: ObjectId(orgId) }, function(err, organization) {
+    Organization.pushStudent(req.user, orgId, stdId, function(err, data){
 
-        if (err) return res.sendError(err);
+        if(err) return res.sendError(err);
 
-        if (!organization) return res.sendError('Data not found');
+        res.set('Content-Type', 'text/xml');
 
-        Student.protect(req.user.role, {value: stdId}, req.user).findOne({
-            _id: ObjectId(stdId),
-            organization: ObjectId(orgId)
-        }, function (err, student) {
-
-            if (err) return res.sendError(err);
-
-            if (!student) return res.sendError('Data not found');
-
-            var CBOStudent = {
-                '@': {
-                    id: student._id.toString()
-                },
-                organization: {
-                    '@': {
-                        refId: student.organization.toString()
-                    },
-                    organizationName: organization.name,
-                    externalServiceId: organization.externalServiceId,
-                    personnelId: organization.personnelId,
-                    authorizedEntityId: organization.authorizedEntityId,
-                    districtStudentId: student.district_student_id,
-                    zoneId: student.school_district,
-                    contextId: xsreConfig.contextId
-                },
-
-                studentActivity: [],
-
-                programs: {
-                    activities: {
-                        activity: []
-                    }
-                }
-
-            };
-
-            var programsId = {};
-
-            var programId = [];
-
-            _.each(student.programs, function(program){
-
-                if(Object.keys(programsId).indexOf(program.program.toString()) === -1) programsId[program.program.toString()] = [];
-
-                programsId[program.program.toString()].push(program.toObject());
-
-                programId.push(program.program);
-
-                CBOStudent.programs.activities.activity.push({
-                    studentActivityRefId: program.program.toString(),
-                    startDate: moment(new Date(program.participation_start_date)).format('MM/DD/YYYY'),
-                    endDate:moment(new Date(program.participation_end_date)).format('MM/DD/YYYY'),
-                    active: program.active,
-                    tags: {
-                        tag: program.cohort
-                    }
-
-                });
-
-            });
-
-            if(!_.isEmpty(programsId)){
-
-                Program.find({ _id: { $in: programId } }, function(err, programs){
-
-                    if(err) return res.sendError(err);
-
-                    _.each(programs, function(program){
-
-                        if(program._id.toString() in programsId){
-
-                            programsId[program._id.toString()].forEach(function(prgm){
-
-                                CBOStudent.studentActivity.push({
-                                    '@': {
-                                        refId: program._id.toString()
-                                    },
-                                    title: program.name
-                                });
-
-                            });
-
-                        }
-
-                    });
-
-                    res.set('Content-Type', 'text/xml');
-
-                    res.send(xmlParser('CBOStudent', CBOStudent, {
-                        declaration: {
-                            encoding: 'utf-16'
-                        }
-                    }));
-
-                });
-
-
-            } else {
-
-                res.set('Content-Type', 'text/xml');
-
-                res.send(xmlParser('CBOStudent', CBOStudent, {
-                    declaration: {
-                        encoding: 'utf-16'
-                    }
-                }));
-            }
-
-        });
+        return res.send(data);
 
     });
 

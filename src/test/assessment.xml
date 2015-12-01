@@ -1,0 +1,1666 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<xSre refId="e2cb9ebc-41c4-49e5-9ba7-599dcd84682c"
+      xmlns:raw="raw"
+      xmlns:psesd="psesd"
+      xmlns:sif="http://www.sifassociation.org/datamodel/na/3.3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <name>
+        <type cedsId="000634">FullName</type>
+        <familyName cedsId="000172">Faamaligi</familyName>
+        <givenName cedsId="000115">Aneela</givenName>
+    </name>
+    <localId cedsId="001071" raw:raw="290357">57462</localId>
+    <demographics>
+        <races>
+            <race cedsId="000301" raw:raw="White">White</race>
+        </races>
+        <hispanicLatinoEthnicity cedsId="000144" raw:raw="t">True</hispanicLatinoEthnicity>
+        <sex cedsId="000255" raw:raw="M">Male</sex>
+    </demographics>
+    <enrollment>
+        <school refId="" cedsId="000126">
+            <leaRefId />
+            <localId cedsId="001071">8400</localId>
+            <schoolName cedsId="000191">Salem High School</schoolName>
+        </school>
+        <leaRefId />
+        <schoolRefId />
+        <membershipType />
+        <entryDate cedsId="000097">2015-07-01</entryDate>
+        <exitDate cedsId="000107">2015-12-31</exitDate>
+        <gradeLevel>11</gradeLevel>
+        <projectedGraduationYear cedsId="000226" />
+        <schoolYear>2016</schoolYear>
+        <daysAbsent />
+        <studentAttendanceRate />
+        <psesd:exitType />
+        <psesd:exitTypeDescription />
+    </enrollment>
+    <languages>
+        <language>
+            <type cedsId="000316">Dominant</type>
+            <code cedsId="000317">SPANISH</code>
+        </language>
+        <language>
+            <type cedsId="000316">Home</type>
+            <code cedsId="000317">SPANISH</code>
+        </language>
+    </languages>
+    <reportDate>2015-10-20</reportDate>
+    <assessments>
+        <assessment>
+            <actualStartDateTime>2015-10-10</actualStartDateTime>
+            <psesd:title>Algebra October Interim Assessment A</psesd:title>
+            <psesd:description />
+            <studentGradeLevel cedsId="000126">12, 9, 11, 10</studentGradeLevel>
+            <school refId="" cedsId="000126">
+                <leaRefId />
+                <localId cedsId="001071" />
+                <schoolName cedsId="000191" />
+            </school>
+            <scoreSets>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">6th Period Bio</subTestSubjectArea>
+                    <subTestName cedsId="000275">Meiosis Quiz</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">3.3</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">6th Period Bio</subTestSubjectArea>
+                    <subTestName cedsId="000275">Goonie Project</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">12.1</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">6th Period Bio</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hemophilia Lab Report</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">13.86</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 3/4 Algebra 1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Tesselations</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 3/4 Algebra 1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Chpt.9 S.G.</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 3/4 Algebra 1</subTestSubjectArea>
+                    <subTestName cedsId="000275">10.3 Hmwk</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 3/4 Algebra 1</subTestSubjectArea>
+                    <subTestName cedsId="000275">10.6 Hmwk</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 3/4 Algebra 1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Multi-St Eq. Hmwk</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 3.5</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 5.2</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 5.6</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk Chpt.5 Review</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 6.0</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Money From Mars Project</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk "Mars Money"</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 6.2</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 6.5b</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 6.4</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 6.6</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 6.7</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2 3/4 Algebra 1 </subTestSubjectArea>
+                    <subTestName cedsId="000275">Chpt 6 SG</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.88</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2Per7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">Comp bk ch 6</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2Per7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">Candy lab</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2Per7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">Comp Bk ch 5</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2Per7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">IR ch7</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2Per7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">Ch 7 Comp Bk</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q2Per7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">Atom Report</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA 8 Q2</subTestSubjectArea>
+                    <subTestName cedsId="000275">RL#1</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">4.4</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA 8 Q2</subTestSubjectArea>
+                    <subTestName cedsId="000275">"Harriet Tubman" poster</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">5.5</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA 8 Q2</subTestSubjectArea>
+                    <subTestName cedsId="000275">RL#2</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">4.4</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA 8 Q2</subTestSubjectArea>
+                    <subTestName cedsId="000275">AF Responses Act 1</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA 8 Q2</subTestSubjectArea>
+                    <subTestName cedsId="000275">RL#4</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">4.4</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA 8 Q2</subTestSubjectArea>
+                    <subTestName cedsId="000275">Persuasive Into &amp; TS</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA 8 Q2</subTestSubjectArea>
+                    <subTestName cedsId="000275">WU#7</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA 8 Q2</subTestSubjectArea>
+                    <subTestName cedsId="000275">Q2 Binder Check</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">29.04</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA 8 Q2</subTestSubjectArea>
+                    <subTestName cedsId="000275">"Tell-Tale Heart" pjct</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">5.5</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 Per 7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">plnts diagrms</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 Per 7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">T plnts ppr</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 Per 7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">Sun energy ppr</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 Per 7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">Glxy Poster</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q4 Per 7 Sci 8</subTestSubjectArea>
+                    <subTestName cedsId="000275">Rockets</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q3 3/4 Algebra</subTestSubjectArea>
+                    <subTestName cedsId="000275">Pg.EP14 Practice</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q3 3/4 Algebra</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 7.8</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q3 3/4 Algebra</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 8.0</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q3 3/4 Algebra</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 8.5</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q3 3/4 Algebra</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk Chpt. 8 Review</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q3 3/4 Algebra</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 9.1</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Q3 3/4 Algebra</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 9.3/9.4</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">3/4 Alg 1 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 2.2</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">3/4 Alg 1 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 2.3</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">3/4 Alg 1 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk Enrichment Activity</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">3/4 Alg 1 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 2.4</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">3/4 Alg 1 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 2.6</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">3/4 Alg 1 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 2.7</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">3/4 Alg 1 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 3.2 </subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">3/4 Alg 1 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Hmwk 3.4</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">0.9</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q3</subTestSubjectArea>
+                    <subTestName cedsId="000275">Lit responses 588-589</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q3</subTestSubjectArea>
+                    <subTestName cedsId="000275">GWB p 296-298</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q3</subTestSubjectArea>
+                    <subTestName cedsId="000275">Reading Journal Q3</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">11</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">RL#1</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">4.4</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">RL#2</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">4.4</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">"Flowers" Part I</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">"Flowers" Part 2</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">RL #3</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">4.4</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">Narrative RD</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">3.3</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">RL#4</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">4.4</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q1</subTestSubjectArea>
+                    <subTestName cedsId="000275">RL #5</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">4.4</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q3</subTestSubjectArea>
+                    <subTestName cedsId="000275">S/V Chart Lesson #15</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q3</subTestSubjectArea>
+                    <subTestName cedsId="000275">S/V Chart Lesson #18</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q3</subTestSubjectArea>
+                    <subTestName cedsId="000275">Poetry Web Quest</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+                <scoreSet>
+                    <subTestSubjectArea cedsId="000021">Periods 5&amp;6 ELA8 Q3</subTestSubjectArea>
+                    <subTestName cedsId="000275">S/V #20 study chart, SWB</subTestName>
+                    <scores>
+                        <score>
+                            <metric cedsId="000369">F</metric>
+                            <scoreValue cedsId="000245">2.2</scoreValue>
+                        </score>
+                    </scores>
+                    <psesd:attemptCode />
+                </scoreSet>
+            </scoreSets>
+        </assessment>
+    </assessments>
+    <attendance>
+        <summaries />
+        <events>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Late">Late</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Absent">Absent</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Late">Late</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Absent">Absent</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+            <event>
+                <school refId="" cedsId="000126">
+                    <leaRefId />
+                    <localId cedsId="001071">8400</localId>
+                    <schoolName cedsId="000191">Salem High School</schoolName>
+                </school>
+                <calendarEventDate cedsId="001275">2015-04-01</calendarEventDate>
+                <dailyAttendanceStatus cedsId="000076" />
+                <attendanceEventType cedsId="000601" />
+                <absentAttendanceCategory cedsId="000599" />
+                <attendanceValue raw:raw="Present">Present</attendanceValue>
+                <course refId="">
+                    <timeTablePeriod />
+                    <schoolRefId />
+                    <leaCourseId cedsId="000055" />
+                    <courseTitle cedsId="000067" />
+                    <subject />
+                    <scedCourseSubjectAreaCode cedsId="001518" />
+                    <creditsAttempted cedsId="000199" />
+                    <creditsEarned cedsId="000200" />
+                    <progressMark cedsId="000183" />
+                    <finalMarkValue cedsId="000124" />
+                </course>
+                <timeTablePeriod />
+                <psesd:absentReasonDescription />
+            </event>
+        </events>
+    </attendance>
+    <transcriptTerm>
+        <school refId="" cedsId="000126">
+            <leaRefId />
+            <localId cedsId="001071" />
+            <schoolName cedsId="000191" />
+        </school>
+        <schoolYear cedsId="000243" />
+        <session>
+            <sessionType cedsId="000254" />
+            <sessionCode cedsId="001270" />
+            <description cedsId="001271" />
+            <markingTerm cedsId="001273" />
+            <startDate cedsId="000251" />
+        </session>
+        <gradeLevel cedsId="000125" />
+        <courses />
+        <academicSummary>
+            <cumulativeWeightedGpa cedsId="000128" />
+            <psesd:onTrackToGraduate />
+            <totalCreditsEarned cedsId="000200" />
+        </academicSummary>
+    </transcriptTerm>
+    <programs>
+        <specialEducation>
+            <schoolYear cedsId="000243" />
+            <services />
+        </specialEducation>
+        <lep>
+            <lepStatus cedsId="000180" />
+            <title3LepParticipationStatus cedsId="000565" />
+        </lep>
+        <giftedTalented cedsId="000122" />
+        <section504 cedsId="000249" />
+    </programs>
+</xSre>

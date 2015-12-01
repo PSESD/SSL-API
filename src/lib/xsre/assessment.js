@@ -81,6 +81,10 @@ Assessment.prototype.processAssessment = function(assessments){
 
       var mm = null;
 
+      if(_.isObject(assessments.assessment)){
+            assessments.assessment = [ assessments.assessment ];
+      }
+
       if(assessments.assessment && _.isArray(assessments.assessment)){
 
             assessments.assessment.forEach(function(assessment){
@@ -160,6 +164,8 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                           if(l.has(scoreSet, 'scores.score')){
 
+                                                if(_.isObject(scoreSet.scores.score)) scoreSet.scores.score = [ scoreSet.scores.score ];
+
                                                 scoreSet.scores.score.forEach(function(score){
 
                                                       switch(score.metric){
@@ -193,8 +199,10 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                           if(l.has(scoreSet, 'scores.score')){
 
-                                                scoreSet.scores.score.forEach(function(score){
+                                                if(_.isObject(scoreSet.scores.score)) scoreSet.scores.score = [ scoreSet.scores.score ];
 
+                                                scoreSet.scores.score.forEach(function(score){
+console.log(score);
                                                       switch(score.metric){
                                                             case '00506':
                                                                   newCollection.RITScore = score.scoreValue;

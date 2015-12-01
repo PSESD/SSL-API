@@ -8,7 +8,7 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
-var Request = require('../../lib/broker/Request');
+var Request = require('../../lib/broker/request');
 var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
 var ObjectId = mongoose.Types.ObjectId;
@@ -17,6 +17,7 @@ var hal = require('hal');
 var php = require('phpjs');
 var xSre = require('../../lib/xsre');
 var async = require('async');
+
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -30,6 +31,9 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     var studentId = ObjectId(req.params.studentId);
 
+    var showRaw = false;
+
+    if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')) showRaw = true;
 
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
@@ -49,6 +53,16 @@ StudentController.getStudentsBackpack = function (req, res) {
         function embeds(results, isFromCache){
 
             res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
+
+            if(showRaw){
+
+                res.header('Content-Type', 'text/xml');
+
+                return res.send(results.raw);
+
+            }
+
+            if(results.raw) delete results.raw;
 
             res.xmlOptions = res.xmlKey = 'CBOStudentDetail';
 
@@ -187,7 +201,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 if(err) return res.sendError(err);
 
-                                var object = new xSre(result).toObject();
+                                var object = new xSre(result, body).toObject();
                                 /**
                                  * Set to cache
                                  */

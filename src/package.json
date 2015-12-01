@@ -29,7 +29,6 @@
     "moment-range": "^2.0.3",
     "morgan": "^1.5.2",
     "natural": "^0.2.1",
-    "node-uuid": "^1.4.3",
     "oauth2orize": "^1.0.1",
     "passport": "^0.2.1",
     "passport-http": "^0.2.2",
@@ -53,7 +52,10 @@
     "express-error-handler": "~1.0.1",
     "i18n": "~0.5.0",
     "cookie-parser": "~1.4.0",
-    "csurf": "~1.8.3"
+    "csurf": "~1.8.3",
+    "pretty-data": "~0.40.0",
+    "node-uuid": "~1.4.7",
+    "request": "~2.65.0"
   },
   "devDependencies": {},
   "scripts": {
