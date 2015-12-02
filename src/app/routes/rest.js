@@ -1,4 +1,7 @@
 'use strict';
+var Limiter = require('express-rate-limiter');
+var MemoryStore = require('express-rate-limiter/lib/memoryStore');
+var limiter = new Limiter({ db : new MemoryStore() });
 /**
  *
  * @param router
@@ -16,6 +19,7 @@ function Rest(router, Api){
  */
 Rest.prototype.handleRoutes = function(router, Api){
       var userCtr = Api.controller('UserController');
+      var ratelimiter = limiter.middleware();
 
       var organizationCtr = Api.controller('OrganizationController');
 
@@ -34,8 +38,8 @@ Rest.prototype.handleRoutes = function(router, Api){
       });
 
       router.route('/user' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, userCtr.get)
-            .put(auth.isBearerAuthenticated, auth.hasAccess, userCtr.save)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, userCtr.get)
+            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, userCtr.save)
       ;
 
       //router.route('/user/role/:userId')
@@ -47,92 +51,93 @@ Rest.prototype.handleRoutes = function(router, Api){
       router.route('/organizations' + format)
             //disabled for now and only available on stage or dev
             //.post(auth.isBearerAuthenticated, auth.isAdmin, organizationCtr.create)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.get);
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.get);
 
-      router.route('/:organizationId' + format).get(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.find);
+      router.route('/:organizationId' + format)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.find);
 
       router.route('/:organizationId/profile' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.profile)
-            .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.updateProfile);
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.profile)
+            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.updateProfile);
 
       router.route('/:organizationId/users' + format)
-            .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.postUser)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.allUsers);
+            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.postUser)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.allUsers);
 
       router.route('/:organizationId/users/:userId' + format)
-            .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.putUser)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.getUser)
-            .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.deleteUser)
+            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.putUser)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.getUser)
+            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.deleteUser)
       ;
 
       router.route('/:organizationId/programs' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.allProgram)
-            .post(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.postProgram);
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.allProgram)
+            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.postProgram);
 
       router.route('/:organizationId/programs/:programId' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.getProgram)
-            .put(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.putProgram)
-            .delete(auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.deleteProgram)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.getProgram)
+            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.putProgram)
+            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.deleteProgram)
       ;
 
       router.route('/:organizationId/students' + format)
-            .post(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.createByOrgId)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudents);
+            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.createByOrgId)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudents);
 
 
       //router.route('/:organizationId/students/not-assign')
       //    .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.getStudentNotAssigns);
 
       router.route('/:organizationId/students/:studentId' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentById)
-            .put(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.putStudentById)
-            .delete(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteStudentById);
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentById)
+            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.putStudentById)
+            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteStudentById);
 
       router.route('/:organizationId/users/:userId/students' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.getByUserId)
-            .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.postByUserId)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.getByUserId)
+            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.postByUserId)
       ;
 
       router.route('/:organizationId/users/:userId/students/:studentId' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.getStudentUserById)
-            .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.putStudentUserById)
-            .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.deleteStudentUserById)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.getStudentUserById)
+            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.putStudentUserById)
+            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.deleteStudentUserById)
       ;
       /**
        * Tag route
        */
       router.route('/:organizationId/tags' + format)
-            .post(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.createByOrgId)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTags);
+            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.createByOrgId)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTags);
 
       router.route('/:organizationId/tags/:tagId' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTagById)
-            .put(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.putTagById)
-            .delete(auth.isBearerAuthenticated, auth.hasAccess, tagCtr.deleteTagById);
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTagById)
+            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.putTagById)
+            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.deleteTagById);
 
       router.route('/:organizationId/students/:studentId/xsre' + format)
-            .delete(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteCacheStudentsBackpack)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentsBackpack);
+            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteCacheStudentsBackpack)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentsBackpack);
 
 
       router.route('/:organizationId/students/:studentId/programs' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByStudentId)
-            .post(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.addByStudentId)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByStudentId)
+            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.addByStudentId)
       ;
 
       router.route('/:organizationId/students/:studentId/programs/CBOStudent.xml')
-            .get(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByStudentIdXsre)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByStudentIdXsre)
       ;
 
       router.route('/:organizationId/programs/:programId/students' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByProgramId)
-            .post(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.addByProgramId)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByProgramId)
+            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.addByProgramId)
       ;
 
       router.route('/:organizationId/programs/:programId/students/:studentId' + format)
-            .get(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getStudentById)
-            .put(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.putStudentById)
-            .delete(auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.deleteStudentById)
+            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getStudentById)
+            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.putStudentById)
+            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.deleteStudentById)
       ;
 
       //router.route('/:organizationId/districts')
