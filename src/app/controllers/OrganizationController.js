@@ -22,7 +22,7 @@ OrganizationController.get = function (req, res) {
 
     Organization.find({ _id: req.organization._id }, function (err, orgs) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         res.xmlKey = 'organizations';
 
@@ -44,7 +44,7 @@ OrganizationController.find = function (req, res) {
 
     Organization.findOne(crit, function (err, org) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         res.sendSuccess(org);
 
@@ -66,7 +66,7 @@ OrganizationController.profile = function (req, res) {
 
     Organization.findOne(crit, function (err, org) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         res.xmlOptions = 'organization';
 
@@ -84,7 +84,7 @@ OrganizationController.updateProfile = function(req, res){
 
     Organization.findOne({_id: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        if (err)  return res.sendError(err);
+        if (err) { return res.sendError(err); }
 
         if (!obj) return res.sendError('Data not found');
 
@@ -103,7 +103,7 @@ OrganizationController.updateProfile = function(req, res){
         // save the movie
         obj.save(function (err) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.xmlOptions = 'organization';
 
@@ -123,7 +123,7 @@ OrganizationController.allUsers = function (req, res) {
 
     User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         var tmp = [];
 
@@ -165,7 +165,7 @@ OrganizationController.getUser = function (req, res) {
         permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
     }, function (err, user) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         if(!user) return res.sendError('User not found!');
 
@@ -218,7 +218,7 @@ OrganizationController.postUser = function (req, res) {
 
     User.findOne({_id: ObjectId(userId)}, function (err, user) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         if (!user) return res.sendError('User data not found');
 
@@ -247,7 +247,7 @@ OrganizationController.postUser = function (req, res) {
 
         User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             user.permissions = allpermission;
 
@@ -293,7 +293,7 @@ OrganizationController.putUser = function (req, res) {
 
     User.findOne({_id: ObjectId(req.params.userId)}, function (err, obj) {
 
-        if (err)  return res.sendError(err);
+        if (err) { return res.sendError(err); }
 
         if (!obj) return res.sendError('Data not found');
 
@@ -325,7 +325,7 @@ OrganizationController.putUser = function (req, res) {
 
             obj.saveWithRole(req.user, req.params.organizationId, role, function (err, user) {
 
-                if (err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
                 res.sendSuccess('Successfully updated!', user);
 
@@ -335,7 +335,7 @@ OrganizationController.putUser = function (req, res) {
 
             obj.saveWithRole(req.user, req.params.organizationId, function (err, user) {
 
-                if (err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
                 res.sendSuccess('Successfully updated!', user);
 
@@ -356,7 +356,7 @@ OrganizationController.deleteUser = function (req, res) {
 
     User.findOne({_id: ObjectId(req.params.userId)}, function (err, user) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
 
         if (!user) return res.sendError("User not found");
@@ -374,7 +374,7 @@ OrganizationController.deleteUser = function (req, res) {
 
         User.where({_id: user._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Delete success');
 
@@ -397,7 +397,7 @@ OrganizationController.allProgram = function (req, res) {
 
     Program.find(crit, function (err, objs) {
 
-        if (err)  return res.sendError(err);
+        if (err) { return res.sendError(err); }
 
         res.sendSuccess(null, objs);
 
@@ -421,7 +421,7 @@ OrganizationController.getProgram = function (req, res) {
 
     Program.findOne(crit, function (err, obj) {
 
-        if (err)  return res.sendError(err);
+        if (err) { return res.sendError(err); }
 
         if (!obj) return res.sendError('Data not found');
 
@@ -443,7 +443,7 @@ OrganizationController.postProgram = function (req, res) {
 
     Program.findOne({ name: req.body.name, organization: orgId }, function(err, obj){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         if(!obj){
 
@@ -466,7 +466,7 @@ OrganizationController.postProgram = function (req, res) {
 
         obj.save(function (err) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Successfully Added', obj);
 
@@ -486,7 +486,7 @@ OrganizationController.putProgram = function (req, res) {
 
     Program.findOne({_id: ObjectId(req.params.programId), organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        if (err)  return res.sendError(err);
+        if (err) { return res.sendError(err); }
 
         if (!obj) return res.sendError('Data not found');
 
@@ -507,7 +507,7 @@ OrganizationController.putProgram = function (req, res) {
 
         obj.save(function (err) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Successfully updated!', obj);
 
@@ -528,7 +528,7 @@ OrganizationController.deleteProgram = function (req, res) {
         organization: ObjectId(req.params.organizationId)
     }, function (err, obj) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         res.sendSuccess('Successfully deleted');
 

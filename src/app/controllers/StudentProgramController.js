@@ -39,7 +39,7 @@ StudentProgramController.getByStudentId = function (req, res) {
 
     Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         if(!student) return res.sendError('Data not found');
 
@@ -60,7 +60,7 @@ StudentProgramController.getByStudentIdXsre = function(req, res){
 
     Organization.pushStudent(req.user, orgId, stdId, function(err, data){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         res.set('Content-Type', 'text/xml');
 
@@ -110,7 +110,7 @@ StudentProgramController.addByStudentId = function (req, res) {
 
     Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         if(!student) return res.sendError('Data not found');
 
@@ -123,7 +123,7 @@ StudentProgramController.addByStudentId = function (req, res) {
 
         student.save(function(err){
 
-            if(err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             Tag.addTag(ObjectId(orgId), studentProgram.cohort);
 
@@ -147,7 +147,7 @@ StudentProgramController.getByProgramId = function (req, res) {
 
     Student.protect(req.user.role, { onlyAssign: true }, req.user).find({ organization: ObjectId(orgId), programs: { $elemMatch: { program: ObjectId(proId) } } }, function(err, students){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         if(!students) return res.sendError('Data not found');
 
@@ -197,7 +197,7 @@ StudentProgramController.addByProgramId = function(req, res){
 
     Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         if(!student) return res.sendError('Data not found');
 
@@ -210,7 +210,7 @@ StudentProgramController.addByProgramId = function(req, res){
 
         student.save(function(err){
 
-            if(err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             Tag.addTag(ObjectId(orgId), studentProgram.cohort);
 
@@ -242,7 +242,7 @@ StudentProgramController.getStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function (err, student) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
         /**
          * If student is empty from database
          */
@@ -273,7 +273,7 @@ StudentProgramController.putStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         if(!student) return res.sendError('Data not found');
 
@@ -319,7 +319,7 @@ StudentProgramController.putStudentById = function(req, res){
 
         Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Update success');
 
@@ -349,7 +349,7 @@ StudentProgramController.deleteStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         if(!student) return res.sendError('Data not found');
 
@@ -366,7 +366,7 @@ StudentProgramController.deleteStudentById = function(req, res){
 
         Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Delete success');
 

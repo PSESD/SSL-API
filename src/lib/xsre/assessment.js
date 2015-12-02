@@ -18,7 +18,9 @@ function Assessment(xsre){
 
       if(xsre.json) {
 
-            if(xsre.json.assessments) this.assessments = xsre.json.assessments;
+            if(xsre.json.assessments) {
+                  this.assessments = xsre.json.assessments;
+            }
 
       }
 
@@ -165,7 +167,9 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                           if(l.has(scoreSet, 'scores.score')){
 
-                                                if(_.isObject(scoreSet.scores.score)) scoreSet.scores.score = [ scoreSet.scores.score ];
+                                                if(_.isObject(scoreSet.scores.score)) {
+                                                      scoreSet.scores.score = [ scoreSet.scores.score ];
+                                                }
 
                                                 scoreSet.scores.score.forEach(function(score){
 
@@ -200,7 +204,9 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                           if(l.has(scoreSet, 'scores.score')){
 
-                                                if(_.isObject(scoreSet.scores.score)) scoreSet.scores.score = [ scoreSet.scores.score ];
+                                                if(_.isObject(scoreSet.scores.score)) {
+                                                      scoreSet.scores.score = [ scoreSet.scores.score ];
+                                                }
 
                                                 scoreSet.scores.score.forEach(function(score){
 

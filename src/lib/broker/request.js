@@ -176,7 +176,7 @@ Request.prototype = {
 
             } else {
 
-                if (response && response.statusCode == 201) {
+                if (response && response.statusCode === 201) {
 
                     console.log(body)
 
