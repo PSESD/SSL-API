@@ -1,7 +1,14 @@
+'use strict';
 var express = require("express");
+var i18n = require("i18n");
 var mongoose = require('mongoose');
-var bodyParser = require("body-parser");
-var app = express();
+var bodyParser  = require("body-parser");
+var cookieParser = require('cookie-parser');
+var csrf = require('csurf');
+var csrfProtection = csrf({ cookie: true });
+var parseForm = bodyParser.urlencoded({ extended: false });
+
+var app  = express();
 var session = require('express-session');
 var passport = require('passport');
 var rollbar = require('rollbar');
@@ -10,7 +17,8 @@ var methodOverride = require('method-override');
 var port = process.env.PORT || 4000;
 var config = require('config');
 var hal = require('hal');
-
+var xmlmodel = require('./lib/xmlmodel');
+var utils = require('./lib/utils');
 var rollbarAccessToken = config.get('rollbar.access_token');
 
 if (rollbarAccessToken) {
@@ -18,7 +26,7 @@ if (rollbarAccessToken) {
     // Use the rollbar error handler to send exceptions to your rollbar account
     app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
 
-    rollbar.handleUncaughtExceptions(rollbarAccessToken, {});
+    rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
 
 }
 
@@ -189,7 +197,11 @@ Api.prototype.configureExpress = function (db) {
 
     app.set('log', require('./lib/utils').log);
 
-    app.use(bodyParser.urlencoded({extended: true}));
+    app.use(bodyParser.urlencoded({ extended: true }));
+
+    app.use(cookieParser());
+
+    app.use(i18n.init);
 
     app.use(bodyParser.json());
 
@@ -208,6 +220,7 @@ Api.prototype.configureExpress = function (db) {
 
     app.use(function (req, res, next) {
 
+
         var resource = null;
         /**
          *
@@ -220,11 +233,57 @@ Api.prototype.configureExpress = function (db) {
             return res.end('Unauthorized');
 
         };
+        /**
+         *
+         * @param req
+         * @param res
+         * @param data
+         * @returns {*}
+         */
+        function sendFormat(req, res, data){
 
-        res.okJson = function (message, data, key, collection) {
+            var format = req.params.format;
+
+            switch( format ){
+
+                case 'json':
+
+                    return res.json(data);
+
+                case 'xml':
+                    //if(res.bigXml){
+                    //    return res.send(utils.js2xml(data, res.xmlOptions));
+                    //}
+
+                    return res.send(xmlmodel(data, res.xmlOptions || 'response'));
+
+
+            }
+
+            return res.send(data);
+
+        }
+
+        res.sendFormat = sendFormat;
+
+
+        res.sendSuccess = function (message, data, key, collection) {
+
+            if(!req.params.format) req.params.format = 'json';
+
+            var format = req.params.format;
+
+            if(format === 'xml' && res.xmlKey && !key){
+
+                key = res.xmlKey;
+
+            }
+
             /**
              * If message is object will direct return
              */
+            //console.log('CLASS: ', message.constructor.name);
+
             if (_.isObject(message)) {
 
                 if (typeof message.toJSON === 'function') {
@@ -235,7 +294,7 @@ Api.prototype.configureExpress = function (db) {
 
                 resource = new hal.Resource(message, req.originalUrl);
 
-                return res.json(resource.toJSON());
+                return sendFormat(req, res, resource.toJSON());
 
             }
 
@@ -291,24 +350,21 @@ Api.prototype.configureExpress = function (db) {
 
             }
 
-            return res.json(resource.toJSON());
+            return sendFormat(req, res, resource.toJSON());
 
         };
 
-        res.errJson = function (err) {
+        res.sendError = function (err) {
 
-            if(err === 'Access Denied' || err === 'Permission Denied') {
+            if(!req.params.format) req.params.format = 'json';
 
-                console.log('Unauthorize cause err "'+err+'"');
-
-                return res.errUnauthorized();
-            }
+            if(err === 'Access Denied' || err === 'Permission Denied') return res.errUnauthorized();
 
             var response = { success: false, error: err };
 
             resource = new hal.Resource(response, req.originalUrl);
 
-            return res.json(resource.toJSON());
+            return sendFormat(req, res, resource.toJSON());
 
         };
 
@@ -352,11 +408,15 @@ Api.prototype.configureExpress = function (db) {
      */
     self.startServer();
 
+    //self.forkingStart();
+
 };
 /**
  * Start Server
  */
 Api.prototype.startServer = function () {
+
+    var me = this;
 
     app.listen(port, function () {
 
@@ -366,12 +426,57 @@ Api.prototype.startServer = function () {
 
 };
 /**
+ * Forking server
+ */
+Api.prototype.forkingStart = function(){
+
+    var me = this;
+
+    var cluster = require('cluster');
+
+    var workers = process.env.WORKERS || require('os').cpus().length;
+
+    if (cluster.isMaster) {
+
+        console.log('start cluster with %s workers', workers);
+
+        for (var i = 0; i < workers; ++i) {
+
+            var worker = cluster.fork().process;
+
+            console.log('worker %s started.', worker.pid);
+
+        }
+
+        cluster.on('exit', function(worker) {
+
+            console.log('worker %s died. restart...', worker.process.pid);
+
+            cluster.fork();
+
+        });
+
+    } else {
+
+        me.startServer();
+
+    }
+
+    process.on('uncaughtException', function (err) {
+
+        console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
+
+        me.stop(err);
+
+    });
+};
+/**
  * Stop Server
  * @param err
  */
 Api.prototype.stop = function (err) {
 
-    console.log("ERROR \n" + err);
+    console.log("ERROR \n" + err.stack);
 
     if (rollbarAccessToken) rollbar.reportMessage("ERROR \n" + err);
 
@@ -392,12 +497,4 @@ Api.errorStack = function (ex) {
 
 };
 
-try {
-
-    new Api();
-
-} catch (e) {
-
-    Api.errorStack(e);
-
-}
+new Api();

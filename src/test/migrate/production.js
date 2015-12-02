@@ -227,12 +227,12 @@ describe('Migrate Production', function () {
         });
 
         it('PUT /user/role/:userId', function (done) {
-            http_build_query({ role: 'admin', is_special_case_worker: false }, urlApi + '/user/role/'+userId, grantToken);
+            http_build_query({ role: 'admin' }, urlApi + '/user/role/'+userId, grantToken);
             request(urlApi)
                 .put('/user/role/'+userId)
                 .set('authorization', grantToken)
                 .set('x-cbo-client-url', 'https://ssldemo.studentsuccesslink.org')
-                .send({ role: 'admin', is_special_case_worker: false })
+                .send({ role: 'admin' })
                 .expect(function (res) {
                     if (!res.body.success) console.log('%j', res.body);
                     assert.equal(true, res.body.success);
@@ -247,7 +247,6 @@ describe('Migrate Production', function () {
             userId: userId,
             students: [],
             role: "admin",
-            is_special_case_worker: false,
             permissions: [{
                 model: 'Student',
                 operation: '*',

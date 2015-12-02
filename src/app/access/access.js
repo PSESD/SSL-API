@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 22/07/15.
  */
@@ -173,7 +174,7 @@ Access.hasAccess = function(req, res, next){
 
         if(err) {
 
-            res.errJson(err);
+            res.sendError(err);
 
             return res.end();
 

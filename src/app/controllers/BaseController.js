@@ -1,3 +1,4 @@
+'use strict';
 var mongoose = require('mongoose');
 var ObjectId = mongoose.Types.ObjectId;
 var User = require('../models/User');
@@ -42,9 +43,9 @@ BaseController.prototype.crud = function(idName) {
 
             obj.save(function (err) {
 
-                if (err)  return res.errJson(err);
+                if (err)  return res.sendError(err);
 
-                return res.okJson('Successfully Added', obj);
+                return res.sendSuccess('Successfully Added', obj);
 
             });
         },
@@ -57,9 +58,9 @@ BaseController.prototype.crud = function(idName) {
 
             self.model.findOne({ _id: ObjectId(req.params[id]) }, function (err, obj) {
 
-                if (err)  return res.errJson(err);
+                if (err)  return res.sendError(err);
 
-                if(!obj) return res.errJson('Data not found');
+                if(!obj) return res.sendError('Data not found');
 
                 for (var prop in req.body) {
 
@@ -77,9 +78,9 @@ BaseController.prototype.crud = function(idName) {
                 // save the movie
                 obj.save(function (err) {
 
-                    if (err)  return res.errJson(err);
+                    if (err)  return res.sendError(err);
 
-                    res.okJson('Successfully updated!', obj);
+                    res.sendSuccess('Successfully updated!', obj);
 
                 });
             });
@@ -93,7 +94,7 @@ BaseController.prototype.crud = function(idName) {
 
             self.model.findOne({ _id: ObjectId(req.params[id]) }, function (err, obj) {
 
-                if (err)  return res.errJson(err);
+                if (err)  return res.sendError(err);
 
                 res.json(obj);
 
@@ -108,7 +109,7 @@ BaseController.prototype.crud = function(idName) {
 
             self.model.find(function (err, objs) {
 
-                if (err)  return res.errJson(err);
+                if (err)  return res.sendError(err);
 
                 res.json(objs);
 
@@ -124,9 +125,9 @@ BaseController.prototype.crud = function(idName) {
                 _id: ObjectId(req.params[id])
             }, function (err, obj) {
 
-                if (err)  return res.errJson(err);
+                if (err)  return res.sendError(err);
 
-                res.okJson('Successfully deleted');
+                res.sendSuccess('Successfully deleted');
 
             });
         }

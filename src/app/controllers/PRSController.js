@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 07/07/15.
  */
@@ -7,7 +8,7 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
-var Request = require('../../lib/broker/Request');
+var Request = require('../../lib/broker/request');
 var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
 var ObjectId = mongoose.Types.ObjectId;
@@ -36,13 +37,13 @@ PRSController.getDistricts = function (req, res) {
 
             brokerRequest.createPsr('districts', function (error, response, body) {
 
-                if (error)  return res.errJson(error);
+                if (error)  return res.sendError(error);
 
-                if (!body) return res.errJson('Data not found');
+                if (!body) return res.sendError('Data not found');
 
                 if (response && response.statusCode == '200') {
 
-                    parseString(body, { explicitArray: false }, function (err, result) {
+                    utils.xml2js(body, function (err, result) {
 
                         var json = result.ArrayOfDistrictSummary;
 
@@ -52,7 +53,7 @@ PRSController.getDistricts = function (req, res) {
 
                             utils.log(err);
 
-                            res.okJson(json);
+                            res.sendSuccess(json);
 
                         });
 
@@ -60,11 +61,11 @@ PRSController.getDistricts = function (req, res) {
 
                 } else {
 
-                    parseString(body, { explicitArray: false }, function (err, result) {
+                    utils.xml2js(body, function (err, result) {
 
                         var json = (result && 'error' in result) ? result.error.message : 'Error not response';
 
-                        res.errJson(json);
+                        res.sendError(json);
 
                     });
                 }
@@ -73,7 +74,7 @@ PRSController.getDistricts = function (req, res) {
 
             //console.log("GET FROM CACHE");
 
-            res.okJson(result);
+            res.sendSuccess(result);
 
         }
 
@@ -96,11 +97,11 @@ PRSController.deleteCacheDistricts = function (req, res) {
 
             log(err, 'error');
 
-            return res.errJson('Delete cache error');
+            return res.sendError('Delete cache error');
 
         }
 
-        res.okJson('Delete cache successfully');
+        res.sendSuccess('Delete cache successfully');
 
     });
 

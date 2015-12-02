@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 03/06/15.
  */
@@ -7,7 +8,7 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
-var Request = require('../../lib/broker/Request');
+var Request = require('../../lib/broker/request');
 var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache();
 var ObjectId = mongoose.Types.ObjectId;
@@ -21,13 +22,15 @@ var TagController = new BaseController(Tag).crud();
  */
 TagController.getTags = function (req, res) {
 
+    res.xmlKey = 'tags';
+
     var orgId = ObjectId(req.params.organizationId);
 
     Tag.find({organization: orgId}, function (err, tags) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
-        res.okJson(null, tags);
+        res.sendSuccess(null, tags);
 
     });
 
@@ -39,6 +42,7 @@ TagController.getTags = function (req, res) {
  */
 TagController.createByOrgId = function (req, res) {
 
+    res.xmlOptions = 'tag';
 
     var obj = new Tag(req.body);
 
@@ -57,9 +61,9 @@ TagController.createByOrgId = function (req, res) {
 
     obj.save(function (err) {
 
-        if (err)  return res.errJson(err);
+        if (err)  return res.sendError(err);
 
-        res.okJson('Successfully Added', obj);
+        res.sendSuccess('Successfully Added', obj);
 
     });
 
@@ -71,19 +75,21 @@ TagController.createByOrgId = function (req, res) {
  */
 TagController.getTagById = function (req, res) {
 
+    res.xmlOptions = 'tag';
+
     var orgId = req.params.organizationId;
 
     var tagId = ObjectId(req.params.tagId);
 
     Tag.findOne({ organization: ObjectId(orgId), _id: tagId }, function (err, tag) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
         /**
          * If tag is empty from database
          */
-        if (!tag) return res.errJson('The tag not found in database');
+        if (!tag) return res.sendError('The tag not found in database');
 
-        res.okJson(tag);
+        res.sendSuccess(tag);
 
     });
 
@@ -95,16 +101,15 @@ TagController.getTagById = function (req, res) {
  */
 TagController.deleteTagById = function (req, res) {
 
-
     var orgId = req.params.organizationId;
 
     var tagId = ObjectId(req.params.tagId);
 
     Tag.remove({ organization: ObjectId(orgId), _id: tagId }, function (err, tag) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
-        res.okJson('Successfully deleted');
+        res.sendSuccess('Successfully deleted');
 
     });
 
@@ -116,14 +121,15 @@ TagController.deleteTagById = function (req, res) {
  */
 TagController.putTagById = function(req, res){
 
+    res.xmlOptions = 'tag';
 
     var tagId = ObjectId(req.params.tagId);
 
     Tag.findOne({ _id: tagId, organization: ObjectId(req.params.organizationId) }, function (err, obj) {
 
-        if (err)  return res.errJson(err);
+        if (err)  return res.sendError(err);
 
-        if (!obj) return res.errJson('Data not found');
+        if (!obj) return res.sendError('Data not found');
 
         for (var prop in req.body) {
 
@@ -144,9 +150,9 @@ TagController.putTagById = function(req, res){
 
         obj.save(function (err) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson('Successfully updated!', obj);
+            res.sendSuccess('Successfully updated!', obj);
 
         });
 

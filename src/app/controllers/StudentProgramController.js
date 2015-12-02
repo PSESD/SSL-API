@@ -1,10 +1,11 @@
+'use strict';
 /**
  * Created by zaenal on 21/05/15.
  */
 var mongoose = require('mongoose');
 var Student = require('../models/Student');
 var StudentProgram = require('../models/StudentProgram');
-var StudentProgramSchema = require('../models/schema/StudentProgram');
+var Organization = require('../models/Organization');
 var Program = require('../models/Program');
 var User = require('../models/User');
 var Tag = require('../models/Tag');
@@ -13,6 +14,10 @@ var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
 var natural = require('natural'),
     tokenizer = new natural.WordTokenizer();
+
+var xmlParser = require('js2xmlparser');
+var moment = require('moment');
+var config = require('config'), xsreConfig = config.get('hzb').xsre;
 
 
 var StudentProgramController = new BaseController(StudentProgram).crud();
@@ -26,17 +31,41 @@ var StudentProgramController = new BaseController(StudentProgram).crud();
  */
 StudentProgramController.getByStudentId = function (req, res) {
 
+    res.xmlKey = 'studentPrograms';
+
     var orgId = req.params.organizationId;
 
     var stdId = req.params.studentId;
 
     Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
-        if(!student) return res.errJson('Data not found');
+        if(!student) return res.sendError('Data not found');
 
-        res.okJson(null, student.programs);
+        res.sendSuccess(null, student.programs);
+    });
+
+};
+/**
+ *
+ * @param req
+ * @param res
+ */
+StudentProgramController.getByStudentIdXsre = function(req, res){
+
+    var orgId = req.params.organizationId;
+
+    var stdId = req.params.studentId;
+
+    Organization.pushStudent(req.user, orgId, stdId, function(err, data){
+
+        if(err) return res.sendError(err);
+
+        res.set('Content-Type', 'text/xml');
+
+        return res.send(data);
+
     });
 
 };
@@ -46,6 +75,8 @@ StudentProgramController.getByStudentId = function (req, res) {
  * @param res
  */
 StudentProgramController.addByStudentId = function (req, res) {
+
+    res.xmlOptions = 'student';
 
     var orgId = req.params.organizationId;
 
@@ -73,15 +104,15 @@ StudentProgramController.addByStudentId = function (req, res) {
 
     if(_.isEmpty(studentProgram)) {
 
-        return res.errJson('POST parameter is empty!');
+        return res.sendError('POST parameter is empty!');
 
     }
 
     Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
-        if(!student) return res.errJson('Data not found');
+        if(!student) return res.sendError('Data not found');
 
         student.programs.push(studentProgram);
 
@@ -92,11 +123,11 @@ StudentProgramController.addByStudentId = function (req, res) {
 
         student.save(function(err){
 
-            if(err) return res.errJson(err);
+            if(err) return res.sendError(err);
 
             Tag.addTag(ObjectId(orgId), studentProgram.cohort);
 
-            res.okJson('Student Program successfully add', student);
+            res.sendSuccess('Student Program successfully add', student);
 
         });
 
@@ -116,11 +147,11 @@ StudentProgramController.getByProgramId = function (req, res) {
 
     Student.protect(req.user.role, { onlyAssign: true }, req.user).find({ organization: ObjectId(orgId), programs: { $elemMatch: { program: ObjectId(proId) } } }, function(err, students){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
-        if(!students) return res.errJson('Data not found');
+        if(!students) return res.sendError('Data not found');
 
-        res.okJson(null, students);
+        res.sendSuccess(null, students);
 
     });
 
@@ -160,15 +191,15 @@ StudentProgramController.addByProgramId = function(req, res){
 
     if(!stdId || _.isEmpty(studentProgram)) {
 
-        return res.errJson('POST parameter is empty!');
+        return res.sendError('POST parameter is empty!');
 
     }
 
     Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
-        if(!student) return res.errJson('Data not found');
+        if(!student) return res.sendError('Data not found');
 
         student.programs.push(studentProgram);
 
@@ -179,11 +210,11 @@ StudentProgramController.addByProgramId = function(req, res){
 
         student.save(function(err){
 
-            if(err) return res.errJson(err);
+            if(err) return res.sendError(err);
 
             Tag.addTag(ObjectId(orgId), studentProgram.cohort);
 
-            res.okJson('Student Program successfully add', student);
+            res.sendSuccess('Student Program successfully add', student);
 
         });
 
@@ -211,13 +242,13 @@ StudentProgramController.getStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function (err, student) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
         /**
          * If student is empty from database
          */
-        if (!student) return res.errJson('The student not found in database');
+        if (!student) return res.sendError('The student not found in database');
 
-        res.okJson(student);
+        res.sendSuccess(student);
 
     });
 };
@@ -242,9 +273,9 @@ StudentProgramController.putStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
-        if(!student) return res.errJson('Data not found');
+        if(!student) return res.sendError('Data not found');
 
 
         var programs = [];
@@ -282,15 +313,15 @@ StudentProgramController.putStudentById = function(req, res){
 
         if (_.isEmpty(studentProgram)) {
 
-            return res.errJson('POST parameter is empty!');
+            return res.sendError('POST parameter is empty!');
 
         }
 
         Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson('Update success');
+            res.sendSuccess('Update success');
 
         });
 
@@ -318,9 +349,9 @@ StudentProgramController.deleteStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
-        if(!student) return res.errJson('Data not found');
+        if(!student) return res.sendError('Data not found');
 
         var programs = [];
 
@@ -335,9 +366,9 @@ StudentProgramController.deleteStudentById = function(req, res){
 
         Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson('Delete success');
+            res.sendSuccess('Delete success');
 
         });
 

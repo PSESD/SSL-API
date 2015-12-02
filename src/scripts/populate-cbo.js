@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 21/05/15.
  */
@@ -23,7 +24,7 @@ var filecsv = __dirname + '/populate.csv';
 var async = require('async');
 var _ = require('underscore');
 
-var Request = require('../lib/broker/Request');
+var Request = require('../lib/broker/request');
 var parseString = require('xml2js').parseString;
 
 

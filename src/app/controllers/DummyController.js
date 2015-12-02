@@ -1,6 +1,4 @@
-/**
- * Created by zaenal on 26/06/15.
- */
+'use strict';
 /**
  * Created by zaenal on 03/06/15.
  */
@@ -10,7 +8,7 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
-var Request = require('../../lib/broker/Request');
+var Request = require('../../lib/broker/request');
 var parseString = require('xml2js').parseString;
 var ObjectId = mongoose.Types.ObjectId;
 var DummyController = new BaseController(Student).crud();
@@ -31,24 +29,24 @@ DummyController.index = function(req, res){
 
         User.findOne({email: req.query.email || req.body.email }, function(err, user){
 
-            if(err) return res.errJson(err);
+            if(err) return res.sendError(err);
 
-            if(!user) return res.errJson('User not found');
+            if(!user) return res.sendError('User not found');
 
             Student.protect(user.role, { students: studentId }, user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-                if(err) return res.errJson(err);
+                if(err) return res.sendError(err);
 
-                if(!student) return res.errJson('Student not found');
+                if(!student) return res.sendError('Student not found');
 
-                res.okJson('Its OK');
+                res.sendSuccess('Its OK');
             });
 
             //Student.protect(user.role, null, user).find({organization: orgId}, function (err, students) {
             //
-            //    if (err) return res.errJson(err);
+            //    if (err) return res.sendError(err);
             //
-            //    res.okJson(null, students);
+            //    res.sendSuccess(null, students);
             //});
         });
     });

@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 03/06/15.
  */
@@ -8,13 +9,16 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
-var Request = require('../../lib/broker/Request');
+var Request = require('../../lib/broker/request');
 var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
 var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
 var php = require('phpjs');
+var xSre = require('../../lib/xsre');
+var async = require('async');
+
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -28,120 +32,20 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     var studentId = ObjectId(req.params.studentId);
 
+    var showRaw = false;
+
+    if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')) showRaw = true;
 
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
         /**
          * If student is empty from database
          */
-        if (!student) return res.errJson('The student not found in database');
+        if (!student) return res.sendError('The student not found in database');
 
-        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district].join('_'));
-        /**
-         *
-         * @param results
-         * @returns {Array}
-         */
-        function getAttendanceBehaviors(results){
-
-            var attendanceBehaviors = [];
-
-            var behaviorDefault = {
-                weekStart: "",
-                weekEnd: "",
-                havePeriods: false,
-                deltaChange: "0%", //Calculated from total this week (attendance - last week attendance) / last week attendance
-                weekData: []
-            };
-
-            var attendance = results.attendance;
-
-            var totalLastWeekAttendance = 0;
-
-            for(var i = 0; i < attendance.summaries.summary.length; i++){
-
-                var summary = attendance.summaries.summary[i];
-
-                var behavior = behaviorDefault, totalAttandance = 0;
-
-                behavior.weekStart = summary.startDate._;
-
-                behavior.weekEnd = php.date('m/d/Y', php.strtotime('+'+summary.daysAbsent+' days', php.strtotime(behavior.weekStart)));
-
-                attendance.events.event.forEach(function(event){
-
-                    var weekDate = {
-                        date: "",
-                        attendance: "0%", //Calculated from total non present/total period
-                        periods: [],
-                        behaviors: []
-                    };
-
-                    weekDate.date = event.calendarEventDate;
-
-                    var total = 0;
-
-                    if('timeTablePeriod' in event && _.isArray(event.timeTablePeriod)){
-
-                        behavior.havePeriods = true;
-
-                        for(var j = 0; j < event.timeTablePeriod.length; j++){
-
-                            var period = {
-                                name: 'Period ' + timeTablePeriod[j]
-                            };
-
-                            period.status = event.attendanceStatus[j];
-
-                            if (period.status !== 'P') {
-
-                            } else {
-
-                                total++;
-
-                            }
-
-                            weekDate.periods.push(period);
-
-                        }
-
-                    }
-
-                    var percent = total === 0 ? 0 : (Math.round(total / weekDate.periods.length) * 100);
-
-                    weekDate.attendance = percent + '%';
-
-                    totalAttandance += percent;
-
-                    behavior.weekData.push(weekDate);
-
-                });
-
-                if(attendanceBehaviors.length === 0){
-
-                    totalLastWeekAttendance = totalAttandance;
-
-                } else {
-
-                    totalLastWeekAttendance = parseInt(attendanceBehaviors[attendanceBehaviors.length -1].deltaChange);
-
-                }
-
-                var deltaChange = totalAttandance === 0 ? 0 : (Math.round(totalAttandance / totalLastWeekAttendance) * 100);
-
-                behavior.deltaChange = deltaChange + '%';
-
-                totalAttandance = 0;
-
-                attendanceBehaviors.push(behavior);
-
-            }
-
-            return attendanceBehaviors;
-
-        }
-
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
+        //key = new Date().getTime();
         /**
          *
          * @param results
@@ -149,7 +53,21 @@ StudentController.getStudentsBackpack = function (req, res) {
          */
         function embeds(results, isFromCache){
 
-            res.header('x-cached-sre' , isFromCache ? 1 : 0 );
+            res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
+
+            if(showRaw){
+
+                res.header('Content-Type', 'text/xml');
+
+                return res.send(results.raw);
+
+            }
+
+            if(results.raw) delete results.raw;
+
+            res.xmlOptions = res.xmlKey = 'CBOStudentDetail';
+
+            res.bigXml = true;
 
             var crit = {
                 permissions: {
@@ -162,7 +80,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             User.find(crit, function(err, users){
 
-                if(err) return res.errJson(err);
+                if(err) return res.sendError(err);
 
                 if(!users) users = [];
 
@@ -194,7 +112,9 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 _.each(student.programs, function(program){
 
-                    programsId[program.program.toString()] = program.toObject();
+                    if(Object.keys(programsId).indexOf(program.program.toString()) === -1) programsId[program.program.toString()] = [];
+
+                    programsId[program.program.toString()].push(program.toObject());
 
                     programId.push(program.program);
 
@@ -204,18 +124,21 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     Program.find({ _id: { $in: programId } }, function(err, programs){
 
-                        if(err) return res.errJson(err);
+                        if(err) return res.sendError(err);
 
                         _.each(programs, function(program){
 
                             if(program._id.toString() in programsId){
 
-                                programsId[program._id.toString()].program_name = program.name;
+                                programsId[program._id.toString()].forEach(function(prgm){
 
-                                embedsPrograms.push(new hal.Resource(programsId[program._id.toString()]));
+                                    prgm.program_name = program.name;
+
+                                    embedsPrograms.push(new hal.Resource(prgm));
+
+                                });
 
                             }
-
 
                         });
 
@@ -223,7 +146,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         resource.embed('programs', embedsPrograms);
 
-                        res.json(resource.toJSON());
+                        res.sendSuccess(null, resource.toJSON());
 
                     });
 
@@ -234,7 +157,8 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     resource.embed('programs', embedsPrograms);
 
-                    res.json(resource.toJSON());
+                    res.sendSuccess(null, resource.toJSON());
+
                 }
 
             });
@@ -242,11 +166,11 @@ StudentController.getStudentsBackpack = function (req, res) {
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
             /**
              * If organization is empty from database
              */
-            if (!organization) return res.errJson('The organization not found in database');
+            if (!organization) return res.sendError('The organization not found in database');
 
             var brokerRequest = new Request({
                 externalServiceId: organization.externalServiceId,
@@ -262,35 +186,31 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
-                        if (error)  return res.errJson(error);
+                        if (error)  return res.sendError(error);
 
-                        if (!body) return res.errJson('Data not found');
+                        if (!body) {
 
-                        if (response && response.statusCode == '200') {
+                            res.statusCode = response.statusCode || 404;
 
-                            parseString(body, { explicitArray: false }, function (err, result) {
+                            return res.sendError('Data not found in database xsre');
 
-                                if(err) return res.errJson(err);
+                        }
 
-                                var json = result.xSre;
+                        if (response && response.statusCode === 200) {
 
-                                delete json['$'];
+                            utils.xml2js(body, function (err, result) {
 
-                                if(!_.isArray(json.attendance.summaries.summary)){
+                                if(err) return res.sendError(err);
 
-                                    json.attendance.summaries.summary = [ json.attendance.summaries.summary ];
-
-                                }
-
-                                json.attendanceBehaviors = getAttendanceBehaviors(json);
+                                var object = new xSre(result, body).toObject();
                                 /**
-                                 * Set to memcached
+                                 * Set to cache
                                  */
-                                cache.set(key, json, function(err){
+                                cache.set(key, object, function(err){
 
-                                    utils.log(err);
+                                    log(err);
 
-                                    embeds(json);
+                                    embeds(object);
 
                                 });
 
@@ -298,11 +218,11 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         } else {
 
-                            parseString(body, { explicitArray: false }, function (err, result) {
+                            utils.xml2js(body, function (err, result) {
 
                                 var json = (result && 'error' in result) ? result.error.message : 'Error not response';
 
-                                res.errJson(json);
+                                res.sendError(json);
 
                             });
                         }
@@ -334,21 +254,21 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
         /**
          * If student is empty from database
          */
-        if (!student) return res.errJson('The student not found in database');
+        if (!student) return res.sendError('The student not found in database');
+
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
             /**
              * If organization is empty from database
              */
-            if (!organization) return res.errJson('The organization not found in database');
-
-            var key = [student.district_student_id, student.school_district, organization.externalServiceId, organization.personnelId, organization.authorizedEntityId].join('_');
+            if (!organization) return res.sendError('The organization not found in database');
 
             cache.del(key, function(err, result){
 
@@ -356,14 +276,82 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
                     log(err, 'error');
 
-                    return res.errJson('Delete cache error');
+                    return res.sendError('Delete cache error');
 
                 }
 
-                res.okJson('Delete cache successfully');
+                key = md5(['_xSre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
+
+                cache.del(key, function(err, result){
+
+                    res.sendSuccess('Delete cache successfully');
+
+                });
 
             });
         });
+
+    });
+};
+/**
+ *
+ * @param brokerRequest
+ * @param student
+ * @param orgId
+ * @param callback
+ */
+StudentController.getStudentDetail = function(brokerRequest, student, orgId, callback){
+
+    var key = md5(['_xSre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
+
+    cache.get(key, function(err, result){
+
+        if(err)  return callback(null, student, false);
+
+        if(!result){
+
+            brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
+
+                if (error)  return callback(null, student, false);
+
+                if (!body) {
+
+                    return callback(null, student, false);
+
+                }
+
+                if (response && response.statusCode === 200) {
+
+                    utils.xml2js(body, function (err, result) {
+
+                        if(err) return res.sendError(err);
+
+                        var object = new xSre(result).getStudentSummary();
+
+                        var newObject = student.toObject();
+
+                        newObject.xsre = object;
+
+                        /**
+                         * Set to cache
+                         */
+                        cache.set(key, newObject, {ttl: 3600}, function(err){
+
+                            callback(null, newObject, false);
+
+                        });
+
+                    });
+
+                }
+            });
+
+        } else {
+
+
+            callback(null, result, true);
+
+        }
 
     });
 };
@@ -374,17 +362,64 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
  */
 StudentController.getStudents = function (req, res) {
 
+    res.xmlKey = 'students';
+
     var orgId = ObjectId(req.params.organizationId);
 
     var crit = Student.crit(req.query, ['organization']);
 
+    var withXsre = parseInt(req.query.xsre) > 0;
+
     crit.organization = orgId;
 
-    Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
 
-        if (err) return res.errJson(err);
+    Organization.findOne({ _id: orgId }, function(err, organization) {
 
-        res.okJson(null, students);
+        if (err) return res.sendError(err);
+        /**
+         * If organization is empty from database
+         */
+        if (!organization) return res.sendError('The organization not found in database');
+
+        var brokerRequest = new Request({
+            externalServiceId: organization.externalServiceId,
+            personnelId: organization.personnelId,
+            authorizedEntityId: organization.authorizedEntityId
+        });
+
+        Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
+
+            if (err) return res.sendError(err);
+
+            if(withXsre) {
+
+                var studentsAsync = [];
+
+                students.forEach(function (student) {
+
+                    studentsAsync.push(function (callback) {
+
+                        StudentController.getStudentDetail(brokerRequest, student, orgId, callback);
+
+                    });
+
+                });
+
+                async.series(studentsAsync, function(err, students, isCache){
+
+                    res.header('X-Cached-Sre' , isCache ? 1 : 0 );
+
+                    res.sendSuccess(null, students);
+
+                });
+
+            } else {
+
+                res.sendSuccess(null, students);
+
+            }
+
+        });
 
     });
 
@@ -424,7 +459,7 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
                 if(permission.organization.toString() === orgId.toString()) {
 
-                    //if (permission.role === 'case-worker' && permission.is_special_case_worker === false) {
+                    //if (permission.role === 'case-worker-restricted') {
 
                         showEmpty = false;
 
@@ -444,7 +479,7 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
         if(showEmpty === true){
 
-            return res.okJson(null, []);
+            return res.sendSuccess(null, []);
 
         }
 
@@ -452,9 +487,9 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
         Student.find(crit, function (err, students) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson(null, students);
+            res.sendSuccess(null, students);
 
         });
 
@@ -467,6 +502,8 @@ StudentController.getStudentNotAssigns = function (req, res) {
  * @param res
  */
 StudentController.createByOrgId = function (req, res) {
+
+    res.xmlKey = 'student';
 
     var obj = new Student(req.body);
 
@@ -483,13 +520,13 @@ StudentController.createByOrgId = function (req, res) {
 
     User.findOne({ _id: req.user._id }, function(err, user){
 
-        if(err) return res.errJson(err);
+        if(err) return res.sendError(err);
 
-        if(!user) return res.errJson('User not update successfully');
+        if(!user) return res.sendError('User not update successfully');
 
         obj.protect(req.user.role, null, req.user).save(function (err) {
 
-            if (err)  return res.errJson(err);
+            if (err)  return res.sendError(err);
 
             _.each(user.permissions, function(permission, key){
 
@@ -503,9 +540,9 @@ StudentController.createByOrgId = function (req, res) {
 
             user.save(function(err){
 
-                if (err)  return res.errJson(err);
+                if (err)  return res.sendError(err);
 
-                res.okJson('Successfully Added', obj);
+                res.sendSuccess('Successfully Added', obj);
 
             });
 
@@ -521,25 +558,59 @@ StudentController.createByOrgId = function (req, res) {
  */
 StudentController.getStudentById = function (req, res) {
 
-    var orgId = req.params.organizationId;
+    res.xmlOptions = 'student';
+
+    var orgId = ObjectId(req.params.organizationId);
 
     var studentId = ObjectId(req.params.studentId);
 
     var crit = Student.crit(req.query, ['_id', 'organization']);
 
-    crit.organization = ObjectId(orgId);
+    var withXsre = parseInt(req.query.xsre) > 0;
+
+    crit.organization = orgId;
 
     crit._id = studentId;
 
-    Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
+    Organization.findOne({ _id: orgId }, function(err, organization) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
         /**
-         * If student is empty from database
+         * If organization is empty from database
          */
-        if (!student) return res.errJson('The student not found in database');
+        if (!organization) return res.sendError('The organization not found in database');
 
-        res.okJson(student);
+        var brokerRequest = new Request({
+            externalServiceId: organization.externalServiceId,
+            personnelId: organization.personnelId,
+            authorizedEntityId: organization.authorizedEntityId
+        });
+
+        Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
+
+            if (err) return res.sendError(err);
+            /**
+             * If student is empty from database
+             */
+            if (!student) return res.sendError('The student not found in database');
+
+            if(withXsre) {
+
+                StudentController.getStudentDetail(brokerRequest, student, orgId, function(err, student, isCache){
+
+                    res.header('X-Cached-Sre' , isCache ? 1 : 0 );
+
+                    res.sendSuccess(student);
+
+                });
+
+            } else {
+
+                res.sendSuccess(student);
+
+            }
+
+        });
 
     });
 
@@ -557,13 +628,13 @@ StudentController.deleteStudentById = function (req, res) {
 
     Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
 
-        if (err) return res.errJson(err);
+        if (err) return res.sendError(err);
 
         User.findOne({ _id: req.user._id }, function(err, user){
 
-            if(err) return res.errJson(err);
+            if(err) return res.sendError(err);
 
-            if(!user) return res.errJson('User not update successfully');
+            if(!user) return res.sendError('User not update successfully');
 
             _.each(user.permissions, function(permission, key){
 
@@ -579,9 +650,9 @@ StudentController.deleteStudentById = function (req, res) {
 
             user.save(function(err){
 
-                if (err)  return res.errJson(err);
+                if (err)  return res.sendError(err);
 
-                res.okJson('Successfully deleted');
+                res.sendSuccess('Successfully deleted');
 
             });
 
@@ -597,13 +668,15 @@ StudentController.deleteStudentById = function (req, res) {
  */
 StudentController.putStudentById = function(req, res){
 
+    res.xmlOptions = 'student';
+
     var studentId = ObjectId(req.params.studentId);
 
     Student.protect(req.user.role, { students: studentId }, req.user).findOne({_id: studentId, organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        if (err)  return res.errJson(err);
+        if (err)  return res.sendError(err);
 
-        if (!obj) return res.errJson('Data not found');
+        if (!obj) return res.sendError('Data not found');
 
         for (var prop in req.body) {
 
@@ -621,9 +694,9 @@ StudentController.putStudentById = function(req, res){
 
         obj.protect(req.user.role, null, req.user).save(function (err) {
 
-            if (err) return res.errJson(err);
+            if (err) return res.sendError(err);
 
-            res.okJson('Successfully updated!', obj);
+            res.sendSuccess('Successfully updated!', obj);
 
         });
 

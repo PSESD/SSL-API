@@ -1,7 +1,7 @@
+'use strict';
 /**
  * Created by zaenal on 03/06/15.
  */
-'use strict';
 var config = require('config');
 var request = require('request');
 var qs = require('querystring');
@@ -107,8 +107,6 @@ Request.prototype = {
      */
     create: function (what, url, method, callback) {
 
-        var config = this.config[what];
-
         if('Authorization' in this.headers){
 
             //skip
@@ -141,8 +139,12 @@ Request.prototype = {
                     throw new Error('Unable to generate token');
 
             }
+
             this.headers.Authorization = 'SIF_HMACSHA256 ' + token;
+
         }
+
+        var config = this.config[what];
 
         var self = this;
 
@@ -160,7 +162,8 @@ Request.prototype = {
             method: method || 'GET',
             headers: this.getHeaders(),
             qsParseOptions: { sep: ';'},
-            strictSSL: false
+            strictSSL: false,
+            timeout: 60000 // timeout 1 minute
         };
 
         //console.dir(options);
