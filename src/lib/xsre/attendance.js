@@ -12,7 +12,7 @@ moment.fn.isISO = true;
  */
 moment.fn.dayISO = function () {
     var self = this.clone();
-    return self.day() == 0 ? 6 : self.day()-1;
+    return self.day() === 0 ? 6 : self.day()-1;
 };
 /**
  *
@@ -20,7 +20,7 @@ moment.fn.dayISO = function () {
  */
 moment.fn.weekISO = function () {
     var self = this.clone();
-    return self.day() == 0 ? self.format('w')-1 : self.format('w');
+    return self.day() === 0 ? self.format('w')-1 : self.format('w');
 };
 /**
  *
@@ -147,11 +147,17 @@ Attendance.prototype.getAttendances = function(){
 
     var me = this;
 
-    if(!_.isObject(me.attendances)) return me.attendanceBehaviors;
+    if(!_.isObject(me.attendances)) {
+        return me.attendanceBehaviors;
+    }
 
-    if(!_.isObject(me.attendances.events)) return me.attendanceBehaviors;
+    if(!_.isObject(me.attendances.events)) {
+        return me.attendanceBehaviors;
+    }
 
-    if(_.isUndefined(me.attendances.events.event)) return me.attendanceBehaviors;
+    if(_.isUndefined(me.attendances.events.event)) {
+        return me.attendanceBehaviors;
+    }
 
     var mm = null;
 
@@ -234,9 +240,13 @@ Attendance.prototype.getAttendances = function(){
 
             delete event.school;
 
-            if(me.allDates.indexOf(event.calendarEventDate) === -1) me.allDates.push(event.calendarEventDateTime);
+            if(me.allDates.indexOf(event.calendarEventDate) === -1) {
+                me.allDates.push(event.calendarEventDateTime);
+            }
 
-            if(Object.keys(me.allEvents).indexOf(event.calendarEventDate) === -1) me.allEvents[event.calendarEventDate] = [];
+            if(Object.keys(me.allEvents).indexOf(event.calendarEventDate) === -1) {
+                me.allEvents[event.calendarEventDate] = [];
+            }
 
             me.allEvents[event.calendarEventDate].push(obj);
 
@@ -279,7 +289,9 @@ Attendance.prototype.getAttendances = function(){
 
                 discipline.incidentDate = mm.format('MM-DD-YYYY');
 
-                if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1) me.allDisciplines[discipline.incidentDate] = [];
+                if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1) {
+                    me.allDisciplines[discipline.incidentDate] = [];
+                }
 
                 me.allDisciplines[discipline.incidentDate].push(obj);
 
@@ -373,7 +385,9 @@ Attendance.prototype.getAttendances = function(){
                 'F'
             ];
 
-            if(summary[nday] === undefined) return;
+            if(summary[nday] === undefined) {
+                return;
+            }
 
             summary[nday].date = dayString;
 
@@ -439,7 +453,7 @@ Attendance.prototype.getAttendances = function(){
 
                     }
 
-                })
+                });
 
 
             }
@@ -474,7 +488,9 @@ Attendance.prototype.getAttendances = function(){
 
                             b[column] = {value: period.value, event: period.event, slug: period.slug};
 
-                            if (period.period !== me.notAvailable) title = period.period;
+                            if (period.period !== me.notAvailable) {
+                                title = period.period;
+                            }
 
                         }
 
@@ -509,11 +525,7 @@ Attendance.prototype.getAttendances = function(){
 
         for(var c = 0; c < columns.length; c++){
 
-            if(columns[c].M.value === me.notAvailable && !columns[c].M.event
-                && columns[c].T.value === me.notAvailable && !columns[c].T.event
-                && columns[c].W.value === me.notAvailable && !columns[c].W.event
-                && columns[c].TH.value === me.notAvailable && !columns[c].TH.event
-                && columns[c].F.value === me.notAvailable && !columns[c].F.event){
+            if(columns[c].M.value === me.notAvailable && !columns[c].M.event && columns[c].T.value === me.notAvailable && !columns[c].T.event && columns[c].W.value === me.notAvailable && !columns[c].W.event && columns[c].TH.value === me.notAvailable && !columns[c].TH.event && columns[c].F.value === me.notAvailable && !columns[c].F.event){
                 continue;
             }
 
@@ -530,7 +542,9 @@ Attendance.prototype.getAttendances = function(){
 
         behavior.raw.weeklyChange = weeklyChange;
 
-        if(weeklyChange === null) weeklyChange = me.notAvailable;
+        if(weeklyChange === null) {
+            weeklyChange = me.notAvailable;
+        }
 
         if(!isNaN(weeklyChange)) {
 
@@ -550,13 +564,15 @@ Attendance.prototype.getAttendances = function(){
 
         }
 
-        if(behavior.weeklyChange === null) behavior.weeklyChange = me.notAvailable;
+        if(behavior.weeklyChange === null) {
+            behavior.weeklyChange = me.notAvailable;
+        }
 
         lastWeeklyChange = behavior.weeklyChange;
 
         if(!isNaN(behavior.weeklyChange)){
 
-            behavior.weeklyChange = parseFloat(behavior.weeklyChange).toFixed(2) + '%'
+            behavior.weeklyChange = parseFloat(behavior.weeklyChange).toFixed(2) + '%';
 
         }
 
@@ -592,7 +608,7 @@ Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, da
 
     var e = events[0];
 
-    if(e.attendanceStatus.toLowerCase() === 'present'){
+    if(e.attendanceStatus && (''+e.attendanceStatus).toLowerCase() === 'present'){
 
         summary[n].value = parseFloat(e.attendanceValue).toFixed(2);
 
@@ -614,7 +630,9 @@ Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, da
  */
 Attendance.prototype.slug = function(value){
 
-    if(!value) return '';
+    if(!value) {
+        return '';
+    }
 
     return (value+'').toLowerCase().replace('absence', '');
 };
@@ -653,7 +671,7 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
 
             summary[n].periods.push({
                 period: me.notAvailable, value: me.notAvailable, event: null, slug: ''
-            })
+            });
 
         }
 

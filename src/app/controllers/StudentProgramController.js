@@ -12,12 +12,10 @@ var Tag = require('../models/Tag');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
-var natural = require('natural'),
-    tokenizer = new natural.WordTokenizer();
+var natural = require('natural'), tokenizer = new natural.WordTokenizer();
 
-var xmlParser = require('js2xmlparser');
 var moment = require('moment');
-var config = require('config'), xsreConfig = config.get('hzb').xsre;
+var config = require('config');
 
 
 var StudentProgramController = new BaseController(StudentProgram).crud();
@@ -41,7 +39,9 @@ StudentProgramController.getByStudentId = function (req, res) {
 
         if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
         res.sendSuccess(null, student.programs);
     });
@@ -84,15 +84,25 @@ StudentProgramController.addByStudentId = function (req, res) {
 
     var studentProgram = {};
 
-    if(req.body.programId) studentProgram.program = ObjectId(req.body.programId);
+    if(req.body.programId) {
+        studentProgram.program = ObjectId(req.body.programId);
+    }
 
-    if(req.body.cohort) studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+    if(req.body.cohort) {
+        studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+    }
 
-    if(req.body.active) studentProgram.active = (req.body.active === 'true');
+    if(req.body.active) {
+        studentProgram.active = (req.body.active === 'true');
+    }
 
-    if(req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+    if(req.body.participation_start_date) {
+        studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+    }
 
-    if(req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+    if(req.body.participation_end_date) {
+        studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+    }
 
     studentProgram.created = new Date();
 
@@ -112,7 +122,9 @@ StudentProgramController.addByStudentId = function (req, res) {
 
         if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
         student.programs.push(studentProgram);
 
@@ -149,7 +161,9 @@ StudentProgramController.getByProgramId = function (req, res) {
 
         if (err)  { return res.sendError(err); }
 
-        if(!students) return res.sendError('Data not found');
+        if(!students) {
+            return res.sendError('Data not found');
+        }
 
         res.sendSuccess(null, students);
 
@@ -171,15 +185,25 @@ StudentProgramController.addByProgramId = function(req, res){
 
     var studentProgram = {};
 
-    if(proId) studentProgram.program = ObjectId(proId);
+    if(proId) {
+        studentProgram.program = ObjectId(proId);
+    }
 
-    if(req.body.cohort) studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+    if(req.body.cohort) {
+        studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+    }
 
-    if(req.body.active) studentProgram.active = (req.body.active === 'true');
+    if(req.body.active) {
+        studentProgram.active = (req.body.active === 'true');
+    }
 
-    if(req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+    if(req.body.participation_start_date) {
+        studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+    }
 
-    if(req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+    if(req.body.participation_end_date) {
+        studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+    }
 
     studentProgram.created = new Date();
 
@@ -199,7 +223,9 @@ StudentProgramController.addByProgramId = function(req, res){
 
         if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
         student.programs.push(studentProgram);
 
@@ -246,7 +272,9 @@ StudentProgramController.getStudentById = function(req, res){
         /**
          * If student is empty from database
          */
-        if (!student) return res.sendError('The student not found in database');
+        if (!student) {
+            return res.sendError('The student not found in database');
+        }
 
         res.sendSuccess(student);
 
@@ -275,7 +303,9 @@ StudentProgramController.putStudentById = function(req, res){
 
         if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
 
         var programs = [];
@@ -292,15 +322,25 @@ StudentProgramController.putStudentById = function(req, res){
 
                 studentProgram = student.programs[i];
 
-                if (proId) studentProgram.program = ObjectId(proId);
+                if (proId) {
+                    studentProgram.program = ObjectId(proId);
+                }
 
-                if (req.body.cohort) studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+                if (req.body.cohort) {
+                    studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+                }
 
-                if (req.body.active) studentProgram.active = (req.body.active === 'true');
+                if (req.body.active) {
+                    studentProgram.active = (req.body.active === 'true');
+                }
 
-                if (req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+                if (req.body.participation_start_date) {
+                    studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+                }
 
-                if (req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+                if (req.body.participation_end_date) {
+                    studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+                }
 
                 studentProgram.last_updated = new Date();
 
@@ -351,7 +391,9 @@ StudentProgramController.deleteStudentById = function(req, res){
 
         if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
         var programs = [];
 

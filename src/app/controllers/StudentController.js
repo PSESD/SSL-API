@@ -10,12 +10,10 @@ var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var Request = require('../../lib/broker/request');
-var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
 var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
-var php = require('phpjs');
 var xSre = require('../../lib/xsre');
 var async = require('async');
 
@@ -296,7 +294,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
                 return res.sendError('The organization not found in database');
             }
 
-            cache.del(key, function(err, result){
+            cache.del(key, function(err){
 
                 if (err){
 
@@ -308,7 +306,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
                 key = md5(['_xSre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
 
-                cache.del(key, function(err, result){
+                cache.del(key, function(){
 
                     res.sendSuccess('Delete cache successfully');
 
@@ -365,7 +363,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
                         /**
                          * Set to cache
                          */
-                        cache.set(key, newObject, {ttl: 3600}, function(err){
+                        cache.set(key, newObject, {ttl: 3600}, function(){
 
                             callback(null, newObject, false);
 
@@ -668,7 +666,7 @@ StudentController.deleteStudentById = function (req, res) {
 
     var studentId = ObjectId(req.params.studentId);
 
-    Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
+    Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err) {
 
         if (err)  { return res.sendError(err); }
 
