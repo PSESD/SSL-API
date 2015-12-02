@@ -1,12 +1,15 @@
 /**
  * Created by zaenal on 27/08/15.
  */
+'use strict';
 var Attendance = require(__dirname+'/../lib/xsre/attendance');
 var xmlFile = __dirname + '/sample1.xml';
 var fs = require('fs');
 var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
-    if(err) return console.log(err);
+    if(err) {
+        return console.log(err);
+    }
     var cleanedString = data.toString().replace("\ufeff", "");
     console.log(cleanedString);
     parseString(cleanedString, {
@@ -21,11 +24,13 @@ fs.readFile(xmlFile, function(err, data) {
 
     }, function (err, result) {
 
-        if(err) return console.log(err);
+        if(err) {
+            return console.log(err);
+        }
 
         var json = result.xSre;
 
-        delete json['$'];
+        delete json.$;
 
         //if(!_.isArray(json.attendance.summaries.summary)){
         //

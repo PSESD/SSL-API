@@ -5,7 +5,9 @@ var fs = require('fs');
 var xmlFile = __dirname + '/../../../mockhzb/sid/payload.xml';
 var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
-    if(err) return console.log(err);
+    if(err) {
+        return console.log(err);
+    }
 
     parseString(data, {
         normalize: true,

@@ -45,7 +45,9 @@ CodeSet.prototype.parse = function(){
 
     fs.writeFile(this.filename, 'module.exports = ' + io + ';', function (err) {
 
-        if (err) throw err;
+        if (err) {
+            throw err;
+        }
 
         console.log('It\'s saved!');
 

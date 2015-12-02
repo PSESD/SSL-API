@@ -24,7 +24,7 @@ UserController.get = function (req, res) {
 
     User.findOne(crit, function (err, obj) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         res.sendSuccess(obj);
 
@@ -47,15 +47,15 @@ UserController.deleteByEmail = function (req, res) {
             _id: userId
         }, function (err, obj) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             Client.remove({userId: userId}, function (err) {
 
-                if (err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
                 Code.remove({userId: userId}, function (err) {
 
-                    if (err) return res.sendError(err);
+                    if (err)  { return res.sendError(err); }
 
                 });
 
@@ -67,13 +67,15 @@ UserController.deleteByEmail = function (req, res) {
 
     };
 
-    if(req.body.email === req.user.email) return res.errUnauthorized();
+    if(req.body.email === req.user.email) {
+        return res.errUnauthorized();
+    }
 
     User.findOne({email: req.body.email}, function (err, user) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!user) return res.sendError('User not found');
+        if(!user) { return res.sendError('User not found'); }
 
         cb(user._id, req);
 
@@ -107,20 +109,26 @@ UserController.updateAccount = function (req, res) {
 
     ['password', 'retype_password'].forEach(function(param){
 
-        if(param in req.body) delete req.body[param];
+        if(param in req.body) {
+            delete req.body[param];
+        }
 
     });
 
 
     User.findOne(crit, function (err, obj) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!obj) return res.sendError('User not found');
+        if(!obj) {
+            return res.sendError('User not found');
+        }
 
         ["first_name", "middle_name", "last_name", "password"].forEach(function(prop){
 
-            if(prop in req.body) obj[prop] = req.body[prop];
+            if(prop in req.body) {
+                obj[prop] = req.body[prop];
+            }
 
         });
         // set update time and update by user
@@ -130,7 +138,7 @@ UserController.updateAccount = function (req, res) {
 
         obj.save(function (err) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Successfully updated!', obj);
 
@@ -170,15 +178,19 @@ UserController.save = function (req, res) {
 
     ['password', 'retype_password'].forEach(function(param){
 
-        if(param in req.body) delete req.body[param];
+        if(param in req.body) {
+            delete req.body[param];
+        }
 
     });
 
     User.findOne(crit, function (err, obj) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!obj) return res.sendError('User not found');
+        if(!obj) {
+            return res.sendError('User not found');
+        }
 
 
         var role = req.body.role + '';
@@ -189,16 +201,22 @@ UserController.save = function (req, res) {
          */
         if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
 
-            if(role.indexOf('case-worker') !== -1) return res.sendError("Admin never be able to downgrade itself to a case worker");
+            if(role.indexOf('case-worker') !== -1) {
+                return res.sendError("Admin never be able to downgrade itself to a case worker");
+            }
 
         }
 
-        if('is_super_admin' in req.body && obj.isAdmin()) delete req.body.is_super_admin;
+        if('is_super_admin' in req.body && obj.isAdmin()) {
+            delete req.body.is_super_admin;
+        }
 
 
         ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
-            if(prop in req.body) obj[prop] = req.body[prop];
+            if(prop in req.body) {
+                obj[prop] = req.body[prop];
+            }
 
         });
 
@@ -206,7 +224,7 @@ UserController.save = function (req, res) {
 
             obj.saveWithRole(req.user, req.params.organizationId, function (err, user) {
 
-                if (err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
                 res.sendSuccess('Successfully updated!', user);
 
@@ -216,7 +234,7 @@ UserController.save = function (req, res) {
 
             obj.saveWithRole(req.user, req.params.organizationId, role, function (err, user) {
 
-                if (err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
                 res.sendSuccess('Successfully updated!', user);
 
@@ -237,11 +255,13 @@ UserController.cleanAll = function(req, res){
 
     var emails = [ 'test@test.com', 'support@upwardstech.com' ];
 
-    if(!email || emails.indexOf(email) === -1) return res.sendError('Mandatory parameters was empty');
+    if(!email || emails.indexOf(email) === -1) {
+        return res.sendError('Mandatory parameters was empty');
+    }
 
     User.findOne({ email: email }, function(err, user){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         User.removeDeep(user._id, function(err){ console.log(err);});
 
@@ -299,7 +319,9 @@ UserController.getByUserId = function(req, res){
 
                         permission.students.forEach(function (student) {
 
-                            if (students.indexOf(student) === -1) students.push(student);
+                            if (students.indexOf(student) === -1) {
+                                students.push(student);
+                            }
 
                         });
 
@@ -317,11 +339,13 @@ UserController.getByUserId = function(req, res){
 
             }
 
-            if(students.length > 0) crit._id = { $nin: students };
+            if(students.length > 0) {
+                crit._id = { $nin: students };
+            }
 
             Student.find(crit, function (err, students) {
 
-                if (err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
                 res.sendSuccess(null, students);
 
@@ -333,15 +357,17 @@ UserController.getByUserId = function(req, res){
 
         User.findOne({_id: ObjectId(currentUserId)}, function (err, currUser) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
-            if (!currUser) return res.sendError('User not found!');
+            if (!currUser) {
+                return res.sendError('User not found!');
+            }
 
             currUser.getCurrentPermission(organizationId);
 
             Student.protect(currUser.role, {onlyAssign: true}, currUser).find({organization: ObjectId(organizationId)}, function (err, students) {
 
-                if (err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
                 res.sendSuccess(null, students);
 
@@ -368,9 +394,11 @@ UserController.postByUserId = function(req, res){
 
     User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!currUser) return res.sendError('User not found!');
+        if(!currUser) {
+            return res.sendError('User not found!');
+        }
 
         var obj = new Student(req.body);
 
@@ -387,7 +415,7 @@ UserController.postByUserId = function(req, res){
 
         obj.save(function (err) {
 
-            if (err)  return res.sendError(err);
+            if (err) { return res.sendError(err); }
 
             _.each(currUser.permissions, function(permission, key){
 
@@ -401,7 +429,7 @@ UserController.postByUserId = function(req, res){
 
             currUser.save(function(err){
 
-                if (err)  return res.sendError(err);
+                if (err) { return res.sendError(err); }
 
                 res.sendSuccess('Successfully Added', obj);
             });
@@ -428,15 +456,17 @@ UserController.getStudentUserById = function(req, res){
 
     User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!currUser) return res.sendError('User not found!');
+        if(!currUser) {
+            return res.sendError('User not found!');
+        }
 
         currUser.getCurrentPermission(organizationId);
 
         Student.protect(currUser.role, { students: ObjectId(studentId) }, currUser).findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, students) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess(null, students);
 
@@ -464,15 +494,19 @@ UserController.putStudentUserById = function(req, res){
 
     User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!currUser) return res.sendError('User not found!');
+        if(!currUser) {
+            return res.sendError('User not found!');
+        }
 
         Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, obj) {
 
-            if (err)  return res.sendError(err);
+            if (err) { return res.sendError(err); }
 
-            if (!obj) return res.sendError('Data not found');
+            if (!obj) {
+                return res.sendError('Data not found');
+            }
 
             for (var prop in req.body) {
 
@@ -490,7 +524,7 @@ UserController.putStudentUserById = function(req, res){
 
             obj.save(function (err) {
 
-                if (err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
                 _.each(currUser.permissions, function(permission, key){
 
@@ -504,7 +538,7 @@ UserController.putStudentUserById = function(req, res){
 
                 currUser.save(function(err){
 
-                    if (err)  return res.sendError(err);
+                    if (err) { return res.sendError(err); }
 
                     res.sendSuccess('Successfully Updated!', obj);
 
@@ -535,15 +569,19 @@ UserController.deleteStudentUserById = function(req, res){
 
     User.findOne({ _id: ObjectId(currentUserId) }, function(err, currUser){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!currUser) return res.sendError('User not found!');
+        if(!currUser) {
+            return res.sendError('User not found!');
+        }
 
         Student.findOne({ _id: studentId, organization: ObjectId(organizationId) }, function (err, student) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
-            if(!student) return res.sendError('Student not found!');
+            if(!student) {
+                return res.sendError('Student not found!');
+            }
 
             var allpermission = [];
 
@@ -573,7 +611,7 @@ UserController.deleteStudentUserById = function(req, res){
 
             User.where({_id: currUser._id}).update({$set: {permissions: allpermission}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-                if (err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
                 res.sendSuccess('Successfully Deleted!');
 

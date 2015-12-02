@@ -29,7 +29,7 @@ PRSController.getDistricts = function (req, res) {
 
     cache.get(key, function(err, result){
 
-        if(err) utils.log(err);
+        if(err) { utils.log(err); }
 
         if(!result){
 
@@ -37,17 +37,21 @@ PRSController.getDistricts = function (req, res) {
 
             brokerRequest.createPsr('districts', function (error, response, body) {
 
-                if (error)  return res.sendError(error);
+                if (error)  {
+                    return res.sendError(error);
+                }
 
-                if (!body) return res.sendError('Data not found');
+                if (!body) {
+                    return res.sendError('Data not found');
+                }
 
-                if (response && response.statusCode == '200') {
+                if (response && response.statusCode === '200') {
 
                     utils.xml2js(body, function (err, result) {
 
                         var json = result.ArrayOfDistrictSummary;
 
-                        delete json['$'];
+                        delete json.$;
 
                         cache.set(key, json, function(err){
 
