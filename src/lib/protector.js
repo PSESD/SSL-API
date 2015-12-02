@@ -1,7 +1,7 @@
+'use strict';
 /**
  * Created by zaenal on 23/06/15.
  */
-'use strict'
 
 var rules = {};
 var mongoose = require('mongoose');

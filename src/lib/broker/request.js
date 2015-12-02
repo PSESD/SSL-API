@@ -1,7 +1,7 @@
+'use strict';
 /**
  * Created by zaenal on 03/06/15.
  */
-'use strict';
 var config = require('config');
 var request = require('request');
 var qs = require('querystring');

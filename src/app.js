@@ -1,3 +1,4 @@
+'use strict';
 var express = require("express");
 var i18n = require("i18n");
 var mongoose = require('mongoose');

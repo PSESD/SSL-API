@@ -1,4 +1,5 @@
 // Load required packages
+'use strict';
 var passport = require('passport');
 var BasicStrategy = require('passport-http').BasicStrategy;
 var BearerStrategy = require('passport-http-bearer').Strategy;

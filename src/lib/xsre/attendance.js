@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 21/08/15.
  */
@@ -188,7 +189,7 @@ Attendance.prototype.getAttendances = function(){
 
                 obj.absentAttendanceCategory = parseInt(event.absentAttendanceCategory);
 
-                obj.absentAttendanceCategoryTitle = obj.absentAttendanceCategory in me.facets ? me.facets[obj.absentAttendanceCategory] : '';
+                obj.absentAttendanceCategoryTitle = (''+obj.absentAttendanceCategory) in me.facets ? me.facets[''+obj.absentAttendanceCategory] : '';
 
             }
 
@@ -202,7 +203,7 @@ Attendance.prototype.getAttendances = function(){
 
                 obj.presentAttendanceCategory = parseInt(event.presentAttendanceCategory);
 
-                obj.presentAttendanceCategoryTitle = obj.presentAttendanceCategory in me.facets ? me.facets[obj.presentAttendanceCategory] : '';
+                obj.presentAttendanceCategoryTitle = (''+obj.presentAttendanceCategory) in me.facets ? me.facets[''+obj.presentAttendanceCategory] : '';
 
             }
 
@@ -210,14 +211,14 @@ Attendance.prototype.getAttendances = function(){
 
                 obj.attendanceEventType = event.attendanceEventType;
 
-                obj.attendanceEventTypeTitle = event.attendanceEventType in me.facets ? me.facets[event.attendanceEventType] : '';
+                obj.attendanceEventTypeTitle = (''+event.attendanceEventType) in me.facets ? me.facets[''+event.attendanceEventType] : '';
             }
 
             if('dailyAttendanceStatus' in event){
 
                 obj.attendanceStatus = event.dailyAttendanceStatus;
 
-                obj.attendanceStatusTitle = event.dailyAttendanceStatus in me.facets ? me.facets[event.dailyAttendanceStatus] : '';
+                obj.attendanceStatusTitle = (''+event.dailyAttendanceStatus) in me.facets ? me.facets[''+event.dailyAttendanceStatus] : '';
 
             }
 
@@ -225,7 +226,7 @@ Attendance.prototype.getAttendances = function(){
 
                 obj.attendanceStatus = event.attendanceStatus;
 
-                obj.attendanceStatusTitle = event.attendanceStatus in me.facets ? me.facets[event.attendanceStatus] : '';
+                obj.attendanceStatusTitle = (''+event.attendanceStatus) in me.facets ? me.facets[''+event.attendanceStatus] : '';
 
             }
 
@@ -272,7 +273,7 @@ Attendance.prototype.getAttendances = function(){
 
                     obj.incidentCategory = parseInt(discipline.incidentCategory);
 
-                    obj.incidentCategoryTitle = obj.incidentCategory in me.facets ? me.facets[obj.incidentCategory] : '';
+                    obj.incidentCategoryTitle = (''+obj.incidentCategory) in me.facets ? me.facets[''+obj.incidentCategory] : '';
 
                 }
 

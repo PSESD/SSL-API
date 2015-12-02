@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 01/10/15.
  */
@@ -202,7 +203,7 @@ Assessment.prototype.processAssessment = function(assessments){
                                                 if(_.isObject(scoreSet.scores.score)) scoreSet.scores.score = [ scoreSet.scores.score ];
 
                                                 scoreSet.scores.score.forEach(function(score){
-console.log(score);
+
                                                       switch(score.metric){
                                                             case '00506':
                                                                   newCollection.RITScore = score.scoreValue;
