@@ -17,8 +17,7 @@ var urlApi = 'http://localhost:4000';
 var config = require('config');
 var dbUri = 'mongodb://' + config.get('db.mongo.host') + '/' + config.get('db.mongo.name');
 console.log(dbUri);
-var mongoose = require('mongoose')
-    , clearDB = require('mocha-mongoose')(dbUri, {noClear: true});
+var mongoose = require('mongoose'), clearDB = require('mocha-mongoose')(dbUri, {noClear: true});
 
 var assert = require('assert');
 /**
@@ -89,7 +88,9 @@ describe('Migrate Staging', function () {
     var email = newUser.email, password = newUser.password;
 
     before(function (done) {
-        if (mongoose.connection.db) return done();
+        if (mongoose.connection.db) {
+            return done();
+        }
         mongoose.connect(dbUri, done);
     });
 
@@ -198,7 +199,9 @@ describe('Migrate Staging', function () {
                 .set('x-cbo-client-url', 'https://helpinghand.sslstaging.studentsuccesslink.upward.st')
                 .send(orgData)
                 .expect(function (res) {
-                    if (!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) {
+                        console.log('%j', res.body);
+                    }
                     assert.equal(true, res.body.success);
                     assert.equal(orgData.name, res.body.info.name);
                     organizationId = res.body.info._id;
@@ -231,7 +234,9 @@ describe('Migrate Staging', function () {
                 .set('x-cbo-client-url', 'https://helpinghand.sslstaging.studentsuccesslink.upward.st')
                 .send({ role: 'admin' })
                 .expect(function (res) {
-                    if (!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) {
+                        console.log('%j', res.body);
+                    }
                     assert.equal(true, res.body.success);
                 })
                 .expect(200)
@@ -263,7 +268,9 @@ describe('Migrate Staging', function () {
                 .set('authorization', grantToken)
                 .send(permissionsData)
                 .expect(function (res) {
-                    if (!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) {
+                        console.log('%j', res.body);
+                    }
                     assert.equal(true, res.body.success);
                     var permit = res.body.info.permissions[0];
                     console.log(permit);
@@ -283,6 +290,6 @@ describe('Migrate Staging', function () {
 
     after(function (done) {
         done();
-    })
+    });
 
 });

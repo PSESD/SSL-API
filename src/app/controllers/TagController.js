@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 03/06/15.
  */
@@ -7,7 +8,7 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
-var Request = require('../../lib/broker/Request');
+var Request = require('../../lib/broker/request');
 var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache();
 var ObjectId = mongoose.Types.ObjectId;
@@ -27,7 +28,7 @@ TagController.getTags = function (req, res) {
 
     Tag.find({organization: orgId}, function (err, tags) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         res.sendSuccess(null, tags);
 
@@ -60,7 +61,9 @@ TagController.createByOrgId = function (req, res) {
 
     obj.save(function (err) {
 
-        if (err)  return res.sendError(err);
+        if (err)  {
+            return res.sendError(err);
+        }
 
         res.sendSuccess('Successfully Added', obj);
 
@@ -82,11 +85,13 @@ TagController.getTagById = function (req, res) {
 
     Tag.findOne({ organization: ObjectId(orgId), _id: tagId }, function (err, tag) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
         /**
          * If tag is empty from database
          */
-        if (!tag) return res.sendError('The tag not found in database');
+        if (!tag) {
+            return res.sendError('The tag not found in database');
+        }
 
         res.sendSuccess(tag);
 
@@ -106,7 +111,7 @@ TagController.deleteTagById = function (req, res) {
 
     Tag.remove({ organization: ObjectId(orgId), _id: tagId }, function (err, tag) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         res.sendSuccess('Successfully deleted');
 
@@ -126,9 +131,11 @@ TagController.putTagById = function(req, res){
 
     Tag.findOne({ _id: tagId, organization: ObjectId(req.params.organizationId) }, function (err, obj) {
 
-        if (err)  return res.sendError(err);
+        if (err) { return res.sendError(err); }
 
-        if (!obj) return res.sendError('Data not found');
+        if (!obj) {
+            return res.sendError('Data not found');
+        }
 
         for (var prop in req.body) {
 
@@ -149,7 +156,7 @@ TagController.putTagById = function(req, res){
 
         obj.save(function (err) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Successfully updated!', obj);
 

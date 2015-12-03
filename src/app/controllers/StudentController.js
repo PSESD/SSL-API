@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 03/06/15.
  */
@@ -8,15 +9,14 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
-var Request = require('../../lib/broker/Request');
-var parseString = require('xml2js').parseString;
+var Request = require('../../lib/broker/request');
 var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
 var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
-var php = require('phpjs');
 var xSre = require('../../lib/xsre');
 var async = require('async');
+
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -30,14 +30,21 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     var studentId = ObjectId(req.params.studentId);
 
+    var showRaw = false;
+
+    if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')) {
+        showRaw = true;
+    }
 
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
         /**
          * If student is empty from database
          */
-        if (!student) return res.sendError('The student not found in database');
+        if (!student) {
+            return res.sendError('The student not found in database');
+        }
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
         //key = new Date().getTime();
@@ -49,6 +56,18 @@ StudentController.getStudentsBackpack = function (req, res) {
         function embeds(results, isFromCache){
 
             res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
+
+            if(showRaw){
+
+                res.header('Content-Type', 'text/xml');
+
+                return res.send(results.raw);
+
+            }
+
+            if(results.raw) {
+                delete results.raw;
+            }
 
             res.xmlOptions = res.xmlKey = 'CBOStudentDetail';
 
@@ -65,9 +84,11 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             User.find(crit, function(err, users){
 
-                if(err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
-                if(!users) users = [];
+                if(!users) {
+                    users = [];
+                }
 
                 var resource = new hal.Resource(results, req.originalUrl);
 
@@ -79,9 +100,15 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     var fullname = [];
 
-                    if(user.first_name) fullname.push(user.first_name);
-                    if(user.middle_name) fullname.push(user.middle_name);
-                    if(user.last_name) fullname.push(user.last_name);
+                    if(user.first_name) {
+                        fullname.push(user.first_name);
+                    }
+                    if(user.middle_name) {
+                        fullname.push(user.middle_name);
+                    }
+                    if(user.last_name) {
+                        fullname.push(user.last_name);
+                    }
 
                     embedsUsers.push(new hal.Resource({
                         id: user._id.toString(),
@@ -97,7 +124,9 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 _.each(student.programs, function(program){
 
-                    if(Object.keys(programsId).indexOf(program.program.toString()) === -1) programsId[program.program.toString()] = [];
+                    if(Object.keys(programsId).indexOf(program.program.toString()) === -1) {
+                        programsId[program.program.toString()] = [];
+                    }
 
                     programsId[program.program.toString()].push(program.toObject());
 
@@ -109,7 +138,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     Program.find({ _id: { $in: programId } }, function(err, programs){
 
-                        if(err) return res.sendError(err);
+                        if (err)  { return res.sendError(err); }
 
                         _.each(programs, function(program){
 
@@ -151,11 +180,13 @@ StudentController.getStudentsBackpack = function (req, res) {
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
             /**
              * If organization is empty from database
              */
-            if (!organization) return res.sendError('The organization not found in database');
+            if (!organization) {
+                return res.sendError('The organization not found in database');
+            }
 
             var brokerRequest = new Request({
                 externalServiceId: organization.externalServiceId,
@@ -165,13 +196,17 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             cache.get(key, function(err, result){
 
-                if(err) log(err);
+                if(err) {
+                    log(err);
+                }
 
                 if(!result){
 
                     brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
-                        if (error)  return res.sendError(error);
+                        if (error)  {
+                            return res.sendError(error);
+                        }
 
                         if (!body) {
 
@@ -185,9 +220,9 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                             utils.xml2js(body, function (err, result) {
 
-                                if(err) return res.sendError(err);
+                                if (err)  { return res.sendError(err); }
 
-                                var object = new xSre(result).toObject();
+                                var object = new xSre(result, body).toObject();
                                 /**
                                  * Set to cache
                                  */
@@ -239,23 +274,27 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
         /**
          * If student is empty from database
          */
-        if (!student) return res.sendError('The student not found in database');
+        if (!student) {
+            return res.sendError('The student not found in database');
+        }
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
             /**
              * If organization is empty from database
              */
-            if (!organization) return res.sendError('The organization not found in database');
+            if (!organization) {
+                return res.sendError('The organization not found in database');
+            }
 
-            cache.del(key, function(err, result){
+            cache.del(key, function(err){
 
                 if (err){
 
@@ -267,7 +306,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
                 key = md5(['_xSre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
 
-                cache.del(key, function(err, result){
+                cache.del(key, function(){
 
                     res.sendSuccess('Delete cache successfully');
 
@@ -291,13 +330,17 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
 
     cache.get(key, function(err, result){
 
-        if(err)  return callback(null, student, false);
+        if(err)  {
+            return callback(null, student, false);
+        }
 
         if(!result){
 
             brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
-                if (error)  return callback(null, student, false);
+                if (error)  {
+                    return callback(null, student, false);
+                }
 
                 if (!body) {
 
@@ -309,7 +352,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
 
                     utils.xml2js(body, function (err, result) {
 
-                        if(err) return res.sendError(err);
+                        if (err)  { return callback(null, student, false); }
 
                         var object = new xSre(result).getStudentSummary();
 
@@ -320,7 +363,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
                         /**
                          * Set to cache
                          */
-                        cache.set(key, newObject, {ttl: 3600}, function(err){
+                        cache.set(key, newObject, {ttl: 3600}, function(){
 
                             callback(null, newObject, false);
 
@@ -360,11 +403,13 @@ StudentController.getStudents = function (req, res) {
 
     Organization.findOne({ _id: orgId }, function(err, organization) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
         /**
          * If organization is empty from database
          */
-        if (!organization) return res.sendError('The organization not found in database');
+        if (!organization) {
+            return res.sendError('The organization not found in database');
+        }
 
         var brokerRequest = new Request({
             externalServiceId: organization.externalServiceId,
@@ -374,7 +419,7 @@ StudentController.getStudents = function (req, res) {
 
         Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             if(withXsre) {
 
@@ -450,7 +495,9 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
                         permission.students.forEach(function (student) {
 
-                            if (students.indexOf(student) === -1) students.push(student);
+                            if (students.indexOf(student) === -1) {
+                                students.push(student);
+                            }
 
                         });
 
@@ -468,11 +515,13 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
         }
 
-        if(students.length > 0) crit._id = { $nin: students };
+        if(students.length > 0) {
+            crit._id = { $nin: students };
+        }
 
         Student.find(crit, function (err, students) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess(null, students);
 
@@ -505,13 +554,15 @@ StudentController.createByOrgId = function (req, res) {
 
     User.findOne({ _id: req.user._id }, function(err, user){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!user) return res.sendError('User not update successfully');
+        if(!user) {
+            return res.sendError('User not update successfully');
+        }
 
         obj.protect(req.user.role, null, req.user).save(function (err) {
 
-            if (err)  return res.sendError(err);
+            if (err) { return res.sendError(err); }
 
             _.each(user.permissions, function(permission, key){
 
@@ -525,7 +576,7 @@ StudentController.createByOrgId = function (req, res) {
 
             user.save(function(err){
 
-                if (err)  return res.sendError(err);
+                if (err) { return res.sendError(err); }
 
                 res.sendSuccess('Successfully Added', obj);
 
@@ -559,11 +610,13 @@ StudentController.getStudentById = function (req, res) {
 
     Organization.findOne({ _id: orgId }, function(err, organization) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
         /**
          * If organization is empty from database
          */
-        if (!organization) return res.sendError('The organization not found in database');
+        if (!organization) {
+            return res.sendError('The organization not found in database');
+        }
 
         var brokerRequest = new Request({
             externalServiceId: organization.externalServiceId,
@@ -573,11 +626,13 @@ StudentController.getStudentById = function (req, res) {
 
         Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
             /**
              * If student is empty from database
              */
-            if (!student) return res.sendError('The student not found in database');
+            if (!student) {
+                return res.sendError('The student not found in database');
+            }
 
             if(withXsre) {
 
@@ -611,15 +666,17 @@ StudentController.deleteStudentById = function (req, res) {
 
     var studentId = ObjectId(req.params.studentId);
 
-    Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err, student) {
+    Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
         User.findOne({ _id: req.user._id }, function(err, user){
 
-            if(err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
-            if(!user) return res.sendError('User not update successfully');
+            if(!user) {
+                return res.sendError('User not update successfully');
+            }
 
             _.each(user.permissions, function(permission, key){
 
@@ -635,7 +692,7 @@ StudentController.deleteStudentById = function (req, res) {
 
             user.save(function(err){
 
-                if (err)  return res.sendError(err);
+                if (err) { return res.sendError(err); }
 
                 res.sendSuccess('Successfully deleted');
 
@@ -659,9 +716,11 @@ StudentController.putStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: studentId }, req.user).findOne({_id: studentId, organization: ObjectId(req.params.organizationId)}, function (err, obj) {
 
-        if (err)  return res.sendError(err);
+        if (err) { return res.sendError(err); }
 
-        if (!obj) return res.sendError('Data not found');
+        if (!obj) {
+            return res.sendError('Data not found');
+        }
 
         for (var prop in req.body) {
 
@@ -679,7 +738,7 @@ StudentController.putStudentById = function(req, res){
 
         obj.protect(req.user.role, null, req.user).save(function (err) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Successfully updated!', obj);
 

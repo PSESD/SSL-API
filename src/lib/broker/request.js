@@ -1,10 +1,9 @@
+'use strict';
 /**
  * Created by zaenal on 03/06/15.
  */
-'use strict';
 var config = require('config');
 var request = require('request');
-var qs = require('querystring');
 var moment = require('moment');
 var uuid = require('node-uuid');
 var CryptoJS = require("crypto-js");
@@ -14,7 +13,7 @@ var CryptoJS = require("crypto-js");
  * @param env
  * @constructor
  */
-function Request(options, env) {
+function RequestXSRE(options, env) {
 
     if(!config.has('hzb')){
 
@@ -32,9 +31,9 @@ function Request(options, env) {
 
 }
 
-Request.prototype = {
+RequestXSRE.prototype = {
 
-    constructor: Request,
+    constructor: RequestXSRE,
 
     /**
      *
@@ -107,11 +106,7 @@ Request.prototype = {
      */
     create: function (what, url, method, callback) {
 
-        if('Authorization' in this.headers){
-
-            //skip
-
-        } else {
+        if(!('Authorization' in this.headers)){
 
             var timestamp = this.headers.timestamp = this.getTimezone();
 
@@ -152,7 +147,9 @@ Request.prototype = {
 
             for (var name in config.headers) {
 
-                self.addHeader(name, config.headers[name]);
+                if(name !== undefined) {
+                    self.addHeader(name, config.headers[name]);
+                }
 
             }
         }
@@ -176,9 +173,9 @@ Request.prototype = {
 
             } else {
 
-                if (response && response.statusCode == 201) {
+                if (response && response.statusCode === 201) {
 
-                    console.log(body)
+                    console.log(body);
 
                 } else {
 
@@ -223,7 +220,9 @@ Request.prototype = {
 
         if(!districtStudentId){
 
-            if(!callback) return;
+            if(!callback) {
+                return;
+            }
 
             return callback('District student id was not set', null, null);
 
@@ -269,7 +268,9 @@ Request.prototype = {
 
         if(!districtStudentId){
 
-            if(!callback) return;
+            if(!callback) {
+                return;
+            }
 
             return callback('District student id was not set', null, null);
 
@@ -390,4 +391,4 @@ Request.prototype = {
  *
  * @type {Request}
  */
-module.exports = Request;
+module.exports = RequestXSRE;

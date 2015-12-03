@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 21/05/15.
  */
@@ -11,12 +12,10 @@ var Tag = require('../models/Tag');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
-var natural = require('natural'),
-    tokenizer = new natural.WordTokenizer();
+var natural = require('natural'), tokenizer = new natural.WordTokenizer();
 
-var xmlParser = require('js2xmlparser');
 var moment = require('moment');
-var config = require('config'), xsreConfig = config.get('hzb').xsre;
+var config = require('config');
 
 
 var StudentProgramController = new BaseController(StudentProgram).crud();
@@ -38,9 +37,11 @@ StudentProgramController.getByStudentId = function (req, res) {
 
     Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
         res.sendSuccess(null, student.programs);
     });
@@ -57,121 +58,13 @@ StudentProgramController.getByStudentIdXsre = function(req, res){
 
     var stdId = req.params.studentId;
 
-    Organization.findOne({ _id: ObjectId(orgId) }, function(err, organization) {
+    Organization.pushStudent(req.user, orgId, stdId, function(err, data){
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if (!organization) return res.sendError('Data not found');
+        res.set('Content-Type', 'text/xml');
 
-        Student.protect(req.user.role, {value: stdId}, req.user).findOne({
-            _id: ObjectId(stdId),
-            organization: ObjectId(orgId)
-        }, function (err, student) {
-
-            if (err) return res.sendError(err);
-
-            if (!student) return res.sendError('Data not found');
-
-            var CBOStudent = {
-                '@': {
-                    id: student._id.toString()
-                },
-                organization: {
-                    '@': {
-                        refId: student.organization.toString()
-                    },
-                    organizationName: organization.name,
-                    externalServiceId: organization.externalServiceId,
-                    personnelId: organization.personnelId,
-                    authorizedEntityId: organization.authorizedEntityId,
-                    districtStudentId: student.district_student_id,
-                    zoneId: student.school_district,
-                    contextId: xsreConfig.contextId
-                },
-
-                studentActivity: [],
-
-                programs: {
-                    activities: {
-                        activity: []
-                    }
-                }
-
-            };
-
-            var programsId = {};
-
-            var programId = [];
-
-            _.each(student.programs, function(program){
-
-                if(Object.keys(programsId).indexOf(program.program.toString()) === -1) programsId[program.program.toString()] = [];
-
-                programsId[program.program.toString()].push(program.toObject());
-
-                programId.push(program.program);
-
-                CBOStudent.programs.activities.activity.push({
-                    studentActivityRefId: program.program.toString(),
-                    startDate: moment(new Date(program.participation_start_date)).format('MM/DD/YYYY'),
-                    endDate:moment(new Date(program.participation_end_date)).format('MM/DD/YYYY'),
-                    active: program.active,
-                    tags: {
-                        tag: program.cohort
-                    }
-
-                });
-
-            });
-
-            if(!_.isEmpty(programsId)){
-
-                Program.find({ _id: { $in: programId } }, function(err, programs){
-
-                    if(err) return res.sendError(err);
-
-                    _.each(programs, function(program){
-
-                        if(program._id.toString() in programsId){
-
-                            programsId[program._id.toString()].forEach(function(prgm){
-
-                                CBOStudent.studentActivity.push({
-                                    '@': {
-                                        refId: program._id.toString()
-                                    },
-                                    title: program.name
-                                });
-
-                            });
-
-                        }
-
-                    });
-
-                    res.set('Content-Type', 'text/xml');
-
-                    res.send(xmlParser('CBOStudent', CBOStudent, {
-                        declaration: {
-                            encoding: 'utf-16'
-                        }
-                    }));
-
-                });
-
-
-            } else {
-
-                res.set('Content-Type', 'text/xml');
-
-                res.send(xmlParser('CBOStudent', CBOStudent, {
-                    declaration: {
-                        encoding: 'utf-16'
-                    }
-                }));
-            }
-
-        });
+        return res.send(data);
 
     });
 
@@ -191,15 +84,25 @@ StudentProgramController.addByStudentId = function (req, res) {
 
     var studentProgram = {};
 
-    if(req.body.programId) studentProgram.program = ObjectId(req.body.programId);
+    if(req.body.programId) {
+        studentProgram.program = ObjectId(req.body.programId);
+    }
 
-    if(req.body.cohort) studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+    if(req.body.cohort) {
+        studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+    }
 
-    if(req.body.active) studentProgram.active = (req.body.active === 'true');
+    if(req.body.active) {
+        studentProgram.active = (req.body.active === 'true');
+    }
 
-    if(req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+    if(req.body.participation_start_date) {
+        studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+    }
 
-    if(req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+    if(req.body.participation_end_date) {
+        studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+    }
 
     studentProgram.created = new Date();
 
@@ -217,9 +120,11 @@ StudentProgramController.addByStudentId = function (req, res) {
 
     Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
         student.programs.push(studentProgram);
 
@@ -230,7 +135,7 @@ StudentProgramController.addByStudentId = function (req, res) {
 
         student.save(function(err){
 
-            if(err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             Tag.addTag(ObjectId(orgId), studentProgram.cohort);
 
@@ -254,9 +159,11 @@ StudentProgramController.getByProgramId = function (req, res) {
 
     Student.protect(req.user.role, { onlyAssign: true }, req.user).find({ organization: ObjectId(orgId), programs: { $elemMatch: { program: ObjectId(proId) } } }, function(err, students){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!students) return res.sendError('Data not found');
+        if(!students) {
+            return res.sendError('Data not found');
+        }
 
         res.sendSuccess(null, students);
 
@@ -278,15 +185,25 @@ StudentProgramController.addByProgramId = function(req, res){
 
     var studentProgram = {};
 
-    if(proId) studentProgram.program = ObjectId(proId);
+    if(proId) {
+        studentProgram.program = ObjectId(proId);
+    }
 
-    if(req.body.cohort) studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+    if(req.body.cohort) {
+        studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+    }
 
-    if(req.body.active) studentProgram.active = (req.body.active === 'true');
+    if(req.body.active) {
+        studentProgram.active = (req.body.active === 'true');
+    }
 
-    if(req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+    if(req.body.participation_start_date) {
+        studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+    }
 
-    if(req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+    if(req.body.participation_end_date) {
+        studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+    }
 
     studentProgram.created = new Date();
 
@@ -304,9 +221,11 @@ StudentProgramController.addByProgramId = function(req, res){
 
     Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
         student.programs.push(studentProgram);
 
@@ -317,7 +236,7 @@ StudentProgramController.addByProgramId = function(req, res){
 
         student.save(function(err){
 
-            if(err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             Tag.addTag(ObjectId(orgId), studentProgram.cohort);
 
@@ -349,11 +268,13 @@ StudentProgramController.getStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function (err, student) {
 
-        if (err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
         /**
          * If student is empty from database
          */
-        if (!student) return res.sendError('The student not found in database');
+        if (!student) {
+            return res.sendError('The student not found in database');
+        }
 
         res.sendSuccess(student);
 
@@ -380,9 +301,11 @@ StudentProgramController.putStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
 
         var programs = [];
@@ -399,15 +322,25 @@ StudentProgramController.putStudentById = function(req, res){
 
                 studentProgram = student.programs[i];
 
-                if (proId) studentProgram.program = ObjectId(proId);
+                if (proId) {
+                    studentProgram.program = ObjectId(proId);
+                }
 
-                if (req.body.cohort) studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+                if (req.body.cohort) {
+                    studentProgram.cohort = _.isArray(req.body.cohort) ? req.body.cohort : tokenizer.tokenize(req.body.cohort);
+                }
 
-                if (req.body.active) studentProgram.active = (req.body.active === 'true');
+                if (req.body.active) {
+                    studentProgram.active = (req.body.active === 'true');
+                }
 
-                if (req.body.participation_start_date) studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+                if (req.body.participation_start_date) {
+                    studentProgram.participation_start_date = new Date(Date.parse(req.body.participation_start_date));
+                }
 
-                if (req.body.participation_end_date) studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+                if (req.body.participation_end_date) {
+                    studentProgram.participation_end_date = new Date(Date.parse(req.body.participation_end_date));
+                }
 
                 studentProgram.last_updated = new Date();
 
@@ -426,7 +359,7 @@ StudentProgramController.putStudentById = function(req, res){
 
         Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Update success');
 
@@ -456,9 +389,11 @@ StudentProgramController.deleteStudentById = function(req, res){
 
     Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
 
-        if(err) return res.sendError(err);
+        if (err)  { return res.sendError(err); }
 
-        if(!student) return res.sendError('Data not found');
+        if(!student) {
+            return res.sendError('Data not found');
+        }
 
         var programs = [];
 
@@ -473,7 +408,7 @@ StudentProgramController.deleteStudentById = function(req, res){
 
         Student.where({_id: student._id}).update({$set: { programs: programs}, last_updated: new Date(), last_updated_by: req.user.userId }, function (err, updated) {
 
-            if (err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
             res.sendSuccess('Delete success');
 

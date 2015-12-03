@@ -174,6 +174,6 @@ describe( 'OAuth2', function () {
 
     after( function (done) {
         done();
-    } )
+    } );
 
 } );

@@ -32,7 +32,9 @@ describe( 'OAuth2', function () {
     var email = 'support@upwardstech.com', password = 'test';
 
     before( function (done) {
-        if (mongoose.connection.db) return done();
+        if (mongoose.connection.db) {
+            return done();
+        }
         mongoose.connect( dbUri, done );
 
     } );
@@ -60,6 +62,6 @@ describe( 'OAuth2', function () {
 
     after( function (done) {
         done();
-    } )
+    } );
 
 } );

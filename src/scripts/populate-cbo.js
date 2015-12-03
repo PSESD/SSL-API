@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 21/05/15.
  */
@@ -23,7 +24,7 @@ var filecsv = __dirname + '/populate.csv';
 var async = require('async');
 var _ = require('underscore');
 
-var Request = require('../lib/broker/Request');
+var Request = require('../lib/broker/request');
 var parseString = require('xml2js').parseString;
 
 
@@ -38,9 +39,11 @@ var populateCbo = {
         async.forEach(collections, function (collectionName, done) {
             var collection = mongoose.connection.collections[collectionName];
             collection.drop(function (err) {
-                if (err && err.message != 'ns not found') done(err);
+                if (err && err.message !== 'ns not found') {
+                    done(err);
+                }
                 done(null);
-            })
+            });
         }, callback);
     },
 
@@ -129,17 +132,19 @@ var populateCbo = {
          * @param programs
          */
         function addStudents(organization, programs){
-            if(organization.name !== 'Helping Hand CBO') return;
+            if(organization.name !== 'Helping Hand CBO') {
+                return;
+            }
             var orgId = organization._id;
             var studentId = '1111111111';
             var zoneId = 'federalway';
             var brokerRequest = new Request();
             brokerRequest.addHeader( 'districtStudentId', studentId );
             var request = brokerRequest.create('/validation-sre/' + studentId + ';zoneId='+zoneId+';contextId=CBO', 'GET', function (error, response, body) {
-                if(response.statusCode == '200'){
+                if(response.statusCode === '200'){
                     parseString(body, function (err, result) {
                         var json = result.sre;
-                        delete json['$'];
+                        delete json.$;
                         if(json.programs){
                             _.each(json.programs, function(program){
 
@@ -168,7 +173,9 @@ var populateCbo = {
                             last_updated_by: organization.userId
                         };
                         Student.findOneAndUpdate({organization: organization._id}, { $set: set }, {safe: true, upsert: true}, function (err, student) {
-                            if(err) return console.dir(err, set);
+                            if(err) {
+                                return console.dir(err, set);
+                            }
                             console.log('Add student success');
                         });
                     });
@@ -190,13 +197,16 @@ var populateCbo = {
                 var user = new User(newUser);
 
                 user.save(function (err) {
-                    if (err)
+                    if (err){
                         (err.code && err.code === 11000) ? console.log({
                             code: err.code,
                             message: 'User already exists'
                         }) : console.log(err);
+                    }
 
-                    if (!user) return console.log('User not found!');
+                    if (!user) {
+                        return console.log('User not found!');
+                    }
 
                     var client = new Client();
                     client.name = 'App ' + user.email;
@@ -204,17 +214,19 @@ var populateCbo = {
                     client.userId = user.userId;
                     client.redirectUri = '([\\w.-]+)?cbo\\.upward\\.st';
                     client.save(function (err) {
-                        if (err)
+                        if (err){
                             return (err.code && err.code === 11000) ? console.log({
                                 code: err.code,
                                 message: 'Client already exists'
                             }) : console.log(err);
+                        }
                         Client.findByIdAndUpdate(client._id, {$set: {secret: secretHash('' + client._id)}}, function (err, newClient) {
-                            if (err)
+                            if (err){
                                 return (err.code && err.code === 11000) ? console.log({
                                     code: err.code,
                                     message: 'Client already exists'
                                 }) : console.log(err);
+                            }
                             // console.log({code: 0, message: 'Client added to the locker!', data: newClient});
                         });
 
@@ -230,7 +242,7 @@ var populateCbo = {
                 var csvStream = csv
                     .fromStream(stream, {ignoreEmpty: true})
                     .on("data", function (row) {
-                        if (row[0] == 'CBO') {
+                        if (row[0] === 'CBO') {
                             return;
                         }
                         var rs = {
@@ -238,13 +250,13 @@ var populateCbo = {
                             website: row[1],
                             services: row[2],
                             grade: row[3],
-                            aurburn: row[4] == 'x' ? 'Aurburn' : null,
-                            federal_way: row[5] == 'x' ? 'Federal Way' : null,
-                            highline: row[6] == 'x' ? 'Highline' : null,
-                            kent: row[7] == 'x' ? 'Kent' : null,
-                            renton: row[8] == 'x' ? 'Renton' : null,
-                            seattle: row[9] == 'x' ? 'Seattle' : null,
-                            tukwila: row[10] == 'x' ? 'Tukwila' : null,
+                            aurburn: row[4] === 'x' ? 'Aurburn' : null,
+                            federal_way: row[5] === 'x' ? 'Federal Way' : null,
+                            highline: row[6] === 'x' ? 'Highline' : null,
+                            kent: row[7] === 'x' ? 'Kent' : null,
+                            renton: row[8] === 'x' ? 'Renton' : null,
+                            seattle: row[9] === 'x' ? 'Seattle' : null,
+                            tukwila: row[10] === 'x' ? 'Tukwila' : null,
                             platforms: row[11],
                             contact: row[12],
                             email: row[13],
@@ -260,8 +272,12 @@ var populateCbo = {
                             return;
                         }
                         var createOrg = function (err, user, permission) {
-                            if (err) return console.log('Error: ' + err);
-                            if (!user) return console.log('User empty');
+                            if (err) {
+                                return console.log('Error: ' + err);
+                            }
+                            if (!user) {
+                                return console.log('User empty');
+                            }
                             var newOrg = {
                                 name: rs.organization,
                                 url: rs.url + '.' + config.get('host'),
@@ -271,12 +287,24 @@ var populateCbo = {
                             };
                             var addrs = null;
                             var addresses = [];
-                            if (rs.aurburn && (addrs = self.city(rs.aurburn))) addresses.push(addrs);
-                            if (rs.federal_way && (addrs = self.city(rs.federal_way))) addresses.push(addrs);
-                            if (rs.kent && (addrs = self.city(rs.kent))) addresses.push(addrs);
-                            if (rs.renton && (addrs = self.city(rs.renton))) addresses.push(addrs);
-                            if (rs.seattle && (addrs = self.city(rs.seattle))) addresses.push(addrs);
-                            if (rs.tukwila && (addrs = self.city(rs.tukwila))) addresses.push(addrs);
+                            if (rs.aurburn && (addrs = self.city(rs.aurburn))) {
+                                addresses.push(addrs);
+                            }
+                            if (rs.federal_way && (addrs = self.city(rs.federal_way))) {
+                                addresses.push(addrs);
+                            }
+                            if (rs.kent && (addrs = self.city(rs.kent))) {
+                                addresses.push(addrs);
+                            }
+                            if (rs.renton && (addrs = self.city(rs.renton))) {
+                                addresses.push(addrs);
+                            }
+                            if (rs.seattle && (addrs = self.city(rs.seattle))) {
+                                addresses.push(addrs);
+                            }
+                            if (rs.tukwila && (addrs = self.city(rs.tukwila))) {
+                                addresses.push(addrs);
+                            }
 
                             /**
                              * Start insert new record
@@ -287,7 +315,9 @@ var populateCbo = {
                                 upsert: true,
                                 new: true
                             }, function (err, org) {
-                                if (err) return console.log(err);
+                                if (err) {
+                                    return console.log(err);
+                                }
                                 if (org) {
 
                                     var userPermission = {
@@ -295,7 +325,9 @@ var populateCbo = {
                                         permissions: [ { model: 'Student', operation: '*', allow: 'all'} ],
                                         students: []
                                     };
-                                    if (err) return console.log(err);
+                                    if (err) {
+                                        return console.log(err);
+                                    }
                                     var newProgram = {
                                         name: org.name
                                     };
@@ -305,17 +337,19 @@ var populateCbo = {
                                         upsert: true,
                                         new: true
                                     }, function (err, program) {
-                                        if (err) return console.log(err);
+                                        if (err) {
+                                            return console.log(err);
+                                        }
                                         if (userPermission) {
                                             addStudents(org, newProgram);
                                             User.findOneAndUpdate({email: user.email}, { $push: { permissions: userPermission }}, {safe: true, upsert: true}, function (err, usr) {
-                                               if (err) return console.log(err);
+                                               if (err) {
+                                                   return console.log(err);
+                                               }
                                                done(org);
                                             });
                                         }
                                     });
-                                } else {
-
                                 }
                             });
                         };
@@ -352,10 +386,11 @@ var populateCbo = {
                         var user = new User(newUser);
                         user.save(function (err) {
                             if (err) {
-                                (err.code && err.code === 11000) ? console.log({
-                                    code: err.code,
-                                    message: 'User already exists'
-                                }) : console.log(err);
+                                 console.log((err.code && err.code === 11000) ? {
+                                     code: err.code,
+                                     message: 'User already exists'
+                                 } : err );
+
                             } else {
                                 console.log({code: 0, message: 'New users added!'});
                             }
