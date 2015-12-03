@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 01/10/15.
  */
@@ -17,7 +18,9 @@ function Assessment(xsre){
 
       if(xsre.json) {
 
-            if(xsre.json.assessments) this.assessments = xsre.json.assessments;
+            if(xsre.json.assessments) {
+                  this.assessments = xsre.json.assessments;
+            }
 
       }
 
@@ -164,7 +167,9 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                           if(l.has(scoreSet, 'scores.score')){
 
-                                                if(_.isObject(scoreSet.scores.score)) scoreSet.scores.score = [ scoreSet.scores.score ];
+                                                if(_.isObject(scoreSet.scores.score)) {
+                                                      scoreSet.scores.score = [ scoreSet.scores.score ];
+                                                }
 
                                                 scoreSet.scores.score.forEach(function(score){
 
@@ -199,10 +204,12 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                           if(l.has(scoreSet, 'scores.score')){
 
-                                                if(_.isObject(scoreSet.scores.score)) scoreSet.scores.score = [ scoreSet.scores.score ];
+                                                if(_.isObject(scoreSet.scores.score)) {
+                                                      scoreSet.scores.score = [ scoreSet.scores.score ];
+                                                }
 
                                                 scoreSet.scores.score.forEach(function(score){
-console.log(score);
+
                                                       switch(score.metric){
                                                             case '00506':
                                                                   newCollection.RITScore = score.scoreValue;

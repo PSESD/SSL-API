@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by zaenal on 20/05/15.
  */
@@ -96,15 +97,19 @@ OrganizationSchema.statics.pushStudent = function(user, orgId, stdId, callback){
 
     this.findOne({ _id: ObjectId(orgId) }, function(err, organization) {
 
-        if (err) return callback(err);
+        if (err) { return callback(err); }
 
-        if (!organization) return callback('Data not found');
+        if (!organization) {
+            return callback('Data not found');
+        }
 
         var cb = function (err, student) {
 
-            if (err) return callback(err);
+            if (err) { return callback(err); }
 
-            if (!student) return callback('Data not found');
+            if (!student) {
+                return callback('Data not found');
+            }
 
             var CBOStudent = {
                 '@': {
@@ -139,7 +144,9 @@ OrganizationSchema.statics.pushStudent = function(user, orgId, stdId, callback){
 
             _.each(student.programs, function(program){
 
-                if(Object.keys(programsId).indexOf(program.program.toString()) === -1) programsId[program.program.toString()] = [];
+                if(Object.keys(programsId).indexOf(program.program.toString()) === -1) {
+                    programsId[program.program.toString()] = [];
+                }
 
                 programsId[program.program.toString()].push(program.toObject());
 
@@ -162,7 +169,9 @@ OrganizationSchema.statics.pushStudent = function(user, orgId, stdId, callback){
 
                 Program.find({ _id: { $in: programId } }, function(err, programs){
 
-                    if(err) return callback(err);
+                    if(err) {
+                        return callback(err);
+                    }
 
                     _.each(programs, function(program){
 
@@ -212,7 +221,7 @@ OrganizationSchema.statics.pushStudent = function(user, orgId, stdId, callback){
             Student.findOne({
                 _id: ObjectId(stdId),
                 organization: ObjectId(orgId)
-            }, cb)
+            }, cb);
         }
 
     });

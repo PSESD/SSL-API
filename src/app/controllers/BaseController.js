@@ -1,3 +1,4 @@
+'use strict';
 var mongoose = require('mongoose');
 var ObjectId = mongoose.Types.ObjectId;
 var User = require('../models/User');
@@ -8,7 +9,7 @@ var _ = require('underscore');
 function BaseController(model){
     this.model = model;
     this.crud();
-};
+}
 /**
  *
  * @returns {{create: Function, save: Function, get: Function, all: Function, delete: Function}}
@@ -32,17 +33,27 @@ BaseController.prototype.crud = function(idName) {
             var obj = new newModel(req.body);
 
             // set update time and update by user
-            if(!obj.created) obj.created = new Date();
+            if(!obj.created) {
+                obj.created = new Date();
+            }
 
-            if(!obj.creator) obj.creator = req.user.userId;
+            if(!obj.creator) {
+                obj.creator = req.user.userId;
+            }
 
-            if(!obj.last_updated) obj.last_updated = new Date();
+            if(!obj.last_updated) {
+                obj.last_updated = new Date();
+            }
 
-            if(!obj.last_updated_by) obj.last_updated_by = req.user.userId;
+            if(!obj.last_updated_by) {
+                obj.last_updated_by = req.user.userId;
+            }
 
             obj.save(function (err) {
 
-                if (err)  return res.sendError(err);
+                if (err)  {
+                    return res.sendError(err);
+                }
 
                 return res.sendSuccess('Successfully Added', obj);
 
@@ -57,9 +68,13 @@ BaseController.prototype.crud = function(idName) {
 
             self.model.findOne({ _id: ObjectId(req.params[id]) }, function (err, obj) {
 
-                if (err)  return res.sendError(err);
+                if (err)  {
+                    return res.sendError(err);
+                }
 
-                if(!obj) return res.sendError('Data not found');
+                if(!obj) {
+                    return res.sendError('Data not found');
+                }
 
                 for (var prop in req.body) {
 
@@ -70,14 +85,20 @@ BaseController.prototype.crud = function(idName) {
                     }
                 }
 
-                if(!obj.last_updated) obj.last_updated = new Date();
+                if(!obj.last_updated) {
+                    obj.last_updated = new Date();
+                }
 
-                if(!obj.last_updated_by) obj.last_updated_by = req.user.userId;
+                if(!obj.last_updated_by) {
+                    obj.last_updated_by = req.user.userId;
+                }
 
                 // save the movie
                 obj.save(function (err) {
 
-                    if (err)  return res.sendError(err);
+                    if (err)  {
+                        return res.sendError(err);
+                    }
 
                     res.sendSuccess('Successfully updated!', obj);
 
@@ -93,7 +114,9 @@ BaseController.prototype.crud = function(idName) {
 
             self.model.findOne({ _id: ObjectId(req.params[id]) }, function (err, obj) {
 
-                if (err)  return res.sendError(err);
+                if (err)  {
+                    return res.sendError(err);
+                }
 
                 res.json(obj);
 
@@ -108,7 +131,9 @@ BaseController.prototype.crud = function(idName) {
 
             self.model.find(function (err, objs) {
 
-                if (err)  return res.sendError(err);
+                if (err)  {
+                    return res.sendError(err);
+                }
 
                 res.json(objs);
 
@@ -124,13 +149,13 @@ BaseController.prototype.crud = function(idName) {
                 _id: ObjectId(req.params[id])
             }, function (err, obj) {
 
-                if (err)  return res.sendError(err);
+                if (err) { return res.sendError(err); }
 
                 res.sendSuccess('Successfully deleted');
 
             });
         }
-    }
+    };
 };
 /**
  *

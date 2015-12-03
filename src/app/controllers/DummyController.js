@@ -1,6 +1,4 @@
-/**
- * Created by zaenal on 26/06/15.
- */
+'use strict';
 /**
  * Created by zaenal on 03/06/15.
  */
@@ -31,22 +29,22 @@ DummyController.index = function(req, res){
 
         User.findOne({email: req.query.email || req.body.email }, function(err, user){
 
-            if(err) return res.sendError(err);
+            if (err)  { return res.sendError(err); }
 
-            if(!user) return res.sendError('User not found');
+            if(!user) { return res.sendError('User not found'); }
 
             Student.protect(user.role, { students: studentId }, user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
-                if(err) return res.sendError(err);
+                if (err)  { return res.sendError(err); }
 
-                if(!student) return res.sendError('Student not found');
+                if(!student) { return res.sendError('Student not found'); }
 
                 res.sendSuccess('Its OK');
             });
 
             //Student.protect(user.role, null, user).find({organization: orgId}, function (err, students) {
             //
-            //    if (err) return res.sendError(err);
+            //    if (err)  { return res.sendError(err); }
             //
             //    res.sendSuccess(null, students);
             //});

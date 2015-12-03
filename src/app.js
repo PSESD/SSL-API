@@ -1,3 +1,4 @@
+'use strict';
 var express = require("express");
 var i18n = require("i18n");
 var mongoose = require('mongoose');
@@ -66,11 +67,15 @@ function Api() {
  */
 Api.prototype.sendMessage = function (type, message, cb) {
 
-    if (!rollbarAccessToken) return;
+    if (!rollbarAccessToken) {
+        return;
+    }
 
     rollbar.reportMessage(message, type || 'debug', function (rollbarErr) {
 
-        if (cb) cb(rollbarErr);
+        if (cb) {
+            cb(rollbarErr);
+        }
 
     });
 
@@ -148,7 +153,9 @@ Api.prototype.registerRoute = function (cb) {
 
     });
 
-    if (cb) cb();
+    if (cb) {
+        cb();
+    }
 };
 /**
  * Connect to database
@@ -173,7 +180,7 @@ Api.prototype.connectDb = function () {
 };
 Api.prototype.migrate = function () {
 
-    if (app.get('env') === 'test') {
+    //if (app.get('env') === 'test') {
 
         /**
          * Run Process to migrate data
@@ -181,7 +188,7 @@ Api.prototype.migrate = function () {
         //var populateCbo = require('./scripts/populate-cbo');
         //populateCbo.run();
 
-    }
+    //}
 
 };
 /**
@@ -268,7 +275,9 @@ Api.prototype.configureExpress = function (db) {
 
         res.sendSuccess = function (message, data, key, collection) {
 
-            if(!req.params.format) req.params.format = 'json';
+            if(!req.params.format) {
+                req.params.format = 'json';
+            }
 
             var format = req.params.format;
 
@@ -355,9 +364,13 @@ Api.prototype.configureExpress = function (db) {
 
         res.sendError = function (err) {
 
-            if(!req.params.format) req.params.format = 'json';
+            if(!req.params.format) {
+                req.params.format = 'json';
+            }
 
-            if(err === 'Access Denied' || err === 'Permission Denied') return res.errUnauthorized();
+            if(err === 'Access Denied' || err === 'Permission Denied') {
+                return res.errUnauthorized();
+            }
 
             var response = { success: false, error: err };
 
@@ -463,7 +476,7 @@ Api.prototype.forkingStart = function(){
 
     process.on('uncaughtException', function (err) {
 
-        console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
+        console.error((new Date()).toUTCString() + ' uncaughtException:', err.message);
 
         me.stop(err);
 
@@ -477,7 +490,9 @@ Api.prototype.stop = function (err) {
 
     console.log("ERROR \n" + err.stack);
 
-    if (rollbarAccessToken) rollbar.reportMessage("ERROR \n" + err);
+    if (rollbarAccessToken) {
+        rollbar.reportMessage("ERROR \n" + err);
+    }
 
     process.exit(1);
 
