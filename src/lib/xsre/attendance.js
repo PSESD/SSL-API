@@ -406,27 +406,40 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
-            var isDailySet = false;
+
+            var dailyEvent = [];
+
+            var classSectionEvent = [];
 
             allEvents.forEach(function(e){
 
-                if(e.attendanceEventType === 'DailyAttendance' && !isDailySet) {
+                if(e.attendanceEventType === 'DailyAttendance') {
 
-                    isDailySet = true;
+                    dailyEvent.push(e);
+
+                } else if(e.attendanceEventType === 'ClassSectionAttendance') {
+
+                    classSectionEvent.push(e);
 
                 }
 
             });
 
-            if(isDailySet){
 
-                me.calculateDailyAttendance(behavior, allEvents, nday, day, summary);
+            if(dailyEvent.length > 0){
 
-            } else {
-
-                me.calculateClassSectionAttendance(behavior, allEvents, nday, day, summary);
+                me.calculateDailyAttendance(behavior, dailyEvent, nday, day, summary);
 
             }
+
+            if(classSectionEvent.length > 0){
+
+                me.calculateClassSectionAttendance(behavior, classSectionEvent, nday, day, summary);
+
+            }
+
+
+
 
         });
 
