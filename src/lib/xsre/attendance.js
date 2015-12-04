@@ -32,7 +32,7 @@ moment.fn.week = function () {
     return {
         begin: self.subtract(day, 'days').clone(),
         end:   self.add(6, 'days').clone()
-    }
+    };
 };
 /**
  *
@@ -138,6 +138,9 @@ function Attendance(xsre){
     this.currentSummary = null;
 
     this.facets = xsre.facets;
+
+    this.extractRawSource = xsre.extractRawSource;
+
 }
 /**
  *
@@ -168,6 +171,8 @@ Attendance.prototype.getAttendances = function(){
     }
 
     me.attendances.events.event.forEach(function(event){
+
+        event = me.injectRawSource(event);
 
         mm = moment(new Date(event.calendarEventDate));
 
@@ -735,6 +740,8 @@ Attendance.prototype.calculateSummary = function(){
 
         me.attendances.events.event.forEach(function(event){
 
+            event = me.injectRawSource(event);
+
             mm = moment(new Date(event.calendarEventDate));
 
             if(mm.isValid() && mm.format('YYYY') === currentYear){
@@ -780,6 +787,16 @@ Attendance.prototype.calculateSummary = function(){
     }
 
     return me.currentSummary;
+
+};
+/**
+ *
+ * @param event
+ * @returns {*}
+ */
+Attendance.prototype.injectRawSource = function(event){
+
+    return this.extractRawSource(event);
 
 };
 /**

@@ -166,6 +166,30 @@ xSre.prototype.getAssessment = function(){
 };
 /**
  *
+ * @param object
+ * @returns {*}
+ */
+xSre.prototype.extractRawSource = function(object){
+
+    if('raw:source' in object && object['raw:source']){
+
+        _.each(object['raw:source'], function(value, key){
+
+            var ikey = (key+'').substring(4);
+
+            object[ikey] = value;
+
+        });
+
+        delete object['raw:source'];
+
+    }
+
+    return object;
+
+};
+/**
+ *
  * @returns {*}
  */
 xSre.prototype.toObject = function(){
@@ -181,6 +205,17 @@ xSre.prototype.toObject = function(){
     json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss');
 
     json.raw = pd.xml(this.raw);
+
+    /**
+     * Delete unnecessary the data
+     */
+    if(json.attendance) {
+        delete json.attendance;
+    }
+
+    if(json.disciplineIncidents) {
+        delete json.disciplineIncidents;
+    }
 
     return json;
 
