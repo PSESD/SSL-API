@@ -1,7 +1,4 @@
 'use strict';
-var Limiter = require('express-rate-limiter');
-var MemoryStore = require('express-rate-limiter/lib/memoryStore');
-var limiter = new Limiter({ db : new MemoryStore() });
 /**
  *
  * @param router
@@ -9,156 +6,226 @@ var limiter = new Limiter({ db : new MemoryStore() });
  * @constructor
  */
 function Rest(router, Api){
-      var self = this;
-      self.handleRoutes(router, Api);
+
+      this.router = router;
+
+      this.Api    = Api;
+
+      this.format = '.:format?';
+      /**
+       * Defined Controller
+       */
+      this.userController = this.Api.controller('UserController');
+
+      this.organizationController = this.Api.controller('OrganizationController');
+
+      this.studentController = this.Api.controller('StudentController');
+
+      this.tagController = this.Api.controller('TagController');
+
+      this.indexController = this.Api.controller('IndexController');
+
+      this.studentProgramController = this.Api.controller('StudentProgramController');
+
+      this.authController = this.Api.controller('Auth');
+
+      this.handleRoutes();
 }
+
 /**
- * Handle Route from Request
- * @param router
- * @param Api
+ *
  */
-Rest.prototype.handleRoutes = function(router, Api){
-      var userCtr = Api.controller('UserController');
-      var ratelimiter = limiter.middleware();
+Rest.prototype.handleRoutes = function(){
 
-      var organizationCtr = Api.controller('OrganizationController');
+      this.routeHome();
 
-      var studentCtr        = Api.controller('StudentController');
-      var tagCtr            = Api.controller('TagController');
-      var indexCtr          = Api.controller('IndexController');
-      var studentProgramCtr = Api.controller('StudentProgramController');
-      var prsCtr            = Api.controller('PRSController');
-      var auth              = Api.controller('Auth');
-      var format            = '.:format?';
+      this.routeUser();
 
-      router.get('/' + format, indexCtr.index);
+      this.routeOrganization();
 
-      router.get('/heartbeat' + format, function(req, res){
+      this.routeOrganizationUser();
+
+      this.routeOrganizationProgram();
+
+      this.routeOrganizationStudent();
+
+      this.routeOrganizationUserStudent();
+
+      this.routeStudentProgram();
+
+      this.routeProgramStudent()
+
+      this.routeTag();
+
+      this.routeTest();
+
+};
+
+/**
+ *
+ */
+Rest.prototype.routeHome = function(){
+
+      this.router.get('/' + this.format, this.indexController.index);
+
+      this.router.get('/heartbeat' + this.format, function(req, res){
             res.sendSuccess('OK');
       });
 
-      router.route('/user' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, userCtr.get)
-            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, userCtr.save)
+};
+/**
+ *
+ */
+Rest.prototype.routeUser = function(){
+
+      this.router.route('/user' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.userController.get)
+            .put(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.userController.save)
+      ;
+};
+/**
+ *
+ */
+Rest.prototype.routeOrganization = function(){
+
+      this.router.route('/organizations' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.organizationController.get);
+
+      this.router.route('/:organizationId' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.organizationController.find);
+
+      this.router.route('/:organizationId/profile' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.organizationController.profile)
+            .put(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.organizationController.updateProfile);
+
+};
+/**
+ *
+ */
+Rest.prototype.routeOrganizationUser = function(){
+
+      this.router.route('/:organizationId/users' + this.format)
+            .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.organizationController.postUser)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.organizationController.allUsers);
+
+      this.router.route('/:organizationId/users/:userId' + this.format)
+            .put(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.organizationController.putUser)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.organizationController.getUser)
+            .delete(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.organizationController.deleteUser)
+      ;
+};
+/**
+ *
+ */
+Rest.prototype.routeOrganizationProgram = function(){
+
+      this.router.route('/:organizationId/programs' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.organizationController.allProgram)
+            .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.organizationController.postProgram);
+
+      this.router.route('/:organizationId/programs/:programId' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.organizationController.getProgram)
+            .put(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.organizationController.putProgram)
+            .delete(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.organizationController.deleteProgram)
+      ;
+};
+/**
+ *
+ */
+Rest.prototype.routeOrganizationStudent = function(){
+      this.router.route('/:organizationId/students' + this.format)
+            .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentController.createByOrgId)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentController.getStudents);
+
+      this.router.route('/:organizationId/students/:studentId' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentController.getStudentById)
+            .put(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentController.putStudentById)
+            .delete(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentController.deleteStudentById);
+
+};
+/**
+ *
+ */
+Rest.prototype.routeOrganizationUserStudent = function(){
+      this.router.route('/:organizationId/users/:userId/students' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.userController.getByUserId)
+            .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.userController.postByUserId)
       ;
 
-      //router.route('/user/role/:userId')
-      //    .put(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.setRole)
-      //    .get(auth.isBearerAuthenticated, userCtr.getRole)
-      //;
-
-
-      router.route('/organizations' + format)
-            //disabled for now and only available on stage or dev
-            //.post(auth.isBearerAuthenticated, auth.isAdmin, organizationCtr.create)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.get);
-
-      router.route('/:organizationId' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.find);
-
-      router.route('/:organizationId/profile' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.profile)
-            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.updateProfile);
-
-      router.route('/:organizationId/users' + format)
-            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.postUser)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.allUsers);
-
-      router.route('/:organizationId/users/:userId' + format)
-            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.putUser)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.getUser)
-            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, organizationCtr.deleteUser)
+      this.router.route('/:organizationId/users/:userId/students/:studentId' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.userController.getStudentUserById)
+            .put(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.userController.putStudentUserById)
+            .delete(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.userController.deleteStudentUserById)
       ;
 
-      router.route('/:organizationId/programs' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.allProgram)
-            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.postProgram);
+      this.router.route('/:organizationId/students/:studentId/xsre' + this.format)
+            .delete(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentController.deleteCacheStudentsBackpack)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentController.getStudentsBackpack);
+};
+/**
+ *
+ */
+Rest.prototype.routeStudentProgram = function(){
 
-      router.route('/:organizationId/programs/:programId' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.getProgram)
-            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.putProgram)
-            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, organizationCtr.deleteProgram)
+      this.router.route('/:organizationId/students/:studentId/programs' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentProgramController.getByStudentId)
+            .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentProgramController.addByStudentId)
       ;
 
-      router.route('/:organizationId/students' + format)
-            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.createByOrgId)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudents);
+      this.router.route('/:organizationId/students/:studentId/programs/CBOStudent.xml')
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentProgramController.getByStudentIdXsre)
+      ;
+};
+/**
+ *
+ */
+Rest.prototype.routeProgramStudent = function(){
 
-
-      //router.route('/:organizationId/students/not-assign')
-      //    .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, studentCtr.getStudentNotAssigns);
-
-      router.route('/:organizationId/students/:studentId' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentById)
-            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.putStudentById)
-            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteStudentById);
-
-      router.route('/:organizationId/users/:userId/students' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.getByUserId)
-            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.postByUserId)
+      this.router.route('/:organizationId/programs/:programId/students' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentProgramController.getByProgramId)
+            .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentProgramController.addByProgramId)
       ;
 
-      router.route('/:organizationId/users/:userId/students/:studentId' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.getStudentUserById)
-            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.putStudentUserById)
-            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.deleteStudentUserById)
+      this.router.route('/:organizationId/programs/:programId/students/:studentId' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentProgramController.getStudentById)
+            .put(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentProgramController.putStudentById)
+            .delete(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.studentProgramController.deleteStudentById)
       ;
+
+
+};
+/**
+ *
+ */
+Rest.prototype.routeTag = function(){
       /**
        * Tag route
        */
-      router.route('/:organizationId/tags' + format)
-            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.createByOrgId)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTags);
+      this.router.route('/:organizationId/tags' + this.format)
+            .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.tagController.createByOrgId)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.tagController.getTags);
 
-      router.route('/:organizationId/tags/:tagId' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.getTagById)
-            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.putTagById)
-            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, tagCtr.deleteTagById);
+      this.router.route('/:organizationId/tags/:tagId' + this.format)
+            .get(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.tagController.getTagById)
+            .put(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.tagController.putTagById)
+            .delete(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.tagController.deleteTagById);
 
-      router.route('/:organizationId/students/:studentId/xsre' + format)
-            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.deleteCacheStudentsBackpack)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentCtr.getStudentsBackpack);
+};
+/**
+ * Only for development
+ */
+Rest.prototype.routeTest = function(){
 
-
-      router.route('/:organizationId/students/:studentId/programs' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByStudentId)
-            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.addByStudentId)
-      ;
-
-      router.route('/:organizationId/students/:studentId/programs/CBOStudent.xml')
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByStudentIdXsre)
-      ;
-
-      router.route('/:organizationId/programs/:programId/students' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getByProgramId)
-            .post(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.addByProgramId)
-      ;
-
-      router.route('/:organizationId/programs/:programId/students/:studentId' + format)
-            .get(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.getStudentById)
-            .put(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.putStudentById)
-            .delete(ratelimiter, auth.isBearerAuthenticated, auth.hasAccess, studentProgramCtr.deleteStudentById)
-      ;
-
-      //router.route('/:organizationId/districts')
-      //    .delete(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.deleteCacheDistricts)
-      //    .get(auth.isBearerAuthenticated, auth.hasAccess, prsCtr.getDistricts);
-
-      /**
-       * Only for development
-       */
-      if(Api.env !== 'production'){
-            router.get('/:organizationId/students/:studentId/xsre-skip' + format, studentCtr.getStudentsBackpack);
-            router.get('/dummy/test' + format, Api.controller('DummyController').index);
-            router.get('/users/cleanup' + format, userCtr.cleanAll);
-            router.route('/organizations' + format).post(auth.isBearerAuthenticated, auth.isAdmin, organizationCtr.create);
-            router.route('/user' + format)
-                  .post(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.create)
-                  .delete(auth.isBearerAuthenticated, auth.hasAccess, auth.isAdmin, userCtr.deleteByEmail)
+      if(this.Api.env !== 'production'){
+            this.router.get('/:organizationId/students/:studentId/xsre-skip' + this.format, this.studentController.getStudentsBackpack);
+            this.router.get('/dummy/test' + this.format, this.Api.controller('DummyController').index);
+            this.router.get('/users/cleanup' + this.format, this.userController.cleanAll);
+            this.router.route('/organizations' + this.format).post(this.authController.isBearerAuthenticated, this.authController.isAdmin, this.organizationController.create);
+            this.router.route('/user' + this.format)
+                  .post(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.userController.create)
+                  .delete(this.authController.isBearerAuthenticated, this.authController.hasAccess, this.authController.isAdmin, this.userController.deleteByEmail)
             ;
       }
-
-
 };
 
 module.exports = Rest;
