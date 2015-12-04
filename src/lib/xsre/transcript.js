@@ -18,11 +18,17 @@ function Transcript(xsre){
 
     if(xsre.json) {
 
-        if(xsre.json.transcriptTerm) this.transcriptTerm = xsre.json.transcriptTerm;
+        if(xsre.json.transcriptTerm) {
+            this.transcriptTerm = xsre.json.transcriptTerm;
+        }
 
-        if(xsre.json.otherTranscriptTerms && xsre.json.otherTranscriptTerms.transcriptTerm) this.transcriptTermOther = xsre.json.otherTranscriptTerms.transcriptTerm;
+        if(xsre.json.otherTranscriptTerms && xsre.json.otherTranscriptTerms.transcriptTerm) {
+            this.transcriptTermOther = xsre.json.otherTranscriptTerms.transcriptTerm;
+        }
 
     }
+
+    this.extractRawSource = xsre.extractRawSource;
 
     this.subject = [];
 
@@ -222,12 +228,26 @@ Transcript.prototype.processTranscript = function(transcript){
 
     if(typeof transcript.academicSummary === 'object'){
 
-        if(!_.isEmpty(transcript.academicSummary.totalCreditsEarned)) summary.totalCreditsEarned = parseFloat(transcript.academicSummary.totalCreditsEarned);
-        if(!_.isEmpty(transcript.academicSummary.termWeightedGpa)) summary.termWeightedGpa = parseFloat(transcript.academicSummary.termWeightedGpa);
-        if(!_.isEmpty(transcript.academicSummary.cumulativeGpa)) summary.cumulativeGpa = parseFloat(transcript.academicSummary.cumulativeGpa);
-        if(!_.isEmpty(transcript.academicSummary.termCreditsAttempted)) summary.termCreditsAttempted = parseFloat(transcript.academicSummary.termCreditsAttempted);
-        if(!_.isEmpty(transcript.academicSummary.classRank)) summary.classRank = parseFloat(transcript.academicSummary.classRank);
-        if(!_.isEmpty(transcript.academicSummary.gpaScale)) summary.gpaScale = parseFloat(transcript.academicSummary.gpaScale);
+        transcript.academicSummary = me.extractRawSource(transcript.academicSummary);
+
+        if(!_.isEmpty(transcript.academicSummary.totalCreditsEarned)) {
+            summary.totalCreditsEarned = parseFloat(transcript.academicSummary.totalCreditsEarned);
+        }
+        if(!_.isEmpty(transcript.academicSummary.termWeightedGpa)) {
+            summary.termWeightedGpa = parseFloat(transcript.academicSummary.termWeightedGpa);
+        }
+        if(!_.isEmpty(transcript.academicSummary.cumulativeGpa)) {
+            summary.cumulativeGpa = parseFloat(transcript.academicSummary.cumulativeGpa);
+        }
+        if(!_.isEmpty(transcript.academicSummary.termCreditsAttempted)) {
+            summary.termCreditsAttempted = parseFloat(transcript.academicSummary.termCreditsAttempted);
+        }
+        if(!_.isEmpty(transcript.academicSummary.classRank)) {
+            summary.classRank = parseFloat(transcript.academicSummary.classRank);
+        }
+        if(!_.isEmpty(transcript.academicSummary.gpaScale)) {
+            summary.gpaScale = parseFloat(transcript.academicSummary.gpaScale);
+        }
 
         me.summary.totalCreditsEarned += summary.totalCreditsEarned;
         me.summary.termWeightedGpa += summary.termWeightedGpa;
@@ -238,6 +258,9 @@ Transcript.prototype.processTranscript = function(transcript){
 
     }
 
+    transcript = me.extractRawSource(transcript);
+
+    //console.log(transcript);
 
     var key = (transcript.schoolYear + ' ' + l.get(transcript, 'session.description')).trim(), info = {
         gradeLevel : transcript.gradeLevel,
@@ -254,14 +277,20 @@ Transcript.prototype.processTranscript = function(transcript){
 
     }
 
-    if(Object.keys(me.course).indexOf(key) === -1) me.course[key] = info;
+    if(Object.keys(me.course).indexOf(key) === -1) {
+        me.course[key] = info;
+    }
 
 
     _.each(transcript.courses.course, function (course) {
 
-        if(!course) return;
+        if(!course) {
+            return;
+        }
 
-        if(!course.leaCourseId) return;
+        if(!course.leaCourseId) {
+            return;
+        }
 
         var uniqueId = course.scedCourseSubjectAreaCode;
 
@@ -269,9 +298,13 @@ Transcript.prototype.processTranscript = function(transcript){
 
             var uniqueStr = me.scedId[uniqueId];
 
-            if (Object.keys(me.course[key].transcripts).indexOf(uniqueStr) === -1) me.course[key].transcripts[uniqueStr] = [];
+            if (Object.keys(me.course[key].transcripts).indexOf(uniqueStr) === -1) {
+                me.course[key].transcripts[uniqueStr] = [];
+            }
 
-            if(me.subject.indexOf(uniqueStr) === -1) me.subject.push(uniqueStr);
+            if(me.subject.indexOf(uniqueStr) === -1) {
+                me.subject.push(uniqueStr);
+            }
 
             var mark = course.progressMark || course.finalMarkValue;
 
