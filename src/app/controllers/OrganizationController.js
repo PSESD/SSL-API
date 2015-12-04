@@ -269,25 +269,35 @@ OrganizationController.postUser = function (req, res) {
  */
 OrganizationController.putUser = function (req, res) {
 
-    //if('password' in req.body){
-    //
-    //    if('retype_password' in req.body && req.body.password !== req.body.retype_password){
-    //
-    //        return res.sendError('Password didn\'t match');
-    //
-    //    } else if(!req.body.password){
-    //
-    //        delete req.body.password;
-    //
-    //    }
-    //
-    //}
+    var canChangePassword = false;
 
-    ['password', 'retype_password'].forEach(function(param){
+    if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'){
+        canChangePassword = true;
+    }
 
-        if(param in req.body) delete req.body[param];
+    if(canChangePassword){
+        if('password' in req.body){
 
-    });
+            if('retype_password' in req.body && req.body.password !== req.body.retype_password){
+
+                return res.sendError('Password didn\'t match');
+
+            } else if(!req.body.password){
+
+                delete req.body.password;
+
+            }
+
+        }
+    } else{
+        ['password', 'retype_password'].forEach(function(param){
+
+            if(param in req.body){
+                delete req.body[param];
+            }
+
+        });
+    }
 
     res.xmlOptions = 'user';
 
