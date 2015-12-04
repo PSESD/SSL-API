@@ -21,7 +21,7 @@ var assert = require('assert');
 /**
  *
  * @param post
- * @param url
+ * @param uri
  * @param token
  */
 function http_build_query(post, uri, token) {
@@ -288,7 +288,9 @@ describe('All-Test', function () {
                 .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(orgData)
                 .expect(function (res) {
-                    if (!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) {
+                        console.log('%j', res.body);
+                    }
                     assert.equal(true, res.body.success);
                     assert.equal(orgData.name, res.body.info.name);
                     organizationId = res.body.info._id;
@@ -398,7 +400,9 @@ describe('All-Test', function () {
                 .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser)
                 .expect(function (res) {
-                    if (!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) {
+                        console.log('%j', res.body);
+                    }
                     assert.equal(true, res.body.success);
                 })
                 .expect(200)
@@ -414,7 +418,9 @@ describe('All-Test', function () {
                 .set('x-cbo-client-url', 'http://localhost:4000')
                 .send({ role: 'admin' })
                 .expect(function (res) {
-                    if (!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) {
+                        console.log('%j', res.body);
+                    }
                     assert.equal(true, res.body.success);
                 })
                 .expect(200)
@@ -446,7 +452,9 @@ describe('All-Test', function () {
                 .set('authorization', grantToken)
                 .send(permissionsData)
                 .expect(function (res) {
-                    if (!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) {
+                        console.log('%j', res.body);
+                    }
                     assert.equal(true, res.body.success);
                     var permit = res.body.info.allPermissionsByOrganization;
                     //console.log(res.body.info);
@@ -471,7 +479,9 @@ describe('All-Test', function () {
                 .set('x-cbo-client-url', 'http://localhost:4000')
                 .send(newUser)
                 .expect(function (res) {
-                    if (!res.body.success) console.log('%j', res.body);
+                    if (!res.body.success) {
+                        console.log('%j', res.body);
+                    }
                     assert.equal(true, res.body.success);
                 })
                 .expect(200)
