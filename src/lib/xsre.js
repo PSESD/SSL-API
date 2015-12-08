@@ -137,10 +137,12 @@ xSre.prototype.getStudentSummary = function(){
 
     var json = this.getJson();
 
-    if(json.personal && json.personal.enrollment){
-        summary.gradeLevel = json.personal.enrollment.gradeLevel;
-        summary.schoolYear = json.personal.enrollment.schoolYear;
-        summary.schoolName = json.personal.enrollment.currentSchool;
+    var personal = this.getPersonal().getPersonal();
+
+    if(personal && personal.enrollment){
+        summary.gradeLevel = personal.enrollment.gradeLevel;
+        summary.schoolYear = personal.enrollment.schoolYear;
+        summary.schoolName = personal.enrollment.currentSchool;
     }
 
     var attendance = this.getAttendanceBehavior();
