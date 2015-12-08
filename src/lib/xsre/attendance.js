@@ -172,7 +172,7 @@ Attendance.prototype.getAttendances = function(){
 
     me.attendances.events.event.forEach(function(event){
 
-        event = me.injectRawSource(event);
+        //event = me.injectRawSource(event);
 
         mm = moment(new Date(event.calendarEventDate));
 
@@ -437,9 +437,6 @@ Attendance.prototype.getAttendances = function(){
                 me.calculateClassSectionAttendance(behavior, classSectionEvent, nday, day, summary);
 
             }
-
-
-
 
         });
 

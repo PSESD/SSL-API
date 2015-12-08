@@ -90,7 +90,7 @@ function Transcript(xsre){
 
     this.totalCreditsAttempted = 0;
 
-    this.info = { totalEarned: 0, totalAttempted: 0, gradeLevel: 0 };
+    this.info = { totalEarned: 0, totalAttempted: 0, gradeLevel: 0, currentSchoolYear: null, courseTitle: [] };
 
 }
 /**
@@ -102,6 +102,8 @@ Transcript.prototype.getTranscript = function(){
     var me = this;
 
     if(null !== me.transcriptTerm) {
+
+        me.info.currentSchoolYear = me.transcriptTerm.schoolYear;
 
         me.processTranscript(me.transcriptTerm);
 
@@ -160,7 +162,7 @@ Transcript.prototype.getTranscript = function(){
 
     me.subject = subjectModified;
 
-    console.log(me.subject);
+    //console.log(me.subject);
 
     me.course = _.sortBy(me.course);
 
@@ -286,7 +288,7 @@ Transcript.prototype.processTranscript = function(transcript){
 
     if(typeof transcript.academicSummary === 'object'){
 
-        transcript.academicSummary = me.extractRawSource(transcript.academicSummary);
+        //transcript.academicSummary = me.extractRawSource(transcript.academicSummary);
 
         if(!_.isEmpty(transcript.academicSummary.totalCreditsEarned) && !isNaN(transcript.academicSummary.totalCreditsEarned)) {
             summary.totalCreditsEarned = parseFloat(transcript.academicSummary.totalCreditsEarned);
@@ -316,11 +318,11 @@ Transcript.prototype.processTranscript = function(transcript){
 
     }
 
-    transcript = me.extractRawSource(transcript);
+    //transcript = me.extractRawSource(transcript);
 
     //console.log(transcript);
 
-    var key = (transcript.schoolYear + ' ' + l.get(transcript, 'session.description')).trim(), info = {
+    var key = (transcript.schoolYear + ':' + l.get(transcript, 'session.description') + ':' + transcript.schoolName).trim(), info = {
         gradeLevel : transcript.gradeLevel,
         schoolYear : transcript.schoolYear,
         schoolName : l.get(transcript, 'school.schoolName'),
@@ -393,6 +395,10 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
 
     me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
 
+    if(course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
+        me.info.courseTitle.push(course.courseTitle);
+    }
+
     me.course[key].transcripts[uniqueStr].push({
         index: null,
         n: me.course[key].transcripts[uniqueStr].length + 1,
@@ -436,6 +442,10 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
     me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
 
     me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+
+    if(course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
+        me.info.courseTitle.push(course.courseTitle);
+    }
 
     me.course[key].transcripts[uniqueStr].push({
         index: null,
