@@ -16,6 +16,19 @@ function Transcript(xsre){
 
     this.transcriptTermOther = null;
 
+    this.enrollments = xsre.json.enrollment ? [xsre.json.enrollment] : [];
+
+    var me = this;
+
+    if(xsre.json.otherEnrollments && _.isArray(xsre.json.otherEnrollments.enrollment)){
+
+        _.each(xsre.json.otherEnrollments.enrollment, function(enrollment){
+
+            me.enrollments.push(enrollment);
+
+        });
+    }
+
     if(xsre.json) {
 
         if(xsre.json.transcriptTerm) {
@@ -151,11 +164,33 @@ Transcript.prototype.getTranscript = function(){
 
     me.course = _.sortBy(me.course);
 
+    if(me.enrollments.length > 0){
+
+        var schools = [];
+
+        _.each(me.enrollments, function(enrollment){
+
+            var school = enrollment.school;
+
+            if(school.schoolName && schools.indexOf(school.schoolName) === -1){
+
+                me.history.push({ schoolName: school.schoolName, schoolYear: school.schoolYear || me.notAvailable });
+
+                schools.push(school.schoolName);
+
+            }
+
+        });
+
+    }
+
+    //console.log(me.history);
+
     _.each(me.course, function(course){
 
         var courseTranscripts = {};
 
-        me.history.push({ schoolName: course.schoolName, schoolYear: course.schoolYear });
+        //me.history.push({ schoolName: course.schoolName, schoolYear: course.schoolYear });
 
         if(_.isObject(course.transcripts)) {
 

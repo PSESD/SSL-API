@@ -27,10 +27,10 @@ fs.readFile(xmlFile, function(err, data) {
             }
             //console.log(require('prettyjson').render(new xSre(result).getTranscript().getTranscript()));
             //console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().getAttendances()));
-            console.log(require('prettyjson').render(new xSre(result).getTranscript().getTranscript()));
+            //console.log(require('prettyjson').render(new xSre(result).getTranscript().getTranscript()));
             //console.log(require('prettyjson').render(new xSre(result).getAssessment().getAssessment()));
             //new xSre(result).getAttendanceBehavior().getAttendances();
-            //new xSre(result).getAttendanceBehavior().getAttendances();
+            new xSre(result).getTranscript().getTranscript();
       });
 
 });
