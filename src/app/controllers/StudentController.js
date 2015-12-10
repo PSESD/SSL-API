@@ -55,6 +55,27 @@ StudentController.getStudentsBackpack = function (req, res) {
          */
         function embeds(results, isFromCache){
 
+            results.personal.collageBound = student.collage_bound;
+            results.personal.phone = student.phone;
+            results.personal.email = student.email;
+            results.personal.address = student.address;
+
+            results.personal.emergency1 = {
+                name: student.emergency1_name,
+                relationship: student.emergency1_relationship,
+                email: student.emergency1_email,
+                phone: student.emergency1_phone,
+                mentor: student.mentor1_name
+            };
+
+            results.personal.emergency2 = {
+                name: student.emergency2_name,
+                relationship: student.emergency2_relationship,
+                email: student.emergency2_email,
+                phone: student.emergency2_phone,
+                mentor: student.mentor2_name
+            };
+
             res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
 
             if(showRaw){

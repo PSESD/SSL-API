@@ -5,8 +5,6 @@ var mongoose = require('mongoose');
 var bodyParser  = require("body-parser");
 var cookieParser = require('cookie-parser');
 var csrf = require('csurf');
-var csrfProtection = csrf({ cookie: true });
-var parseForm = bodyParser.urlencoded({ extended: false });
 
 var app  = express();
 var session = require('express-session');
@@ -20,6 +18,9 @@ var hal = require('hal');
 var xmlmodel = require('./lib/xmlmodel');
 var utils = require('./lib/utils');
 var rollbarAccessToken = config.get('rollbar.access_token');
+var compress = require('compression');
+
+app.use(compress());
 
 if (rollbarAccessToken) {
 

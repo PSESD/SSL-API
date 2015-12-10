@@ -6,6 +6,7 @@ var moment = require('moment');
 var Transcript = require(__dirname + '/xsre/transcript');
 var Attendance = require(__dirname + '/xsre/attendance');
 var Assessment = require(__dirname + '/xsre/assessment');
+var Personal = require(__dirname + '/xsre/personal');
 var CodeSet = require(__dirname + '/xsre/codeset');
 var _ = require('lodash');
 var pd = require('pretty-data').pd;
@@ -136,32 +137,58 @@ xSre.prototype.getStudentSummary = function(){
 
     var json = this.getJson();
 
-    summary.gradeLevel = _.get(json, 'enrollment.gradeLevel');
-    summary.schoolYear = _.get(json,'enrollment.schoolYear');
-    summary.schoolName = _.get(json,'enrollment.school.schoolName');
+    var personal = this.getPersonal().getPersonal();
+
+    if(personal && personal.enrollment){
+        summary.gradeLevel = personal.enrollment.gradeLevel;
+        summary.schoolYear = personal.enrollment.schoolYear;
+        summary.schoolName = personal.enrollment.currentSchool;
+    }
 
     var attendance = this.getAttendanceBehavior();
 
     summary.attendance = attendance.getCurrentTotalAttendance();
     summary.behavior = attendance.getCurrentTotalBehavior();
-    summary.onTrackToGraduate = _.get(json, 'transcriptTerm.academicSummary.onTrackToGraduate');
+    summary.onTrackToGraduate = null;
+
+    var academicSummary = _.get(json, 'transcriptTerm.academicSummary');
+
+    if(academicSummary){
+        if('onTrackToGraduate' in academicSummary){
+            summary.onTrackToGraduate = academicSummary.onTrackToGraduate;
+        } else if('psesd:onTrackToGraduate' in academicSummary) {
+            summary.onTrackToGraduate = academicSummary['psesd:onTrackToGraduate'];
+        }
+    }
 
     return summary;
 
 };
 /**
  *
- * @returns {*}
+ * @returns {Attendance}
  */
 xSre.prototype.getAttendanceBehavior = function(){
 
     return new Attendance(this);
 
 };
-
+/**
+ *
+ * @returns {Assessment}
+ */
 xSre.prototype.getAssessment = function(){
 
     return new Assessment(this);
+
+};
+/**
+ *
+ * @returns {Personal}
+ */
+xSre.prototype.getPersonal = function(){
+
+    return new Personal(this);
 
 };
 /**
@@ -171,21 +198,23 @@ xSre.prototype.getAssessment = function(){
  */
 xSre.prototype.extractRawSource = function(object){
 
-    if('raw:source' in object && object['raw:source']){
-
-        _.each(object['raw:source'], function(value, key){
-
-            var ikey = (key+'').substring(4);
-
-            object[ikey] = value;
-
-        });
-
-        delete object['raw:source'];
-
-    }
-
     return object;
+
+    //if('raw:source' in object && object['raw:source']){
+    //
+    //    _.each(object['raw:source'], function(value, key){
+    //
+    //        var ikey = (key+'').substring(4);
+    //
+    //        object[ikey] = value;
+    //
+    //    });
+    //
+    //    delete object['raw:source'];
+    //
+    //}
+    //
+    //return object;
 
 };
 /**
@@ -200,6 +229,8 @@ xSre.prototype.toObject = function(){
 
     json.transcripts = this.getTranscript().getTranscript();
 
+    json.personal = this.getPersonal().getPersonal();
+
     json.assessments = this.getAssessment().getAssessment();
 
     json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss');
@@ -211,6 +242,34 @@ xSre.prototype.toObject = function(){
      */
     if(json.attendance) {
         delete json.attendance;
+    }
+
+    if(json.languages) {
+        delete json.languages;
+    }
+
+    if(json.enrollment) {
+        delete json.enrollment;
+    }
+
+    if(json.demographics) {
+        delete json.demographics;
+    }
+
+    if(json.name) {
+        delete json.name;
+    }
+
+    if(json.otherIds) {
+        delete json.otherIds;
+    }
+
+    if(json.programs) {
+        delete json.programs;
+    }
+
+    if(json.transcriptTerm) {
+        delete json.transcriptTerm;
     }
 
     if(json.disciplineIncidents) {
