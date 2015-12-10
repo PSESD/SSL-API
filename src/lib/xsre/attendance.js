@@ -172,7 +172,7 @@ Attendance.prototype.getAttendances = function(){
 
     me.attendances.events.event.forEach(function(event){
 
-        event = me.injectRawSource(event);
+        //event = me.injectRawSource(event);
 
         mm = moment(new Date(event.calendarEventDate));
 
@@ -406,25 +406,35 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
-            var isDailySet = false;
+
+            var dailyEvent = [];
+
+            var classSectionEvent = [];
 
             allEvents.forEach(function(e){
 
-                if(e.attendanceEventType === 'DailyAttendance' && !isDailySet) {
+                if(e.attendanceEventType === 'DailyAttendance') {
 
-                    isDailySet = true;
+                    dailyEvent.push(e);
+
+                } else if(e.attendanceEventType === 'ClassSectionAttendance') {
+
+                    classSectionEvent.push(e);
 
                 }
 
             });
 
-            if(isDailySet){
 
-                me.calculateDailyAttendance(behavior, allEvents, nday, day, summary);
+            if(dailyEvent.length > 0){
 
-            } else {
+                me.calculateDailyAttendance(behavior, dailyEvent, nday, day, summary);
 
-                me.calculateClassSectionAttendance(behavior, allEvents, nday, day, summary);
+            }
+
+            if(classSectionEvent.length > 0){
+
+                me.calculateClassSectionAttendance(behavior, classSectionEvent, nday, day, summary);
 
             }
 
@@ -615,11 +625,11 @@ Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, da
 
     if(e.attendanceStatus && (''+e.attendanceStatus).toLowerCase() === 'present'){
 
-        summary[n].value = parseFloat(e.attendanceValue).toFixed(2);
+        summary[n].value = isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue).toFixed(2);
 
     } else {
 
-        summary[n].value = ((1 - parseFloat(e.attendanceValue)) * 100).toFixed(2);
+        summary[n].value = ((1 - (isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue))) * 100).toFixed(2);
 
     }
 
@@ -664,7 +674,7 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
                 period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
             });
 
-            value += parseFloat(e.attendanceValue);
+            value += isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue);
 
         }
 
