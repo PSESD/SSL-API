@@ -53,7 +53,7 @@ Rest.prototype.handleRoutes = function(){
 
       this.routeStudentProgram();
 
-      this.routeProgramStudent()
+      this.routeProgramStudent();
 
       this.routeTag();
 

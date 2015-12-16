@@ -317,7 +317,7 @@ Attendance.prototype.getAttendances = function(){
 
     var summary = {};
 
-    var maxDay = 5;
+    var maxDay = [];
 
     var lastWeeklyChange = 100;
 
@@ -327,9 +327,9 @@ Attendance.prototype.getAttendances = function(){
 
         var ikey = week.startString + ' - ' + week.endString;
 
-        weeklyChange = 0;
+        maxDay = [];
 
-        var maxPeriod = 1;
+        weeklyChange = null;
 
         summary = [
             { name: 'M', value: me.notAvailable, date: me.notAvailable, periods: [] },
@@ -343,12 +343,12 @@ Attendance.prototype.getAttendances = function(){
             weekDate: ikey,
             summary: {
                 title: ikey,
-                M: '0.00%',
-                T: '0.00%',
-                W: '0.00%',
-                TH: '0.00%',
-                F: '0.00%',
-                weeklyChange: '0.00%'
+                M: me.notAvailable,
+                T: me.notAvailable,
+                W: me.notAvailable,
+                TH: me.notAvailable,
+                F: me.notAvailable,
+                weeklyChange: me.notAvailable
             },
             detailColumns: [],
             details: [],
@@ -444,7 +444,9 @@ Attendance.prototype.getAttendances = function(){
 
         var collects = {};
 
-        var periodsColumns = [];
+        var periodsColumns = [1, 2, 3, 4, 5, 6];
+
+        var total = 0;
 
         summary.forEach(function(s){
 
@@ -452,30 +454,43 @@ Attendance.prototype.getAttendances = function(){
 
             if(s.name in behavior.summary && !isNaN(s.value)){
 
-                behavior.summary[s.name] = s.value + '%';
+                var svalue = parseInt(s.value) === 0 ? 0 : parseFloat(s.value);
 
-                weeklyChange += parseFloat(s.value);
+                behavior.summary[s.name] = svalue + '%';
 
-            }
+                total += svalue;
 
-            if(s.periods.length > 0) {
-
-                s.periods.forEach(function(p){
-
-                    if(p.period !== me.notAvailable && periodsColumns.indexOf(p.period) === -1){
-
-                        periodsColumns.push(p.period);
-
-                    }
-
-                });
-
+                maxDay.push(svalue);
 
             }
+
+            //if(s.periods.length > 0) {
+            //
+            //    s.periods.forEach(function(p){
+            //
+            //        if(p.period !== me.notAvailable && periodsColumns.indexOf(p.period) === -1){
+            //
+            //            periodsColumns.push(p.period);
+            //
+            //        }
+            //
+            //    });
+            //
+            //}
 
         });
 
-        periodsColumns = _.sortBy(periodsColumns);
+        if(maxDay.length > 0){
+
+            weeklyChange = (total / maxDay.length);
+
+        } else {
+
+            weeklyChange = null;
+
+        }
+
+        behavior.summary.weeklyChange = weeklyChange;
 
         behavior.raw.collects = collects;
 
@@ -484,7 +499,7 @@ Attendance.prototype.getAttendances = function(){
         periodsColumns.forEach(function(p){
 
             var b = {
-                title: me.notAvailable,
+                title: p,
                 M: { value: me.notAvailable, event: null, slug: '' },
                 T: { value: me.notAvailable, event: null, slug: '' },
                 W: { value: me.notAvailable, event: null, slug: '' },
@@ -504,7 +519,9 @@ Attendance.prototype.getAttendances = function(){
                             b[column] = {value: period.value, event: period.event, slug: period.slug};
 
                             if (period.period !== me.notAvailable) {
+
                                 title = period.period;
+
                             }
 
                         }
@@ -516,11 +533,7 @@ Attendance.prototype.getAttendances = function(){
 
             });
 
-            if(b.title === me.notAvailable && title){
-
-                b.title = 'Period ' + title;
-
-            }
+            b.title = 'Period ' + b.title;
 
             columns.push(b);
 
@@ -540,9 +553,9 @@ Attendance.prototype.getAttendances = function(){
 
         for(var c = 0; c < columns.length; c++){
 
-            if(columns[c].M.value === me.notAvailable && !columns[c].M.event && columns[c].T.value === me.notAvailable && !columns[c].T.event && columns[c].W.value === me.notAvailable && !columns[c].W.event && columns[c].TH.value === me.notAvailable && !columns[c].TH.event && columns[c].F.value === me.notAvailable && !columns[c].F.event){
-                continue;
-            }
+            //if(columns[c].M.value === me.notAvailable && !columns[c].M.event && columns[c].T.value === me.notAvailable && !columns[c].T.event && columns[c].W.value === me.notAvailable && !columns[c].W.event && columns[c].TH.value === me.notAvailable && !columns[c].TH.event && columns[c].F.value === me.notAvailable && !columns[c].F.event){
+            //    continue;
+            //}
 
             behavior.periods.push(columns[c].title);
             behavior.detailColumns.periods.push(columns[c].title);
@@ -555,27 +568,18 @@ Attendance.prototype.getAttendances = function(){
 
         }
 
+
         behavior.raw.weeklyChange = weeklyChange;
-
-        if(weeklyChange === null) {
-            weeklyChange = me.notAvailable;
-        }
-
-        if(!isNaN(weeklyChange)) {
-
-            weeklyChange = ((weeklyChange / maxDay) * 100).toFixed(2);
-
-        }
 
         behavior.raw.lastWeeklyChange = lastWeeklyChange;
 
         if(lastWeeklyChange !== me.notAvailable && lastWeeklyChange > 0 && !isNaN(weeklyChange)){
 
-            behavior.weeklyChange = (weeklyChange / lastWeeklyChange);
+            behavior.weeklyChange = lastWeeklyChange - weeklyChange;
 
         } else {
 
-            behavior.weeklyChange = weeklyChange;
+            behavior.weeklyChange = '0.00%';
 
         }
 
@@ -583,7 +587,7 @@ Attendance.prototype.getAttendances = function(){
             behavior.weeklyChange = me.notAvailable;
         }
 
-        lastWeeklyChange = behavior.weeklyChange;
+        lastWeeklyChange = weeklyChange;
 
         if(!isNaN(behavior.weeklyChange)){
 
@@ -625,17 +629,23 @@ Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, da
 
     if(e.attendanceStatus && (''+e.attendanceStatus).toLowerCase() === 'present'){
 
-        summary[n].value = isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue).toFixed(2);
+        summary[n].value = parseFloat(isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue) * 100);
 
     } else {
 
-        summary[n].value = ((1 - (isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue))) * 100).toFixed(2);
+        summary[n].value = ((1 - (isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue))) * 100);
 
     }
 
-    summary[n].periods.push({
-        period: e.timeTablePeriod ? e.timeTablePeriod : me.notAvailable, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
-    });
+    if(parseInt(summary[n].value) === 0) {
+
+        summary[n].value = 0;
+
+    }
+
+    //summary[n].periods.push({
+    //    period: e.timeTablePeriod ? e.timeTablePeriod : me.notAvailable, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
+    //});
 
 };
 /**
@@ -674,7 +684,7 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
                 period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
             });
 
-            value += isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue);
+            //value += isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue).toFixed(2);
 
         }
 
@@ -692,11 +702,17 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
 
     }
 
-    if(summary[n].periods.length > 0){
-
-        summary[n].value = value.toFixed(2);
-
-    }
+    //if(summary[n].periods.length > 0){
+    //
+    //    summary[n].value = value.toFixed(2);
+    //
+    //}
+    //
+    //if(parseInt(summary[n].value) === 0) {
+    //
+    //    summary[n].value = 0;
+    //
+    //}
 
 };
 /**

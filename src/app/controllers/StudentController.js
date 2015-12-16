@@ -10,7 +10,7 @@ var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var Request = require('../../lib/broker/request');
-var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
+var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark  = utils.benchmark();
 var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
@@ -30,12 +30,14 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     var studentId = ObjectId(req.params.studentId);
 
+    benchmark.info('XSRE - START GET STUDENT BACKPACK');
+
     var showRaw = false;
 
     if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')) {
         showRaw = true;
     }
-
+    benchmark.info('XSRE - GET STUDENT');
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
         if (err)  { return res.sendError(err); }
@@ -54,7 +56,7 @@ StudentController.getStudentsBackpack = function (req, res) {
          * @param isFromCache
          */
         function embeds(results, isFromCache){
-
+            benchmark.info('XSRE - EMBED RESULTS => ' + (isFromCache ? ' FROM CACHE' : ' FROM SERVER'));
             results.personal.collageBound = student.collage_bound;
             results.personal.phone = student.phone;
             results.personal.email = student.email;
@@ -102,7 +104,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                     }
                 }
             };
-
+            benchmark.info('XSRE - EMBED USER');
             User.find(crit, function(err, users){
 
                 if (err)  { return res.sendError(err); }
@@ -156,7 +158,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                 });
 
                 if(!_.isEmpty(programsId)){
-
+                    benchmark.info('XSRE - EMBED PROGRAM');
                     Program.find({ _id: { $in: programId } }, function(err, programs){
 
                         if (err)  { return res.sendError(err); }
@@ -181,6 +183,8 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         resource.embed('programs', embedsPrograms);
 
+                        benchmark.info('XSRE - FINISH');
+
                         res.sendSuccess(null, resource.toJSON());
 
                     });
@@ -192,13 +196,15 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     resource.embed('programs', embedsPrograms);
 
+                    benchmark.info('XSRE - FINISH');
+
                     res.sendSuccess(null, resource.toJSON());
 
                 }
 
             });
         }
-
+        benchmark.info('XSRE - GET ORGANIZATION');
         Organization.findOne({ _id: orgId }, function(err, organization){
 
             if (err)  { return res.sendError(err); }
@@ -222,9 +228,9 @@ StudentController.getStudentsBackpack = function (req, res) {
                 }
 
                 if(!result){
-
+                    benchmark.info('XSRE - REQUEST XSRE');
                     brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
-
+                        benchmark.info('XSRE - GET RESPONSE');
                         if (error)  {
                             return res.sendError(error);
                         }
@@ -238,15 +244,16 @@ StudentController.getStudentsBackpack = function (req, res) {
                         }
 
                         if (response && response.statusCode === 200) {
-
+                            benchmark.info('XSRE - PARSING DATA FROM XML TO JS');
                             utils.xml2js(body, function (err, result) {
 
                                 if (err)  { return res.sendError(err); }
-
-                                var object = new xSre(result, body).toObject();
+                                benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
+                                var object = new xSre(result, body).setLogger(benchmark).toObject();
                                 /**
                                  * Set to cache
                                  */
+                                benchmark.info('XSRE - SET TO CACHE');
                                 cache.set(key, object, function(err){
 
                                     log(err);
@@ -258,11 +265,11 @@ StudentController.getStudentsBackpack = function (req, res) {
                             });
 
                         } else {
-
+                            benchmark.info('XSRE - PARSING DATA ERROR FROM XML TO JS');
                             utils.xml2js(body, function (err, result) {
 
                                 var json = (result && 'error' in result) ? result.error.message : 'Error not response';
-
+                                benchmark.info('XSRE - FINISH');
                                 res.sendError(json);
 
                             });

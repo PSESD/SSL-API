@@ -170,17 +170,30 @@ Transcript.prototype.getTranscript = function(){
 
         var schools = [];
 
+        var histories = [];
+
         _.each(me.enrollments, function(enrollment){
 
             var school = enrollment.school;
 
-            if(school.schoolName && schools.indexOf(school.schoolName) === -1){
+            var schoolName = school.schoolName;
 
-                me.history.push({ schoolName: school.schoolName, schoolYear: school.schoolYear || me.notAvailable });
+            var schoolYear = enrollment.schoolYear || me.notAvailable;
 
-                schools.push(school.schoolName);
+            if(schoolName && schools.indexOf(schoolName) === -1){
+
+                schools.push(schoolName);
 
             }
+
+            if(histories.indexOf(schoolName+':'+schoolYear) === -1){
+
+                me.history.push({ schoolName: schoolName, schoolYear: schoolYear });
+
+                histories.push(schoolName+':'+schoolYear);
+
+            }
+
 
         });
 
@@ -234,9 +247,12 @@ Transcript.prototype.getTranscript = function(){
 
     _.each(subjectModified, function(s){
 
-        subjectValues.push({ name: s, value: subjectObject[s] });
+        subjectValues.push({ name: s, value: parseFloat(subjectObject[s]).toFixed(1) });
 
     });
+
+    me.info.totalAttempted = parseFloat(me.info.totalAttempted).toFixed(1);
+    me.info.totalEarned = parseFloat(me.info.totalEarned).toFixed(1);
 
     return {
         history: _.sortBy(me.history, 'schoolYear').reverse(),
