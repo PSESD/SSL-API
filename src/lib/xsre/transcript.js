@@ -105,7 +105,7 @@ Transcript.prototype.getTranscript = function(){
 
         me.info.currentSchoolYear = me.transcriptTerm.schoolYear;
 
-        me.processTranscript(me.transcriptTerm);
+        me.processTranscript(me.transcriptTerm, true);
 
     }
 
@@ -114,7 +114,7 @@ Transcript.prototype.getTranscript = function(){
 
         _.each(me.transcriptTermOther, function (transcript) {
 
-            me.processTranscript(transcript);
+            me.processTranscript(transcript, false);
 
         });
 
@@ -270,12 +270,24 @@ Transcript.prototype.getTranscript = function(){
 /**
  *
  * @param transcript
+ * @param current
  */
-Transcript.prototype.processTranscript = function(transcript){
+Transcript.prototype.processTranscript = function(transcript, current){
 
     var me = this;
 
     if(!_.isObject(transcript.courses)){
+
+        return;
+
+    }
+
+
+    var tSchoolYear = l.get(transcript, 'schoolYear');
+    var tSession = l.get(transcript, 'session.description');
+    var tSchoolName = l.get(transcript, 'school.schoolName');
+
+    if(!tSchoolName || !tSession || !tSchoolYear){
 
         return;
 
@@ -338,11 +350,11 @@ Transcript.prototype.processTranscript = function(transcript){
 
     //console.log(transcript);
 
-    var key = (transcript.schoolYear + ':' + l.get(transcript, 'session.description') + ':' + transcript.schoolName).trim(), info = {
+    var key = (tSchoolYear + ':' + tSession + ':' + tSchoolName).trim(), info = {
         gradeLevel : transcript.gradeLevel,
-        schoolYear : transcript.schoolYear,
-        schoolName : l.get(transcript, 'school.schoolName'),
-        session: l.get(transcript, 'session.description'),
+        schoolYear : tSchoolYear,
+        schoolName : tSchoolName,
+        session: tSession,
         transcripts: {},
         summary: summary
     };
@@ -372,11 +384,11 @@ Transcript.prototype.processTranscript = function(transcript){
 
         if(uniqueId in me.scedId) {
 
-            me.transcriptWithSCED(uniqueId, key, course, info);
+            me.transcriptWithSCED(uniqueId, key, course, info, current);
 
         } else {
 
-            me.transcriptWithNoSCED(uniqueId, key, course, info);
+            me.transcriptWithNoSCED(uniqueId, key, course, info, current);
 
         }
 
@@ -390,8 +402,9 @@ Transcript.prototype.processTranscript = function(transcript){
  * @param key
  * @param course
  * @param info
+ * @param current
  */
-Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, info){
+Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, info, current){
 
     var me = this;
 
@@ -417,7 +430,7 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
 
     me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted).toFixed(1);
 
-    if(course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
+    if(current && course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
         me.info.courseTitle.push(course.courseTitle);
     }
 
@@ -440,8 +453,9 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
  * @param key
  * @param course
  * @param info
+ * @param current
  */
-Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, info){
+Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, info, current){
 
     var me = this;
 
@@ -465,7 +479,7 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
 
     me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted).toFixed(1);
 
-    if(course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
+    if(current && course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
         me.info.courseTitle.push(course.courseTitle);
     }
 
