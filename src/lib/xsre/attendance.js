@@ -319,7 +319,7 @@ Attendance.prototype.getAttendances = function(){
 
     var maxDay = [];
 
-    var lastWeeklyChange = 100;
+    var lastWeeklyChange = me.notAvailable;
 
     var weeklyChange = 0;
 
@@ -456,7 +456,7 @@ Attendance.prototype.getAttendances = function(){
 
                 var svalue = parseInt(s.value) === 0 ? 0 : parseFloat(s.value);
 
-                behavior.summary[s.name] = svalue + '%';
+                behavior.summary[s.name] = svalue.toFixed(1) + '%';
 
                 total += svalue;
 
@@ -575,7 +575,7 @@ Attendance.prototype.getAttendances = function(){
 
         if(lastWeeklyChange !== me.notAvailable && lastWeeklyChange > 0 && !isNaN(weeklyChange)){
 
-            behavior.weeklyChange = lastWeeklyChange - weeklyChange;
+            behavior.weeklyChange = weeklyChange - lastWeeklyChange;
 
         } else {
 
@@ -633,7 +633,8 @@ Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, da
 
     } else {
 
-        summary[n].value = ((1 - (isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue))) * 100);
+        //summary[n].value = ((1 - (isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue))) * 100);
+        summary[n].value = isNaN(e.attendanceValue) ? 0 : (parseFloat(e.attendanceValue) * 100);
 
     }
 

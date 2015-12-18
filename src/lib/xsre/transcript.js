@@ -260,8 +260,8 @@ Transcript.prototype.getTranscript = function(){
         credits: me.credits,
         subject: subjectModified,
         subjectValues: subjectValues,
-        totalCreditsEarned: isNaN(me.totalCreditsEarned) ? 0 : parseFloat(me.totalCreditsEarned),
-        totalCreditsAttempted: isNaN(me.totalCreditsAttempted) ? 0 : parseFloat(me.totalCreditsAttempted),
+        totalCreditsEarned: isNaN(me.totalCreditsEarned) ? 0 : parseFloat(me.totalCreditsEarned).toFixed(1),
+        totalCreditsAttempted: isNaN(me.totalCreditsAttempted) ? 0 : parseFloat(me.totalCreditsAttempted).toFixed(1),
         gradeLevel: me.gradeLevel,
         summary: me.summary,
         info: me.info
@@ -405,11 +405,17 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
         me.subject.push(uniqueStr);
     }
 
-    var mark = course.progressMark || course.finalMarkValue;
+    var mark = /*course.progressMark || */course.finalMarkValue;
 
-    me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+    if(!mark) {
 
-    me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+        return;
+
+    }
+
+    me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned).toFixed(1);
+
+    me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted).toFixed(1);
 
     if(course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
         me.info.courseTitle.push(course.courseTitle);
@@ -455,9 +461,9 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
 
     var mark = course.progressMark || course.finalMarkValue;
 
-    me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+    me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned).toFixed(1);
 
-    me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+    me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted).toFixed(1);
 
     if(course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
         me.info.courseTitle.push(course.courseTitle);

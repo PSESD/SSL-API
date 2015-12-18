@@ -30,6 +30,22 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     var studentId = ObjectId(req.params.studentId);
 
+    var separate = req.params.separate;
+
+    var usePagination = false;
+
+    if(separate === 'xsre') {
+
+        separate = 'general';
+
+    }
+
+    if(separate !== 'general'){
+
+        usePagination = true;
+
+    }
+
     benchmark.info('XSRE - START GET STUDENT BACKPACK');
 
     var showRaw = false;
@@ -38,6 +54,7 @@ StudentController.getStudentsBackpack = function (req, res) {
         showRaw = true;
     }
     benchmark.info('XSRE - GET STUDENT');
+
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
         if (err)  { return res.sendError(err); }
@@ -48,15 +65,68 @@ StudentController.getStudentsBackpack = function (req, res) {
             return res.sendError('The student not found in database');
         }
 
-        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
-        //key = new Date().getTime();
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
+        key = new Date().getTime();
         /**
          *
          * @param results
          * @param isFromCache
          */
         function embeds(results, isFromCache){
+
+            res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
+
             benchmark.info('XSRE - EMBED RESULTS => ' + (isFromCache ? ' FROM CACHE' : ' FROM SERVER'));
+
+            /**
+             * Defined paging here
+             */
+            if(usePagination !== false){
+
+                benchmark.info('XSRE - USING PAGINATION ON( ' + separate + ')');
+
+                benchmark.info('XSRE - FINISH');
+
+                if(results.raw) {
+                    delete results.raw;
+                }
+
+
+
+                var paginate = {
+                    total: 0,
+                    pageSize: 10,
+                    pageCount: 0,
+                    currentPage: 1,
+                    data: []
+                };
+                var arrayList = [];
+
+                if (typeof req.query.page !== 'undefined') {
+                    paginate.currentPage = +req.query.page;
+                }
+
+                paginate.total = results.length;
+
+                //split list into groups
+                while (results.length > 0) {
+                    arrayList.push(results.splice(0, paginate.pageSize));
+                }
+
+                paginate.data = arrayList[+paginate.currentPage - 1];
+
+                paginate.pageCount = Math.ceil(paginate.total/paginate.pageSize);
+
+                var resource = new hal.Resource(paginate, req.originalUrl);
+
+                if(paginate.page + 1 <= paginate.pageCount) {
+                    resource.link(new hal.Link('next', req.originalUrl + '?page=' + paginate.page + 1));
+                }
+
+                return res.sendSuccess(null, resource.toJSON());
+
+            }
+
             results.personal.collageBound = student.collage_bound;
             results.personal.phone = student.phone;
             results.personal.email = student.email;
@@ -78,7 +148,6 @@ StudentController.getStudentsBackpack = function (req, res) {
                 mentor: student.mentor2_name
             };
 
-            res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
 
             if(showRaw){
 
@@ -249,7 +318,34 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 if (err)  { return res.sendError(err); }
                                 benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
-                                var object = new xSre(result, body).setLogger(benchmark).toObject();
+
+                                var object = null;
+
+                                var xsre = new xSre(result, body).setLogger(benchmark);
+
+                                if(usePagination === false){
+
+                                    object = xsre.toObject();
+
+                                } else {
+
+
+                                    switch (separate){
+
+                                        case 'attendance':
+                                            object = xsre.getAttendanceBehavior().getAttendances();
+                                            break;
+                                        case 'transcript':
+                                            object = xsre.getTranscript().getTranscript().details;
+                                            break;
+                                        case 'assessment':
+                                            object = xsre.getAssessment().getAssessment();
+                                            break;
+
+                                    }
+
+                                }
+
                                 /**
                                  * Set to cache
                                  */
@@ -300,6 +396,14 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
     var studentId = ObjectId(req.params.studentId);
 
+    var separate = req.query.separate || 'xsre';
+
+    if(separate === 'xsre') {
+
+        separate = 'general';
+
+    }
+
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
         if (err)  { return res.sendError(err); }
@@ -310,7 +414,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
             return res.sendError('The student not found in database');
         }
 
-        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 

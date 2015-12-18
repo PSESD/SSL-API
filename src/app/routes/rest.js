@@ -159,8 +159,10 @@ Rest.prototype.routeOrganizationUserStudent = function(){
       ;
 
       this.router.route('/:organizationId/students/:studentId/xsre' + this.format)
-            .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.deleteCacheStudentsBackpack)
-            .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
+            .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.deleteCacheStudentsBackpack);
+            //.get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
+      this.router.route('/:organizationId/students/:studentId/:separate' + this.format)
+        .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
 };
 /**
  *
