@@ -119,8 +119,14 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 var resource = new hal.Resource(paginate, req.originalUrl);
 
-                if(paginate.page + 1 <= paginate.pageCount) {
-                    resource.link(new hal.Link('next', req.originalUrl + '?page=' + paginate.page + 1));
+                if(paginate.currentPage + 1 <= paginate.pageCount) {
+                    var nextUrl = req.originalUrl;
+                    if(nextUrl.indexOf('?') === -1){
+                        nextUrl += '?';
+                    } else {
+                        nextUrl += '&';
+                    }
+                    resource.link(new hal.Link('nextUrl', nextUrl + 'page=' + paginate.currentPage + 1));
                 }
 
                 return res.sendSuccess(null, resource.toJSON());
