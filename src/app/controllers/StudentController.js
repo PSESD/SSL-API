@@ -66,7 +66,7 @@ StudentController.getStudentsBackpack = function (req, res) {
         }
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
-        key = new Date().getTime();
+        //key = new Date().getTime();
         /**
          *
          * @param results
