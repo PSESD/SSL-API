@@ -91,16 +91,26 @@ StudentController.getStudentsBackpack = function (req, res) {
                     delete results.raw;
                 }
 
-
-
                 var paginate = {
                     total: 0,
                     pageSize: 10,
                     pageCount: 0,
                     currentPage: 1,
-                    data: []
+                    data: [],
+                    source: {}
                 };
+
                 var arrayList = [];
+
+                if(separate === 'transcript'){
+
+                    paginate.source = _.clone(results);
+
+                    delete paginate.source.details;
+
+                    results = results.details;
+
+                }
 
                 if (typeof req.query.page !== 'undefined') {
                     paginate.currentPage = +req.query.page;
@@ -126,7 +136,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                     } else {
                         nextUrl += '&';
                     }
-                    resource.link(new hal.Link('nextUrl', nextUrl + 'page=' + paginate.currentPage + 1));
+                    resource.link(new hal.Link('nextUrl', nextUrl + 'page=' + (+paginate.currentPage + 1)));
                 }
 
                 return res.sendSuccess(null, resource.toJSON());
@@ -342,7 +352,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                                             object = xsre.getAttendanceBehavior().getAttendances();
                                             break;
                                         case 'transcript':
-                                            object = xsre.getTranscript().getTranscript().details;
+                                            object = xsre.getTranscript().getTranscript();
                                             break;
                                         case 'assessment':
                                             object = xsre.getAssessment().getAssessment();
