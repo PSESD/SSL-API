@@ -287,11 +287,6 @@ Transcript.prototype.processTranscript = function(transcript, current){
     var tSession = l.get(transcript, 'session.description');
     var tSchoolName = l.get(transcript, 'school.schoolName');
 
-    if(!tSchoolName || !tSession || !tSchoolYear){
-
-        return;
-
-    }
 
     if(_.isUndefined(transcript.courses.course)){
 
@@ -302,6 +297,26 @@ Transcript.prototype.processTranscript = function(transcript, current){
     if(!_.isArray(transcript.courses.course)){
 
         transcript.courses.course = [ transcript.courses.course ];
+
+    }
+
+    if(current) {
+
+        _.each(transcript.courses.course, function (course) {
+
+            if (!course) {
+                return;
+            }
+
+            if (!course.leaCourseId) {
+                return;
+            }
+
+            if(course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
+                me.info.courseTitle.push(course.courseTitle);
+            }
+
+        });
 
     }
 
@@ -349,6 +364,12 @@ Transcript.prototype.processTranscript = function(transcript, current){
     //transcript = me.extractRawSource(transcript);
 
     //console.log(transcript);
+
+    if(!tSchoolName || !tSession || !tSchoolYear){
+
+        return;
+
+    }
 
     var key = (tSchoolYear + ':' + tSession + ':' + tSchoolName).trim(), info = {
         gradeLevel : transcript.gradeLevel,
@@ -430,10 +451,6 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
 
     me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
 
-    if(current && course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
-        me.info.courseTitle.push(course.courseTitle);
-    }
-
     me.course[key].transcripts[uniqueStr].push({
         index: null,
         n: me.course[key].transcripts[uniqueStr].length + 1,
@@ -478,10 +495,6 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
     me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
 
     me.course[key].summary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
-
-    if(current && course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
-        me.info.courseTitle.push(course.courseTitle);
-    }
 
     me.course[key].transcripts[uniqueStr].push({
         index: null,
