@@ -14,8 +14,9 @@ var pd = require('pretty-data').pd;
  * @constructor
  * @param result
  * @param raw
+ * @param separate
  */
-function xSre(result, raw){
+function xSre(result, raw, separate){
 
     this.config = new CodeSet().get();
 
@@ -30,6 +31,8 @@ function xSre(result, raw){
     }
 
     this.raw = raw;
+
+    this.separate = separate || 'xsre';
 
 
     this.facets = {
@@ -243,13 +246,27 @@ xSre.prototype.toObject = function(){
 
     var json = this.json;
 
-    json.attendanceBehaviors = this.getAttendanceBehavior().getAttendances();
+    if(this.separate === 'general'){
 
-    json.transcripts = this.getTranscript().getTranscript();
+        json.personal = this.getPersonal().getPersonal();
 
-    json.personal = this.getPersonal().getPersonal();
+        if(json.assessments){
 
-    json.assessments = this.getAssessment().getAssessment();
+            delete json.assessments;
+
+        }
+
+    } else {
+
+        json.attendanceBehaviors = this.getAttendanceBehavior().getAttendances();
+
+        json.transcripts = this.getTranscript().getTranscript();
+
+        json.assessments = this.getAssessment().getAssessment();
+
+        json.personal = this.getPersonal().getPersonal();
+
+    }
 
     json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss');
 

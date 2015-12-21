@@ -34,13 +34,13 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     var usePagination = false;
 
-    if(separate === 'xsre') {
+    if(!separate) {
 
-        separate = 'general';
+        separate = 'xsre';
 
     }
 
-    if(separate !== 'general'){
+    if(separate !== 'general' && separate !== 'xsre'){
 
         usePagination = true;
 
@@ -337,7 +337,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                                 var object = null;
 
-                                var xsre = new xSre(result, body).setLogger(benchmark);
+                                var xsre = new xSre(result, body, separate).setLogger(benchmark);
 
                                 if(usePagination === false){
 
@@ -414,9 +414,9 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
     var separate = req.query.separate || 'xsre';
 
-    if(separate === 'xsre') {
+    if(!separate) {
 
-        separate = 'general';
+        separate = 'xsre';
 
     }
 
