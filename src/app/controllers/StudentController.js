@@ -146,7 +146,11 @@ StudentController.getStudentsBackpack = function (req, res) {
             results.personal.collageBound = student.collage_bound;
             results.personal.phone = student.phone;
             results.personal.email = student.email;
-            results.personal.address = student.address;
+            results.personal.firstName = student.first_name;
+            results.personal.lastName = student.last_name;
+            results.personal.middleName = student.middle_name;
+            results.personal.schoolDistrict = student.school_district;
+            results.personal.address = student.addresses;
 
             results.personal.emergency1 = {
                 name: student.emergency1_name,

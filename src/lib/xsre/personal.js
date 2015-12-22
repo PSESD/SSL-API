@@ -38,6 +38,10 @@ Personal.prototype.getPersonal = function(){
       me.personal.phone = null;
       me.personal.email = null;
       me.personal.address = null;
+      me.personal.firstName = null;
+      me.personal.lastName = null;
+      me.personal.middleName = null;
+      me.personal.schoolDistrict = null;
       me.personal.emergency1 = {
             name: null,
             relationship: null,
