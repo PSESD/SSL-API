@@ -756,6 +756,8 @@ StudentController.getStudentById = function (req, res) {
 
     var withXsre = parseInt(req.query.xsre) > 0;
 
+    console.log('with XSRE: ', withXsre);
+
     crit.organization = orgId;
 
     crit._id = studentId;
