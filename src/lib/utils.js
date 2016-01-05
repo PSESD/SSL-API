@@ -3,6 +3,7 @@
  * Created by zaenal on 12/05/15.
  */
 var crypto = require('crypto');
+var justlog = require('justlog');
 var config = require('config');
 var rollbar = require('rollbar');
 var saltStatic = config.get('salt');
@@ -242,12 +243,10 @@ var utils = {
          * @returns {string}
          */
         var randomValueHex = function (howMany, chars) {
-            var rnd = crypto.randomBytes(howMany)
-                  , value = new Array(howMany)
-                  , len = chars.length;
+            var rnd = crypto.randomBytes(howMany), value = new Array(howMany), len = chars.length;
 
             for (var i = 0; i < howMany; i++) {
-                value[i] = chars[rnd[i] % len]
+                value[i] = chars[rnd[i] % len];
             }
 
             return new Buffer(value.join('')).toString('hex');
@@ -336,8 +335,21 @@ var utils = {
 
         }
 
-        console.log(message);
+        //console.log(message);
 
+    },
+
+    benchmark: function(){
+        var log = justlog({
+            file : {
+                pattern : '{fulltime} [{level}] {msg}' // use custom pattern
+            },
+            stdio : {
+                //pattern : '{fulltime} [{level}] {msg} {timestamp} {mstimestamp}' // use predefined pattern
+                pattern : 'color' // use predefined pattern
+            }
+        });
+        return log;
     }
 
 };

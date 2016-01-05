@@ -53,11 +53,29 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, acces
 
     Token.findOne({ token: accessTokenHash }, function (err, token) {
 
-      if (err) { return callback(err); }
+      if (err) {
+
+        return callback(err);
+
+      }
 
       // No token found
       if (!token) {
+
         return callback(null, false);
+
+      }
+
+      /**
+       * Skipped email
+       * @type {string}
+       */
+      var hackIp = 'x-cbo-ip-skipped';
+
+      if(hackIp in req.headers && req.headers[hackIp]){
+
+        clientIp = token.ip;
+
       }
 
       //check for ip token
