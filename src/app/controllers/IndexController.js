@@ -6,7 +6,7 @@ var IndexController = {
 
     index: function(req, res){
 
-        res.json({ "test": "Welcome To API"});
+        res.json({ "test": "Welcome To API SSL :)"});
 
     }
 

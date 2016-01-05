@@ -10,7 +10,7 @@ var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var Request = require('../../lib/broker/request');
-var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
+var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark  = utils.benchmark();
 var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
@@ -30,11 +30,30 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     var studentId = ObjectId(req.params.studentId);
 
+    var separate = req.params.separate;
+
+    var usePagination = false;
+
+    if(!separate) {
+
+        separate = 'xsre';
+
+    }
+
+    if(separate !== 'general' && separate !== 'xsre'){
+
+        usePagination = true;
+
+    }
+
+    benchmark.info('XSRE - START GET STUDENT BACKPACK');
+
     var showRaw = false;
 
     if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')) {
         showRaw = true;
     }
+    benchmark.info('XSRE - GET STUDENT');
 
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
@@ -46,7 +65,7 @@ StudentController.getStudentsBackpack = function (req, res) {
             return res.sendError('The student not found in database');
         }
 
-        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
         //key = new Date().getTime();
         /**
          *
@@ -55,10 +74,83 @@ StudentController.getStudentsBackpack = function (req, res) {
          */
         function embeds(results, isFromCache){
 
+            res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
+
+            benchmark.info('XSRE - EMBED RESULTS => ' + (isFromCache ? ' FROM CACHE' : ' FROM SERVER'));
+
+            /**
+             * Defined paging here
+             */
+            if(usePagination !== false){
+
+                benchmark.info('XSRE - USING PAGINATION ON( ' + separate + ')');
+
+                benchmark.info('XSRE - FINISH');
+
+                if(results.raw) {
+                    delete results.raw;
+                }
+
+                var paginate = {
+                    total: 0,
+                    pageSize: 10,
+                    pageCount: 0,
+                    currentPage: 1,
+                    data: [],
+                    source: {}
+                };
+
+                var arrayList = [];
+
+                if(separate === 'transcript'){
+
+                    paginate.source = _.clone(results);
+
+                    delete paginate.source.details;
+
+                    results = results.details;
+
+                }
+
+                if (typeof req.query.page !== 'undefined') {
+                    paginate.currentPage = +req.query.page;
+                }
+
+                paginate.total = results.length;
+
+                //split list into groups
+                while (results.length > 0) {
+                    arrayList.push(results.splice(0, paginate.pageSize));
+                }
+
+                paginate.data = arrayList[+paginate.currentPage - 1];
+
+                paginate.pageCount = Math.ceil(paginate.total/paginate.pageSize);
+
+                var resource = new hal.Resource(paginate, req.originalUrl);
+
+                if(paginate.currentPage + 1 <= paginate.pageCount) {
+                    var nextUrl = req.originalUrl;
+                    if(nextUrl.indexOf('?') === -1){
+                        nextUrl += '?';
+                    } else {
+                        nextUrl += '&';
+                    }
+                    resource.link(new hal.Link('nextUrl', nextUrl + 'page=' + (+paginate.currentPage + 1)));
+                }
+
+                return res.sendSuccess(null, resource.toJSON());
+
+            }
+
             results.personal.collageBound = student.collage_bound;
             results.personal.phone = student.phone;
             results.personal.email = student.email;
-            results.personal.address = student.address;
+            results.personal.firstName = student.first_name;
+            results.personal.lastName = student.last_name;
+            results.personal.middleName = student.middle_name;
+            results.personal.schoolDistrict = student.school_district;
+            results.personal.address = student.addresses;
 
             results.personal.emergency1 = {
                 name: student.emergency1_name,
@@ -76,7 +168,6 @@ StudentController.getStudentsBackpack = function (req, res) {
                 mentor: student.mentor2_name
             };
 
-            res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
 
             if(showRaw){
 
@@ -102,7 +193,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                     }
                 }
             };
-
+            benchmark.info('XSRE - EMBED USER');
             User.find(crit, function(err, users){
 
                 if (err)  { return res.sendError(err); }
@@ -156,7 +247,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                 });
 
                 if(!_.isEmpty(programsId)){
-
+                    benchmark.info('XSRE - EMBED PROGRAM');
                     Program.find({ _id: { $in: programId } }, function(err, programs){
 
                         if (err)  { return res.sendError(err); }
@@ -181,6 +272,8 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         resource.embed('programs', embedsPrograms);
 
+                        benchmark.info('XSRE - FINISH');
+
                         res.sendSuccess(null, resource.toJSON());
 
                     });
@@ -192,13 +285,15 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     resource.embed('programs', embedsPrograms);
 
+                    benchmark.info('XSRE - FINISH');
+
                     res.sendSuccess(null, resource.toJSON());
 
                 }
 
             });
         }
-
+        benchmark.info('XSRE - GET ORGANIZATION');
         Organization.findOne({ _id: orgId }, function(err, organization){
 
             if (err)  { return res.sendError(err); }
@@ -222,9 +317,9 @@ StudentController.getStudentsBackpack = function (req, res) {
                 }
 
                 if(!result){
-
+                    benchmark.info('XSRE - REQUEST XSRE');
                     brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
-
+                        benchmark.info('XSRE - GET RESPONSE');
                         if (error)  {
                             return res.sendError(error);
                         }
@@ -238,15 +333,43 @@ StudentController.getStudentsBackpack = function (req, res) {
                         }
 
                         if (response && response.statusCode === 200) {
-
+                            benchmark.info('XSRE - PARSING DATA FROM XML TO JS');
                             utils.xml2js(body, function (err, result) {
 
                                 if (err)  { return res.sendError(err); }
+                                benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
 
-                                var object = new xSre(result, body).toObject();
+                                var object = null;
+
+                                var xsre = new xSre(result, body, separate).setLogger(benchmark);
+
+                                if(usePagination === false){
+
+                                    object = xsre.toObject();
+
+                                } else {
+
+
+                                    switch (separate){
+
+                                        case 'attendance':
+                                            object = xsre.getAttendanceBehavior().getAttendances();
+                                            break;
+                                        case 'transcript':
+                                            object = xsre.getTranscript().getTranscript();
+                                            break;
+                                        case 'assessment':
+                                            object = xsre.getAssessment().getAssessment();
+                                            break;
+
+                                    }
+
+                                }
+
                                 /**
                                  * Set to cache
                                  */
+                                benchmark.info('XSRE - SET TO CACHE');
                                 cache.set(key, object, function(err){
 
                                     log(err);
@@ -258,11 +381,11 @@ StudentController.getStudentsBackpack = function (req, res) {
                             });
 
                         } else {
-
+                            benchmark.info('XSRE - PARSING DATA ERROR FROM XML TO JS');
                             utils.xml2js(body, function (err, result) {
 
                                 var json = (result && 'error' in result) ? result.error.message : 'Error not response';
-
+                                benchmark.info('XSRE - FINISH');
                                 res.sendError(json);
 
                             });
@@ -293,6 +416,14 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
     var studentId = ObjectId(req.params.studentId);
 
+    var separate = req.query.separate || 'xsre';
+
+    if(!separate) {
+
+        separate = 'xsre';
+
+    }
+
     Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
 
         if (err)  { return res.sendError(err); }
@@ -303,7 +434,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
             return res.sendError('The student not found in database');
         }
 
-        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format].join('_'));
+        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 
@@ -624,6 +755,8 @@ StudentController.getStudentById = function (req, res) {
     var crit = Student.crit(req.query, ['_id', 'organization']);
 
     var withXsre = parseInt(req.query.xsre) > 0;
+
+    console.log('with XSRE: ', withXsre);
 
     crit.organization = orgId;
 

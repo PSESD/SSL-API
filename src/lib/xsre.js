@@ -14,8 +14,9 @@ var pd = require('pretty-data').pd;
  * @constructor
  * @param result
  * @param raw
+ * @param separate
  */
-function xSre(result, raw){
+function xSre(result, raw, separate){
 
     this.config = new CodeSet().get();
 
@@ -30,6 +31,8 @@ function xSre(result, raw){
     }
 
     this.raw = raw;
+
+    this.separate = separate || 'xsre';
 
 
     this.facets = {
@@ -100,17 +103,33 @@ function xSre(result, raw){
 
     if('$' in this.json) {
 
-        delete this.json['$'];
+        delete this.json.$;
 
     }
 
+    this.justlog = {
+        info: function(){},
+        debug: function(){},
+        warn: function(){},
+        error: function(){}
+    };
+
 }
+/**
+ *
+ * @param justlog
+ * @returns {xSre}
+ */
+xSre.prototype.setLogger = function(justlog){
+    this.justlog = justlog;
+    return this;
+};
 /**
  *
  * @returns {*}
  */
 xSre.prototype.getTranscript= function(){
-
+    this.justlog.info('XSRE - START TRANSCRIPT');
     return new Transcript(this);
     
 };
@@ -119,13 +138,13 @@ xSre.prototype.getTranscript= function(){
  * @returns {*}
  */
 xSre.prototype.getJson = function(){
-
+    this.justlog.info('XSRE - GET JSON');
     return this.json;
 
 };
 
 xSre.prototype.getStudentSummary = function(){
-
+    this.justlog.info('XSRE - START STUDENT SUMMARY');
     var summary = {
         gradeLevel: null,
         schoolYear: null,
@@ -169,7 +188,7 @@ xSre.prototype.getStudentSummary = function(){
  * @returns {Attendance}
  */
 xSre.prototype.getAttendanceBehavior = function(){
-
+    this.justlog.info('XSRE - START ATTENDANCE');
     return new Attendance(this);
 
 };
@@ -178,7 +197,7 @@ xSre.prototype.getAttendanceBehavior = function(){
  * @returns {Assessment}
  */
 xSre.prototype.getAssessment = function(){
-
+    this.justlog.info('XSRE - START ASSESSMENT');
     return new Assessment(this);
 
 };
@@ -187,7 +206,7 @@ xSre.prototype.getAssessment = function(){
  * @returns {Personal}
  */
 xSre.prototype.getPersonal = function(){
-
+    this.justlog.info('XSRE - START PERSONAL');
     return new Personal(this);
 
 };
@@ -223,20 +242,39 @@ xSre.prototype.extractRawSource = function(object){
  */
 xSre.prototype.toObject = function(){
 
+    this.justlog.info('XSRE - START TO JSON');
+
     var json = this.json;
 
-    json.attendanceBehaviors = this.getAttendanceBehavior().getAttendances();
+    if(this.separate === 'general'){
 
-    json.transcripts = this.getTranscript().getTranscript();
+        json.personal = this.getPersonal().getPersonal();
 
-    json.personal = this.getPersonal().getPersonal();
+        if(json.assessments){
 
-    json.assessments = this.getAssessment().getAssessment();
+            delete json.assessments;
+
+        }
+
+    } else {
+
+        json.attendanceBehaviors = this.getAttendanceBehavior().getAttendances();
+
+        json.transcripts = this.getTranscript().getTranscript();
+
+        json.assessments = this.getAssessment().getAssessment();
+
+        json.personal = this.getPersonal().getPersonal();
+
+    }
 
     json.lastUpdated = moment().format('MM/DD/YYYY HH:mm:ss');
 
+    this.justlog.info('XSRE - START SET RAW');
+
     json.raw = pd.xml(this.raw);
 
+    this.justlog.info('XSRE - REMOVE UNNECESSARY');
     /**
      * Delete unnecessary the data
      */
@@ -254,6 +292,18 @@ xSre.prototype.toObject = function(){
 
     if(json.demographics) {
         delete json.demographics;
+    }
+
+    if(json.otherEnrollments) {
+        delete json.otherEnrollments;
+    }
+
+    if(json.otherTranscriptTerms) {
+        delete json.otherTranscriptTerms;
+    }
+
+    if(json.phoneNumber) {
+        delete json.phoneNumber;
     }
 
     if(json.name) {
@@ -275,7 +325,7 @@ xSre.prototype.toObject = function(){
     if(json.disciplineIncidents) {
         delete json.disciplineIncidents;
     }
-
+    this.justlog.info('XSRE - RETURN RESULT');
     return json;
 
 };
