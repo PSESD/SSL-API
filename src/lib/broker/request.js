@@ -7,6 +7,7 @@ var request = require('request');
 var moment = require('moment');
 var uuid = require('node-uuid');
 var CryptoJS = require("crypto-js");
+var utils = require('../utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark  = utils.benchmark();
 /**
  *
  * @param options
@@ -284,10 +285,75 @@ RequestXSRE.prototype = {
 
         this.addHeader('messageId', this.generateUUID());
 
-        return this.create('xsre', url, 'GET', callback);
+        var key = md5([url, this.headers.personnelId, this.headers.authorizedEntityId, this.headers.externalServiceId].join('_'));
+
+        if(typeof callback !== 'function'){
+
+            callback = function(error, response, body){
+              console.log('ERROR: ', error);
+              console.log('RESPONSE: ', response);
+              console.log('BODY: ', body);
+            };
+
+        }
+
+        var me = this;
+
+        benchmark.info('REQUEST-XSRE-HZB: START');
+
+        cache.get(key, function(err, result){
+
+            var encBody;
+
+            if(err || !result || (result.body && !(encBody = utils.decrypt(result.body)))){
+
+                me.create('xsre', url, 'GET', function (error, response, body) {
+
+                    if (error)  {
+                        return callback(error, response, body);
+                    }
+
+                    var object = {
+                        body: utils.encrypt(body),
+                        response: response
+                    };
+
+                    cache.set(key, object, {ttl: 86400}, function(){
+
+                        benchmark.info('REQUEST-XSRE-HZB: STORE DATA TO CACHE');
+
+                        callback(error, response, body);
+
+                    });
+
+                });
+
+            } else {
+
+                benchmark.info('REQUEST-XSRE-HZB: GET DATA FROM CACHE');
+
+                callback(null, result.response, encBody);
+
+            }
+        });
 
     },
+    /**
+     *
+     * @param districtStudentId
+     * @param zoneId
+     * @param organization
+     * @returns {*}
+     */
+    clearCacheXsreKey: function(districtStudentId, zoneId, organization){
 
+        var config = this.config.xsre;
+
+        var url = '/requestProvider/' + config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+ config.contextId;
+
+        return md5([url, organization.personnelId, organization.authorizedEntityId, organization.externalServiceId].join('_'));
+
+    },
     /**
      *
      * @param uri

@@ -294,6 +294,7 @@ StudentController.getStudentsBackpack = function (req, res) {
             });
         }
         benchmark.info('XSRE - GET ORGANIZATION');
+
         Organization.findOne({ _id: orgId }, function(err, organization){
 
             if (err)  { return res.sendError(err); }
@@ -460,7 +461,21 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
                 cache.del(key, function(){
 
-                    res.sendSuccess('Delete cache successfully');
+                    if(separate === 'xsre'){
+
+                        key = new Request().clearCacheXsreKey(student.district_student_id, student.school_district, organization);
+
+                        cache.del(key, function(){
+
+                            res.sendSuccess('Delete cache successfully');
+
+                        });
+
+                    } else{
+
+                        res.sendSuccess('Delete cache successfully');
+                        
+                    }
 
                 });
 
