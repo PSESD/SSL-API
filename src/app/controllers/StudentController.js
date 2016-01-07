@@ -16,7 +16,7 @@ var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
 var xSre = require('../../lib/xsre');
 var async = require('async');
-
+var prefixListStudent = '_xsre_list_students_';
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -88,7 +88,9 @@ StudentController.getStudentsBackpack = function (req, res) {
                 benchmark.info('XSRE - FINISH');
 
                 if(results.raw) {
+
                     delete results.raw;
+
                 }
 
                 var paginate = {
@@ -112,15 +114,33 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 }
 
+                paginate.total = results.length;
+
                 if (typeof req.query.page !== 'undefined') {
+
                     paginate.currentPage = +req.query.page;
+
                 }
 
-                paginate.total = results.length;
+                if (typeof req.query.pageSize !== 'undefined') {
+
+                    if(req.query.pageSize !== 'all'){
+
+                        paginate.pageSize = paginate.total;
+
+                    } else {
+
+                        paginate.pageSize = +req.query.pageSize;
+
+                    }
+                }
+
 
                 //split list into groups
                 while (results.length > 0) {
+
                     arrayList.push(results.splice(0, paginate.pageSize));
+
                 }
 
                 paginate.data = arrayList[+paginate.currentPage - 1];
@@ -474,7 +494,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
                     } else{
 
                         res.sendSuccess('Delete cache successfully');
-                        
+
                     }
 
                 });
@@ -530,7 +550,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
                         /**
                          * Set to cache
                          */
-                        cache.set(key, newObject, {ttl: 3600}, function(){
+                        cache.set(key, newObject, {ttl: 86400}, function(){
 
                             callback(null, newObject, false);
 
@@ -547,6 +567,60 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
             callback(null, result, true);
 
         }
+
+    });
+};
+/**
+ *
+ * @param brokerRequest
+ * @param student
+ * @param orgId
+ * @param callback
+ */
+StudentController.refreshStudentSummary = function(brokerRequest, student, orgId, callback){
+
+    var key = prefixListStudent+orgId;
+
+    cache.get(key, function(err, result){
+
+        if(err)  {
+            return callback(err);
+        }
+
+        if(!(student._id.toString() in result)){
+
+              result[student._id.toString()] = {};
+
+        }
+
+        brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
+
+            if (error)  {
+                  return callback(err);
+            }
+
+            if (!body) {
+                  return callback('Empty response');
+            }
+
+            if (response && response.statusCode === 200) {
+
+                  utils.xml2js(body, function (err, result) {
+
+                      if (err)  { return callback(null, data, false); }
+
+                        result[student._id.toString()] = new xSre(result).getStudentSummary();
+
+                        cache.set(key, result, {ttl: 86400}, callback);
+
+                  });
+
+            } else {
+
+                  callback();
+            }
+
+      }, true);
 
     });
 };
@@ -578,43 +652,55 @@ StudentController.getStudents = function (req, res) {
             return res.sendError('The organization not found in database');
         }
 
-        var brokerRequest = new Request({
-            externalServiceId: organization.externalServiceId,
-            personnelId: organization.personnelId,
-            authorizedEntityId: organization.authorizedEntityId
-        });
+        //var brokerRequest = new Request({
+        //    externalServiceId: organization.externalServiceId,
+        //    personnelId: organization.personnelId,
+        //    authorizedEntityId: organization.authorizedEntityId
+        //});
 
         Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
 
             if (err)  { return res.sendError(err); }
 
-            if(withXsre) {
+            var key = prefixListStudent+orgId;
 
-                var studentsAsync = [];
+            cache.get(key, function(err, results){
 
-                students.forEach(function (student) {
+                //console.log(key, ' DATA ', results);
 
-                    studentsAsync.push(function (callback) {
+                var studentsList = [];
 
-                        StudentController.getStudentDetail(brokerRequest, student, orgId, callback);
+                if(!_.isUndefined(results)){
+
+                    students.forEach(function(student){
+
+                        var newObject = student.toObject();
+
+                        if(student._id.toString() in results){
+
+                            newObject.xsre = results[student._id.toString()];
+
+                        } else{
+
+                            newObject.xsre = {
+                                "gradeLevel": "N/A",
+                                "schoolYear": "N/A",
+                                "schoolName": "N/A",
+                                "attendance": "N/A",
+                                "behavior": "N/A",
+                                "onTrackToGraduate": "N/A"
+                            };
+
+                        }
+
+                        studentsList.push(newObject);
 
                     });
+                }
 
-                });
+                res.sendSuccess(null, studentsList);
 
-                async.series(studentsAsync, function(err, students, isCache){
-
-                    res.header('X-Cached-Sre' , isCache ? 1 : 0 );
-
-                    res.sendSuccess(null, students);
-
-                });
-
-            } else {
-
-                res.sendSuccess(null, students);
-
-            }
+            });
 
         });
 
@@ -704,54 +790,88 @@ StudentController.getStudentNotAssigns = function (req, res) {
  */
 StudentController.createByOrgId = function (req, res) {
 
-    res.xmlKey = 'student';
+      res.xmlKey = 'student';
 
-    var obj = new Student(req.body);
+      var orgId = ObjectId(req.params.organizationId);
 
-    obj.organization = ObjectId(req.params.organizationId);
+      Organization.findOne({ _id: orgId }, function(err, organization){
 
-    // set update time and update by user
-    obj.created = new Date();
+            if(err){
+                  return res.sendError(err);
+            }
+            /**
+             * If organization is empty from database
+             */
+            if(!organization){
+                  return res.sendError('The organization not found in database');
+            }
 
-    obj.creator = req.user.userId;
+            var brokerRequest = new Request({
+                  externalServiceId: organization.externalServiceId,
+                  personnelId: organization.personnelId,
+                  authorizedEntityId: organization.authorizedEntityId
+            });
 
-    obj.last_updated = new Date();
+            var obj = new Student(req.body);
 
-    obj.last_updated_by = req.user.userId;
+            obj.organization = orgId;
 
-    User.findOne({ _id: req.user._id }, function(err, user){
+            // set update time and update by user
+            obj.created = new Date();
 
-        if (err)  { return res.sendError(err); }
+            obj.creator = req.user.userId;
 
-        if(!user) {
-            return res.sendError('User not update successfully');
-        }
+            obj.last_updated = new Date();
 
-        obj.protect(req.user.role, null, req.user).save(function (err) {
+            obj.last_updated_by = req.user.userId;
 
-            if (err) { return res.sendError(err); }
+            User.findOne({ _id: req.user._id }, function(err, user){
 
-            _.each(user.permissions, function(permission, key){
+                  if(err){
+                        return res.sendError(err);
+                  }
 
-                if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+                  if(!user){
+                        return res.sendError('User not update successfully');
+                  }
 
-                    user.permissions[key].students.push(obj._id);
+                  obj.protect(req.user.role, null, req.user).save(function(err){
 
-                }
+                        if(err){
+                              return res.sendError(err);
+                        }
+
+                        _.each(user.permissions, function(permission, key){
+
+                              if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+
+                                    user.permissions[key].students.push(obj._id);
+
+                              }
+
+                        });
+
+                        user.save(function(err){
+
+                              if(err){
+                                    return res.sendError(err);
+                              }
+
+                              StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(){
+
+                                    res.sendSuccess('Successfully Added', obj);
+
+                              });
+
+
+
+                        });
+
+                  });
 
             });
 
-            user.save(function(err){
-
-                if (err) { return res.sendError(err); }
-
-                res.sendSuccess('Successfully Added', obj);
-
-            });
-
-        });
-
-    });
+      });
 
 };
 /**
@@ -861,9 +981,38 @@ StudentController.deleteStudentById = function (req, res) {
 
             user.save(function(err){
 
-                if (err) { return res.sendError(err); }
+                if (err) {
+                    return res.sendError(err);
+                }
 
-                res.sendSuccess('Successfully deleted');
+                cache.get(prefixListStudent+orgId, function(err, xsre){
+
+                    if(err || !xsre) {
+
+                        return res.sendSuccess('Successfully deleted');
+
+                    }
+
+                    if(studentId.toString() in xsre){
+
+                        delete xsre[studentId.toString()];
+                        /**
+                         * Restore cache again
+                         */
+                        cache.set(prefixListStudent+orgId, xsre, {ttl: 86400}, function(){
+
+                            res.sendSuccess('Successfully deleted');
+
+                        });
+
+                    } else {
+
+                        res.sendSuccess('Successfully deleted');
+
+                    }
+
+                });
+
 
             });
 
@@ -879,41 +1028,75 @@ StudentController.deleteStudentById = function (req, res) {
  */
 StudentController.putStudentById = function(req, res){
 
-    res.xmlOptions = 'student';
+      res.xmlOptions = 'student';
 
-    var studentId = ObjectId(req.params.studentId);
+      var studentId = ObjectId(req.params.studentId);
 
-    Student.protect(req.user.role, { students: studentId }, req.user).findOne({_id: studentId, organization: ObjectId(req.params.organizationId)}, function (err, obj) {
+      var orgId = ObjectId(req.params.organizationId);
 
-        if (err) { return res.sendError(err); }
+      Organization.findOne({ _id: orgId }, function(err, organization){
 
-        if (!obj) {
-            return res.sendError('Data not found');
-        }
-
-        for (var prop in req.body) {
-
-            if(prop in obj) {
-
-                obj[prop] = req.body[prop];
-
+            if(err){
+                  return res.sendError(err);
+            }
+            /**
+             * If organization is empty from database
+             */
+            if(!organization){
+                  return res.sendError('The organization not found in database');
             }
 
-        }
-        // set update time and update by user
-        obj.last_updated = new Date();
+            var brokerRequest = new Request({
+                  externalServiceId: organization.externalServiceId,
+                  personnelId: organization.personnelId,
+                  authorizedEntityId: organization.authorizedEntityId
+            });
 
-        obj.last_updated_by = req.user.userId;
+            Student.protect(req.user.role, { students: studentId }, req.user).findOne({
+                  _id: studentId,
+                  organization: orgId
+            }, function(err, obj){
 
-        obj.protect(req.user.role, null, req.user).save(function (err) {
+                  if(err){
+                        return res.sendError(err);
+                  }
 
-            if (err)  { return res.sendError(err); }
+                  if(!obj){
+                        return res.sendError('Data not found');
+                  }
 
-            res.sendSuccess('Successfully updated!', obj);
+                  for(var prop in req.body){
 
-        });
+                        if(prop in obj){
 
-    });
+                              obj[prop] = req.body[prop];
+
+                        }
+
+                  }
+                  // set update time and update by user
+                  obj.last_updated = new Date();
+
+                  obj.last_updated_by = req.user.userId;
+
+                  obj.protect(req.user.role, null, req.user).save(function(err){
+
+                        if(err){
+
+                              return res.sendError(err);
+
+                        }
+
+                        StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(){
+
+                              res.sendSuccess('Successfully updated!', obj);
+
+                        });
+
+                  });
+
+            });
+      });
 
 };
 
