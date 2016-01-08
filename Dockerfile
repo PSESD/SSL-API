@@ -31,11 +31,17 @@ WORKDIR /src
 RUN npm -g update npm
 RUN npm install
 
+# Setup crontab
+ADD     /config/crontab.root /var/spool/cron/crontabs/root
+# Make cron not complain
+RUN	touch /etc/mtab
+
 # Run Supervisord
 RUN /usr/bin/easy_install supervisor
 RUN /usr/bin/easy_install supervisor-stdout
 RUN /usr/bin/easy_install superlance
 ADD /config/supervisord.conf /etc/supervisord.conf
+
 
 # Publish port
 EXPOSE 443

@@ -357,7 +357,21 @@ StudentController.getStudentsBackpack = function (req, res) {
                             benchmark.info('XSRE - PARSING DATA FROM XML TO JS');
                             utils.xml2js(body, function (err, result) {
 
-                                if (err)  { return res.sendError(err); }
+                                if (err)  {
+                                    return res.sendError(err);
+                                }
+
+                                if(result && 'error' in result){
+
+                                    var msg = result.error.message ? result.error.message : result.error;
+                                    if(!msg){
+                                        msg = 'Data not found!';
+                                    }
+                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                    return res.sendError(msg);
+
+                                }
+
                                 benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
 
                                 var object = null;
@@ -405,9 +419,18 @@ StudentController.getStudentsBackpack = function (req, res) {
                             benchmark.info('XSRE - PARSING DATA ERROR FROM XML TO JS');
                             utils.xml2js(body, function (err, result) {
 
-                                var json = (result && 'error' in result) ? result.error.message : 'Error not response';
-                                benchmark.info('XSRE - FINISH');
-                                res.sendError(json);
+                                if(result && 'error' in result){
+
+                                    var msg = result.error.message ? result.error.message : result.error;
+                                    if(!msg){
+                                        msg = 'Data not found!';
+                                    }
+                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                    return res.sendError(msg);
+
+                                }
+
+                                return res.sendError('Data not found!');
 
                             });
                         }

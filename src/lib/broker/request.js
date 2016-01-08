@@ -245,9 +245,10 @@ RequestXSRE.prototype = {
      * @param districtStudentId
      * @param zoneId
      * @param callback
-     * @returns {*|request}
+     * @param forceStore
+     * @returns {*}
      */
-    createXsre: function(districtStudentId, zoneId, callback){
+    createXsre: function(districtStudentId, zoneId, callback, forceStore){
 
         if(this.options.personnelId) {
 
@@ -305,7 +306,7 @@ RequestXSRE.prototype = {
 
             var encBody;
 
-            if(err || !result || (result.body && !(encBody = utils.decrypt(result.body)))){
+            if(err || !result || (result.body && !(encBody = utils.decrypt(result.body))) || forceStore === true){
 
                 me.create('xsre', url, 'GET', function (error, response, body) {
 
