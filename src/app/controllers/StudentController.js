@@ -630,7 +630,7 @@ StudentController.refreshStudentSummary = function(brokerRequest, student, orgId
 
                   utils.xml2js(body, function (err, result) {
 
-                      if (err)  { return callback(null, data, false); }
+                      if (err)  { return callback(err, null); }
 
                         result[student._id.toString()] = new xSre(result).getStudentSummary();
 

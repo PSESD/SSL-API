@@ -32,9 +32,9 @@ RUN npm -g update npm
 RUN npm install
 
 # Setup crontab
-ADD /config/crontab.root /var/spool/cron/crontabs/root
+#ADD /config/crontab.root /var/spool/cron/crontabs/root
 # Make cron not complain
-RUN	touch /etc/mtab
+#RUN	touch /etc/mtab
 
 # Run Supervisord
 RUN /usr/bin/easy_install supervisor
