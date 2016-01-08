@@ -693,33 +693,28 @@ StudentController.getStudents = function (req, res) {
 
                 var studentsList = [];
 
-                if(!_.isUndefined(results)){
+                students.forEach(function(student){
 
-                    students.forEach(function(student){
+                    var newObject = student.toObject();
 
-                        var newObject = student.toObject();
+                    newObject.xsre = {
+                        "gradeLevel": "N/A",
+                        "schoolYear": "N/A",
+                        "schoolName": "N/A",
+                        "attendance": 0,
+                        "behavior": 0,
+                        "onTrackToGraduate": "N/A"
+                    };
 
-                        if(student._id.toString() in results){
+                    if(!_.isUndefined(results) && student._id.toString() in results){
 
-                            newObject.xsre = results[student._id.toString()];
+                        newObject.xsre = results[student._id.toString()];
 
-                        } else{
+                    }
 
-                            newObject.xsre = {
-                                "gradeLevel": "N/A",
-                                "schoolYear": "N/A",
-                                "schoolName": "N/A",
-                                "attendance": 0,
-                                "behavior": 0,
-                                "onTrackToGraduate": "N/A"
-                            };
+                    studentsList.push(newObject);
 
-                        }
-
-                        studentsList.push(newObject);
-
-                    });
-                }
+                });
 
                 res.sendSuccess(null, studentsList);
 
