@@ -469,18 +469,54 @@ function collectCacheListStudentsAsync(done) {
              * @param cb
              */
             var mapStudent = function(student, cb){
+
+                var studentId = student._id.toString();
+
+                var data = {};
+
+                data[studentId] = null;
                 /**
                  * If student is empty from database
                  */
                 if (!student) {
                     benchmark.info('The student not found in database');
-                    return cb('The student not found in database', student);
+                    return cb('The student not found in database', data);
                 }
 
-                getStudentDetail(brokerRequest, student, organization._id, function (err, std) {
+                //getStudentDetail(brokerRequest, student, organization._id, function (err, std) {
+                //
+                //    cb(null, std);
+                //
+                //});
+                brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
-                    cb(null, std);
+                    if (error) {
+                        benchmark.warning('Body was empty');
+                        return cb(null, data);
+                    }
 
+                    if (!body) {
+                        benchmark.info(error);
+                        return cb(null, data);
+
+                    }
+
+                    if (response && response.statusCode === 200) {
+
+                        utils.xml2js(body, function (err, result) {
+
+                            if (err) {
+                                benchmark.info(error);
+                                return cb(null, data);
+                            }
+
+                            data[studentId] = new xSre(result).getStudentSummary();
+
+                            cb(null, data);
+
+                        });
+
+                    }
                 });
 
             };
@@ -498,10 +534,27 @@ function collectCacheListStudentsAsync(done) {
 
                 var key = prefixListStudent + organization._id;
 
-                async.each(students, mapStudent, function(err, stds){
+                var studentAsync = [];
+
+                students.forEach(function(student){
+                    studentAsync.push(function(pop){
+                        mapStudent(student, pop);
+                    });
+                });
+
+                //async.each(students, mapStudent, function(err, stds){
+                async.series(studentAsync, function(err, stds){
+                    if(err){
+                        benchmark.info('ERROR: ', err);
+                    }
+                    if(!stds){
+                        benchmark.info(
+                            'FAILED POPULATE THE DATA'
+                        );
+                    }
                     benchmark.info('Store student into the cache: ', stds);
                     cache.set(key, stds, {ttl: 86400}, function () {
-                        benchmark.info('Cache student from org: ', organization);
+                        benchmark.info('Cache student from org: ', organization._id);
                         callback(null, organization);
                     });
                 });
@@ -509,11 +562,23 @@ function collectCacheListStudentsAsync(done) {
             });
         };
 
+        var organizationAsync = [];
+
+        //organizations.forEach(function(organization){
+        //    organizationAsync.push(function(pop){
+        //        map(organization, pop);
+        //    });
+        //});
 
         async.each(organizations, map, function (err, data) {
+        //async.series(organizationAsync, function (err, data) {
             if(err){
                 benchmark.info(err);
             }
+
+            benchmark.info(
+              '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
+            );
             done(err, data);
         });
 
