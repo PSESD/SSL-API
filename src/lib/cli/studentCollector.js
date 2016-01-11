@@ -273,7 +273,7 @@ var getStudentDetail = function (brokerRequest, student, orgId, callback) {
         data[studentId] = null;
 
         if (error) {
-            benchmark.warning('Body was empty');
+            benchmark.info('Body was empty');
             return callback(null, data);
         }
 
@@ -302,137 +302,6 @@ var getStudentDetail = function (brokerRequest, student, orgId, callback) {
     });
 
 };
-/**
- * [collectCacheListStudents description]
- * @param  {Function} done [description]
- * @return {[type]}        [description]
- */
-//function collectCacheListStudents(done) {
-//
-//    benchmark.info("CACHE-LIST-STUDENT\tSTART");
-//    Organization.find({}, function (err, organizations) {
-//
-//        if (err) {
-//            return benchmark.info(err);
-//        }
-//        var prefix = "";
-//        var exit = false;
-//        var i = 0;
-//        benchmark.info("CACHE-LIST-STUDENT\tORG FOUND: " + organizations.length);
-//
-//        _.each(organizations, function (organization) {
-//
-//            var orgId = organization._id;
-//            benchmark.info('ORGID: ' + orgId);
-//            prefix = "CACHE-LIST-STUDENT";
-//            if(++i >= organizations.length){
-//                exit = true;
-//            }
-//            //console.benchmark.info(organization);
-//            var brokerRequest = new Request({
-//                externalServiceId: organization.externalServiceId,
-//                personnelId: organization.personnelId,
-//                authorizedEntityId: organization.authorizedEntityId
-//            });
-//
-//            Student.find({
-//                organization: organization._id
-//            }, function (err, students) {
-//
-//                if(err){
-//
-//                    return benchmark.warn(err);
-//
-//                }
-//
-//                benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
-//
-//                var studentsAsync = [];
-//
-//                var studentIds = [];
-//
-//                var key = prefixListStudent + organization._id;
-//
-//                cache.del(key, function(err) {
-//
-//                    students.forEach(function (student) {
-//                        /**
-//                         * If student is empty from database
-//                         */
-//                        if (!student) {
-//                            return benchmark.info('The student not found in database');
-//                        }
-//
-//                        //studentsAsync.push(function (callback) {
-//                        //
-//                        //    getStudentDetail(brokerRequest, student, organization._id, callback);
-//                        //
-//                        //});
-//
-//                        getStudentDetail(brokerRequest, student, organization._id, function (err, std) {
-//
-//
-//                            cache.get(key, function (err, data) {
-//
-//                                if (!data) {
-//                                    data = {};
-//                                }
-//                                /**
-//                                 * Append data
-//                                 */
-//                                for(var k in std){
-//                                    data[k] = std[k];
-//                                }
-//
-//                                cache.set(key, data, {ttl: 86400}, function () {
-//                                    done();
-//                                });
-//
-//                            });
-//
-//                        });
-//
-//                    });
-//
-//                });
-//
-//                //console.benchmark.info('ORXXXXXXXXXXXXXXXXXXGID: ' + organization._id, studentsAsync);
-//                //
-//                //async.series(studentsAsync, function (err, students) {
-//                //    benchmark.info('YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY: ' + organization._id);
-//                //    if(err){
-//                //
-//                //        return benchmark.warn(err);
-//                //
-//                //    }
-//                //
-//                //    var newStore = {};
-//                //
-//                //    students.forEach(function(st){
-//                //        for(var k in st){
-//                //            newStore[k] = st[k];
-//                //        }
-//                //    });
-//                //
-//                //    //console.benchmark.info(newStore);
-//                //
-//                //    benchmark.info(prefix + "\tAFTER-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
-//                //
-//                //    benchmark.info('KEYS: ' + prefixListStudent + organization._id);
-//                //
-//                //    cache.set(prefixListStudent + organization._id, newStore, {ttl: 86400}, function () {
-//                //
-//                //        done();
-//                //
-//                //    });
-//                //
-//                //});
-//
-//            });
-//        });
-//
-//    });
-//}
 /**
  *
  * @param done
@@ -480,18 +349,13 @@ function collectCacheListStudentsAsync(done) {
                  */
                 if (!student) {
                     benchmark.info('The student not found in database');
-                    return cb('The student not found in database', data);
+                    return cb(null, data);
                 }
 
-                //getStudentDetail(brokerRequest, student, organization._id, function (err, std) {
-                //
-                //    cb(null, std);
-                //
-                //});
                 brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
                     if (error) {
-                        benchmark.warning('Body was empty');
+                        benchmark.info(error);
                         return cb(null, data);
                     }
 
@@ -506,9 +370,35 @@ function collectCacheListStudentsAsync(done) {
                         utils.xml2js(body, function (err, result) {
 
                             if (err) {
-                                benchmark.info(error);
+                                benchmark.info(err);
                                 return cb(null, data);
                             }
+                            var msg;
+
+                            if(result && 'error' in result){
+
+                                msg = result.error.message ? result.error.message : result.error;
+                                console.log('X1:', result);
+                                if(!msg){
+                                    msg = 'Data not found!';
+                                }
+                                benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                return cb(null, data);
+
+                            }
+
+                            if(result && 'Error' in result){
+
+                                msg = result.Error.Message ? result.Error.Message : result.Error;
+                                if(!msg){
+                                    msg = 'Data not found!';
+                                }
+                                benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                return cb(null, data);
+
+                            }
+
+                            benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
 
                             data[studentId] = new xSre(result).getStudentSummary();
 
@@ -516,6 +406,8 @@ function collectCacheListStudentsAsync(done) {
 
                         });
 
+                    } else {
+                        cb(null, data);
                     }
                 });
 
@@ -527,7 +419,7 @@ function collectCacheListStudentsAsync(done) {
 
                 if(err){
                     benchmark.warn(err);
-                    return callback(err, organization);
+                    return callback(null, organization);
                 }
 
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
@@ -542,7 +434,6 @@ function collectCacheListStudentsAsync(done) {
                     });
                 });
 
-                //async.each(students, mapStudent, function(err, stds){
                 async.series(studentAsync, function(err, stds){
                     if(err){
                         benchmark.info('ERROR: ', err);
@@ -552,9 +443,9 @@ function collectCacheListStudentsAsync(done) {
                             'FAILED POPULATE THE DATA'
                         );
                     }
-                    benchmark.info('Store student into the cache: ', stds);
+                    benchmark.info('Store student into the cache: ', stds.length);
                     cache.set(key, stds, {ttl: 86400}, function () {
-                        benchmark.info('Cache student from org: ', organization._id);
+                        benchmark.info('Cache student from org: ', organization.name);
                         callback(null, organization);
                     });
                 });
@@ -562,16 +453,7 @@ function collectCacheListStudentsAsync(done) {
             });
         };
 
-        var organizationAsync = [];
-
-        //organizations.forEach(function(organization){
-        //    organizationAsync.push(function(pop){
-        //        map(organization, pop);
-        //    });
-        //});
-
         async.each(organizations, map, function (err, data) {
-        //async.series(organizationAsync, function (err, data) {
             if(err){
                 benchmark.info(err);
             }
