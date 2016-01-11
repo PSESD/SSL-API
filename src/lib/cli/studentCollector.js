@@ -187,7 +187,7 @@ function collectCacheStudents(done) {
     Organization.find({}, function (err, organizations) {
 
         if (err) {
-            return log(err);
+            return benchmark.info(err);
         }
 
         var exit = false;
@@ -211,13 +211,14 @@ function collectCacheStudents(done) {
                     var studentId = student._id;
 
                     if (err) {
+                        benchmark.info(err);
                         return callback(err);
                     }
                     /**
                      * If student is empty from database
                      */
                     if (!student) {
-                        return log('The student not found in database');
+                        return benchmark.info('The student not found in database');
                     }
 
                     var brokerRequest = new Request({
@@ -231,11 +232,12 @@ function collectCacheStudents(done) {
                     brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
                         if (error) {
+                            benchmark.info(error);
                             return callback(error);
                         }
 
                         if (!body) {
-
+                            benchmark.info('Data not found in database xsre');
                             return callback('Data not found in database xsre');
 
                         }
@@ -271,11 +273,12 @@ var getStudentDetail = function (brokerRequest, student, orgId, callback) {
         data[studentId] = null;
 
         if (error) {
+            benchmark.warning('Body was empty');
             return callback(null, data);
         }
 
         if (!body) {
-
+            benchmark.info(error);
             return callback(null, data);
 
         }
@@ -285,6 +288,7 @@ var getStudentDetail = function (brokerRequest, student, orgId, callback) {
             utils.xml2js(body, function (err, result) {
 
                 if (err) {
+                    benchmark.info(error);
                     return callback(null, data);
                 }
 
@@ -303,128 +307,214 @@ var getStudentDetail = function (brokerRequest, student, orgId, callback) {
  * @param  {Function} done [description]
  * @return {[type]}        [description]
  */
-function collectCacheListStudents(done) {
+//function collectCacheListStudents(done) {
+//
+//    benchmark.info("CACHE-LIST-STUDENT\tSTART");
+//    Organization.find({}, function (err, organizations) {
+//
+//        if (err) {
+//            return benchmark.info(err);
+//        }
+//        var prefix = "";
+//        var exit = false;
+//        var i = 0;
+//        benchmark.info("CACHE-LIST-STUDENT\tORG FOUND: " + organizations.length);
+//
+//        _.each(organizations, function (organization) {
+//
+//            var orgId = organization._id;
+//            benchmark.info('ORGID: ' + orgId);
+//            prefix = "CACHE-LIST-STUDENT";
+//            if(++i >= organizations.length){
+//                exit = true;
+//            }
+//            //console.benchmark.info(organization);
+//            var brokerRequest = new Request({
+//                externalServiceId: organization.externalServiceId,
+//                personnelId: organization.personnelId,
+//                authorizedEntityId: organization.authorizedEntityId
+//            });
+//
+//            Student.find({
+//                organization: organization._id
+//            }, function (err, students) {
+//
+//                if(err){
+//
+//                    return benchmark.warn(err);
+//
+//                }
+//
+//                benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
+//
+//                var studentsAsync = [];
+//
+//                var studentIds = [];
+//
+//                var key = prefixListStudent + organization._id;
+//
+//                cache.del(key, function(err) {
+//
+//                    students.forEach(function (student) {
+//                        /**
+//                         * If student is empty from database
+//                         */
+//                        if (!student) {
+//                            return benchmark.info('The student not found in database');
+//                        }
+//
+//                        //studentsAsync.push(function (callback) {
+//                        //
+//                        //    getStudentDetail(brokerRequest, student, organization._id, callback);
+//                        //
+//                        //});
+//
+//                        getStudentDetail(brokerRequest, student, organization._id, function (err, std) {
+//
+//
+//                            cache.get(key, function (err, data) {
+//
+//                                if (!data) {
+//                                    data = {};
+//                                }
+//                                /**
+//                                 * Append data
+//                                 */
+//                                for(var k in std){
+//                                    data[k] = std[k];
+//                                }
+//
+//                                cache.set(key, data, {ttl: 86400}, function () {
+//                                    done();
+//                                });
+//
+//                            });
+//
+//                        });
+//
+//                    });
+//
+//                });
+//
+//                //console.benchmark.info('ORXXXXXXXXXXXXXXXXXXGID: ' + organization._id, studentsAsync);
+//                //
+//                //async.series(studentsAsync, function (err, students) {
+//                //    benchmark.info('YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY: ' + organization._id);
+//                //    if(err){
+//                //
+//                //        return benchmark.warn(err);
+//                //
+//                //    }
+//                //
+//                //    var newStore = {};
+//                //
+//                //    students.forEach(function(st){
+//                //        for(var k in st){
+//                //            newStore[k] = st[k];
+//                //        }
+//                //    });
+//                //
+//                //    //console.benchmark.info(newStore);
+//                //
+//                //    benchmark.info(prefix + "\tAFTER-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
+//                //
+//                //    benchmark.info('KEYS: ' + prefixListStudent + organization._id);
+//                //
+//                //    cache.set(prefixListStudent + organization._id, newStore, {ttl: 86400}, function () {
+//                //
+//                //        done();
+//                //
+//                //    });
+//                //
+//                //});
+//
+//            });
+//        });
+//
+//    });
+//}
+/**
+ *
+ * @param done
+ */
+function collectCacheListStudentsAsync(done) {
 
     benchmark.info("CACHE-LIST-STUDENT\tSTART");
     Organization.find({}, function (err, organizations) {
 
         if (err) {
-            return log(err);
+            return benchmark.info(err);
         }
         var prefix = "";
-        var exit = false;
-        var i = 0;
         benchmark.info("CACHE-LIST-STUDENT\tORG FOUND: " + organizations.length);
 
-        _.each(organizations, function (organization) {
-
+        /**
+         *
+         * @param organization
+         * @param callback
+         */
+        var map = function(organization, callback){
             var orgId = organization._id;
             benchmark.info('ORGID: ' + orgId);
             prefix = "CACHE-LIST-STUDENT";
-            if(++i >= organizations.length){
-                exit = true;
-            }
-            //console.log(organization);
             var brokerRequest = new Request({
                 externalServiceId: organization.externalServiceId,
                 personnelId: organization.personnelId,
                 authorizedEntityId: organization.authorizedEntityId
             });
 
+            /**
+             *
+             * @param student
+             * @param cb
+             */
+            var mapStudent = function(student, cb){
+                /**
+                 * If student is empty from database
+                 */
+                if (!student) {
+                    benchmark.info('The student not found in database');
+                    return cb('The student not found in database', student);
+                }
+
+                getStudentDetail(brokerRequest, student, organization._id, function (err, std) {
+
+                    cb(null, std);
+
+                });
+
+            };
+
             Student.find({
                 organization: organization._id
             }, function (err, students) {
 
                 if(err){
-
-                    return benchmark.warn(err);
-
+                    benchmark.warn(err);
+                    return callback(err, organization);
                 }
 
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
 
-                var studentsAsync = [];
-
-                var studentIds = [];
-
                 var key = prefixListStudent + organization._id;
 
-                cache.del(key, function(err) {
-
-                    students.forEach(function (student) {
-                        /**
-                         * If student is empty from database
-                         */
-                        if (!student) {
-                            return log('The student not found in database');
-                        }
-
-                        //studentsAsync.push(function (callback) {
-                        //
-                        //    getStudentDetail(brokerRequest, student, organization._id, callback);
-                        //
-                        //});
-
-                        getStudentDetail(brokerRequest, student, organization._id, function (err, std) {
-
-
-                            cache.get(key, function (err, data) {
-
-                                if (!data) {
-                                    data = {};
-                                }
-                                /**
-                                 * Append data
-                                 */
-                                for(var k in std){
-                                    data[k] = std[k];
-                                }
-
-                                cache.set(key, data, {ttl: 86400}, function () {
-                                    done();
-                                });
-
-                            });
-
-                        });
-
+                async.each(students, mapStudent, function(err, stds){
+                    benchmark.info('Store student into the cache: ', stds);
+                    cache.set(key, stds, {ttl: 86400}, function () {
+                        benchmark.info('Cache student from org: ', organization);
+                        callback(null, organization);
                     });
-
                 });
 
-                //console.log('ORXXXXXXXXXXXXXXXXXXGID: ' + organization._id, studentsAsync);
-                //
-                //async.series(studentsAsync, function (err, students) {
-                //    benchmark.info('YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY: ' + organization._id);
-                //    if(err){
-                //
-                //        return benchmark.warn(err);
-                //
-                //    }
-                //
-                //    var newStore = {};
-                //
-                //    students.forEach(function(st){
-                //        for(var k in st){
-                //            newStore[k] = st[k];
-                //        }
-                //    });
-                //
-                //    //console.log(newStore);
-                //
-                //    benchmark.info(prefix + "\tAFTER-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
-                //
-                //    benchmark.info('KEYS: ' + prefixListStudent + organization._id);
-                //
-                //    cache.set(prefixListStudent + organization._id, newStore, {ttl: 86400}, function () {
-                //
-                //        done();
-                //
-                //    });
-                //
-                //});
-
             });
+        };
+
+
+        async.each(organizations, map, function (err, data) {
+            if(err){
+                benchmark.info(err);
+            }
+            done(err, data);
         });
 
     });
@@ -433,5 +523,5 @@ function collectCacheListStudents(done) {
 module.exports = {
     collect: collectDataStudents,
     cache: collectCacheStudents,
-    cacheList: collectCacheListStudents
+    cacheList: collectCacheListStudentsAsync
 };

@@ -46,7 +46,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     }
 
-    benchmark.info('XSRE - START GET STUDENT BACKPACK');
+    benchmark.info('XSRE - START GET STUDENT BACKPACK => ' + separate);
 
     var showRaw = false;
 
@@ -66,7 +66,7 @@ StudentController.getStudentsBackpack = function (req, res) {
         }
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
-        //key = new Date().getTime();
+        key = new Date().getTime();
         /**
          *
          * @param results
@@ -85,7 +85,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 benchmark.info('XSRE - USING PAGINATION ON( ' + separate + ')');
 
-                benchmark.info('XSRE - FINISH');
+                benchmark.info('XSRE - FINISH 3');
 
                 if(results.raw) {
 
@@ -124,7 +124,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 if (typeof req.query.pageSize !== 'undefined') {
 
-                    if(req.query.pageSize !== 'all'){
+                    if(req.query.pageSize === 'all'){
 
                         paginate.pageSize = paginate.total;
 
@@ -135,13 +135,13 @@ StudentController.getStudentsBackpack = function (req, res) {
                     }
                 }
 
-
                 //split list into groups
+                console.log('PAGE: ', paginate);
                 while (results.length > 0) {
-
                     arrayList.push(results.splice(0, paginate.pageSize));
-
                 }
+
+                //console.log('LEEEEEEEEEEEEEEEEEEENGTH: ', results.length);
 
                 paginate.data = arrayList[+paginate.currentPage - 1];
 
@@ -292,7 +292,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         resource.embed('programs', embedsPrograms);
 
-                        benchmark.info('XSRE - FINISH');
+                        benchmark.info('XSRE - FINISH 1');
 
                         res.sendSuccess(null, resource.toJSON());
 
@@ -305,7 +305,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     resource.embed('programs', embedsPrograms);
 
-                    benchmark.info('XSRE - FINISH');
+                    benchmark.info('XSRE - FINISH 2');
 
                     res.sendSuccess(null, resource.toJSON());
 
@@ -313,6 +313,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             });
         }
+
         benchmark.info('XSRE - GET ORGANIZATION');
 
         Organization.findOne({ _id: orgId }, function(err, organization){
@@ -360,10 +361,23 @@ StudentController.getStudentsBackpack = function (req, res) {
                                 if (err)  {
                                     return res.sendError(err);
                                 }
+                                var msg;
 
                                 if(result && 'error' in result){
 
-                                    var msg = result.error.message ? result.error.message : result.error;
+                                    msg = result.error.message ? result.error.message : result.error;
+                                    console.log('X1:', result);
+                                    if(!msg){
+                                        msg = 'Data not found!';
+                                    }
+                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                    return res.sendError(msg);
+
+                                }
+
+                                if(result && 'Error' in result){
+
+                                    msg = result.Error.Message ? result.Error.Message : result.Error;
                                     if(!msg){
                                         msg = 'Data not found!';
                                     }
@@ -404,24 +418,29 @@ StudentController.getStudentsBackpack = function (req, res) {
                                 /**
                                  * Set to cache
                                  */
-                                benchmark.info('XSRE - SET TO CACHE');
-                                cache.set(key, object, function(err){
-
-                                    log(err);
+                                //benchmark.info('XSRE - SET TO CACHE');
+                                //cache.set(key, object, function(err){
+                                //
+                                //    console.log(err);
+                                //    log(err);
 
                                     embeds(object);
 
-                                });
+                                //});
 
                             });
 
                         } else {
                             benchmark.info('XSRE - PARSING DATA ERROR FROM XML TO JS');
                             utils.xml2js(body, function (err, result) {
+                                if (err)  {
+                                    return res.sendError(err);
+                                }
+                                var msg;
 
                                 if(result && 'error' in result){
 
-                                    var msg = result.error.message ? result.error.message : result.error;
+                                    msg = result.error.message ? result.error.message : result.error;
                                     if(!msg){
                                         msg = 'Data not found!';
                                     }
@@ -429,7 +448,17 @@ StudentController.getStudentsBackpack = function (req, res) {
                                     return res.sendError(msg);
 
                                 }
+                                if(result && 'Error' in result){
 
+                                    msg = result.Error.Message ? result.Error.Message : result.Error;
+                                    if(!msg){
+                                        msg = 'Data not found!';
+                                    }
+                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                    return res.sendError(msg);
+
+                                }
+                                console.log('X2:', result);
                                 return res.sendError('Data not found!');
 
                             });
@@ -437,7 +466,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                     });
 
                 } else {
-
+                    console.log('FROM CACHE ---------------------------');
                     embeds(result, 1);
 
                 }

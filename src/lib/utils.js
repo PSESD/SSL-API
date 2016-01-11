@@ -26,14 +26,15 @@ var utils = {
      * @returns {*}
      */
     encrypt: function(text){
-        try{
-            var cipher  = crypto.createCipher(algorithm, password);
-            var crypted = cipher.update(text, 'utf8', 'hex');
-            crypted += cipher.final('hex');
-            return crypted;
-        } catch(ex){
-            return '';
-        }
+        return text;
+        //try{
+        //    var cipher  = crypto.createCipher(algorithm, password);
+        //    var crypted = cipher.update(text, 'utf8', 'hex');
+        //    crypted += cipher.final('hex');
+        //    return crypted;
+        //} catch(ex){
+        //    return '';
+        //}
     },
     /**
      *
@@ -41,14 +42,15 @@ var utils = {
      * @returns {*}
      */
     decrypt: function(text){
-        try{
-            var decipher = crypto.createDecipher(algorithm, password);
-            var dec      = decipher.update(text, 'hex', 'utf8');
-            dec += decipher.final('utf8');
-            return dec;
-        } catch(ex){
-            return '';
-        }
+        return text;
+        //try{
+        //    var decipher = crypto.createDecipher(algorithm, password);
+        //    var dec      = decipher.update(text, 'hex', 'utf8');
+        //    dec += decipher.final('utf8');
+        //    return dec;
+        //} catch(ex){
+        //    return '';
+        //}
     },
 
     /**

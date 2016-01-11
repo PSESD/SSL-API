@@ -65,19 +65,18 @@ switch(what){
             pullJob();
             break;
       case 'cache':
-            studentCollector.cache(function(exit){
-                  if(exit) {
-                        console.log('Cache done');
-                        process.exit();
-                  }
-            });
+            //studentCollector.cache(function(exit){
+            //      if(exit) {
+            //            console.log('Cache done');
+            //            process.exit();
+            //      }
+            //});
+            process.exit('Deprecated: use "cache-list"');
             break;
       case 'cache-list':
-            studentCollector.cacheList(function(exit){
-                  if(exit) {
-                        console.log('Cache list done');
-                        process.exit();
-                  }
+            studentCollector.cacheList(function(data){
+                    console.log('Cache list done');
+                    process.exit();
             });
             break;
       case 'token-cleaner':
