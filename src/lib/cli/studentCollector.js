@@ -444,7 +444,18 @@ function collectCacheListStudentsAsync(done) {
                         );
                     }
                     benchmark.info('Store student into the cache: ', stds.length);
-                    cache.set(key, stds, {ttl: 86400}, function () {
+                    /**
+                     * Filter stds
+                     */
+                    var datas = {};
+                    stds.forEach(function(std){
+                        for(var sk in std){
+                            datas[sk] = std[sk];
+                        }
+                    });
+
+                    benchmark.info('Store student into the cache after filter: ', stds.length);
+                    cache.set(key, datas, {ttl: 86400}, function () {
                         benchmark.info('Cache student from org: ', organization.name);
                         callback(null, organization);
                     });
