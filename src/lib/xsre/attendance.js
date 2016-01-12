@@ -814,7 +814,7 @@ Attendance.prototype.calculateSummary = function(){
                 }
 
                 var attendanceStatus = me.slug(event.attendanceStatus);
-console.log(attendanceStatus);
+
                 if(attendanceStatus === 'excused' || attendanceStatus === 'unexcused' || attendanceStatus === 'unexcusedabsence' || attendanceStatus === 'excusedabsence' ){
 
                     me.currentSummary.attendance++;

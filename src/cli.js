@@ -74,6 +74,15 @@ switch(what){
             process.exit();
         });
         break;
+    case 'generate-xml':
+        studentCollector.collect(function(bulkStudent){
+            require('fs').writeFile(__dirname + '/CBOStudents-data.xml', bulkStudent, function (err) {
+                if (err) throw err;
+                console.log('It\'s saved!');
+                process.exit();
+            });
+        });
+        break;
     case 'cache':
         //studentCollector.cache(function(exit){
         //      if(exit) {

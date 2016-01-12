@@ -150,7 +150,7 @@ StudentController.getStudentsBackpack = function(req, res){
                 }
 
                 //split list into groups
-                console.log('PAGE: ', paginate);
+                //console.log('PAGE: ', paginate);
                 while(results.length > 0){
                     arrayList.push(results.splice(0, paginate.pageSize));
                 }
@@ -425,6 +425,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                             var attendance = xsre.getAttendanceBehavior();
                                             object = attendance.getAttendances();
                                             object.years = attendance.getAvailableYears();
+                                            xsre.getStudentSummary();
                                             break;
                                         case 'transcript':
                                             object = xsre.getTranscript().getTranscript();
