@@ -409,7 +409,7 @@ function collectCacheListStudentsAsync(done) {
                     } else {
                         cb(null, data);
                     }
-                });
+                }, true);
 
             };
 
@@ -454,7 +454,7 @@ function collectCacheListStudentsAsync(done) {
                         }
                     });
 
-                    benchmark.info('Store student into the cache after filter: ', datas.length);
+                    benchmark.info('Store student into the cache after filter: ', Object.keys(datas).length);
                     cache.set(key, datas, {ttl: 86400}, function () {
                         benchmark.info('Cache student from org: ', organization.name);
                         callback(null, organization);
