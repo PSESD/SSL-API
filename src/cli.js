@@ -64,6 +64,11 @@ switch(what){
     case 'pull':
         pullJob();
         break;
+    case 'dump-districtid':
+        studentCollector.dumpDataDistrictId(function(){
+            process.exit();
+        });
+        break;
     case 'cache-debug':
         studentCollector.cacheDebug(function(){
             process.exit();

@@ -132,6 +132,9 @@ function Attendance(xsre){
     this.attendanceBehaviors = [];
     this.allDates = [];
     this.weeks = [];
+    this.availableYear = [];
+
+    this.filterYear = xsre.params.year || null;
 
     this.notAvailable = 'N/A';
 
@@ -142,6 +145,21 @@ function Attendance(xsre){
     this.extractRawSource = xsre.extractRawSource;
 
 }
+/**
+ *
+ * @returns {Array}
+ */
+Attendance.prototype.getAvailableYears = function(){
+
+    if(!this.availableYear){
+        return [];
+    }
+
+    return this.availableYear.sort(function(a, b){
+        return b - a;
+    });
+
+};
 /**
  *
  * @returns {*}
@@ -170,13 +188,29 @@ Attendance.prototype.getAttendances = function(){
 
     }
 
+    console.log(me.filterYear);
+
     me.attendances.events.event.forEach(function(event){
 
         //event = me.injectRawSource(event);
 
         mm = moment(new Date(event.calendarEventDate));
 
-        if(mm.isValid()){
+        var isTrue = true;
+
+        var cYear = mm.year();
+
+        if(me.filterYear){
+            isTrue =  (parseInt(cYear) === parseInt(me.filterYear)) ? true : false;
+        }
+
+        if(me.availableYear.indexOf(mm.year()) === -1){
+
+            me.availableYear.push(mm.year());
+
+        }
+
+        if(isTrue && mm.isValid()){
 
             event.calendarEventDateTime = mm.valueOf();
 

@@ -22,6 +22,10 @@ var Request = require(libPath+'/broker/request');
 var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
 var xSre = require(libPath+'/xsre');
 var async = require('async');
+var districtFile = rootPath + '/test/data/districts';
+var fs = require('fs');
+var readline = require('readline');
+var filename = districtFile;
 var prefixListStudent = '_xsre_list_students_';
 
 function cacheDebug(done){
@@ -29,6 +33,40 @@ function cacheDebug(done){
     cache.get(key, function(err, data){
         benchmark.info(key, ' >>>>>>>>>>>>>>> DATA >>>>>>>>>>>>>>', data);
         done();
+    });
+}
+/**
+ *
+ */
+function dumpDataDistrictId(done){
+    readline.createInterface({
+        input: fs.createReadStream(filename),
+        terminal: false
+    }).on('line', function(line) {
+        return;
+        Student.findOne({first_name: "Student " + line, last_name: "Test"}, function(err, student){
+            console.log('MASUP');
+            if(err){
+                return console.log(err);
+            }
+            if(!student){
+                student = new Student();
+                student.district_student_id = line;
+                student.emergency1_phone = "";
+                student.emergency2_phone = "";
+                student.first_name = "Student " + line;
+                student.last_name = "Test";
+                student.organization =  mongoose.Types.ObjectId("55913fc817aac10c2bbfe1e8");
+                student.phone = "";
+                student.school_district = "seattle";
+                student.save(function(){
+                    console.log('Add student: ', line, ' => ', student._id);
+                });
+            } else {
+                console.log('GET ', line);
+            }
+
+        });
     });
 }
 /**
@@ -490,5 +528,6 @@ module.exports = {
     collect: collectDataStudents,
     cache: collectCacheStudents,
     cacheList: collectCacheListStudentsAsync,
-    cacheDebug: cacheDebug
+    cacheDebug: cacheDebug,
+    dumpDataDistrictId: dumpDataDistrictId
 };

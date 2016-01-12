@@ -120,6 +120,14 @@ StudentController.getStudentsBackpack = function(req, res){
 
                 }
 
+                if(separate === 'attendance'){
+
+                    paginate.source.years = results.years;
+
+                    delete results.years;
+
+                }
+
                 paginate.total = results.length;
 
                 if(typeof req.query.page !== 'undefined'){
@@ -402,7 +410,7 @@ StudentController.getStudentsBackpack = function(req, res){
 
                                 var object = null;
 
-                                var xsre = new xSre(result, body, separate).setLogger(benchmark);
+                                var xsre = new xSre(result, body, separate, req.query).setLogger(benchmark);
 
                                 if(usePagination === false){
 
@@ -414,7 +422,9 @@ StudentController.getStudentsBackpack = function(req, res){
                                     switch(separate){
 
                                         case 'attendance':
-                                            object = xsre.getAttendanceBehavior().getAttendances();
+                                            var attendance = xsre.getAttendanceBehavior();
+                                            object = attendance.getAttendances();
+                                            object.years = attendance.getAvailableYears();
                                             break;
                                         case 'transcript':
                                             object = xsre.getTranscript().getTranscript();
