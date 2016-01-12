@@ -188,8 +188,6 @@ Attendance.prototype.getAttendances = function(){
 
     }
 
-    console.log(me.filterYear);
-
     me.attendances.events.event.forEach(function(event){
 
         //event = me.injectRawSource(event);
@@ -201,7 +199,9 @@ Attendance.prototype.getAttendances = function(){
         var cYear = mm.year();
 
         if(me.filterYear){
-            isTrue =  (parseInt(cYear) === parseInt(me.filterYear)) ? true : false;
+
+            isTrue =  (parseInt(cYear) === parseInt(me.filterYear));
+
         }
 
         if(me.availableYear.indexOf(mm.year()) === -1){
@@ -813,7 +813,9 @@ Attendance.prototype.calculateSummary = function(){
 
                 }
 
-                if(me.slug(event.attendanceStatus) === 'excused' || me.slug(event.attendanceStatus) === 'unexcused'){
+                var attendanceStatus = me.slug(event.attendanceStatus);
+console.log(attendanceStatus);
+                if(attendanceStatus === 'excused' || attendanceStatus === 'unexcused' || attendanceStatus === 'unexcusedabsence' || attendanceStatus === 'excusedabsence' ){
 
                     me.currentSummary.attendance++;
 

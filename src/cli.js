@@ -85,7 +85,8 @@ switch(what){
         process.exit();
         break;
     case 'cache-list':
-        studentCollector.cacheList(function(data){
+        var args = process.argv.slice(3)[0] ? true : false;
+        studentCollector.cacheList(args, function(data){
             console.log('Cache list done');
             process.exit();
         });

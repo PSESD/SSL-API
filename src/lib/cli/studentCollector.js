@@ -352,7 +352,7 @@ var getStudentDetail = function (brokerRequest, student, orgId, callback) {
  *
  * @param done
  */
-function collectCacheListStudentsAsync(done) {
+function collectCacheListStudentsAsync(force, done) {
 
     benchmark.info("CACHE-LIST-STUDENT\tSTART");
     Organization.find({}, function (err, organizations) {
@@ -455,7 +455,7 @@ function collectCacheListStudentsAsync(done) {
                     } else {
                         cb(null, data);
                     }
-                }, true);
+                }, force);
 
             };
 
