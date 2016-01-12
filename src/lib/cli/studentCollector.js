@@ -23,6 +23,14 @@ var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, m
 var xSre = require(libPath+'/xsre');
 var async = require('async');
 var prefixListStudent = '_xsre_list_students_';
+
+function cacheDebug(done){
+    var key = prefixListStudent + '*';
+    cache.get(key, function(err, data){
+        benchmark.info(key, ' >>>>>>>>>>>>>>> DATA >>>>>>>>>>>>>>', data);
+        done();
+    });
+}
 /**
  *
  * @param callback
@@ -481,5 +489,6 @@ function collectCacheListStudentsAsync(done) {
 module.exports = {
     collect: collectDataStudents,
     cache: collectCacheStudents,
-    cacheList: collectCacheListStudentsAsync
+    cacheList: collectCacheListStudentsAsync,
+    cacheDebug: cacheDebug
 };
