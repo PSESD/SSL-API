@@ -254,6 +254,20 @@ Transcript.prototype.getTranscript = function(){
     me.info.totalAttempted = parseFloat(me.info.totalAttempted).toFixed(1);
     me.info.totalEarned = parseFloat(me.info.totalEarned).toFixed(1);
 
+    if(me.summary.termCreditsAttempted === 0 && me.summary.totalCreditsEarned === 0){
+
+        me.totalCreditsAttempted = me.info.totalAttempted;
+
+        me.totalCreditsEarned = me.info.totalEarned;
+
+    }
+
+    if(me.gradeLevel === me.notAvailable){
+
+        me.gradeLevel = me.info.gradeLevel;
+
+    }
+
     return {
         history: _.sortBy(me.history, 'schoolYear').reverse(),
         details: me.course,
