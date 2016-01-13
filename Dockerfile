@@ -37,7 +37,6 @@ ADD cronjob/files/etc/crontab /etc/crontab
 ADD cronjob/files/bin/start-cron.sh /usr/bin/start-cron.sh
 RUN chmod +x /usr/bin/start-cron.sh
 RUN touch /var/log/cron.log
-CMD /usr/bin/start-cron.sh
 
 # Run Supervisord
 RUN /usr/bin/easy_install supervisor
