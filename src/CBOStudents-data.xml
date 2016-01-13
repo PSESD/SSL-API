@@ -1,0 +1,4715 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CBOStudents>
+	<CBOStudent id="55f143806376010d00da8779">
+		<organization refId="55913fc817aac10c2bbfe1e7">
+			<organizationName>Super Athletes</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="566947f64c74c70b002bfb6d">
+		<organization refId="55913fc817aac10c2bbfe1e7">
+			<organizationName>Super Athletes</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56694c944944300b00c3f08c">
+		<organization refId="55913fc817aac10c2bbfe1e7">
+			<organizationName>Super Athletes</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="566955f547693d0d00ad1f04">
+		<organization refId="55913fc817aac10c2bbfe1e7">
+			<organizationName>Super Athletes</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="55c0912ff9f16f5b008190c1">
+		<organization refId="55913fc817aac10c2bbfe1ea">
+			<organizationName>Super Athletes - GOOD</organizationName>
+			<externalServiceId>3</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="55c3dc2df912c488008de29c">
+		<organization refId="55c2df2317aac10c2bc04f4f">
+			<organizationName>Galen Dev</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId>1</personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>Seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="566a763881a2f40c00765d46">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5660c7f3d2c7f709005cc80e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>10651041</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56948d3af353020d000eeafb">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>11108723</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a6e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12649829</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a81">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12748136</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a86">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>17115086</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a8b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>17443420</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a90">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>13210855</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="55d263b18c55b9ea0068abfd">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample2</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614c98cdd24ff981f881962">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>61442</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614c9a8dd24ff981f881963">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>61454</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614c9bedd24ff981f881964">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>61469</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614c9d0dd24ff981f881965">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>61472</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614c9e3dd24ff981f881966">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>61872</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614c9f8dd24ff981f881967">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>61873</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614ca0add24ff981f881968">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>61874</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614ca1ddd24ff981f881969">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>70002</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56247c68d27e3b090045dfb1">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>58303</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56247c77d27e3b090045dfb2">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>54466</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56247c91d27e3b090045dfb3">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>55699</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56247cabd27e3b090045dfb4">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>56967</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56247cbad27e3b090045dfb5">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>57420</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56247cd9d27e3b090045dfb6">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>54658</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56247cebd27e3b090045dfb7">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>57099</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56247d24d27e3b090045dfb8">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>55864</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56247d39d27e3b090045dfb9">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>57254</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5660c70cd2c7f709005cc80b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>10355702</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5660c804d2c7f709005cc80f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>10713556</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="565dd464bbd4f00d001e1696">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>123</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614a174b5c0e5bc1392bbbb">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>63035</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="566957c947693d0d00ad1f08">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="569452b06fa1450900b86d9c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>10987538</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a6c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>11760011</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a6d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12057478</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a72">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12820684</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a77">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>11333918</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a7c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>13263687</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a95">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>18885858</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a9a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>17354354</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a9e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>21389540</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa3">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>24948430</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa8">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28306673</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a71">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12473879</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a76">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12035072</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a7b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>13616782</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a80">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12084082</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a85">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>14973161</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a6f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>11362710</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a8a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>16856847</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a74">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>15521681</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a8f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>18498317</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a79">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12125043</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a94">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>18092694</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a7e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>11108723</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a99">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>16727927</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a83">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>14766912</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a88">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>15891385</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a8d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>16938471</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a9d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>20147329</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a92">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>17013383</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa2">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>24207587</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a97">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>14388484</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa7">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>27981713</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aab">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30304424</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a9c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>19170186</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab0">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33810076</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa0">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>22825834</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab5">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>36820714</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa5">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>26363309</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aba">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40788399</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5abf">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>45653465</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa9">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28966774</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac3">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>75102460</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aae">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>32326440</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab3">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>35287619</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab8">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>39191169</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5abd">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>43936922</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aac">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30940124</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab1">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>34084451</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab6">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>37641332</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5abb">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>42486138</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac0">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>47854383</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac4">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>80629056</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac9">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>21388804</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ace">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>24835221</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad3">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28168248</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad8">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>31329992</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5add">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>34565358</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae2">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>38145347</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae7">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>42843636</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac8">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>20001691</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5acd">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>24020150</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad2">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>27828861</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad7">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30616948</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5adc">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33994970</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae1">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>37481188</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae6">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>42464715</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac1">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>58371561</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac6">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>94916161</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5acb">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>22801626</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad0">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>26359019</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad5">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>29573802</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ada">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>32892982</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aec">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>56548026</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af1">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>91948503</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af6">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>23275047</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5afb">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>26919785</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b00">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30202915</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b05">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33424219</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b0a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>36759307</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5adf">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>36513063</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae4">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40073717</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae9">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>44183973</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aee">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>75067966</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aeb">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>47585430</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af0">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>84089239</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af5">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>22458380</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b0f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40338976</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b14">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>45377480</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b19">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>80237585</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5afa">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>26315221</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aff">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>29371304</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b04">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>32740934</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b1e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>21209419</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b23">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>24349613</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b28">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28053985</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b09">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>36240033</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b0e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40048973</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b13">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>44156380</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b18">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>72663074</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b1d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>19473327</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b22">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>23809069</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b27">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>27291134</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af3">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>21242473</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af8">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>24490003</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5afd">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28070883</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b02">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>31272291</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b07">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>34558412</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b0c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>38092329</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b11">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>42646382</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b16">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>53287182</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b1b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>89799961</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b20">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>22267651</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b2d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>31259385</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b32">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>34442603</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b37">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>37782887</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b3c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>42637985</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b41">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>51942138</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a70">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>11955403</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a73">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>13943832</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a75">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>11737233</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b25">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>26307201</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b46">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>88619059</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b2c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30602192</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a78">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>11825883</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a7a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12766573</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b2a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>29336849</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b4b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>22238367</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b31">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33858668</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a7d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>14690630</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a7f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>11787417</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b2f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>32612913</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b50">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>26297070</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b36">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>37112452</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a82">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>13321082</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a84">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>16336849</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b3b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>41835018</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a87">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>12589308</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a89">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>15779912</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b55">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>29229911</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a8c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>18329278</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a8e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>17602923</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b40">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>46054409</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b5a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>32511829</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a91">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>16226976</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a93">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>17938381</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b45">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>81367446</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b5f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>35330091</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a98">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>15634418</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a96">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>18550761</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b4a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>21728435</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b64">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>39466983</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a9b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>18310348</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa1">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>23406344</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b69">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>44089203</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5a9f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>22102072</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa6">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>27043148</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b6e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>69642665</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aa4">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>25984544</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aaa">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>29639470</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aaf">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33202741</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aad">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>31335354</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab4">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>36541558</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab2">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>34655464</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab9">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40082147</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ab7">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>38187515</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5abe">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>44198592</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5abc">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>42879040</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac2">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>69092184</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac7">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>18914895</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b34">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>35708883</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5acc">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>23301419</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b39">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40039669</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad1">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>27031926</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b3e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>44121389</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad6">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30245062</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5adb">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33777454</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ac5">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>85971740</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae0">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>36801652</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aca">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>22029682</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae5">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40445417</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5acf">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>25783482</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aea">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>45401559</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad4">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28958750</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aef">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>80449131</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ad9">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>32253601</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af4">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>21933112</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ade">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>35210854</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af9">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>25435435</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5afe">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28810485</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae3">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>39156535</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b03">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>32232567</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5ae8">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>43577785</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b08">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>34992325</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5aed">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>67529968</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b0d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>38561869</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af2">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>19676932</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5af7">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>23949269</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5afc">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>27759058</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b01">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30614169</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b06">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33993469</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b0b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>37288539</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b10">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>42399593</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b15">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>47135759</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b1a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>83979008</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b1f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>21816140</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b12">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>43217357</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b17">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>66343733</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b1c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>98610697</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b43">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>69693383</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b48">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>19448215</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b4d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>23644341</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b52">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>27109515</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b24">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>25382832</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b29">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28774688</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b2e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>32062499</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b33">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>34759395</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b38">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>38339000</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b3d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>43181466</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b42">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>61579923</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b4f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>24975226</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b54">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28350180</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b59">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>31567530</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b5e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>34682029</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b63">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>38295673</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b68">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>43180798</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b6d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>59661286</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b72">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>96315541</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b47">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>97722102</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b4c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>22955941</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b51">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>26393444</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b57">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30580977</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b5c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33824210</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b61">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>36821511</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b66">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40807550</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b6b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>45831824</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b70">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>80781590</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b21">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>23225628</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b56">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30033785</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b26">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>26781606</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b5b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33240987</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b2b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>30036537</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b60">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>36617837</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b30">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>33423230</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b65">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40114811</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b6a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>44815634</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b35">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>36636879</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b6f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>77876412</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b3a">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>40255781</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd26eec6ae1a45fb5b3f">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>44844329</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b44">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>78288615</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b49">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>20524327</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b4e">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>24284477</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b53">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>28034053</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b58">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>31199141</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b5d">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>34125250</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b62">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>37724999</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b67">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>42542823</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b6c">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>49927407</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694cd27eec6ae1a45fb5b71">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>87108886</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5694ed14a8ae6c8d00a3b5fd">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>123456789</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="5614d20d2bb72b1b3424bf86">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample2</districtStudentId>
+			<zoneId>test</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<studentActivity refId="5592d25c23ab6a4800d0e94f">
+			<title>After-school Tutoring</title>
+		</studentActivity>
+		<studentActivity refId="55ad83b5eb731c66004c85ad">
+			<title>Basketball</title>
+		</studentActivity>
+		<studentActivity refId="55ce045c8c55b9ea0068abfb">
+			<title>tennis</title>
+		</studentActivity>
+		<studentActivity refId="55e0b37c0a86ca0d0014e499">
+			<title>Super Athletes - 3</title>
+		</studentActivity>
+		<programs>
+			<activities>
+				<activity>
+					<studentActivityRefId>55ce045c8c55b9ea0068abfb</studentActivityRefId>
+					<startDate>11/16/2015</startDate>
+					<endDate>11/30/2015</endDate>
+					<active>true</active>
+					<tags>
+					</tags>
+				</activity>
+				<activity>
+					<studentActivityRefId>55ad83b5eb731c66004c85ad</studentActivityRefId>
+					<startDate>11/16/2015</startDate>
+					<endDate>11/30/2015</endDate>
+					<active>true</active>
+					<tags>
+					</tags>
+				</activity>
+				<activity>
+					<studentActivityRefId>55e0b37c0a86ca0d0014e499</studentActivityRefId>
+					<startDate>11/30/2015</startDate>
+					<endDate>11/30/2015</endDate>
+					<active>true</active>
+					<tags>
+					</tags>
+				</activity>
+				<activity>
+					<studentActivityRefId>5592d25c23ab6a4800d0e94f</studentActivityRefId>
+					<startDate>Invalid date</startDate>
+					<endDate>Invalid date</endDate>
+					<active>false</active>
+					<tags>
+					</tags>
+				</activity>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="564996c3891f5cd43c5a89c3">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample2</districtStudentId>
+			<zoneId>test</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<studentActivity refId="55e0b37c0a86ca0d0014e499">
+			<title>Super Athletes - 3</title>
+		</studentActivity>
+		<programs>
+			<activities>
+				<activity>
+					<studentActivityRefId>55e0b37c0a86ca0d0014e499</studentActivityRefId>
+					<startDate>11/02/2015</startDate>
+					<endDate>11/28/2015</endDate>
+					<active>true</active>
+					<tags>
+						<tag>cboby</tag>
+					</tags>
+				</activity>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="55d24c418c55b9ea0068abfc">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample2</districtStudentId>
+			<zoneId>test</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<studentActivity refId="5592d25c23ab6a4800d0e94f">
+			<title>After-school Tutoring</title>
+		</studentActivity>
+		<programs>
+			<activities>
+				<activity>
+					<studentActivityRefId>5592d25c23ab6a4800d0e94f</studentActivityRefId>
+					<startDate>09/16/2015</startDate>
+					<endDate>09/30/2015</endDate>
+					<active>true</active>
+					<tags>
+					</tags>
+				</activity>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="55c0f385f912c488008de29b">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample11</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<studentActivity refId="55b78a6d09356aa70014f048">
+			<title>Test Program</title>
+		</studentActivity>
+		<programs>
+			<activities>
+				<activity>
+					<studentActivityRefId>55b78a6d09356aa70014f048</studentActivityRefId>
+					<startDate>08/03/2015</startDate>
+					<endDate>08/21/2015</endDate>
+					<active>true</active>
+					<tags>
+						<tag>2015</tag>
+						<tag>2016</tag>
+						<tag>GroupA</tag>
+					</tags>
+				</activity>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="564999cf891f5cd43c5a89c8">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample2</districtStudentId>
+			<zoneId>tukwila</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<studentActivity refId="55b78a6d09356aa70014f048">
+			<title>Test Program</title>
+		</studentActivity>
+		<studentActivity refId="55e0b37c0a86ca0d0014e499">
+			<title>Super Athletes - 3</title>
+		</studentActivity>
+		<programs>
+			<activities>
+				<activity>
+					<studentActivityRefId>55e0b37c0a86ca0d0014e499</studentActivityRefId>
+					<startDate>10/05/2015</startDate>
+					<endDate>02/11/2016</endDate>
+					<active>true</active>
+					<tags>
+						<tag>elliot</tag>
+					</tags>
+				</activity>
+				<activity>
+					<studentActivityRefId>55b78a6d09356aa70014f048</studentActivityRefId>
+					<startDate>01/01/2016</startDate>
+					<endDate>10/07/2016</endDate>
+					<active>true</active>
+					<tags>
+					</tags>
+				</activity>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="561b7c6c9a6309ae33d8d9cd">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample2</districtStudentId>
+			<zoneId>tukwila</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<studentActivity refId="5592d25c23ab6a4800d0e94f">
+			<title>After-school Tutoring</title>
+		</studentActivity>
+		<studentActivity refId="55e0b37c0a86ca0d0014e499">
+			<title>Super Athletes - 3</title>
+		</studentActivity>
+		<programs>
+			<activities>
+				<activity>
+					<studentActivityRefId>5592d25c23ab6a4800d0e94f</studentActivityRefId>
+					<startDate>11/16/2015</startDate>
+					<endDate>11/30/2015</endDate>
+					<active>true</active>
+					<tags>
+						<tag>after</tag>
+						<tag>school</tag>
+						<tag>school</tag>
+					</tags>
+				</activity>
+				<activity>
+					<studentActivityRefId>55e0b37c0a86ca0d0014e499</studentActivityRefId>
+					<startDate>11/02/2015</startDate>
+					<endDate>11/30/2015</endDate>
+					<active>true</active>
+					<tags>
+					</tags>
+				</activity>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56499966891f5cd43c5a89c6">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample2</districtStudentId>
+			<zoneId>test</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<studentActivity refId="55b78a6d09356aa70014f048">
+			<title>Test Program</title>
+		</studentActivity>
+		<studentActivity refId="55e0b37c0a86ca0d0014e499">
+			<title>Super Athletes - 3</title>
+		</studentActivity>
+		<programs>
+			<activities>
+				<activity>
+					<studentActivityRefId>55e0b37c0a86ca0d0014e499</studentActivityRefId>
+					<startDate>11/01/2015</startDate>
+					<endDate>11/30/2015</endDate>
+					<active>true</active>
+					<tags>
+						<tag>open</tag>
+					</tags>
+				</activity>
+				<activity>
+					<studentActivityRefId>55b78a6d09356aa70014f048</studentActivityRefId>
+					<startDate>11/30/2015</startDate>
+					<endDate>03/12/2016</endDate>
+					<active>true</active>
+					<tags>
+					</tags>
+				</activity>
+			</activities>
+		</programs>
+	</CBOStudent>
+</CBOStudents>

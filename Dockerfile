@@ -32,9 +32,11 @@ RUN npm -g update npm
 RUN npm install
 
 # Setup crontab
-#ADD /config/crontab.root /var/spool/cron/crontabs/root
-# Make cron not complain
-#RUN	touch /etc/mtab
+RUN apt-get -y install rsyslog
+ADD cronjob/files/etc/crontab /etc/crontab
+ADD cronjob/files/bin/start-cron.sh /usr/bin/start-cron.sh
+RUN chmod +x /usr/bin/start-cron.sh
+RUN touch /var/log/cron.log
 
 # Run Supervisord
 RUN /usr/bin/easy_install supervisor

@@ -20,7 +20,7 @@ function processJob(job, callback){
     setTimeout(function(){
         var objectData = JSON.parse(job.data);
         console.log('PUSH DATA: ', objectData);
-        // request.push(objectData.content, callback);
+         request.push(objectData.content, callback);
     }, 1000);
 }
 /**
