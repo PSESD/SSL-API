@@ -3,7 +3,8 @@
  * Created by zaenal on 03/06/15.
  */
 var config = require('config');
-var request = require('request');
+//var request = require('request');
+var retryRequest = require('retry-request');
 var moment = require('moment');
 var uuid = require('node-uuid');
 var CryptoJS = require("crypto-js");
@@ -164,9 +165,22 @@ RequestXSRE.prototype = {
             timeout: 60000 // timeout 1 minute
         };
 
+        var opts = {
+            retries: 3,
+            /**
+             *
+             * @param incomingHttpMessage
+             * @returns {boolean}
+             */
+            shouldRetryFn: function (incomingHttpMessage) {
+                return incomingHttpMessage.statusCode !== 200;
+            }
+        };
+
         //console.dir(options);
 
-        return request.get(options, callback || function (error, response, body) {
+        //return request.get(options, callback || function (error, response, body) {
+        return retryRequest(options, opts, callback || function (error, response, body) {
 
             if(error){
 

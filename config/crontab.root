@@ -1,2 +1,0 @@
-0 0 * * * /usr/bin/node /src/cli.js cache
-0 3 * * * /usr/bin/node /src/cli.js cache-list
