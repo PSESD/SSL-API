@@ -20,7 +20,7 @@ function processJob(job, callback){
     setTimeout(function(){
         var objectData = JSON.parse(job.data);
         console.log('PUSH DATA: ', objectData);
-         request.push(objectData.content, callback);
+         //request.push(objectData.content, callback);
     }, 1000);
 }
 /**
@@ -76,12 +76,53 @@ switch(what){
         break;
     case 'generate-xml':
         studentCollector.collect(function(bulkStudent){
-            require('fs').writeFile(__dirname + '/CBOStudents-data.xml', bulkStudent, function (err) {
+            require('fs').writeFile(__dirname + '/data/CBOStudents-data.xml', bulkStudent, function (err) {
                 if (err) throw err;
                 console.log('It\'s saved!');
                 process.exit();
             });
         });
+        break;
+    case 'push-xml-student':
+        studentCollector.collect(function(bulkStudent){
+                setTimeout(function(){
+                    //console.log('PUSH DATA: ', bulkStudent);
+                    (new request()).push(bulkStudent, function(error, response, body){
+                        require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents', body, function (err) {
+                            if (err) throw err;
+                            process.exit();
+                        });
+                    });
+                }, 1000);
+
+        });
+        break;
+    case 'pull-xml-student':
+        setTimeout(function(){
+            //console.log('PUSH DATA: ', bulkStudent);
+            (new request()).get(function(error, response, body){
+                console.log(body);
+                var mysql      = require('mysql');
+                var connection = mysql.createConnection({
+                    host     : 'localhost',
+                    user     : 'root',
+                    password : 'g3mb0k',
+                    database : 'my_db'
+                });
+
+                connection.connect();
+
+                connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+                    if (err) throw err;
+
+                    console.log('The solution is: ', rows[0].solution);
+                });
+
+                connection.end();
+                process.exit();
+            });
+        }, 1000);
+
         break;
     case 'cache':
         //studentCollector.cache(function(exit){

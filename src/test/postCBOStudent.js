@@ -1,9 +1,9 @@
-var request      = require(__dirname + '/../lib/xsre/push/request');
+var request      = require(__dirname + '/../lib/cli/request');
 var Organization = require(__dirname + '/../app/models/Organization');
 var orgId        = '55913fc817aac10c2bbfe1e8';
 var studentId    = '5614c98cdd24ff981f881962';
 var Request      = new request();
-var body         = '<?xml version="1.0" encoding="utf-16"?>';
+var body         = '<?xml version="1.0" encoding="utf-8"?><CBOStudents>';
 body += '<CBOStudent id="5614c98cdd24ff981f881962">';
 body += '    <organization refId="55913fc817aac10c2bbfe1e8">';
 body += '        <organizationName>Helping Hand CBO</organizationName>';
@@ -17,7 +17,7 @@ body += '    </organization>';
 body += '    <programs>';
 body += '        <activities></activities>';
 body += '    </programs>';
-body += '</CBOStudent>';
+body += '</CBOStudent></CBOStudents>';
 
 Request.push(body);
 
