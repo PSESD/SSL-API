@@ -111,19 +111,7 @@ Request.prototype = {
 
         zoneId = zoneId || config.zoneId;
 
-        var url = '/requestProvider/' + config.service + ';zoneId=' + zoneId + ';contextId=' + config.contextId;
-
-        this.addHeader('messageId', this.generateUUID());
-
-        this.addHeader('Content-Length', Buffer.byteLength(data));
-
-        var timestamp = this.headers.timestamp = this.getTimezone();
-
-        var token = this.generateXSREAuthToken(timestamp);
-
-        self.headers.Authorization = 'SIF_HMACSHA256 ' + token;
-
-
+        var url = '/requestProvider/' + config.service1 + ';zoneId=' + zoneId + ';contextId=' + config.contextId;
 
         if('headers' in config){
 
@@ -133,39 +121,79 @@ Request.prototype = {
 
             }
         }
-        self.addHeader('mustuseadvisory', true);
-        self.addHeader('MessageType', 'REQUEST');
-        self.addHeader('requestType', 'DELAYED');
-        self.addHeader('objectType', 'CBOStudent');
+
+        self.create(config.url + url, 'POST', data, callback);
+    },
+    /**
+     *
+     * @param callback
+     * @param zoneId
+     */
+    get: function(callback, serviceNumber, zoneId){
+
+        var config = this.config.CBOStudent.get;
+
+        var serviceName = serviceNumber === 1 ? config.service1 : config.service2;
+
+        var self = this;
+
+        zoneId = zoneId || config.zoneId;
+
+        var url = '/requestProvider/' + serviceName + ';zoneId=' + zoneId + ';contextId=' + config.contextId;
+
+        if('headers' in config){
+
+            for(var name in config.headers){
+
+                self.addHeader(name, config.headers[name]);
+
+            }
+        }
+
+        self.create(config.url + url, 'GET', null, callback);
+    },
+    /**
+     *
+     * @param url
+     * @param method
+     * @param data
+     * @param callback
+     */
+    create: function(url, method, data, callback){
+
+        this.addHeader('messageId', this.generateUUID());
+
+        var timestamp = this.headers.timestamp = this.getTimezone();
+
+        var token = this.generateXSREAuthToken(timestamp);
+
+        this.headers.Authorization = 'SIF_HMACSHA256 ' + token;
 
         var options = {
-            url: config.url + url,
-            headers: self.getHeaders(),
-            strictSSL: false,
-            timeout: 60000 // timeout 1 minute
+            method: method || 'GET',
+            preambleCRLF: true,
+            postambleCRLF: true,
+            uri: url,
+            headers: this.getHeaders()
         };
-
-        //options.body = data;
 
         console.log(options);
 
-        request({
-                method: 'POST',
-                preambleCRLF: true,
-                postambleCRLF: true,
-                uri: options.url,
-                headers: options.headers,
-                // alternatively pass an object containing additional options
-                multipart: {
-                    chunked: false,
+
+        if(data){
+            options.multipart = {
+                chunked: true,
                     data: [
-                        {
-                            'content-type': 'application/xml',
-                            body: data
-                        }
-                    ]
-                }
-            },
+                    {
+                        'content-type': 'text/xml',
+                        body: data
+                    }
+                ]
+            };
+        }
+
+
+        request(options,
             function(error, response, body){
                 if(error){
                     callback(error, response, body);
@@ -174,75 +202,8 @@ Request.prototype = {
                 console.log('Upload successful!  Server responded with:', body);
                 callback(error, response, body);
             });
-
     },
-    /**
-     *
-     * @param callback
-     * @param zoneId
-     */
-    get: function(callback, zoneId){
 
-        var config = this.config.CBOStudent.push;
-
-        var self = this;
-
-        zoneId = zoneId || config.zoneId;
-
-        //var url = '/requestProvider/' + config.service + ';zoneId=' + zoneId + ';contextId=' + config.contextId;
-        var url = '/requestProvider/CBOStudentsWithXSres;zoneId=' + zoneId + ';contextId=' + config.contextId;
-
-        this.addHeader('messageId', this.generateUUID());
-
-        var timestamp = this.headers.timestamp = this.getTimezone();
-
-        var token = this.generateXSREAuthToken(timestamp);
-
-        self.headers.Authorization = 'SIF_HMACSHA256 ' + token;
-
-
-
-        if('headers' in config){
-
-            for(var name in config.headers){
-
-                self.addHeader(name, config.headers[name]);
-
-            }
-        }
-        self.addHeader('mustuseadvisory', true);
-        self.addHeader('MessageType', 'REQUEST');
-        self.addHeader('requestType', 'DELAYED');
-        self.addHeader('objectType', 'CBOStudentsWithXSres');
-
-        var options = {
-            url: config.url + url,
-            headers: self.getHeaders(),
-            strictSSL: false,
-            timeout: 60000 // timeout 1 minute
-        };
-
-        //options.body = data;
-
-        console.log(options);
-
-        request({
-                method: 'GET',
-                preambleCRLF: true,
-                postambleCRLF: true,
-                uri: options.url,
-                headers: options.headers
-            },
-            function(error, response, body){
-                if(error){
-                    callback(error, response, body);
-                    return console.error('get data failed:', error);
-                }
-                console.log('Get data successful!  Server responded with:', body);
-                callback(error, response, body);
-            });
-
-    },
     /**
      *
      * @returns {*|ServerResponse}

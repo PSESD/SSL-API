@@ -155,8 +155,6 @@ StudentController.getStudentsBackpack = function(req, res){
                     arrayList.push(results.splice(0, paginate.pageSize));
                 }
 
-                //console.log('LEEEEEEEEEEEEEEEEEEENGTH: ', results.length);
-
                 paginate.data = arrayList[+paginate.currentPage - 1];
 
                 paginate.pageCount = Math.ceil(paginate.total / paginate.pageSize);
@@ -425,7 +423,6 @@ StudentController.getStudentsBackpack = function(req, res){
                                             var attendance = xsre.getAttendanceBehavior();
                                             object = attendance.getAttendances();
                                             object.years = attendance.getAvailableYears();
-                                            xsre.getStudentSummary();
                                             break;
                                         case 'transcript':
                                             object = xsre.getTranscript().getTranscript();

@@ -13,6 +13,8 @@ var bs = require('nodestalker'),
 var studentCollector = require('./lib/cli/studentCollector');
 var tokenCleaner = require('./lib/cli/tokenCleaner');
 var request = require('./lib/cli/request');
+var con = require('./lib/cli/mysql');
+var parseString = require('xml2js').parseString;
 
 function processJob(job, callback){
     // doing something really expensive
@@ -98,41 +100,58 @@ switch(what){
         });
         break;
     case 'pull-xml-student':
-        setTimeout(function(){
-            //console.log('PUSH DATA: ', bulkStudent);
-            (new request()).get(function(error, response, body){
-                console.log(body);
-                var mysql      = require('mysql');
-                var connection = mysql.createConnection({
-                    host     : 'localhost',
-                    user     : 'root',
-                    password : 'g3mb0k',
-                    database : 'my_db'
-                });
-
-                connection.connect();
-
-                connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
-                    if (err) throw err;
-
-                    console.log('The solution is: ', rows[0].solution);
-                });
-
-                connection.end();
+        //setTimeout(function(){
+        //    //console.log('PUSH DATA: ', bulkStudent);
+        //    (new request()).get(function(error, response, body){
+        //        console.log(body);
+        //
+        //
+        //        process.exit();
+        //    });
+        //}, 1000);
+        con.connect(function(err) {
+            if (err) {
+                console.error('error connecting: ' + err.stack);
                 process.exit();
-            });
-        }, 1000);
+                return;
+            }
 
-        break;
-    case 'cache':
-        //studentCollector.cache(function(exit){
-        //      if(exit) {
-        //            console.log('Cache done');
-        //            process.exit();
-        //      }
-        //});
-        console.log('Deprecated: use "cache-list"');
-        process.exit();
+            new request().get(function(error, res, body){
+
+                if(error){
+                    console.error('error response: ' + error);
+                    process.exit();
+                    return;
+                }
+
+                parseString(body, {
+                    normalize: true,
+                    explicitArray: false,
+                    parseBooleans: true,
+                    parseNumbers: true,
+                    stripPrefix: true,
+                    firstCharLowerCase: true,
+                    ignoreAttrs: true
+                }, function (err, result) {
+
+                    if(err) {
+                        process.exit();
+                        return console.log(err);
+                    }
+
+                    require('fs').writeFile(__dirname + '/data/RESPONSE-PULL-CBOStudents.json', JSON.stringify(result), function (err) {
+                        if (err) throw err;
+                        process.exit();
+                    });
+
+                });
+
+            }, 1);
+
+            console.log('connected as id ' + con.threadId);
+        });
+
+
         break;
     case 'cache-list':
         var args = process.argv.slice(3)[0] ? true : false;
