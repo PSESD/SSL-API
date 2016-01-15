@@ -164,7 +164,9 @@ Transcript.prototype.getTranscript = function(){
 
     //console.log(me.subject);
 
-    me.course = _.sortBy(me.course);
+    me.course = _.sortBy(me.course, function(o){
+        return o.startDateTime * -1;
+    });
 
     if(me.enrollments.length > 0){
 
@@ -389,10 +391,19 @@ Transcript.prototype.processTranscript = function(transcript, current){
         gradeLevel : transcript.gradeLevel,
         schoolYear : tSchoolYear,
         schoolName : tSchoolName,
+        startDate: l.get(transcript, 'session.startDate'),
+        startDateTime: 0,
         session: tSession,
         transcripts: {},
         summary: summary
     };
+
+    if(info.startDate){
+        info.startDateTime = new Date(info.startDate).getTime();
+    } else {
+        info.startDate = info.tSchoolYear;
+        info.startDateTime = new Date(info.startDate).getTime();
+    }
 
     if(parseInt(me.info.gradeLevel) < parseInt(info.gradeLevel)){
 
