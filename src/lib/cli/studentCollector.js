@@ -19,6 +19,9 @@ var moment = require('moment');
 var config = require('config'), xsreConfig = config.get('hzb').xsre;
 
 var Request = require(libPath+'/broker/request');
+var request = require('./request');
+var con = require('./mysql');
+var parseString = require('xml2js').parseString;
 var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
 var xSre = require(libPath+'/xsre');
 var async = require('async');
@@ -38,37 +41,37 @@ function cacheDebug(done){
 /**
  *
  */
-function dumpDataDistrictId(done){
-    readline.createInterface({
-        input: fs.createReadStream(filename),
-        terminal: false
-    }).on('line', function(line) {
-        return;
-        Student.findOne({first_name: "Student " + line, last_name: "Test"}, function(err, student){
-            console.log('MASUP');
-            if(err){
-                return console.log(err);
-            }
-            if(!student){
-                student = new Student();
-                student.district_student_id = line;
-                student.emergency1_phone = "";
-                student.emergency2_phone = "";
-                student.first_name = "Student " + line;
-                student.last_name = "Test";
-                student.organization =  mongoose.Types.ObjectId("55913fc817aac10c2bbfe1e8");
-                student.phone = "";
-                student.school_district = "seattle";
-                student.save(function(){
-                    console.log('Add student: ', line, ' => ', student._id);
-                });
-            } else {
-                console.log('GET ', line);
-            }
-
-        });
-    });
-}
+//function dumpDataDistrictId(done){
+//    readline.createInterface({
+//        input: fs.createReadStream(filename),
+//        terminal: false
+//    }).on('line', function(line) {
+//        return;
+//        Student.findOne({first_name: "Student " + line, last_name: "Test"}, function(err, student){
+//            console.log('MASUP');
+//            if(err){
+//                return console.log(err);
+//            }
+//            if(!student){
+//                student = new Student();
+//                student.district_student_id = line;
+//                student.emergency1_phone = "";
+//                student.emergency2_phone = "";
+//                student.first_name = "Student " + line;
+//                student.last_name = "Test";
+//                student.organization =  mongoose.Types.ObjectId("55913fc817aac10c2bbfe1e8");
+//                student.phone = "";
+//                student.school_district = "seattle";
+//                student.save(function(){
+//                    console.log('Add student: ', line, ' => ', student._id);
+//                });
+//            } else {
+//                console.log('GET ', line);
+//            }
+//
+//        });
+//    });
+//}
 /**
  *
  * @param callback
@@ -301,55 +304,8 @@ function collectCacheStudents(done) {
     });
 }
 /**
- * [getStudentDetail description]
- * @param  {[type]}   brokerRequest [description]
- * @param  {[type]}   student       [description]
- * @param  {[type]}   orgId         [description]
- * @param  {Function} callback      [description]
- * @return {[type]}                 [description]
- */
-var getStudentDetail = function (brokerRequest, student, orgId, callback) {
-
-    brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
-
-        var studentId = student._id.toString();
-
-        var data = {};
-
-        data[studentId] = null;
-
-        if (error) {
-            benchmark.info('Body was empty');
-            return callback(null, data);
-        }
-
-        if (!body) {
-            benchmark.info(error);
-            return callback(null, data);
-
-        }
-
-        if (response && response.statusCode === 200) {
-
-            utils.xml2js(body, function (err, result) {
-
-                if (err) {
-                    benchmark.info(error);
-                    return callback(null, data);
-                }
-
-                data[studentId] = new xSre(result).getStudentSummary();
-
-                callback(null, data);
-
-            });
-
-        }
-    });
-
-};
-/**
  *
+ * @param force
  * @param done
  */
 function collectCacheListStudentsAsync(force, done) {
@@ -524,10 +480,109 @@ function collectCacheListStudentsAsync(force, done) {
     });
 }
 
+function pullStudent(error, done){
+    con.connect(function(err) {
+        if (err) {
+
+            return;
+        }
+        /**
+         *
+         * @param organization
+         * @param callback
+         */
+        function pullMap(organization, callback){
+
+            new request().get(function(err, res, body){
+
+                if(err){
+                    callback(null, organization);
+                    return;
+                }
+
+                parseString(body, {
+                    normalize: true,
+                    explicitArray: false,
+                    parseBooleans: true,
+                    parseNumbers: true,
+                    stripPrefix: true,
+                    firstCharLowerCase: true,
+                    ignoreAttrs: false
+                }, function(err, result){
+
+                    if(err){
+
+                        return callback(null, organization);
+
+                    }
+
+                    //require('fs').writeFile(rootPath + '/data/'+organization.name+'.json', JSON.stringify(result), function (err) {
+                    //    require('fs').writeFile(rootPath + '/data/'+organization.name+'.xml', body, function (err) {
+                    //        callback(null, organization);
+                    //    });
+                    //});
+
+                    var studentList = null;
+
+                    if(_.isObject(result.CBOStudents) && 'CBOStudent' in result.CBOStudents && _.isArray(result.CBOStudents.CBOStudent)){
+                        studentList = result.CBOStudents.CBOStudent;
+                    } else if(_.isObject(result.CBOStudentsWithXSres) && 'CBOStudentsWithXSre' in result.CBOStudentsWithXSres && _.isArray(result.CBOStudentsWithXSres.CBOStudentsWithXSre)){
+                        studentList = result.CBOStudentsWithXSres.CBOStudentsWithXSre;
+                    }
+
+                    if(studentList !== null){
+
+                        async.each(studentList, function(student, cb){
+                            var students = {
+                                id: student.organization.$.refId,
+                                org_name: student.organization.organizationName,
+                                student_id: student.$.id,
+                                school_district: student.organization.districtStudentId,
+                                school: "",
+                                first_name: "",
+                                last_name: ""
+                            };
+                            con.query('INSERT INTO students SET ? ON DUPLICATE KEY UPDATE id=VALUES(id)', students, function(err, result){
+                                cb(null, result);
+                            });
+                        }, function(err, data){
+                            callback(null, organization);
+                        });
+                    } else {
+                        callback(null, organization);
+                    }
+
+                });
+
+            }, 2, 'organization/organizationName="' + organization.name + '"');
+        }
+        Organization.find({}, function(err, organizations){
+
+            async.each(organizations, pullMap, function (err, data) {
+                if(err){
+                    benchmark.info(err);
+                }
+
+                benchmark.info(
+                    '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
+                );
+
+                con.end(function(err){
+                    done();
+                });
+
+            });
+        });
+
+        console.log('connected as id ' + con.threadId);
+    });
+}
+
 module.exports = {
     collect: collectDataStudents,
     cache: collectCacheStudents,
     cacheList: collectCacheListStudentsAsync,
     cacheDebug: cacheDebug,
-    dumpDataDistrictId: dumpDataDistrictId
+    //dumpDataDistrictId: dumpDataDistrictId,
+    pullStudent: pullStudent
 };

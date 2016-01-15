@@ -127,9 +127,11 @@ Request.prototype = {
     /**
      *
      * @param callback
+     * @param serviceNumber
+     * @param where
      * @param zoneId
      */
-    get: function(callback, serviceNumber, zoneId){
+    get: function(callback, serviceNumber, where, zoneId){
 
         var config = this.config.CBOStudent.get;
 
@@ -140,6 +142,10 @@ Request.prototype = {
         zoneId = zoneId || config.zoneId;
 
         var url = '/requestProvider/' + serviceName + ';zoneId=' + zoneId + ';contextId=' + config.contextId;
+
+        if(where){
+            url += '?where='+where;
+        }
 
         if('headers' in config){
 

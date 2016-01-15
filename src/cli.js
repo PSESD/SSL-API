@@ -86,6 +86,7 @@ switch(what){
         });
         break;
     case 'push-xml-student':
+    case 'push-caderlab':
         studentCollector.collect(function(bulkStudent){
                 setTimeout(function(){
                     //console.log('PUSH DATA: ', bulkStudent);
@@ -99,59 +100,15 @@ switch(what){
 
         });
         break;
+    case 'pull-caderlab':
     case 'pull-xml-student':
-        //setTimeout(function(){
-        //    //console.log('PUSH DATA: ', bulkStudent);
-        //    (new request()).get(function(error, response, body){
-        //        console.log(body);
-        //
-        //
-        //        process.exit();
-        //    });
-        //}, 1000);
-        con.connect(function(err) {
-            if (err) {
-                console.error('error connecting: ' + err.stack);
-                process.exit();
-                return;
-            }
-
-            new request().get(function(error, res, body){
-
-                if(error){
-                    console.error('error response: ' + error);
-                    process.exit();
-                    return;
-                }
-
-                parseString(body, {
-                    normalize: true,
-                    explicitArray: false,
-                    parseBooleans: true,
-                    parseNumbers: true,
-                    stripPrefix: true,
-                    firstCharLowerCase: true,
-                    ignoreAttrs: true
-                }, function (err, result) {
-
-                    if(err) {
-                        process.exit();
-                        return console.log(err);
-                    }
-
-                    require('fs').writeFile(__dirname + '/data/RESPONSE-PULL-CBOStudents.json', JSON.stringify(result), function (err) {
-                        if (err) throw err;
-                        process.exit();
-                    });
-
-                });
-
-            }, 1);
-
-            console.log('connected as id ' + con.threadId);
+        studentCollector.pullStudent(function(err){
+            console.error('error connecting: ' + err.stack);
+            process.exit();
+        }, function(){
+            console.error('Done !');
+            process.exit();
         });
-
-
         break;
     case 'cache-list':
         var args = process.argv.slice(3)[0] ? true : false;
@@ -171,6 +128,7 @@ switch(what){
         });
         break;
     default:
+        throw 'Not valid command';
         resJob();
         break;
 }

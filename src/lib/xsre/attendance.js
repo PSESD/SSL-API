@@ -136,6 +136,22 @@ function Attendance(xsre){
 
     this.filterYear = xsre.params.year || null;
 
+    if(this.filterYear){
+        if(this.filterYear.indexOf('/') !== -1){
+            var split = this.filterYear.split('/');
+            this.academicStart = moment(new Date(split[0], 9, 1, 0, 0, 0));
+            this.academicEnd = moment(new Date(split[1], 8, 31, 0, 0, 0));
+        } else {
+            var y1 = parseInt(this.filterYear);
+            var y2 = y1 - 1;
+            this.academicStart = moment(new Date(y2, 9, 1, 0, 0, 0));
+            this.academicEnd = moment(new Date(y1, 8, 31, 0, 0, 0));
+        }
+    } else {
+        this.academicStart = null;
+        this.academicEnd = null;
+    }
+
     this.notAvailable = 'N/A';
 
     this.currentSummary = null;
@@ -155,9 +171,19 @@ Attendance.prototype.getAvailableYears = function(){
         return [];
     }
 
-    return this.availableYear.sort(function(a, b){
+    var years = [];
+
+    this.availableYear.sort(function(a, b){
         return b - a;
+    }).forEach(function(year){
+
+        if(year){
+            years.push((year - 1) + '/' + year);
+        }
+
     });
+
+    return years;
 
 };
 /**
@@ -194,25 +220,25 @@ Attendance.prototype.getAttendances = function(){
 
         mm = moment(new Date(event.calendarEventDate));
 
-        var isTrue = true;
-
-        var cYear = mm.year();
-
-        if(me.filterYear){
-
-            isTrue =  (parseInt(cYear) === parseInt(me.filterYear));
-
-        }
-
         if(me.availableYear.indexOf(mm.year()) === -1){
 
             me.availableYear.push(mm.year());
 
         }
 
-        if(isTrue && mm.isValid()){
+        event.calendarEventDateTime = mm.valueOf();
 
-            event.calendarEventDateTime = mm.valueOf();
+        var passed = true;
+
+        if(me.filterYear && me.academicStart && me.academicEnd){
+
+            passed = (event.calendarEventDateTime >= me.academicStart && event.calendarEventDateTime <= me.academicEnd);
+
+        }
+
+        if(passed && mm.isValid()){
+
+
 
             var obj = {
                 calendarEventDate: event.calendarEventDate,
@@ -305,11 +331,20 @@ Attendance.prototype.getAttendances = function(){
 
             mm = moment(new Date(discipline.incidentDate));
 
-            if(mm.isValid()){
+            discipline.incidentDateTime = mm.valueOf();
+
+
+            var passed = true;
+
+            if(me.filterYear && me.academicStart && me.academicEnd){
+
+                passed = (event.calendarEventDateTime >= me.academicStart && event.calendarEventDateTime <= me.academicEnd);
+
+            }
+
+            if(passed && mm.isValid()){
 
                 delete discipline.actions;
-
-                discipline.incidentDateTime = mm.valueOf();
 
                 var obj = {
                     incidentDate: discipline.incidentDate,
