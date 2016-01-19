@@ -468,7 +468,8 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
 
     if(!mark) {
 
-        return;
+        //return;
+        mark = 0;
 
     }
 

@@ -6,7 +6,8 @@ var xSre = require(__dirname+'/../lib/xsre');
 
 var fs = require('fs');
 //var xmlFile = __dirname + '/../../../mockhzb/sid/sample1.xml';
-var xmlFile = __dirname + '/data/xml.xml';
+//var xmlFile = __dirname + '/data/xml.xml';
+var xmlFile = __dirname + '/data/sample1.xml';
 var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
     if(err) {
@@ -37,7 +38,8 @@ fs.readFile(xmlFile, function(err, data) {
                 schoolName:  tr.schoolName,
                 'startDate':  tr.startDate,
                 startDateTime:  tr.startDateTime,
-                session:  tr.session
+                session:  tr.session,
+                totals: tr.schoolYear === '2016' ? tr.transcripts : Object.keys(tr.transcripts).length
             });
         });
         console.log(require('prettyjson').render(t));

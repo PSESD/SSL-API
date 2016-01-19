@@ -132,7 +132,7 @@ function Attendance(xsre){
     this.attendanceBehaviors = [];
     this.allDates = [];
     this.weeks = [];
-    this.availableYear = [];
+    this.availableYear = [moment().year()];
 
     this.filterYear = xsre.params.year || null;
 
@@ -338,7 +338,7 @@ Attendance.prototype.getAttendances = function(){
 
             if(me.filterYear && me.academicStart && me.academicEnd){
 
-                passed = (event.calendarEventDateTime >= me.academicStart && event.calendarEventDateTime <= me.academicEnd);
+                passed = (discipline.incidentDateTime >= me.academicStart && discipline.incidentDateTime <= me.academicEnd);
 
             }
 
