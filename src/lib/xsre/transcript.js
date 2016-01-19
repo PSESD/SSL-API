@@ -18,6 +18,8 @@ function Transcript(xsre){
 
     this.enrollments = xsre.json.enrollment ? [xsre.json.enrollment] : [];
 
+    this.transcriptFilterMark = [];
+
     var me = this;
 
     if(xsre.json.otherEnrollments && _.isArray(xsre.json.otherEnrollments.enrollment)){
@@ -472,6 +474,16 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
         mark = 0;
 
     }
+
+    var icheck = key + '+' + uniqueStr + '+' + (course.courseTitle || me.notAvailable);
+
+    if(me.transcriptFilterMark.indexOf(icheck) !== -1){
+
+        return;
+
+    }
+
+    me.transcriptFilterMark.push(icheck);
 
     me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
 

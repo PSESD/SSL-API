@@ -39,7 +39,7 @@ fs.readFile(xmlFile, function(err, data) {
                 'startDate':  tr.startDate,
                 startDateTime:  tr.startDateTime,
                 session:  tr.session,
-                totals: tr.schoolYear === '2016' ? tr.transcripts : Object.keys(tr.transcripts).length
+                totals: tr.schoolYear === '2015' ? tr.transcripts : Object.keys(tr.transcripts).length
             });
         });
         console.log(require('prettyjson').render(t));

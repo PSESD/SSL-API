@@ -139,13 +139,13 @@ function Attendance(xsre){
     if(this.filterYear){
         if(this.filterYear.indexOf('/') !== -1){
             var split = this.filterYear.split('/');
-            this.academicStart = moment(new Date(split[0], 9, 1, 0, 0, 0));
-            this.academicEnd = moment(new Date(split[1], 8, 31, 0, 0, 0));
+            this.academicStart = moment(new Date(split[0], 8, 1, 0, 0, 0));
+            this.academicEnd = moment(new Date(split[1], 7, 31, 0, 0, 0));
         } else {
             var y1 = parseInt(this.filterYear);
             var y2 = y1 - 1;
-            this.academicStart = moment(new Date(y2, 9, 1, 0, 0, 0));
-            this.academicEnd = moment(new Date(y1, 8, 31, 0, 0, 0));
+            this.academicStart = moment(new Date(y2, 8, 1, 0, 0, 0));
+            this.academicEnd = moment(new Date(y1, 7, 31, 0, 0, 0));
         }
     } else {
         this.academicStart = null;
