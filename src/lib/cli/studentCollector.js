@@ -14,6 +14,7 @@ var Program = require(appPath+'/models/Program');
 var User = require(appPath+'/models/User');
 var Tag = require(appPath+'/models/Tag');
 var _ = require('underscore');
+var l = require('lodash');
 var xmlParser = require('js2xmlparser');
 var moment = require('moment');
 var config = require('config'), xsreConfig = config.get('hzb').xsre;
@@ -486,93 +487,125 @@ function pullStudent(error, done){
 
             return;
         }
-        /**
-         *
-         * @param organization
-         * @param callback
-         */
-        function pullMap(organization, callback){
+        con.query('CREATE TABLE students__ LIKE students', function(err, results){
+            if(err){
 
-            new request().get(function(err, res, body){
+                return;
+            }
 
-                if(err){
-                    callback(null, organization);
-                    return;
-                }
+            /**
+             *
+             * @param organization
+             * @param callback
+             */
+            function pullMap(organization, callback){
 
-                parseString(body, {
-                    normalize: true,
-                    explicitArray: false,
-                    parseBooleans: true,
-                    parseNumbers: true,
-                    stripPrefix: true,
-                    firstCharLowerCase: true,
-                    ignoreAttrs: false
-                }, function(err, result){
+                new request().get(function(err, res, body){
 
                     if(err){
-
-                        return callback(null, organization);
-
-                    }
-
-                    //require('fs').writeFile(rootPath + '/data/'+organization.name+'.json', JSON.stringify(result), function (err) {
-                    //    require('fs').writeFile(rootPath + '/data/'+organization.name+'.xml', body, function (err) {
-                    //        callback(null, organization);
-                    //    });
-                    //});
-
-                    var studentList = null;
-
-                    if(_.isObject(result.CBOStudents) && 'CBOStudent' in result.CBOStudents && _.isArray(result.CBOStudents.CBOStudent)){
-                        studentList = result.CBOStudents.CBOStudent;
-                    } else if(_.isObject(result.CBOStudentsWithXSres) && 'CBOStudentsWithXSre' in result.CBOStudentsWithXSres && _.isArray(result.CBOStudentsWithXSres.CBOStudentsWithXSre)){
-                        studentList = result.CBOStudentsWithXSres.CBOStudentsWithXSre;
-                    }
-
-                    if(studentList !== null){
-
-                        async.each(studentList, function(student, cb){
-                            var students = {
-                                id: student.organization.$.refId,
-                                org_name: student.organization.organizationName,
-                                student_id: student.$.id,
-                                school_district: student.organization.districtStudentId,
-                                school: "",
-                                first_name: "",
-                                last_name: ""
-                            };
-                            con.query('INSERT INTO students SET ? ON DUPLICATE KEY UPDATE id=VALUES(id)', students, function(err, result){
-                                cb(null, result);
-                            });
-                        }, function(err, data){
-                            callback(null, organization);
-                        });
-                    } else {
                         callback(null, organization);
+                        return;
                     }
 
+                    parseString(body, {
+                        normalize: true,
+                        explicitArray: false,
+                        parseBooleans: true,
+                        parseNumbers: true,
+                        stripPrefix: true,
+                        firstCharLowerCase: true,
+                        ignoreAttrs: false
+                    }, function(err, result){
+
+                        if(err){
+
+                            return callback(null, organization);
+
+                        }
+
+                        //require('fs').writeFile(rootPath + '/data/'+organization.name+'.json', JSON.stringify(result), function (err) {
+                        //    require('fs').writeFile(rootPath + '/data/'+organization.name+'.xml', body, function (err) {
+                        //        //callback(null, organization);
+                        //    });
+                        //});
+
+                        var studentList = null;
+                        var isXsre = false;
+
+                        if(_.isObject(result.CBOStudents) && 'CBOStudent' in result.CBOStudents && _.isArray(result.CBOStudents.CBOStudent)){
+                            studentList = result.CBOStudents.CBOStudent;
+                        } else if(_.isObject(result.CBOStudentsWithXSres) && 'CBOStudentsWithXSre' in result.CBOStudentsWithXSres && _.isArray(result.CBOStudentsWithXSres.CBOStudentsWithXSre)){
+                            studentList = result.CBOStudentsWithXSres.CBOStudentsWithXSre;
+                            isXsre = true;
+                        }
+
+                        if(studentList !== null){
+                            console.log(organization.name, ' >>> STUDENT LIST: ', studentList.length);
+                            async.each(studentList, function(student, cb){
+                                var xSre = l.get(student, 'xSre.xSre');
+                                var students = {
+                                    id: student.organization.$.refId,
+                                    org_name: student.organization.organizationName,
+                                    student_id: student.$.id,
+                                    school_district: student.organization.districtStudentId,
+                                    school: "",
+                                    first_name: "",
+                                    last_name: "",
+                                    grade_year: "",
+                                    ethnicity: "",
+                                    gender: ""
+                                };
+
+                                if(xSre){
+                                    students.gender = l.get(xSre, 'demographics.sex');
+                                    students.school = l.get(xSre, 'enrollment.school.schoolName');
+                                    students.first_name = l.get(xSre, 'name.givenName');
+                                    students.last_name = l.get(xSre, 'name.familyName');
+                                    students.grade_year = l.get(xSre, 'enrollment.schoolYear');
+                                    students.ethnicity = l.get(xSre, 'demographics.races.race.race');
+                                }
+                                con.query('INSERT INTO students__ SET ?', students, function(err, result){
+                                    cb(null, result);
+                                });
+                            }, function(err, data){
+                                callback(null, organization);
+                            });
+                        } else {
+                            callback(null, organization);
+                        }
+
+                    });
+
+                }, 2, 'organization/organizationName="' + organization.name + '"');
+            }
+
+
+            Organization.find({}, function(err, organizations){
+
+                async.each(organizations, pullMap, function (err, data) {
+                    if(err){
+                        benchmark.info(err);
+                    }
+
+                    benchmark.info(
+                        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
+                    );
+
+                    con.query('ALTER TABLE `students`  RENAME TO `students______`; ALTER TABLE `students__`  RENAME TO `students`; DROP TABLE `students______`;', function(err, results){
+
+                        console.log('FINISH MOVE TABLE >>>> ', err);
+
+                        con.end(function(err){
+
+                            done();
+                        });
+                    });
+
+
                 });
-
-            }, 2, 'organization/organizationName="' + organization.name + '"');
-        }
-        Organization.find({}, function(err, organizations){
-
-            async.each(organizations, pullMap, function (err, data) {
-                if(err){
-                    benchmark.info(err);
-                }
-
-                benchmark.info(
-                    '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
-                );
-
-                con.end(function(err){
-                    done();
-                });
-
             });
         });
+
 
         console.log('connected as id ' + con.threadId);
     });

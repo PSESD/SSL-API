@@ -205,7 +205,7 @@ Request.prototype = {
                     callback(error, response, body);
                     return console.error('upload failed:', error);
                 }
-                console.log('Upload successful!  Server responded with:', body);
+                //console.log('Upload successful!  Server responded with:', body);
                 callback(error, response, body);
             });
     },

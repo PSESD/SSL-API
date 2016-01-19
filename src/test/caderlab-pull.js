@@ -3,7 +3,7 @@
  */
 'use strict';
 var fs = require('fs');
-var xmlFile = __dirname + '/data/Helping Hand CBO.xml';
+var xmlFile = __dirname + '/../data/Helping Hand CBO.xml';
 var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
     if(err) {

@@ -27,6 +27,8 @@ function Rest(router, Api){
 
     this.studentProgramController = this.Api.controller('StudentProgramController');
 
+    this.reportController = this.Api.controller('ReportController');
+
     this.auth = this.Api.middleware('Auth');
 
     this.handleRoutes();
@@ -58,6 +60,8 @@ Rest.prototype.handleRoutes = function(){
     this.routeTag();
 
     this.routeTest();
+
+    this.routeReport();
 
 };
 
@@ -232,6 +236,14 @@ Rest.prototype.routeTest = function(){
             .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.userController.deleteByEmail)
         ;
     }
+};
+
+Rest.prototype.routeReport = function(){
+
+    this.router.route('/:organizationId/report/students/:by' + this.format)
+        .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.reportController.getStudentBy)
+    ;
+
 };
 
 module.exports = Rest;
