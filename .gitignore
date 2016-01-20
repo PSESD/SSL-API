@@ -36,4 +36,3 @@ src/node_modules
 config
 src/config
 src/logs/*
-src/data/*

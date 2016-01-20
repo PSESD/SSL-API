@@ -1,0 +1,25 @@
+<CBOStudentsWithXSres xmlns="http://www.sifassociation.org/datamodel/na/3.2"><CBOStudentsWithXSre id="55c3dc2df912c488008de29c">
+<organization refId="55c2df2317aac10c2bc04f4f">
+<organizationName>Galen Dev</organizationName>
+<externalServiceId>5</externalServiceId>
+<personnelId>1</personnelId>
+<authorizedEntityId>2</authorizedEntityId>
+<districtStudentId>sample1</districtStudentId>
+<zoneId>Seattle</zoneId>
+<contextId>CBO</contextId>
+</organization>
+<env>
+<domain>psesd</domain>
+<solution>dev</solution>
+</env>
+<lastResponse>
+<statusCode>500</statusCode>
+<statusMessage>Internal Server Error</statusMessage>
+<env>
+<domain>psesd</domain>
+<solution>dev</solution>
+</env>
+<error>An unexpected error occurred retrieving the student data</error>
+<attempts>1</attempts>
+</lastResponse>
+</CBOStudentsWithXSre></CBOStudentsWithXSres>

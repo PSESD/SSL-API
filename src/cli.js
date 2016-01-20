@@ -88,10 +88,12 @@ switch(what){
     case 'push-xml-student':
     case 'push-caderlab':
         studentCollector.collect(function(bulkStudent){
+                require('fs').writeFile(__dirname + '/data/REQUEST-CBOStudents.xml', bulkStudent, function (err) {
+                });
                 setTimeout(function(){
                     //console.log('PUSH DATA: ', bulkStudent);
                     (new request()).push(bulkStudent, function(error, response, body){
-                        require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents', body, function (err) {
+                        require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
                             if (err) throw err;
                             process.exit();
                         });

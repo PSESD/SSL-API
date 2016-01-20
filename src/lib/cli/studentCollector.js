@@ -480,14 +480,16 @@ function collectCacheListStudentsAsync(force, done) {
 
     });
 }
-
+/**
+ *
+ * @param error
+ * @param done
+ */
 function pullStudent(error, done){
-    con.query('CREATE TABLE students__ LIKE students', function(err, results){
-        if(err){
+    var masterTable = '`students`';
+    var backupTable = '`students__`';
 
-            return;
-        }
-
+    con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
         /**
          *
          * @param organization
@@ -518,11 +520,10 @@ function pullStudent(error, done){
 
                     }
 
-                    //require('fs').writeFile(rootPath + '/data/'+organization.name+'.json', JSON.stringify(result), function (err) {
-                    //    require('fs').writeFile(rootPath + '/data/'+organization.name+'.xml', body, function (err) {
-                    //        //callback(null, organization);
-                    //    });
-                    //});
+                    require('fs').writeFile(rootPath + '/data/' + organization.name + '.json', JSON.stringify(result), function(err){
+                        require('fs').writeFile(rootPath + '/data/' + organization.name + '.xml', body, function(err){
+                        });
+                    });
 
                     var studentList = null;
                     var isXsre = false;
@@ -543,8 +544,8 @@ function pullStudent(error, done){
                                 org_name: student.organization.organizationName,
                                 student_id: student.$.id,
                                 //school_district: student.organization.districtStudentId,
-                                school_district: (student.organization.zoneId + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1) {
-                                        return $1.toUpperCase();
+                                school_district: (student.organization.zoneId + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1){
+                                    return $1.toUpperCase();
                                 }),
                                 school: "",
                                 first_name: "",
@@ -562,44 +563,44 @@ function pullStudent(error, done){
                                 students.grade_year = l.get(xSre, 'enrollment.schoolYear');
                                 students.ethnicity = l.get(xSre, 'demographics.races.race.race');
                             }
-                            con.query('INSERT INTO students__ SET ?', students, function(err, result){
+                            con.query('INSERT INTO ' + backupTable + ' SET ?', students, function(err, result){
                                 cb(null, result);
                             });
                         }, function(err, data){
                             callback(null, organization);
                         });
-                    } else {
+                    } else{
                         callback(null, organization);
                     }
 
                 });
 
-            }, 2, 'organization/organizationName="' + organization.name + '"');
+            }, 2, "(organization/organizationName='" + organization.name + "')");
         }
 
 
         Organization.find({}, function(err, organizations){
+            var sql = 'TRUNCATE TABLE ' + backupTable;
+            con.query(sql, function(err, results){
+                async.each(organizations, pullMap, function(err, data){
+                    if(err){
+                        benchmark.info(err);
+                    }
 
-            async.each(organizations, pullMap, function (err, data) {
-                if(err){
-                    benchmark.info(err);
-                }
-
-                benchmark.info(
-                    '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
-                );
-
-                con.query('ALTER TABLE `students`  RENAME TO `students______`; ALTER TABLE `students__`  RENAME TO `students`; DROP TABLE `students______`;', function(err, results){
-
-                    console.log('FINISH MOVE TABLE >>>> ', err);
-
-                    con.end(function(err){
-
-                        done();
+                    benchmark.info(
+                        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
+                    );
+                    var sql = 'DROP TABLE ' + masterTable;
+                    con.query(sql, function(err, results){
+                        sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
+                        con.query(sql, function(err, results){
+                            console.log('FINISH MOVE TABLE >>>> ', err);
+                            con.end(function(err){
+                                done();
+                            });
+                        });
                     });
                 });
-
-
             });
         });
     });
