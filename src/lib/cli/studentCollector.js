@@ -542,7 +542,10 @@ function pullStudent(error, done){
                                 id: student.organization.$.refId,
                                 org_name: student.organization.organizationName,
                                 student_id: student.$.id,
-                                school_district: student.organization.districtStudentId,
+                                //school_district: student.organization.districtStudentId,
+                                school_district: (student.organization.zoneId + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1) {
+                                        return $1.toUpperCase();
+                                }),
                                 school: "",
                                 first_name: "",
                                 last_name: "",
