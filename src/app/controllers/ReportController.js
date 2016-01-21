@@ -28,7 +28,7 @@ ReportController.getStudentBy = function (req, res) {
 
     switch(by){
         case 'school_district':
-            sql = 'SELECT s.school as schoolName, s.school_district as schoolDistrict, COUNT(s.student_id) as total ';
+            sql = 'SELECT IF(s.school = "", "N/A", s.school) as schoolName, s.school_district as schoolDistrict, COUNT(s.student_id) as total ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
@@ -58,7 +58,7 @@ ReportController.getStudentBy = function (req, res) {
             });
             break;
         case 'grade':
-            sql = 'SELECT s.grade_year as gradeYear, COUNT(s.student_id) as total ';
+            sql = 'SELECT IF(s.grade_year = "0000", "N/A", s.grade_year) as gradeYear, COUNT(s.student_id) as total ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
@@ -88,7 +88,7 @@ ReportController.getStudentBy = function (req, res) {
             });
             break;
         case 'gender':
-            sql = 'SELECT s.gender, COUNT(s.student_id) as total ';
+            sql = 'SELECT IF(s.gender = "", "N/A", s.gender) as gender, COUNT(s.student_id) as total ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
@@ -118,7 +118,7 @@ ReportController.getStudentBy = function (req, res) {
             });
             break;
         case 'race':
-            sql = 'SELECT s.ethnicity, COUNT(s.student_id) as total ';
+            sql = 'SELECT IF(s.ethnicity = "", "N/A", s.ethnicity) as ethnicity, COUNT(s.student_id) as total ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
