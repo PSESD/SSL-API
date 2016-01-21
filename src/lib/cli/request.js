@@ -147,6 +147,10 @@ Request.prototype = {
             url += '?where='+where;
         }
 
+        this.headers.navigationpage = 1;
+        this.headers.navigationpagesize = 200;
+
+
         if('headers' in config){
 
             for(var name in config.headers){
@@ -201,6 +205,7 @@ Request.prototype = {
 
         request(options,
             function(error, response, body){
+                console.log(response.headers);
                 if(error){
                     callback(error, response, body);
                     return console.error('upload failed:', error);
