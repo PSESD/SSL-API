@@ -19,7 +19,10 @@ var xmlmodel = require('./lib/xmlmodel');
 var utils = require('./lib/utils');
 var rollbarAccessToken = config.get('rollbar.access_token');
 var compress = require('compression');
-
+i18n.configure({
+    locales:['en'],
+    directory: __dirname + '/resource/lang'
+});
 app.use(compress());
 
 if (rollbarAccessToken) {

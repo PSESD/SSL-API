@@ -24,7 +24,7 @@
     "express-subdomain": "^1.0.3",
     "fast-csv": "^0.6.0",
     "hal": "^0.1.0",
-    "i18n": "~0.5.0",
+    "i18n": "^0.5.0",
     "inflection": "~1.7.1",
     "js2xmlparser": "~1.0.0",
     "justlog": "~0.1.5",

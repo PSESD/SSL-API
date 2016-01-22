@@ -58,7 +58,7 @@ ReportController.getStudentBy = function (req, res) {
             });
             break;
         case 'grade':
-            sql = 'SELECT IF(s.grade_year = "0000", "N/A", s.grade_year) as gradeYear, COUNT(s.student_id) as total ';
+            sql = 'SELECT IF(s.grade_level = "", "N/A", s.grade_level) as gradeLevel, COUNT(s.student_id) as total ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
@@ -78,7 +78,7 @@ ReportController.getStudentBy = function (req, res) {
                 //sql += ' AND sp.caseload = ?';
                 //params.push(filters.caseload);
             }
-            sql += 'GROUP BY gradeYear';
+            sql += 'GROUP BY gradeLevel';
             console.log(con.format(sql,params));
             con.query(sql,params, function(err, results){
                 if(err){

@@ -1,3 +1,0 @@
-0 0 * * * /usr/bin/node /src/cli.js cache-list true >> /var/log/cron.log 2>&1
-0 0 * * * /usr/bin/node /src/cli.js push-caderlab >> /var/log/cron.log 2>&1
-0 2 * * * /usr/bin/node /src/cli.js pull-caderlab >> /var/log/cron.log 2>&1

@@ -8,7 +8,7 @@ var IndexController = {
 
     index: function(req, res){
 
-        res.json({ "test": "Welcome To API SSL :)"});
+        res.json({ "test": res.__('welcome_api')});
 
     },
     /**

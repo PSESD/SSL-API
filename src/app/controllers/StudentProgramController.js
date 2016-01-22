@@ -139,7 +139,7 @@ StudentProgramController.addByStudentId = function (req, res) {
 
             Tag.addTag(ObjectId(orgId), studentProgram.cohort);
 
-            res.sendSuccess('Student Program successfully add', student);
+            res.sendSuccess('Student successfully added to program', student);
 
         });
 
@@ -240,7 +240,7 @@ StudentProgramController.addByProgramId = function(req, res){
 
             Tag.addTag(ObjectId(orgId), studentProgram.cohort);
 
-            res.sendSuccess('Student Program successfully add', student);
+            res.sendSuccess('Student successfully added to program', student);
 
         });
 
