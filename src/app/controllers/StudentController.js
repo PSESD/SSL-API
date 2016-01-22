@@ -959,7 +959,7 @@ StudentController.createByOrgId = function(req, res){
 
                     StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(){
 
-                        res.sendSuccess('Successfully Added', obj);
+                        res.sendSuccess(res.__('data_added'), obj);
 
                     });
 
@@ -1005,7 +1005,7 @@ StudentController.getStudentById = function(req, res){
          * If organization is empty from database
          */
         if(!organization){
-            return res.sendError('The organization not found in database');
+            return res.sendError(res.__('record_not_found', 'Organization'));
         }
 
         var brokerRequest = new Request({
@@ -1023,7 +1023,7 @@ StudentController.getStudentById = function(req, res){
              * If student is empty from database
              */
             if(!student){
-                return res.sendError('The student not found in database');
+                return res.sendError(res.__('record_not_found', 'Student'));
             }
 
             if(withXsre){
@@ -1074,7 +1074,7 @@ StudentController.deleteStudentById = function(req, res){
             }
 
             if(!user){
-                return res.sendError('User not update successfully');
+                return res.sendError(res.__('data_updated_failed'));
             }
 
             _.each(user.permissions, function(permission, key){
@@ -1099,7 +1099,7 @@ StudentController.deleteStudentById = function(req, res){
 
                     if(err || !xsre){
 
-                        return res.sendSuccess('Successfully deleted');
+                        return res.sendSuccess(res.__('data_deleted'));
 
                     }
 
@@ -1111,13 +1111,13 @@ StudentController.deleteStudentById = function(req, res){
                          */
                         cache.set(prefixListStudent + orgId, xsre, { ttl: 86400 }, function(){
 
-                            res.sendSuccess('Successfully deleted');
+                            res.sendSuccess(res.__('data_deleted'));
 
                         });
 
                     } else{
 
-                        res.sendSuccess('Successfully deleted');
+                        res.sendSuccess(res.__('data_deleted'));
 
                     }
 
@@ -1153,7 +1153,7 @@ StudentController.putStudentById = function(req, res){
          * If organization is empty from database
          */
         if(!organization){
-            return res.sendError('The organization not found in database');
+            return res.sendError(res.__('record_not_found', 'Organization'));
         }
 
         var brokerRequest = new Request({
@@ -1172,7 +1172,7 @@ StudentController.putStudentById = function(req, res){
             }
 
             if(!obj){
-                return res.sendError('Data not found');
+                return res.sendError(res.__('data_not_found'));
             }
 
             for(var prop in req.body){
@@ -1199,7 +1199,7 @@ StudentController.putStudentById = function(req, res){
 
                 StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(){
 
-                    res.sendSuccess('Successfully updated!', obj);
+                    res.sendSuccess(res.__('data_updated'), obj);
 
                 });
 

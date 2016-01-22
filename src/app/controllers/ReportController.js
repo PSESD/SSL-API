@@ -148,7 +148,7 @@ ReportController.getStudentBy = function (req, res) {
             });
             break;
         default:
-            res.sendError('Request not valid!');
+            res.sendError(res.__('request_not_valid'));
             break;
     }
 

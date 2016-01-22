@@ -86,7 +86,9 @@ OrganizationController.updateProfile = function(req, res){
 
         if (err) { return res.sendError(err); }
 
-        if (!obj) return res.sendError('Data not found');
+        if (!obj) {
+            return res.sendError(res.__('data_not_found'));
+        }
 
         for (var prop in req.body) {
 
@@ -107,7 +109,7 @@ OrganizationController.updateProfile = function(req, res){
 
             res.xmlOptions = 'organization';
 
-            res.sendSuccess('Successfully updated!', obj);
+            res.sendSuccess(res.__('data_updated'), obj);
 
         });
     });
@@ -167,7 +169,9 @@ OrganizationController.getUser = function (req, res) {
 
         if (err)  { return res.sendError(err); }
 
-        if(!user) return res.sendError('User not found!');
+        if(!user) {
+            return res.sendError(res.__('user_not_found'));
+        }
 
         user.getCurrentPermission(req.params.organizationId);
 
@@ -194,7 +198,9 @@ OrganizationController.postUser = function (req, res) {
 
     var permissions = {};
 
-    if (req.body.organization) permissions.organization = ObjectId(req.body.organization);
+    if (req.body.organization) {
+        permissions.organization = ObjectId(req.body.organization);
+    }
 
     permissions.students = req.body.students || [];
 
@@ -214,13 +220,17 @@ OrganizationController.postUser = function (req, res) {
 
     permissions.last_updated_by = req.user.userId;
 
-    if (_.isEmpty(permissions)) return res.sendError('POST parameter is empty!');
+    if (_.isEmpty(permissions)) {
+        return res.sendError(res.__('parameter_required'));
+    }
 
     User.findOne({_id: ObjectId(userId)}, function (err, user) {
 
         if (err)  { return res.sendError(err); }
 
-        if (!user) return res.sendError('User data not found');
+        if (!user) {
+            return res.sendError(res.__('user_not_found'));
+        }
 
         var allpermission = [];
 
@@ -241,7 +251,9 @@ OrganizationController.postUser = function (req, res) {
             }
         }
 
-        if(allpermission.length === 0) allpermission.push(permissions);
+        if(allpermission.length === 0) {
+            allpermission.push(permissions);
+        }
 
 
 
@@ -255,7 +267,7 @@ OrganizationController.postUser = function (req, res) {
 
             res.xmlOptions = 'user';
 
-            res.sendSuccess('Organization successfully add to User', user);
+            res.sendSuccess(res.__('success_add_to', { name: 'Organization', to: 'User'}), user);
 
         });
 
@@ -280,7 +292,7 @@ OrganizationController.putUser = function (req, res) {
 
             if('retype_password' in req.body && req.body.password !== req.body.retype_password){
 
-                return res.sendError('Password didn\'t match');
+                return res.sendError(res.__('password_not_match'));
 
             } else if(!req.body.password){
 
@@ -305,7 +317,9 @@ OrganizationController.putUser = function (req, res) {
 
         if (err) { return res.sendError(err); }
 
-        if (!obj) return res.sendError('Data not found');
+        if (!obj) {
+            return res.sendError(res.__('data_not_found'));
+        }
 
 
         // set update time and update by user
@@ -317,7 +331,9 @@ OrganizationController.putUser = function (req, res) {
 
         ["first_name", "middle_name", "last_name", "password", "is_super_admin"].forEach(function(prop){
 
-            if(prop in req.body) obj[prop] = req.body[prop];
+            if(prop in req.body) {
+                obj[prop] = req.body[prop];
+            }
 
         });
 
@@ -329,7 +345,9 @@ OrganizationController.putUser = function (req, res) {
              */
             if(req.user._id.toString() === obj._id.toString() && req.user.isAdmin()){
 
-                if(role.indexOf('case-worker') !== -1) return res.sendError("Admin never be able to downgrade itself to a case worker");
+                if(role.indexOf('case-worker') !== -1) {
+                    return res.sendError(res.__('admin_never_able_to_downgrade'));
+                }
 
             }
 
@@ -337,7 +355,7 @@ OrganizationController.putUser = function (req, res) {
 
                 if (err)  { return res.sendError(err); }
 
-                res.sendSuccess('Successfully updated!', user);
+                res.sendSuccess(res.__('data_updated'), user);
 
             });
 
@@ -347,7 +365,7 @@ OrganizationController.putUser = function (req, res) {
 
                 if (err)  { return res.sendError(err); }
 
-                res.sendSuccess('Successfully updated!', user);
+                res.sendSuccess(res.__('data_updated'), user);
 
             });
 
@@ -369,13 +387,15 @@ OrganizationController.deleteUser = function (req, res) {
         if (err)  { return res.sendError(err); }
 
 
-        if (!user) return res.sendError("User not found");
+        if (!user) {
+            return res.sendError(res.__('user_not_found'));
+        }
 
         var allpermission = [];
 
         for (var i = 0; i < user.permissions.length; i++) {
 
-            if (req.params.organizationId != (user.permissions[i].organization + '')) {
+            if (req.params.organizationId !== (user.permissions[i].organization + '')) {
 
                 allpermission.push(user.permissions[i]);
 
@@ -386,7 +406,7 @@ OrganizationController.deleteUser = function (req, res) {
 
             if (err)  { return res.sendError(err); }
 
-            res.sendSuccess('Delete success');
+            res.sendSuccess(res.__('data_deleted'));
 
         });
     });
@@ -433,7 +453,7 @@ OrganizationController.getProgram = function (req, res) {
 
         if (err) { return res.sendError(err); }
 
-        if (!obj) return res.sendError('Data not found');
+        if (!obj) return res.sendError(res.__('data_not_found'));
 
         res.sendSuccess(obj);
 
@@ -478,7 +498,7 @@ OrganizationController.postProgram = function (req, res) {
 
             if (err)  { return res.sendError(err); }
 
-            res.sendSuccess('Successfully Added', obj);
+            res.sendSuccess(res.__('data_added'), obj);
 
         });
 
@@ -498,7 +518,7 @@ OrganizationController.putProgram = function (req, res) {
 
         if (err) { return res.sendError(err); }
 
-        if (!obj) return res.sendError('Data not found');
+        if (!obj) return res.sendError(res.__('data_not_found'));
 
         for (var prop in req.body) {
 
@@ -519,7 +539,7 @@ OrganizationController.putProgram = function (req, res) {
 
             if (err)  { return res.sendError(err); }
 
-            res.sendSuccess('Successfully updated!', obj);
+            res.sendSuccess(res.__('data_updated'), obj);
 
         });
 
@@ -540,7 +560,7 @@ OrganizationController.deleteProgram = function (req, res) {
 
         if (err)  { return res.sendError(err); }
 
-        res.sendSuccess('Successfully deleted');
+        res.sendSuccess(res.__('data_deleted'));
 
     });
 
