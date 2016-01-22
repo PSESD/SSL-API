@@ -34,7 +34,7 @@ RUN npm install
 
 # Setup crontab
 RUN apt-get -y install rsyslog
-ADD cronjob/files/etc/crontab /etc/cron.d/ssl-cron
+ADD cronjob/files/etc/ssl-cron /etc/cron.d/ssl-cron
 RUN chmod 0644 /etc/cron.d/ssl-cron
 RUN touch /var/log/cron.log
 
