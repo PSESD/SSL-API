@@ -553,18 +553,18 @@ function pullStudent(error, done){
                                     school: "",
                                     first_name: "",
                                     last_name: "",
-                                    grade_year: "",
+                                    grade_level: "",
                                     ethnicity: "",
                                     gender: ""
                                 };
 
                                 if(xSre){
-                                    students.gender = l.get(xSre, 'demographics.sex') || 'N/A';
-                                    students.school = l.get(xSre, 'enrollment.school.schoolName') || 'N/A';
-                                    students.first_name = l.get(xSre, 'name.givenName') || 'N/A';
-                                    students.last_name = l.get(xSre, 'name.familyName') || 'N/A';
-                                    students.grade_level = l.get(xSre, 'enrollment.gradeLevel') || 'N/A';
-                                    students.ethnicity = l.get(xSre, 'demographics.races.race.race') || 'N/A';
+                                    students.gender = l.get(xSre, 'demographics.sex');
+                                    students.school = l.get(xSre, 'enrollment.school.schoolName');
+                                    students.first_name = l.get(xSre, 'name.givenName');
+                                    students.last_name = l.get(xSre, 'name.familyName');
+                                    students.grade_level = l.get(xSre, 'enrollment.gradeLevel');
+                                    students.ethnicity = l.get(xSre, 'demographics.races.race.race');
                                 }
 
                                 var studentPrograms = {};
