@@ -500,7 +500,7 @@ function pullStudent(error, done){
              */
             function pullMap(organization, callback){
 
-                new request().get(function(err, res, body){
+                new request().clearParam().get(function(err, res, body){
                 //require('fs').readFile(rootPath + '/data/' + organization.name + '.xml', function(err, body){
                     if(err){
                         callback(null, organization);

@@ -30,6 +30,10 @@ function Request(options, env){
 
     this.headers = {};
 
+    this.lastPage = 0;
+
+    this.body = [];
+
 }
 
 Request.prototype = {
@@ -122,7 +126,19 @@ Request.prototype = {
             }
         }
 
+        self.addHeader('queueId', uuid.v4());
+        self.addHeader('requestId', uuid.v1());
+
         self.create(config.url + url, 'POST', data, callback);
+    },
+    /**
+     *
+     * @returns {Request}
+     */
+    clearParam: function(){
+      this.body = [];
+      this.lastPage = 0;
+      return this;
     },
     /**
      *
@@ -147,8 +163,8 @@ Request.prototype = {
             url += '?where='+where;
         }
 
-        this.headers.navigationpage = 1;
-        this.headers.navigationpagesize = 200;
+        this.headers.navigationpage = self.lastPage;
+        this.headers.navigationpagesize = 500;
 
 
         if('headers' in config){
@@ -159,8 +175,19 @@ Request.prototype = {
 
             }
         }
-
         self.create(config.url + url, 'GET', null, callback);
+        //self.create(config.url + url, 'GET', null, function(error, response, body){
+        //
+        //    if(!error && !('navigationlastpage' in response.headers)){
+        //        self.lastPage++;
+        //        self.body.push(body);
+        //        self.get(callback, serviceNumber, where, zoneId);
+        //    } else {
+        //        self.body.push(body);
+        //        callback(error, response, self.body.join(''));
+        //    }
+        //});
+
     },
     /**
      *
