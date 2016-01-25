@@ -90,15 +90,17 @@ switch(what){
         studentCollector.collect(function(bulkStudent){
                 require('fs').writeFile(__dirname + '/data/REQUEST-CBOStudents.xml', bulkStudent, function (err) {
                 });
-                setTimeout(function(){
+                //setTimeout(function(){
                     //console.log('PUSH DATA: ', bulkStudent);
                     (new request()).push(bulkStudent, function(error, response, body){
                         require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
-                            if (err) throw err;
+                            if (err) {
+                                throw err;
+                            }
                             process.exit();
                         });
                     });
-                }, 1000);
+                //}, 1000);
 
         });
         break;
