@@ -480,6 +480,10 @@ function collectCacheListStudentsAsync(force, done) {
 
     });
 }
+
+function queue(done){
+    new request().clearParam().queue('d9979ac0-a36a-4f71-8fc4-331153d92e57', done);
+}
 /**
  *
  * @param error
@@ -680,6 +684,7 @@ module.exports = {
     cache: collectCacheStudents,
     cacheList: collectCacheListStudentsAsync,
     cacheDebug: cacheDebug,
+    queue: queue,
     //dumpDataDistrictId: dumpDataDistrictId,
     pullStudent: pullStudent
 };

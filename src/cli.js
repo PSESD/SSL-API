@@ -114,6 +114,12 @@ switch(what){
             process.exit();
         });
         break;
+    case 'queue-caderlab':
+        studentCollector.queue(function(){
+            console.log('Queue done');
+            process.exit();
+        });
+        break;
     case 'cache-list':
         var args = process.argv.slice(3)[0] ? true : false;
         studentCollector.cacheList(args, function(data){

@@ -759,7 +759,7 @@ StudentController.getStudents = function(req, res){
         //    authorizedEntityId: organization.authorizedEntityId
         //});
 
-        Student.protect(req.user.role, null, req.user).find(crit, function(err, students){
+        Student.protect(req.user.role, null, req.user).find(crit, null, { sort: { first_name: 1, last_name: 1 }}, function(err, students){
 
             if(err){
                 return res.sendError(err);
@@ -769,7 +769,7 @@ StudentController.getStudents = function(req, res){
 
             cache.get(key, function(err, results){
 
-                //console.log(key, ' DATA ', results);
+                console.log(key, ' DATA ', results);
 
                 var studentsList = [];
 
@@ -799,6 +799,8 @@ StudentController.getStudents = function(req, res){
                 res.sendSuccess(null, studentsList);
 
             });
+
+            res.sendSuccess(null, []);
 
         });
 

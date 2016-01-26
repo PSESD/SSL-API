@@ -8,6 +8,7 @@ var qs = require('querystring');
 var moment = require('moment');
 var uuid = require('node-uuid');
 var CryptoJS = require("crypto-js");
+var TIME = 1321644961388;
 /**
  *
  * @param options
@@ -126,10 +127,32 @@ Request.prototype = {
             }
         }
 
-        self.addHeader('queueId', uuid.v4());
-        self.addHeader('requestId', uuid.v1());
+        self.addHeader('queueId', uuid.v1({msecs: TIME + 1}));
+        self.addHeader('requestId', uuid.v1({msecs: TIME + 28*24*3600*1000}));
 
         self.create(config.url + url, 'POST', data, callback);
+    },
+    /**
+     *
+     * @param queueId
+     * @param done
+     */
+    queue: function(queueId, done){
+
+        var config = this.config.CBOStudent.get;
+
+        var self = this;
+
+        var url = '/queues/'+ queueId +'/messages;deleteMessageId=';
+        self.addHeader('queueId', queueId);
+        self.addHeader('requestId', queueId);
+
+        self.create(config.url + url, 'GET', null, function(error, response, body){
+            console.log('RESPONSE CODE: ' + response.statusCode);
+            console.log('BODY: ' + body);
+            console.log('ERROR: ' + error);
+            done();
+        });
     },
     /**
      *
@@ -211,7 +234,8 @@ Request.prototype = {
             preambleCRLF: true,
             postambleCRLF: true,
             uri: url,
-            headers: this.getHeaders()
+            headers: this.getHeaders(),
+            followAllRedirects: true
         };
 
         console.log(options);
@@ -237,7 +261,9 @@ Request.prototype = {
                     callback(error, response, body);
                     return console.error('upload failed:', error);
                 }
-                //console.log('Upload successful!  Server responded with:', body);
+                console.log('Response Header:', response.headers);
+                console.log('Response STATUS CODE:', response.statusCode);
+                console.log('Upload successful!  Server responded with:', body);
                 callback(error, response, body);
             });
     },
