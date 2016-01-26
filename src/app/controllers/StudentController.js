@@ -753,13 +753,8 @@ StudentController.getStudents = function(req, res){
             return res.sendError('The organization not found in database');
         }
 
-        //var brokerRequest = new Request({
-        //    externalServiceId: organization.externalServiceId,
-        //    personnelId: organization.personnelId,
-        //    authorizedEntityId: organization.authorizedEntityId
-        //});
 
-        Student.protect(req.user.role, null, req.user).find(crit, null, { sort: { first_name: 1, last_name: 1 }}, function(err, students){
+        Student.protect(req.user.role, null, req.user).find(crit, function(err, students){
 
             if(err){
                 return res.sendError(err);
@@ -795,12 +790,12 @@ StudentController.getStudents = function(req, res){
                     studentsList.push(newObject);
 
                 });
-
-                res.sendSuccess(null, studentsList);
+                //res.sendSuccess(null, studentsList);
+                res.sendSuccess(null, _.sortBy(studentsList, function(st){
+                  return [st.first_name, st.last_name];
+                }));
 
             });
-
-            res.sendSuccess(null, []);
 
         });
 
