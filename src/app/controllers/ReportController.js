@@ -23,7 +23,8 @@ ReportController.getStudentBy = function (req, res) {
         cohort: req.query.cohort,
         caseload: req.query.caseload
     };
-    var sql = '';
+    var sql = null;
+    var group = null;
     var params = [ orgId ];
 
     switch(by){
@@ -32,124 +33,82 @@ ReportController.getStudentBy = function (req, res) {
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
-            if(filters.program){
-                sql += ' AND sp.program_name = ?';
-                params.push(filters.program);
-            }
-            if(filters.district){
-                sql += ' AND s.school_district = ?';
-                params.push(filters.district);
-            }
-            if(filters.cohort){
-                sql += ' AND FIND_IN_SET(?, sp.cohorts)';
-                params.push(filters.cohort);
-            }
-            if(filters.caseload){
-                //sql += ' AND sp.caseload = ?';
-                //params.push(filters.caseload);
-            }
-            sql += 'GROUP BY schoolName, schoolDistrict';
-            console.log(con.format(sql,params));
-            con.query(sql,params, function(err, results){
-                if(err){
-                    return res.sendError(err);
-                }
-                res.sendSuccess(results);
-            });
+            group = 'schoolName, schoolDistrict';
             break;
         case 'grade':
             sql = 'SELECT IF(s.grade_level = "" OR s.grade_level IS NULL, "N/A", s.grade_level) as gradeLevel, COUNT(s.student_id) as total ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
-            if(filters.program){
-                sql += ' AND sp.program_name = ?';
-                params.push(filters.program);
-            }
-            if(filters.district){
-                sql += ' AND s.school_district = ?';
-                params.push(filters.district);
-            }
-            if(filters.cohort){
-                sql += ' AND FIND_IN_SET(?, sp.cohorts)';
-                params.push(filters.cohort);
-            }
-            if(filters.caseload){
-                //sql += ' AND sp.caseload = ?';
-                //params.push(filters.caseload);
-            }
-            sql += 'GROUP BY gradeLevel';
-            console.log(con.format(sql,params));
-            con.query(sql,params, function(err, results){
-                if(err){
-                    return res.sendError(err);
-                }
-                res.sendSuccess(results);
-            });
+            group = 'gradeLevel';
             break;
         case 'gender':
             sql = 'SELECT IF(s.gender = "" OR s.gender IS NULL,  "N/A", s.gender) as genderName, COUNT(s.student_id) as total ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
-            if(filters.program){
-                sql += ' AND sp.program_name = ?';
-                params.push(filters.program);
-            }
-            if(filters.district){
-                sql += ' AND s.school_district = ?';
-                params.push(filters.district);
-            }
-            if(filters.cohort){
-                sql += ' AND FIND_IN_SET(?, sp.cohorts)';
-                params.push(filters.cohort);
-            }
-            if(filters.caseload){
-                //sql += ' AND sp.caseload = ?';
-                //params.push(filters.caseload);
-            }
-            sql += 'GROUP BY genderName';
-            console.log(con.format(sql,params));
-            con.query(sql,params, function(err, results){
-                if(err){
-                    return res.sendError(err);
-                }
-                res.sendSuccess(results);
-            });
+            group = 'genderName';
             break;
         case 'race':
             sql = 'SELECT IF(s.ethnicity = "" OR s.ethnicity IS NULL, "N/A", s.ethnicity) as ethnicityName, COUNT(s.student_id) as total ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
-            if(filters.program){
-                sql += ' AND sp.program_name = ?';
-                params.push(filters.program);
-            }
-            if(filters.district){
-                sql += ' AND s.school_district = ?';
-                params.push(filters.district);
-            }
-            if(filters.cohort){
-                sql += ' AND FIND_IN_SET(?, sp.cohorts)';
-                params.push(filters.cohort);
-            }
-            if(filters.caseload){
-                //sql += ' AND sp.caseload = ?';
-                //params.push(filters.caseload);
-            }
-            sql += 'GROUP BY ethnicityName';
-            console.log(con.format(sql,params));
-            con.query(sql,params, function(err, results){
-                if(err){
-                    return res.sendError(err);
-                }
-                res.sendSuccess(results);
-            });
+            group = 'ethnicityName';
             break;
         default:
-            res.sendError(res.__('request_not_valid'));
-            break;
+            return res.sendError(res.__('request_not_valid'));
+    }
+
+    if(sql !== null){
+        if(filters.program){
+            sql += ' AND sp.program_name';
+            if(_.isArray(filters.program)){
+                sql += ' IN( ? )';
+            } else {
+                sql += ' = ?';
+            }
+            params.push(filters.program);
+        }
+        if(filters.district){
+            sql += ' AND s.school_district';
+            if(_.isArray(filters.district)){
+                sql += ' IN( ? )';
+            } else {
+                sql += ' = ?';
+            }
+            params.push(filters.district);
+        }
+        if(filters.cohort){
+            if(_.isArray(filters.cohort)){
+                var orWhere = [];
+                filters.cohort.forEach(function(c){
+                    orWhere.push('FIND_IN_SET(?, sp.cohorts) > 0');
+                    params.push(c);
+                });
+                if(orWhere.length > 0){
+                    sql += ' AND (' + orWhere.join(' OR ') + ')';
+                }
+            } else {
+                sql += ' AND FIND_IN_SET(?, sp.cohorts) > 0';
+                params.push(filters.cohort);
+            }
+        }
+        if(filters.caseload){
+            //sql += ' AND sp.caseload = ?';
+            //params.push(filters.caseload);
+        }
+
+        if(group){
+            sql = 'SELECT * FROM (' + sql + ') as t GROUP BY ' + group;
+        }
+        console.log(con.format(sql,params));
+        con.query(sql, params, function(err, results){
+            if(err){
+                return res.sendError(err);
+            }
+            res.sendSuccess(results);
+        });
     }
 
 };
