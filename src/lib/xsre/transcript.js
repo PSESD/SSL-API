@@ -18,6 +18,8 @@ function Transcript(xsre){
 
     this.enrollments = xsre.json.enrollment ? [xsre.json.enrollment] : [];
 
+    this.transcriptFilterMark = [];
+
     var me = this;
 
     if(xsre.json.otherEnrollments && _.isArray(xsre.json.otherEnrollments.enrollment)){
@@ -164,7 +166,9 @@ Transcript.prototype.getTranscript = function(){
 
     //console.log(me.subject);
 
-    me.course = _.sortBy(me.course);
+    me.course = _.sortBy(me.course, function(o){
+        return o.startDateTime * -1;
+    });
 
     if(me.enrollments.length > 0){
 
@@ -253,6 +257,20 @@ Transcript.prototype.getTranscript = function(){
 
     me.info.totalAttempted = parseFloat(me.info.totalAttempted).toFixed(1);
     me.info.totalEarned = parseFloat(me.info.totalEarned).toFixed(1);
+
+    if(me.summary.termCreditsAttempted === 0 && me.summary.totalCreditsEarned === 0){
+
+        me.totalCreditsAttempted = me.info.totalAttempted;
+
+        me.totalCreditsEarned = me.info.totalEarned;
+
+    }
+
+    if(me.gradeLevel === me.notAvailable){
+
+        me.gradeLevel = me.info.gradeLevel;
+
+    }
 
     return {
         history: _.sortBy(me.history, 'schoolYear').reverse(),
@@ -375,10 +393,19 @@ Transcript.prototype.processTranscript = function(transcript, current){
         gradeLevel : transcript.gradeLevel,
         schoolYear : tSchoolYear,
         schoolName : tSchoolName,
+        startDate: l.get(transcript, 'session.startDate'),
+        startDateTime: 0,
         session: tSession,
         transcripts: {},
         summary: summary
     };
+
+    if(info.startDate){
+        info.startDateTime = new Date(info.startDate).getTime();
+    } else {
+        info.startDate = info.tSchoolYear;
+        info.startDateTime = new Date(info.startDate).getTime();
+    }
 
     if(parseInt(me.info.gradeLevel) < parseInt(info.gradeLevel)){
 
@@ -443,9 +470,20 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
 
     if(!mark) {
 
+        //return;
+        mark = 0;
+
+    }
+
+    var icheck = key + '+' + uniqueStr + '+' + (course.courseTitle || me.notAvailable);
+
+    if(me.transcriptFilterMark.indexOf(icheck) !== -1){
+
         return;
 
     }
+
+    me.transcriptFilterMark.push(icheck);
 
     me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
 

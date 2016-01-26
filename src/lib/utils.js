@@ -11,11 +11,48 @@ var cacheManager = require('cache-manager');
 var xml2js = require('xml2js');
 var _ = require('underscore');
 var parseString = require('xml2js').parseString;
+// Nodejs encryption with CTR
+var algorithm = 'aes-256-ctr',
+      password = 'ssl-encrypted-827192';
 /**
  *
  * @type {{cache: Function, uid: Function, tokenHash: Function, secretHash: Function, codeHash: Function, calculateExp: Function, preg_quote: Function, log: Function}}
  */
 var utils = {
+
+    /**
+     *
+     * @param text
+     * @returns {*}
+     */
+    encrypt: function(text){
+        return text;
+        //try{
+        //    var cipher  = crypto.createCipher(algorithm, password);
+        //    var crypted = cipher.update(text, 'utf8', 'hex');
+        //    crypted += cipher.final('hex');
+        //    return crypted;
+        //} catch(ex){
+        //    return '';
+        //}
+    },
+    /**
+     *
+     * @param text
+     * @returns {*}
+     */
+    decrypt: function(text){
+        return text;
+        //try{
+        //    var decipher = crypto.createDecipher(algorithm, password);
+        //    var dec      = decipher.update(text, 'hex', 'utf8');
+        //    dec += decipher.final('utf8');
+        //    return dec;
+        //} catch(ex){
+        //    return '';
+        //}
+    },
+
     /**
      *
      * @returns cache-manager

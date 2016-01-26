@@ -290,7 +290,19 @@ Run Unit Test:
 
     $ cd src && mocha
 
+## Cron Job
 
+Cronjob using crontab:
+
+    0 0 * * * /usr/bin/node /src/cli.js cache-list true >> /var/log/cron.log 2>&1
+    0 0 * * * /usr/bin/node /src/cli.js push-caderlab >> /var/log/cron.log 2>&1
+    0 2 * * * /usr/bin/node /src/cli.js pull-caderlab >> /var/log/cron.log 2>&1
+    
+Cronjob run manually:
+    
+        /usr/bin/node /src/cli.js cache-list true
+        /usr/bin/node /src/cli.js push-caderlab
+        /usr/bin/node /src/cli.js pull-caderlab
 
 
 ### Configurations
