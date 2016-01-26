@@ -86,7 +86,7 @@ switch(what){
         });
         break;
     case 'push-xml-student':
-    case 'push-caderlab':
+    case 'push-cedarlabs':
         studentCollector.collect(function(bulkStudent){
                 require('fs').writeFile(__dirname + '/data/REQUEST-CBOStudents.xml', bulkStudent, function (err) {
                 });
@@ -104,7 +104,7 @@ switch(what){
 
         });
         break;
-    case 'pull-caderlab':
+    case 'pull-cedarlabs':
     case 'pull-xml-student':
         studentCollector.pullStudent(function(err){
             console.error('error connecting: ' + err.stack);
@@ -114,7 +114,7 @@ switch(what){
             process.exit();
         });
         break;
-    case 'queue-caderlab':
+    case 'queue-cedarlabs':
         studentCollector.queue(function(){
             console.log('Queue done');
             process.exit();
