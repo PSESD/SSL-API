@@ -471,7 +471,7 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
     if(!mark) {
 
         //return;
-        mark = 0;
+        mark = '';
 
     }
 
@@ -528,7 +528,14 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
         me.subject.push(uniqueStr);
     }
 
-    var mark = course.progressMark || course.finalMarkValue;
+    var mark = /*course.progressMark || */course.finalMarkValue;
+
+    if(!mark) {
+
+        //return;
+        mark = '';
+
+    }
 
     me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
 
