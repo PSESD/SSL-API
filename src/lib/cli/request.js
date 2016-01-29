@@ -196,7 +196,7 @@ Request.prototype = {
 
         //this.headers.navigationpage = self.lastPage;
         //this.headers.navigationpage = 0;
-        this.headers.navigationpagesize = 2;
+        this.headers.navigationpagesize = 5;
         this.headers.queryIntention = 'ALL'; //(ALL, ONE-OFF, NO-CACHING)
 
 
@@ -249,13 +249,13 @@ Request.prototype = {
                     done(items);
                 } else {
                     grab(function(){
-                        console.log(pageId, ' => ', items.length);
+                        console.log(pageId + ' => ' + items.length);
                     });
                 }
             }, serviceNumber, where, zoneId, { navigationid: navigationId, navigationpage: pageId });
         }
 
-        grab(function() { console.log(pageId, ' =>  ', 'Item Get: ' + items.length); });
+        grab(function() { console.log(pageId + ' =>  Item Get: ' + items.length); });
     },
     /**
      *
@@ -282,7 +282,7 @@ Request.prototype = {
             headers: this.getHeaders()
         };
 
-        console.log('OPTIONS: ', JSON.stringify(options));
+        //console.log('OPTIONS: ', JSON.stringify(options));
 
 
         if(data){
@@ -300,13 +300,13 @@ Request.prototype = {
 
         request(options,
             function(error, response, body){
-                console.log(response.headers);
+                //console.log(response.headers);
                 if(error){
                     callback(error, response, body);
                     return console.error('upload failed:', error);
                 }
-                console.log('Response Header:', JSON.stringify(response.headers));
-                console.log('Response STATUS CODE:', response.statusCode);
+                //console.log('Response Header:', JSON.stringify(response.headers));
+                //console.log('Response STATUS CODE:', response.statusCode);
                 //console.log('Server responded with:', body);
                 callback(error, response, body);
             });
