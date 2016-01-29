@@ -169,8 +169,9 @@ Request.prototype = {
      * @param serviceNumber
      * @param where
      * @param zoneId
+     * @param headers
      */
-    get: function(callback, serviceNumber, where, zoneId){
+    get: function(callback, serviceNumber, where, zoneId, headers){
 
         var config = this.config.CBOStudent.get;
 
@@ -193,8 +194,10 @@ Request.prototype = {
         }
         url += 'json=true';
 
-        this.headers.navigationpage = self.lastPage;
-        this.headers.navigationpagesize = 10;
+        //this.headers.navigationpage = self.lastPage;
+        //this.headers.navigationpage = 0;
+        this.headers.navigationpagesize = 2;
+        this.headers.queryIntention = 'ALL'; //(ALL, ONE-OFF, NO-CACHING)
 
 
         if('headers' in config){
@@ -202,6 +205,15 @@ Request.prototype = {
             for(var name in config.headers){
 
                 self.addHeader(name, config.headers[name]);
+
+            }
+        }
+
+        if(headers){
+
+            for(var name in headers){
+
+                self.addHeader(name, headers[name]);
 
             }
         }
@@ -217,9 +229,33 @@ Request.prototype = {
      * @param zoneId
      */
     getBulk: function(done, serviceNumber, where, zoneId){
-        var items = [];
         var me = this;
-        
+        var items = [];
+        var navigationId = null;
+        var pageId = 0;
+        me.clearParam();
+        /**
+         *
+         * @param c
+         */
+        function grab(c){
+            me.get(function(e, r, b){
+                var ret = JSON.parse(b);
+                items = items.concat(ret);
+                c();
+                navigationId = r.headers.navigationid;
+                pageId = parseInt(r.headers.navigationpage) + 1;
+                if(r.headers.navigationlastpage === 'true'){
+                    done(items);
+                } else {
+                    grab(function(){
+                        console.log(pageId, ' => ', items.length);
+                    });
+                }
+            }, serviceNumber, where, zoneId, { navigationid: navigationId, navigationpage: pageId });
+        }
+
+        grab(function() { console.log(pageId, ' =>  ', 'Item Get: ' + items.length); });
     },
     /**
      *
@@ -271,7 +307,7 @@ Request.prototype = {
                 }
                 console.log('Response Header:', JSON.stringify(response.headers));
                 console.log('Response STATUS CODE:', response.statusCode);
-                console.log('Server responded with:', body);
+                //console.log('Server responded with:', body);
                 callback(error, response, body);
             });
     },

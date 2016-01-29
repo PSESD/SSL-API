@@ -660,34 +660,14 @@ function pullStudent(done){
 }
 /**
  *
- * @param error
  * @param ok
  */
-function pullStudentAsync(error, ok){
+function pullStudentAsync(ok){
     var masterTable = '`students`';
     var backupTable = '`students__`';
     var t1 = '`student_programs`';
     var t2 = '`student_programs__`';
 
-    /**
-     *
-     * @param err
-     */
-    function done(err){
-        if(err){
-            con.end(function(e){
-                if(e){
-                    ok(e);
-                } else{
-                    ok(err);
-                }
-            });
-        } else{
-            con.end(function(err){
-                ok(err);
-            });
-        }
-    }
     con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
         con.query('create table ' + t2 + ' like ' + t1, function(err, results){
             /**
@@ -697,22 +677,11 @@ function pullStudentAsync(error, ok){
              */
             function pullMap(organization, callback){
 
-                new request().clearParam().get(function(err, res, body){
-                    if(err){
-                        callback(null, organization);
-                        return;
-                    }
+                //if(organization.name === 'Helping Hand CBO') return callback(null, organization);
 
-                    var result = JSON.parse(body);
-                    //var result = JSON.parse(fs.readFileSync(rootPath + '/data/response.json', 'utf8'));
-                    //require('fs').writeFile(rootPath + '/data/' + organization.name + '.json', body, function(err){});
+                new request().getBulk(function(studentList){
 
-                    var studentList = null;
-
-                    if(result){
-                        studentList = result;
-                    }
-                    if(studentList !== null){
+                    if(studentList){
                         console.log(organization.name, ' >>> STUDENT LIST: ', studentList.length);
                         async.each(studentList, function(student, cb){
                             var xSre = l.get(student, 'xSre');
@@ -744,38 +713,38 @@ function pullStudentAsync(error, ok){
                             var studentProgramData = [];
 
                             if(student.studentActivity){
-                                if(!_.isArray(student.studentActivity)){
-                                    student.studentActivity = [student.studentActivity];
+                                if(_.isObject(student.studentActivity)){
+                                    _.values(student.studentActivity).forEach(function(programs){
+                                        if(programs.title){
+                                            studentPrograms[programs.refId] = programs.title;
+                                        }
+                                    });
                                 }
-                                student.studentActivity.forEach(function(programs){
-                                    if(programs.title){
-                                        studentPrograms[programs.refId] = programs.title;
-                                    }
-                                });
                             }
 
                             if(student.programs && student.programs.activities && student.programs.activities.activity){
-                                if(!_.isArray(student.programs.activities.activity)){
-                                    student.programs.activities.activity = [student.programs.activities.activity];
-                                }
-                                student.programs.activities.activity.forEach(function(activity){
-                                    if(activity.studentActivityRefId in studentPrograms){
-                                        var tags = [];
-                                        if(activity.tags){
-                                            if(!_.isArray(activity.tags.tag)){
-                                                tags.push(activity.tags.tag);
-                                            } else{
-                                                tags = activity.tags.tag;
+                                if(_.isObject(student.programs.activities.activity)){
+                                    _.values(student.programs.activities.activity).forEach(function(activity){
+                                        if(activity.studentActivityRefId in studentPrograms){
+                                            var tags = [];
+                                            if(activity.tags){
+                                                if(!_.isArray(activity.tags.tag)){
+                                                    tags.push(activity.tags.tag);
+                                                } else if(_.isObject(activity.tags.tag)){
+                                                    tags = _.values(activity.tags.tag);
+                                                } else{
+                                                    tags = activity.tags.tag;
+                                                }
                                             }
+                                            studentProgramData.push({
+                                                program_id: activity.studentActivityRefId,
+                                                student_id: students.student_id,
+                                                program_name: studentPrograms[activity.studentActivityRefId],
+                                                cohorts: tags.join(",")
+                                            });
                                         }
-                                        studentProgramData.push({
-                                            program_id: activity.studentActivityRefId,
-                                            student_id: students.student_id,
-                                            program_name: studentPrograms[activity.studentActivityRefId],
-                                            cohorts: tags.join(",")
-                                        });
-                                    }
-                                });
+                                    });
+                                }
                             }
                             //console.log(students);
                             con.query('INSERT INTO ' + backupTable + ' SET ?', students, function(err, result){
@@ -815,25 +784,25 @@ function pullStudentAsync(error, ok){
                         var sql = 'DROP TABLE ' + masterTable;
                         con.query(sql, function(err, results){
                             if(err){
-                                return done(err);
+                                console.log(err);
                             }
                             sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
                             con.query(sql, function(err, results){
                                 if(err){
-                                    return done(err);
+                                    console.log(err);
                                 }
                                 var sql = 'DROP TABLE ' + t1;
                                 con.query(sql, function(err, results){
                                     if(err){
-                                        return done(err);
+                                        console.log(err);
                                     }
                                     sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
                                     con.query(sql, function(err, results){
                                         if(err){
-                                            return done(err);
+                                            console.log(err);
                                         }
                                         con.end(function(err){
-                                            done(err);
+                                            ok();
                                         });
                                     });
                                 });
