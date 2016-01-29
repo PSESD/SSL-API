@@ -127,10 +127,10 @@ Request.prototype = {
             }
         }
 
-        self.addHeader('queueId', uuid.v1({msecs: TIME + 1}));
+        //self.addHeader('queueId', uuid.v1({msecs: TIME + 1}));
         self.addHeader('requestId', uuid.v1({msecs: TIME + 28*24*3600*1000}));
 
-        self.create(config.url + url, 'POST', data, callback);
+        self.create(config.url + url, 'PUT', data, callback);
     },
     /**
      *
@@ -148,7 +148,7 @@ Request.prototype = {
         self.addHeader('requestId', queueId);
 
         self.create(config.url + url, 'GET', null, function(error, response, body){
-            console.log('RESPONSE CODE: ' + response.statusCode);
+            console.log('RESPONSE CODE: ', response.statusCode);
             console.log('BODY: ' + body);
             console.log('ERROR: ' + error);
             done();
@@ -186,8 +186,15 @@ Request.prototype = {
             url += '?where='+where;
         }
 
+        if(url.indexOf('?') === -1){
+            url += '?';
+        } else {
+            url += '&';
+        }
+        url += 'json=true';
+
         this.headers.navigationpage = self.lastPage;
-        this.headers.navigationpagesize = 500;
+        this.headers.navigationpagesize = 10;
 
 
         if('headers' in config){
@@ -198,18 +205,8 @@ Request.prototype = {
 
             }
         }
+
         self.create(config.url + url, 'GET', null, callback);
-        //self.create(config.url + url, 'GET', null, function(error, response, body){
-        //
-        //    if(!error && !('navigationlastpage' in response.headers)){
-        //        self.lastPage++;
-        //        self.body.push(body);
-        //        self.get(callback, serviceNumber, where, zoneId);
-        //    } else {
-        //        self.body.push(body);
-        //        callback(error, response, self.body.join(''));
-        //    }
-        //});
 
     },
     /**
@@ -234,11 +231,10 @@ Request.prototype = {
             preambleCRLF: true,
             postambleCRLF: true,
             uri: url,
-            headers: this.getHeaders(),
-            followAllRedirects: true
+            headers: this.getHeaders()
         };
 
-        console.log(options);
+        console.log('OPTIONS: ', JSON.stringify(options));
 
 
         if(data){
@@ -261,9 +257,9 @@ Request.prototype = {
                     callback(error, response, body);
                     return console.error('upload failed:', error);
                 }
-                console.log('Response Header:', response.headers);
+                console.log('Response Header:', JSON.stringify(response.headers));
                 console.log('Response STATUS CODE:', response.statusCode);
-                console.log('Upload successful!  Server responded with:', body);
+                console.log('Server responded with:', body);
                 callback(error, response, body);
             });
     },

@@ -280,6 +280,7 @@ Transcript.prototype.getTranscript = function(){
         subjectValues: subjectValues,
         totalCreditsEarned: isNaN(me.totalCreditsEarned) ? 0 : parseFloat(me.totalCreditsEarned).toFixed(1),
         totalCreditsAttempted: isNaN(me.totalCreditsAttempted) ? 0 : parseFloat(me.totalCreditsAttempted).toFixed(1),
+        totalCumulativeGpa: me.summary.cumulativeGpa.toFixed(1),
         gradeLevel: me.gradeLevel,
         summary: me.summary,
         info: me.info
@@ -471,7 +472,7 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
     if(!mark) {
 
         //return;
-        mark = 0;
+        mark = '';
 
     }
 
@@ -528,7 +529,14 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
         me.subject.push(uniqueStr);
     }
 
-    var mark = course.progressMark || course.finalMarkValue;
+    var mark = /*course.progressMark || */course.finalMarkValue;
+
+    if(!mark) {
+
+        //return;
+        mark = '';
+
+    }
 
     me.course[key].summary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
 

@@ -148,8 +148,18 @@ function Attendance(xsre){
             this.academicEnd = moment(new Date(y1, 7, 31, 0, 0, 0));
         }
     } else {
-        this.academicStart = null;
-        this.academicEnd = null;
+        /**
+         * Try get from current year
+         * @type {null}
+         */
+        var today = new Date();
+        if(today.getMonth() <= 7){
+            this.academicStart = moment(new Date(today.getYear() - 1, 8, 1, 0, 0, 0));
+            this.academicEnd = moment(new Date(today.getYear(), 7, 31, 0, 0, 0));
+        } else {
+            this.academicStart = moment(new Date(today.getYear(), 8, 1, 0, 0, 0));
+            this.academicEnd = moment(new Date(today.getYear() + 1, 7, 31, 0, 0, 0));
+        }
     }
 
     this.notAvailable = 'N/A';
@@ -332,7 +342,6 @@ Attendance.prototype.getAttendances = function(){
             mm = moment(new Date(discipline.incidentDate));
 
             discipline.incidentDateTime = mm.valueOf();
-
 
             var passed = true;
 
@@ -824,8 +833,6 @@ Attendance.prototype.calculateSummary = function(){
         behavior: 0
     };
 
-    var currentYear = moment().format('YYYY');
-
     if(_.isObject(me.attendances) && _.isObject(me.attendances.events) && !_.isUndefined(me.attendances.events.event)){
 
         if(!_.isArray(me.attendances.events.event)){
@@ -840,7 +847,17 @@ Attendance.prototype.calculateSummary = function(){
 
             mm = moment(new Date(event.calendarEventDate));
 
-            if(mm.isValid() && mm.format('YYYY') === currentYear){
+            event.calendarEventDateTime = mm.valueOf();
+
+            var passed = true;
+
+            if(me.academicStart && me.academicEnd){
+
+                passed = (event.calendarEventDateTime >= me.academicStart && event.calendarEventDateTime <= me.academicEnd);
+
+            }
+
+            if(passed && mm.isValid()){
 
                 if('dailyAttendanceStatus' in event){
 
@@ -874,7 +891,17 @@ Attendance.prototype.calculateSummary = function(){
 
             mm = moment(new Date(discipline.incidentDate));
 
-            if(mm.isValid() && mm.format('YYYY') === currentYear){
+            discipline.incidentDateTime = mm.valueOf();
+
+            var passed = true;
+
+            if(me.academicStart && me.academicEnd){
+
+                passed = (discipline.incidentDateTime >= me.academicStart && discipline.incidentDateTime <= me.academicEnd);
+
+            }
+
+            if(passed && mm.isValid()){
 
                 me.currentSummary.behavior++;
 

@@ -13,6 +13,7 @@ var bs = require('nodestalker'),
 var studentCollector = require('./lib/cli/studentCollector');
 var tokenCleaner = require('./lib/cli/tokenCleaner');
 var request = require('./lib/cli/request');
+var utils = require('./lib/utils');
 var con = require('./lib/cli/mysql');
 var parseString = require('xml2js').parseString;
 
@@ -90,27 +91,25 @@ switch(what){
         studentCollector.collect(function(bulkStudent){
                 require('fs').writeFile(__dirname + '/data/REQUEST-CBOStudents.xml', bulkStudent, function (err) {
                 });
-                //setTimeout(function(){
-                    //console.log('PUSH DATA: ', bulkStudent);
-                    (new request()).push(bulkStudent, function(error, response, body){
-                        require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
-                            if (err) {
-                                throw err;
-                            }
-                            process.exit();
-                        });
+                (new request()).push(bulkStudent, function(error, response, body){
+                    require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
+                        if (err) {
+                            throw err;
+                        }
+                        process.exit();
                     });
-                //}, 1000);
+                });
 
         });
         break;
     case 'pull-cedarlabs':
     case 'pull-xml-student':
         studentCollector.pullStudent(function(err){
-            console.error('error connecting: ' + err.stack);
-            process.exit();
-        }, function(){
-            console.error('Done !');
+            if(err){
+                utils.log(err, 'error');
+            } else {
+                utils.log('Pull Done !', 'info');
+            }
             process.exit();
         });
         break;

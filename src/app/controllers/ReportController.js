@@ -29,28 +29,28 @@ ReportController.getStudentBy = function (req, res) {
 
     switch(by){
         case 'school_district':
-            sql = 'SELECT IF(s.school = "" OR s.school IS NULL, "N/A", s.school) as schoolName, s.school_district as schoolDistrict, COUNT(s.student_id) as total ';
+            sql = 'SELECT IF(s.school = "" OR s.school IS NULL, "N/A", s.school) as schoolName, s.school_district as schoolDistrict ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
             group = 'schoolName, schoolDistrict';
             break;
         case 'grade':
-            sql = 'SELECT IF(s.grade_level = "" OR s.grade_level IS NULL, "N/A", s.grade_level) as gradeLevel, COUNT(s.student_id) as total ';
+            sql = 'SELECT IF(s.grade_level IS NULL, "N/A", s.grade_level) as gradeLevel ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
             group = 'gradeLevel';
             break;
         case 'gender':
-            sql = 'SELECT IF(s.gender = "" OR s.gender IS NULL,  "N/A", s.gender) as genderName, COUNT(s.student_id) as total ';
+            sql = 'SELECT IF(s.gender = "" OR s.gender IS NULL,  "N/A", s.gender) as genderName ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
             group = 'genderName';
             break;
         case 'race':
-            sql = 'SELECT IF(s.ethnicity = "" OR s.ethnicity IS NULL, "N/A", s.ethnicity) as ethnicityName, COUNT(s.student_id) as total ';
+            sql = 'SELECT IF(s.ethnicity = "" OR s.ethnicity IS NULL, "N/A", s.ethnicity) as ethnicityName ';
             sql += 'FROM students s ';
             sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
@@ -100,7 +100,7 @@ ReportController.getStudentBy = function (req, res) {
         }
 
         if(group){
-            sql = 'SELECT * FROM (' + sql + ') as t GROUP BY ' + group;
+            sql = 'SELECT *, COUNT(*) as total FROM (' + sql + ') as t GROUP BY ' + group;
         }
         console.log(con.format(sql,params));
         con.query(sql, params, function(err, results){
@@ -138,11 +138,12 @@ ReportController.getFilters = function(req, res){
             }
             if(row.cohorts){
                 row.cohorts.split(',').forEach(function(cohort){
-                    rowsets.cohorts.push(cohort);
-                    if(cohort && rowsets.cohorts.indexOf(cohort) === -1){
-                        rowsets.cohorts.push((''+cohort).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1){
-                            return $1.toUpperCase();
-                        }));
+                    if(!_.isObject(cohort)){
+                        if(cohort && rowsets.cohorts.indexOf(cohort) === -1){
+                            rowsets.cohorts.push(('' + cohort).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1){
+                                return $1.toUpperCase();
+                            }));
+                        }
                     }
                 });
             }
