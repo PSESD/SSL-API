@@ -182,7 +182,7 @@ StudentController.getStudentsBackpack = function(req, res){
             results.personal.lastName = student.last_name;
             results.personal.middleName = student.middle_name;
             results.personal.schoolDistrict = student.school_district;
-            results.personal.address = student.addresses;
+            results.personal.address = student.address;
 
             results.personal.emergency1 = {
                 name: student.emergency1_name,
