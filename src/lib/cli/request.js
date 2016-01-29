@@ -211,6 +211,18 @@ Request.prototype = {
     },
     /**
      *
+     * @param done
+     * @param serviceNumber
+     * @param where
+     * @param zoneId
+     */
+    getBulk: function(done, serviceNumber, where, zoneId){
+        var items = [];
+        var me = this;
+        
+    },
+    /**
+     *
      * @param url
      * @param method
      * @param data

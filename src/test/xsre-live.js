@@ -5,8 +5,8 @@
 var xSre = require(__dirname+'/../lib/xsre');
 
 var fs = require('fs');
-//var xmlFile = __dirname + '/data/xsre.xml';
-var xmlFile = __dirname + '/data/xml.xml';
+var xmlFile = __dirname + '/data/xsre.xml';
+//var xmlFile = __dirname + '/data/xml.xml';
 var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
       if(err) {
@@ -58,7 +58,9 @@ fs.readFile(xmlFile, function(err, data) {
                     //console.log(JSON.stringify(t));
                 }
             });
-            console.log(require('prettyjson').render(transcript));
+
+            console.log(require('prettyjson').render(xsre.getStudentSummary()));
+            //console.log(require('prettyjson').render(transcript));
             //console.log(require('prettyjson').render(attendanceSummary));
       });
 

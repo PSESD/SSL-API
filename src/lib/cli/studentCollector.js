@@ -557,40 +557,38 @@ function pullStudent(done){
                             var studentProgramData = [];
 
                             if(student.studentActivity){
-                                if(!_.isArray(student.studentActivity)){
-                                    student.studentActivity = [student.studentActivity];
+                                if(_.isObject(student.studentActivity)){
+                                    _.values(student.studentActivity).forEach(function(programs){
+                                        if(programs.title){
+                                            studentPrograms[programs.refId] = programs.title;
+                                        }
+                                    });
                                 }
-                                student.studentActivity.forEach(function(programs){
-                                    if(programs.title){
-                                        studentPrograms[programs.refId] = programs.title;
-                                    }
-                                });
                             }
 
                             if(student.programs && student.programs.activities && student.programs.activities.activity){
-                                if(!_.isArray(student.programs.activities.activity)){
-                                    student.programs.activities.activity = [student.programs.activities.activity];
-                                }
-                                student.programs.activities.activity.forEach(function(activity){
-                                    if(activity.studentActivityRefId in studentPrograms){
-                                        var tags = [];
-                                        if(activity.tags){
-                                            if(!_.isArray(activity.tags.tag)){
-                                                tags.push(activity.tags.tag);
-                                            } else if(_.isObject(activity.tags.tag)){
-                                                tags = _.values(activity.tags.tag);
-                                            } else {
-                                                tags = activity.tags.tag;
+                                if(_.isObject(student.programs.activities.activity)){
+                                    _.values(student.programs.activities.activity).forEach(function(activity){
+                                        if(activity.studentActivityRefId in studentPrograms){
+                                            var tags = [];
+                                            if(activity.tags){
+                                                if(!_.isArray(activity.tags.tag)){
+                                                    tags.push(activity.tags.tag);
+                                                } else if(_.isObject(activity.tags.tag)){
+                                                    tags = _.values(activity.tags.tag);
+                                                } else{
+                                                    tags = activity.tags.tag;
+                                                }
                                             }
+                                            studentProgramData.push({
+                                                program_id: activity.studentActivityRefId,
+                                                student_id: students.student_id,
+                                                program_name: studentPrograms[activity.studentActivityRefId],
+                                                cohorts: tags.join(",")
+                                            });
                                         }
-                                        studentProgramData.push({
-                                            program_id: activity.studentActivityRefId,
-                                            student_id: students.student_id,
-                                            program_name: studentPrograms[activity.studentActivityRefId],
-                                            cohorts: tags.join(",")
-                                        });
-                                    }
-                                });
+                                    });
+                                }
                             }
                             //console.log(students);
                             con.query('INSERT INTO ' + backupTable + ' SET ?', students, function(err, result){
