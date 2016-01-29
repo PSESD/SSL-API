@@ -154,11 +154,11 @@ function Attendance(xsre){
          */
         var today = new Date();
         if(today.getMonth() <= 7){
-            this.academicStart = moment(new Date(today.getYear() - 1, 8, 1, 0, 0, 0));
-            this.academicEnd = moment(new Date(today.getYear(), 7, 31, 0, 0, 0));
+            this.academicStart = moment(new Date(today.getFullYear() - 1, 8, 1, 0, 0, 0));
+            this.academicEnd = moment(new Date(today.getFullYear(), 7, 31, 0, 0, 0));
         } else {
-            this.academicStart = moment(new Date(today.getYear(), 8, 1, 0, 0, 0));
-            this.academicEnd = moment(new Date(today.getYear() + 1, 7, 31, 0, 0, 0));
+            this.academicStart = moment(new Date(today.getFullYear(), 8, 1, 0, 0, 0));
+            this.academicEnd = moment(new Date(today.getFullYear() + 1, 7, 31, 0, 0, 0));
         }
     }
 
