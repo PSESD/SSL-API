@@ -101,7 +101,7 @@ switch(what){
 
         });
         break;
-    case 'pullall-cedarlabs':
+    case 'pull-cedarlabs':
         studentCollector.pullStudentAsync(function(err){
             if(err){
                 utils.log(err, 'error');
@@ -111,16 +111,16 @@ switch(what){
             process.exit();
         });
         break;
-    case 'pull-cedarlabs':
-        studentCollector.pullStudent(function(err){
-            if(err){
-                utils.log(err, 'error');
-            } else {
-                utils.log('Pull Done !', 'info');
-            }
-            process.exit();
-        });
-        break;
+    //case 'pull-cedarlabs':
+    //    studentCollector.pullStudent(function(err){
+    //        if(err){
+    //            utils.log(err, 'error');
+    //        } else {
+    //            utils.log('Pull Done !', 'info');
+    //        }
+    //        process.exit();
+    //    });
+    //    break;
     case 'queue-cedarlabs':
         studentCollector.queue(function(){
             console.log('Queue done');
