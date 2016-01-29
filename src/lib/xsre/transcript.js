@@ -280,6 +280,7 @@ Transcript.prototype.getTranscript = function(){
         subjectValues: subjectValues,
         totalCreditsEarned: isNaN(me.totalCreditsEarned) ? 0 : parseFloat(me.totalCreditsEarned).toFixed(1),
         totalCreditsAttempted: isNaN(me.totalCreditsAttempted) ? 0 : parseFloat(me.totalCreditsAttempted).toFixed(1),
+        totalCumulativeGpa: me.summary.cumulativeGpa.toFixed(1),
         gradeLevel: me.gradeLevel,
         summary: me.summary,
         info: me.info

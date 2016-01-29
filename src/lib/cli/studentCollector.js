@@ -578,9 +578,7 @@ function pullStudent(done){
                                             if(!_.isArray(activity.tags.tag)){
                                                 tags.push(activity.tags.tag);
                                             } else if(_.isObject(activity.tags.tag)){
-                                                for(var tag in activity.tags.tag){
-                                                    tags.push(activity.tags.tag[tag]);
-                                                }
+                                                tags = _.values(activity.tags.tag);
                                             } else {
                                                 tags = activity.tags.tag;
                                             }

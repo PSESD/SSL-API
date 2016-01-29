@@ -194,7 +194,7 @@ Request.prototype = {
         url += 'json=true';
 
         this.headers.navigationpage = self.lastPage;
-        this.headers.navigationpagesize = 500;
+        this.headers.navigationpagesize = 10;
 
 
         if('headers' in config){
