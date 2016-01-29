@@ -138,11 +138,12 @@ ReportController.getFilters = function(req, res){
             }
             if(row.cohorts){
                 row.cohorts.split(',').forEach(function(cohort){
-                    rowsets.cohorts.push(cohort);
-                    if(cohort && rowsets.cohorts.indexOf(cohort) === -1){
-                        rowsets.cohorts.push((''+cohort).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1){
-                            return $1.toUpperCase();
-                        }));
+                    if(!_.isObject(cohort)){
+                        if(cohort && rowsets.cohorts.indexOf(cohort) === -1){
+                            rowsets.cohorts.push(('' + cohort).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1){
+                                return $1.toUpperCase();
+                            }));
+                        }
                     }
                 });
             }

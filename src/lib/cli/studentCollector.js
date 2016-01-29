@@ -508,8 +508,14 @@ function pullStudent(done){
                         callback(null, organization);
                         return;
                     }
-                    console.log(body);
-                    var result = JSON.parse(body);
+                    var result;
+                    //console.log(body);
+                    try{
+                        result = JSON.parse(body);
+                    } catch(e){
+                        callback(null, organization);
+                        return;
+                    }
                     //var result = JSON.parse(fs.readFileSync(rootPath + '/data/response.json', 'utf8'));
                     //require('fs').writeFile(rootPath + '/data/' + organization.name + '.json', body, function(err){});
 
@@ -571,7 +577,11 @@ function pullStudent(done){
                                         if(activity.tags){
                                             if(!_.isArray(activity.tags.tag)){
                                                 tags.push(activity.tags.tag);
-                                            } else{
+                                            } else if(_.isObject(activity.tags.tag)){
+                                                for(var tag in activity.tags.tag){
+                                                    tags.push(activity.tags.tag[tag]);
+                                                }
+                                            } else {
                                                 tags = activity.tags.tag;
                                             }
                                         }
