@@ -15,6 +15,7 @@ ENV NODE_CONFIG_DIR /src/config
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get -y install curl unzip git wget vim nginx nodejs npm python-setuptools libkrb5-dev
 RUN ln -s /usr/bin/nodejs /usr/bin/node
+RUN export TERM=xterm
 
 # Setup Nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
@@ -31,11 +32,18 @@ WORKDIR /src
 RUN npm -g update npm
 RUN npm install
 
+# Setup crontab
+RUN apt-get -y install rsyslog
+ADD cronjob/files/etc/ssl-cron /etc/cron.d/ssl-cron
+RUN chmod 0644 /etc/cron.d/ssl-cron
+RUN touch /var/log/cron.log
+
 # Run Supervisord
 RUN /usr/bin/easy_install supervisor
 RUN /usr/bin/easy_install supervisor-stdout
 RUN /usr/bin/easy_install superlance
 ADD /config/supervisord.conf /etc/supervisord.conf
+
 
 # Publish port
 EXPOSE 443

@@ -9,14 +9,15 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
+var __ = require('lodash');
 var Request = require('../../lib/broker/request');
-var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark  = utils.benchmark();
+var utils = require('../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
 var ObjectId = mongoose.Types.ObjectId;
 var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
 var xSre = require('../../lib/xsre');
 var async = require('async');
-
+var prefixListStudent = '_xsre_list_students_';
 
 /**
  * Get the list of all organizations that this user have access to in our system.
@@ -24,7 +25,7 @@ var async = require('async');
  * @param res
  * @returns {*}
  */
-StudentController.getStudentsBackpack = function (req, res) {
+StudentController.getStudentsBackpack = function(req, res){
 
     var orgId = ObjectId(req.params.organizationId);
 
@@ -34,7 +35,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     var usePagination = false;
 
-    if(!separate) {
+    if(!separate){
 
         separate = 'xsre';
 
@@ -46,27 +47,32 @@ StudentController.getStudentsBackpack = function (req, res) {
 
     }
 
-    benchmark.info('XSRE - START GET STUDENT BACKPACK');
+    benchmark.info('XSRE - START GET STUDENT BACKPACK => ' + separate);
 
     var showRaw = false;
 
-    if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')) {
+    if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')){
         showRaw = true;
     }
     benchmark.info('XSRE - GET STUDENT');
 
-    Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
+    Student.protect(req.user.role, { value: studentId }, req.user).findOne({
+        _id: studentId,
+        organization: orgId
+    }, function(err, student){
 
-        if (err)  { return res.sendError(err); }
+        if(err){
+            return res.sendError(err);
+        }
         /**
          * If student is empty from database
          */
-        if (!student) {
+        if(!student){
             return res.sendError('The student not found in database');
         }
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
-        //key = new Date().getTime();
+        key = new Date().getTime();
         /**
          *
          * @param results
@@ -74,7 +80,7 @@ StudentController.getStudentsBackpack = function (req, res) {
          */
         function embeds(results, isFromCache){
 
-            res.header('X-Cached-Sre' , isFromCache ? 1 : 0 );
+            res.header('X-Cached-Sre', isFromCache ? 1 : 0);
 
             benchmark.info('XSRE - EMBED RESULTS => ' + (isFromCache ? ' FROM CACHE' : ' FROM SERVER'));
 
@@ -85,10 +91,12 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 benchmark.info('XSRE - USING PAGINATION ON( ' + separate + ')');
 
-                benchmark.info('XSRE - FINISH');
+                benchmark.info('XSRE - FINISH 3');
 
-                if(results.raw) {
+                if(results.raw){
+
                     delete results.raw;
+
                 }
 
                 var paginate = {
@@ -112,28 +120,52 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 }
 
-                if (typeof req.query.page !== 'undefined') {
-                    paginate.currentPage = +req.query.page;
+                if(separate === 'attendance'){
+
+                    paginate.source.years = results.years;
+
+                    delete results.years;
+
                 }
 
                 paginate.total = results.length;
 
+                if(typeof req.query.page !== 'undefined'){
+
+                    paginate.currentPage = +req.query.page;
+
+                }
+
+                if(typeof req.query.pageSize !== 'undefined'){
+
+                    if(req.query.pageSize === 'all'){
+
+                        paginate.pageSize = paginate.total;
+
+                    } else{
+
+                        paginate.pageSize = +req.query.pageSize;
+
+                    }
+                }
+
                 //split list into groups
-                while (results.length > 0) {
+                //console.log('PAGE: ', paginate);
+                while(results.length > 0){
                     arrayList.push(results.splice(0, paginate.pageSize));
                 }
 
                 paginate.data = arrayList[+paginate.currentPage - 1];
 
-                paginate.pageCount = Math.ceil(paginate.total/paginate.pageSize);
+                paginate.pageCount = Math.ceil(paginate.total / paginate.pageSize);
 
                 var resource = new hal.Resource(paginate, req.originalUrl);
 
-                if(paginate.currentPage + 1 <= paginate.pageCount) {
+                if(paginate.currentPage + 1 <= paginate.pageCount){
                     var nextUrl = req.originalUrl;
                     if(nextUrl.indexOf('?') === -1){
                         nextUrl += '?';
-                    } else {
+                    } else{
                         nextUrl += '&';
                     }
                     resource.link(new hal.Link('nextUrl', nextUrl + 'page=' + (+paginate.currentPage + 1)));
@@ -150,7 +182,7 @@ StudentController.getStudentsBackpack = function (req, res) {
             results.personal.lastName = student.last_name;
             results.personal.middleName = student.middle_name;
             results.personal.schoolDistrict = student.school_district;
-            results.personal.address = student.addresses;
+            results.personal.address = student.address;
 
             results.personal.emergency1 = {
                 name: student.emergency1_name,
@@ -177,7 +209,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             }
 
-            if(results.raw) {
+            if(results.raw){
                 delete results.raw;
             }
 
@@ -196,9 +228,11 @@ StudentController.getStudentsBackpack = function (req, res) {
             benchmark.info('XSRE - EMBED USER');
             User.find(crit, function(err, users){
 
-                if (err)  { return res.sendError(err); }
+                if(err){
+                    return res.sendError(err);
+                }
 
-                if(!users) {
+                if(!users){
                     users = [];
                 }
 
@@ -212,13 +246,13 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                     var fullname = [];
 
-                    if(user.first_name) {
+                    if(user.first_name){
                         fullname.push(user.first_name);
                     }
-                    if(user.middle_name) {
+                    if(user.middle_name){
                         fullname.push(user.middle_name);
                     }
-                    if(user.last_name) {
+                    if(user.last_name){
                         fullname.push(user.last_name);
                     }
 
@@ -226,7 +260,7 @@ StudentController.getStudentsBackpack = function (req, res) {
                         id: user._id.toString(),
                         email: user.email,
                         fullname: fullname.join(' ')
-                    }, '/'+orgId+'/users/'+user._id));
+                    }, '/' + orgId + '/users/' + user._id));
 
                 });
 
@@ -236,7 +270,7 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                 _.each(student.programs, function(program){
 
-                    if(Object.keys(programsId).indexOf(program.program.toString()) === -1) {
+                    if(Object.keys(programsId).indexOf(program.program.toString()) === -1){
                         programsId[program.program.toString()] = [];
                     }
 
@@ -250,7 +284,9 @@ StudentController.getStudentsBackpack = function (req, res) {
                     benchmark.info('XSRE - EMBED PROGRAM');
                     Program.find({ _id: { $in: programId } }, function(err, programs){
 
-                        if (err)  { return res.sendError(err); }
+                        if(err){
+                            return res.sendError(err);
+                        }
 
                         _.each(programs, function(program){
 
@@ -272,20 +308,20 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         resource.embed('programs', embedsPrograms);
 
-                        benchmark.info('XSRE - FINISH');
+                        benchmark.info('XSRE - FINISH 1');
 
                         res.sendSuccess(null, resource.toJSON());
 
                     });
 
 
-                } else {
+                } else{
 
                     resource.embed('users', embedsUsers);
 
                     resource.embed('programs', embedsPrograms);
 
-                    benchmark.info('XSRE - FINISH');
+                    benchmark.info('XSRE - FINISH 2');
 
                     res.sendSuccess(null, resource.toJSON());
 
@@ -293,14 +329,18 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             });
         }
+
         benchmark.info('XSRE - GET ORGANIZATION');
+
         Organization.findOne({ _id: orgId }, function(err, organization){
 
-            if (err)  { return res.sendError(err); }
+            if(err){
+                return res.sendError(err);
+            }
             /**
              * If organization is empty from database
              */
-            if (!organization) {
+            if(!organization){
                 return res.sendError('The organization not found in database');
             }
 
@@ -312,19 +352,19 @@ StudentController.getStudentsBackpack = function (req, res) {
 
             cache.get(key, function(err, result){
 
-                if(err) {
+                if(err){
                     log(err);
                 }
 
                 if(!result){
                     benchmark.info('XSRE - REQUEST XSRE');
-                    brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
+                    brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
                         benchmark.info('XSRE - GET RESPONSE');
-                        if (error)  {
+                        if(error){
                             return res.sendError(error);
                         }
 
-                        if (!body) {
+                        if(!body){
 
                             res.statusCode = response.statusCode || 404;
 
@@ -332,28 +372,57 @@ StudentController.getStudentsBackpack = function (req, res) {
 
                         }
 
-                        if (response && response.statusCode === 200) {
+                        if(response && response.statusCode === 200){
                             benchmark.info('XSRE - PARSING DATA FROM XML TO JS');
-                            utils.xml2js(body, function (err, result) {
+                            utils.xml2js(body, function(err, result){
 
-                                if (err)  { return res.sendError(err); }
+                                if(err){
+                                    return res.sendError(err);
+                                }
+                                var msg;
+
+                                if(result && 'error' in result){
+
+                                    msg = result.error.message ? result.error.message : result.error;
+                                    console.log('X1:', result);
+                                    if(!msg){
+                                        msg = 'Data not found!';
+                                    }
+                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                    return res.sendError(msg);
+
+                                }
+
+                                if(result && 'Error' in result){
+
+                                    msg = result.Error.Message ? result.Error.Message : result.Error;
+                                    if(!msg){
+                                        msg = 'Data not found!';
+                                    }
+                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                    return res.sendError(msg);
+
+                                }
+
                                 benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
 
                                 var object = null;
 
-                                var xsre = new xSre(result, body, separate).setLogger(benchmark);
+                                var xsre = new xSre(result, body, separate, req.query).setLogger(benchmark);
 
                                 if(usePagination === false){
 
                                     object = xsre.toObject();
 
-                                } else {
+                                } else{
 
 
-                                    switch (separate){
+                                    switch(separate){
 
                                         case 'attendance':
-                                            object = xsre.getAttendanceBehavior().getAttendances();
+                                            var attendance = xsre.getAttendanceBehavior();
+                                            object = attendance.getAttendances();
+                                            object.years = attendance.getAvailableYears();
                                             break;
                                         case 'transcript':
                                             object = xsre.getTranscript().getTranscript();
@@ -369,31 +438,55 @@ StudentController.getStudentsBackpack = function (req, res) {
                                 /**
                                  * Set to cache
                                  */
-                                benchmark.info('XSRE - SET TO CACHE');
-                                cache.set(key, object, function(err){
+                                    //benchmark.info('XSRE - SET TO CACHE');
+                                    //cache.set(key, object, function(err){
+                                    //
+                                    //    console.log(err);
+                                    //    log(err);
 
-                                    log(err);
+                                embeds(object);
 
-                                    embeds(object);
-
-                                });
+                                //});
 
                             });
 
-                        } else {
+                        } else{
                             benchmark.info('XSRE - PARSING DATA ERROR FROM XML TO JS');
-                            utils.xml2js(body, function (err, result) {
+                            utils.xml2js(body, function(err, result){
+                                if(err){
+                                    return res.sendError(err);
+                                }
+                                var msg;
 
-                                var json = (result && 'error' in result) ? result.error.message : 'Error not response';
-                                benchmark.info('XSRE - FINISH');
-                                res.sendError(json);
+                                if(result && 'error' in result){
+
+                                    msg = result.error.message ? result.error.message : result.error;
+                                    if(!msg){
+                                        msg = 'Data not found!';
+                                    }
+                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                    return res.sendError(msg);
+
+                                }
+                                if(result && 'Error' in result){
+
+                                    msg = result.Error.Message ? result.Error.Message : result.Error;
+                                    if(!msg){
+                                        msg = 'Data not found!';
+                                    }
+                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                    return res.sendError(msg);
+
+                                }
+                                console.log('X2:', result);
+                                return res.sendError('Data not found!');
 
                             });
                         }
                     });
 
-                } else {
-
+                } else{
+                    console.log('FROM CACHE ---------------------------');
                     embeds(result, 1);
 
                 }
@@ -418,19 +511,24 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
     var separate = req.query.separate || 'xsre';
 
-    if(!separate) {
+    if(!separate){
 
         separate = 'xsre';
 
     }
 
-    Student.protect(req.user.role, { value: studentId }, req.user).findOne({_id: studentId, organization: orgId}, function (err, student) {
+    Student.protect(req.user.role, { value: studentId }, req.user).findOne({
+        _id: studentId,
+        organization: orgId
+    }, function(err, student){
 
-        if (err)  { return res.sendError(err); }
+        if(err){
+            return res.sendError(err);
+        }
         /**
          * If student is empty from database
          */
-        if (!student) {
+        if(!student){
             return res.sendError('The student not found in database');
         }
 
@@ -438,17 +536,19 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
         Organization.findOne({ _id: orgId }, function(err, organization){
 
-            if (err)  { return res.sendError(err); }
+            if(err){
+                return res.sendError(err);
+            }
             /**
              * If organization is empty from database
              */
-            if (!organization) {
+            if(!organization){
                 return res.sendError('The organization not found in database');
             }
 
             cache.del(key, function(err){
 
-                if (err){
+                if(err){
 
                     log(err, 'error');
 
@@ -460,7 +560,21 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
                 cache.del(key, function(){
 
-                    res.sendSuccess('Delete cache successfully');
+                    if(separate === 'xsre'){
+
+                        key = new Request().clearCacheXsreKey(student.district_student_id, student.school_district, organization);
+
+                        cache.del(key, function(){
+
+                            res.sendSuccess('Delete cache successfully');
+
+                        });
+
+                    } else{
+
+                        res.sendSuccess('Delete cache successfully');
+
+                    }
 
                 });
 
@@ -482,29 +596,31 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
 
     cache.get(key, function(err, result){
 
-        if(err)  {
+        if(err){
             return callback(null, student, false);
         }
 
         if(!result){
 
-            brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
+            brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
 
-                if (error)  {
+                if(error){
                     return callback(null, student, false);
                 }
 
-                if (!body) {
+                if(!body){
 
                     return callback(null, student, false);
 
                 }
 
-                if (response && response.statusCode === 200) {
+                if(response && response.statusCode === 200){
 
-                    utils.xml2js(body, function (err, result) {
+                    utils.xml2js(body, function(err, result){
 
-                        if (err)  { return callback(null, student, false); }
+                        if(err){
+                            return callback(null, student, false);
+                        }
 
                         var object = new xSre(result).getStudentSummary();
 
@@ -515,7 +631,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
                         /**
                          * Set to cache
                          */
-                        cache.set(key, newObject, {ttl: 3600}, function(){
+                        cache.set(key, newObject, { ttl: 86400 }, function(){
 
                             callback(null, newObject, false);
 
@@ -526,7 +642,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
                 }
             });
 
-        } else {
+        } else{
 
 
             callback(null, result, true);
@@ -536,11 +652,83 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
     });
 };
 /**
+ *
+ * @param brokerRequest
+ * @param student
+ * @param orgId
+ * @param callback
+ */
+StudentController.refreshStudentSummary = function(brokerRequest, student, orgId, callback){
+
+    var key = prefixListStudent + orgId;
+
+    cache.get(key, function(err, result){
+
+        if(err){
+            return callback(err);
+        }
+
+        if(!result){
+            result = {};
+        }
+
+        console.log('COUNT 1: ' + Object.keys(result).length);
+
+        if(!(student._id.toString() in result)){
+
+
+            result[student._id.toString()] = {};
+        }
+        console.log('COUNT 2: ' + Object.keys(result).length);
+
+        brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
+
+            var studentId = student._id.toString();
+            if(error){
+                return callback(err);
+            }
+
+            if(!body){
+                return callback('Empty response');
+            }
+            console.log('COUNT 3: ' + Object.keys(result).length);
+            if(response && response.statusCode === 200){
+
+                utils.xml2js(body, function(err, xmlResult){
+
+                    if(err){
+                        return callback(err, null);
+                    }
+
+                    var updateObject = new xSre(xmlResult).getStudentSummary();
+
+                    var newObject = {};
+
+                    newObject[studentId] = updateObject;
+
+                    result = __.merge(result, newObject);
+
+                    //console.log(key, 'RESULT >>>>>>>>>>>>>>>>>>>', Object.keys(result).length, JSON.stringify(result));callback();
+
+                    cache.set(key, result, {ttl: 86400}, callback);
+
+                });
+
+            } else{
+
+                callback();
+            }
+
+        });
+
+    });
+};
+/**
  * Get all student in organization
  * @param req
  * @param res
  */
-StudentController.getStudents = function (req, res) {
+StudentController.getStudents = function(req, res){
 
     res.xmlKey = 'students';
 
@@ -553,53 +741,61 @@ StudentController.getStudents = function (req, res) {
     crit.organization = orgId;
 
 
-    Organization.findOne({ _id: orgId }, function(err, organization) {
+    Organization.findOne({ _id: orgId }, function(err, organization){
 
-        if (err)  { return res.sendError(err); }
+        if(err){
+            return res.sendError(err);
+        }
         /**
          * If organization is empty from database
          */
-        if (!organization) {
+        if(!organization){
             return res.sendError('The organization not found in database');
         }
 
-        var brokerRequest = new Request({
-            externalServiceId: organization.externalServiceId,
-            personnelId: organization.personnelId,
-            authorizedEntityId: organization.authorizedEntityId
-        });
 
-        Student.protect(req.user.role, null, req.user).find(crit, function (err, students) {
+        Student.protect(req.user.role, null, req.user).find(crit, function(err, students){
 
-            if (err)  { return res.sendError(err); }
-
-            if(withXsre) {
-
-                var studentsAsync = [];
-
-                students.forEach(function (student) {
-
-                    studentsAsync.push(function (callback) {
-
-                        StudentController.getStudentDetail(brokerRequest, student, orgId, callback);
-
-                    });
-
-                });
-
-                async.series(studentsAsync, function(err, students, isCache){
-
-                    res.header('X-Cached-Sre' , isCache ? 1 : 0 );
-
-                    res.sendSuccess(null, students);
-
-                });
-
-            } else {
-
-                res.sendSuccess(null, students);
-
+            if(err){
+                return res.sendError(err);
             }
+
+            var key = prefixListStudent + orgId;
+
+            cache.get(key, function(err, results){
+
+                console.log(key, ' DATA ', results);
+
+                var studentsList = [];
+
+                students.forEach(function(student){
+
+                    var newObject = student.toObject();
+
+                    newObject.xsre = {
+                        "gradeLevel": "N/A",
+                        "schoolYear": "N/A",
+                        "schoolName": "N/A",
+                        "attendance": 0,
+                        "behavior": 0,
+                        "onTrackToGraduate": "N/A"
+                    };
+
+                    if(!_.isUndefined(results) && student._id.toString() in results){
+
+                        newObject.xsre = results[student._id.toString()];
+
+                    }
+
+                    studentsList.push(newObject);
+
+                });
+                //res.sendSuccess(null, studentsList);
+                res.sendSuccess(null, _.sortBy(studentsList, function(st){
+                  return [st.first_name, st.last_name];
+                }));
+
+            });
 
         });
 
@@ -611,11 +807,11 @@ StudentController.getStudents = function (req, res) {
  * @param req
  * @param res
  */
-StudentController.getStudentNotAssigns = function (req, res) {
+StudentController.getStudentNotAssigns = function(req, res){
 
     var orgId = ObjectId(req.params.organizationId);
 
-    var where = { permissions: { $elemMatch: { organization: orgId } }};
+    var where = { permissions: { $elemMatch: { organization: orgId } } };
 
     if(req.body.userId){
 
@@ -639,19 +835,19 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
             user.permissions.forEach(function(permission){
 
-                if(permission.organization.toString() === orgId.toString()) {
+                if(permission.organization.toString() === orgId.toString()){
 
                     //if (permission.role === 'case-worker-restricted') {
 
-                        showEmpty = false;
+                    showEmpty = false;
 
-                        permission.students.forEach(function (student) {
+                    permission.students.forEach(function(student){
 
-                            if (students.indexOf(student) === -1) {
-                                students.push(student);
-                            }
+                        if(students.indexOf(student) === -1){
+                            students.push(student);
+                        }
 
-                        });
+                    });
 
                     //}
 
@@ -667,13 +863,15 @@ StudentController.getStudentNotAssigns = function (req, res) {
 
         }
 
-        if(students.length > 0) {
+        if(students.length > 0){
             crit._id = { $nin: students };
         }
 
-        Student.find(crit, function (err, students) {
+        Student.find(crit, function(err, students){
 
-            if (err)  { return res.sendError(err); }
+            if(err){
+                return res.sendError(err);
+            }
 
             res.sendSuccess(null, students);
 
@@ -687,50 +885,83 @@ StudentController.getStudentNotAssigns = function (req, res) {
  * @param req
  * @param res
  */
-StudentController.createByOrgId = function (req, res) {
+StudentController.createByOrgId = function(req, res){
 
     res.xmlKey = 'student';
 
-    var obj = new Student(req.body);
+    var orgId = ObjectId(req.params.organizationId);
 
-    obj.organization = ObjectId(req.params.organizationId);
+    Organization.findOne({ _id: orgId }, function(err, organization){
 
-    // set update time and update by user
-    obj.created = new Date();
-
-    obj.creator = req.user.userId;
-
-    obj.last_updated = new Date();
-
-    obj.last_updated_by = req.user.userId;
-
-    User.findOne({ _id: req.user._id }, function(err, user){
-
-        if (err)  { return res.sendError(err); }
-
-        if(!user) {
-            return res.sendError('User not update successfully');
+        if(err){
+            return res.sendError(err);
+        }
+        /**
+         * If organization is empty from database
+         */
+        if(!organization){
+            return res.sendError('The organization not found in database');
         }
 
-        obj.protect(req.user.role, null, req.user).save(function (err) {
+        var brokerRequest = new Request({
+            externalServiceId: organization.externalServiceId,
+            personnelId: organization.personnelId,
+            authorizedEntityId: organization.authorizedEntityId
+        });
 
-            if (err) { return res.sendError(err); }
+        var obj = new Student(req.body);
 
-            _.each(user.permissions, function(permission, key){
+        obj.organization = orgId;
 
-                if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+        // set update time and update by user
+        obj.created = new Date();
 
-                    user.permissions[key].students.push(obj._id);
+        obj.creator = req.user.userId;
 
+        obj.last_updated = new Date();
+
+        obj.last_updated_by = req.user.userId;
+
+        User.findOne({ _id: req.user._id }, function(err, user){
+
+            if(err){
+                return res.sendError(err);
+            }
+
+            if(!user){
+                return res.sendError('User not update successfully');
+            }
+
+            obj.protect(req.user.role, null, req.user).save(function(err){
+
+                if(err){
+                    return res.sendError(err);
                 }
 
-            });
+                _.each(user.permissions, function(permission, key){
 
-            user.save(function(err){
+                    if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
 
-                if (err) { return res.sendError(err); }
+                        user.permissions[key].students.push(obj._id);
 
-                res.sendSuccess('Successfully Added', obj);
+                    }
+
+                });
+
+                user.save(function(err){
+
+                    if(err){
+                        return res.sendError(err);
+                    }
+
+                    StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(){
+
+                        res.sendSuccess(res.__('data_added'), obj);
+
+                    });
+
+
+                });
 
             });
 
@@ -744,7 +975,7 @@ StudentController.createByOrgId = function (req, res) {
  * @param req
  * @param res
  */
-StudentController.getStudentById = function (req, res) {
+StudentController.getStudentById = function(req, res){
 
     res.xmlOptions = 'student';
 
@@ -762,14 +993,16 @@ StudentController.getStudentById = function (req, res) {
 
     crit._id = studentId;
 
-    Organization.findOne({ _id: orgId }, function(err, organization) {
+    Organization.findOne({ _id: orgId }, function(err, organization){
 
-        if (err)  { return res.sendError(err); }
+        if(err){
+            return res.sendError(err);
+        }
         /**
          * If organization is empty from database
          */
-        if (!organization) {
-            return res.sendError('The organization not found in database');
+        if(!organization){
+            return res.sendError(res.__('record_not_found', 'Organization'));
         }
 
         var brokerRequest = new Request({
@@ -778,27 +1011,29 @@ StudentController.getStudentById = function (req, res) {
             authorizedEntityId: organization.authorizedEntityId
         });
 
-        Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function (err, student) {
+        Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function(err, student){
 
-            if (err)  { return res.sendError(err); }
+            if(err){
+                return res.sendError(err);
+            }
             /**
              * If student is empty from database
              */
-            if (!student) {
-                return res.sendError('The student not found in database');
+            if(!student){
+                return res.sendError(res.__('record_not_found', 'Student'));
             }
 
-            if(withXsre) {
+            if(withXsre){
 
                 StudentController.getStudentDetail(brokerRequest, student, orgId, function(err, student, isCache){
 
-                    res.header('X-Cached-Sre' , isCache ? 1 : 0 );
+                    res.header('X-Cached-Sre', isCache ? 1 : 0);
 
                     res.sendSuccess(student);
 
                 });
 
-            } else {
+            } else{
 
                 res.sendSuccess(student);
 
@@ -814,22 +1049,29 @@ StudentController.getStudentById = function (req, res) {
  * @param req
  * @param res
  */
-StudentController.deleteStudentById = function (req, res) {
+StudentController.deleteStudentById = function(req, res){
 
     var orgId = req.params.organizationId;
 
     var studentId = ObjectId(req.params.studentId);
 
-    Student.protect(req.user.role, { students: studentId }, req.user).remove({organization: ObjectId(orgId), _id: ObjectId(req.params.studentId)}, function (err) {
+    Student.protect(req.user.role, { students: studentId }, req.user).remove({
+        organization: ObjectId(orgId),
+        _id: ObjectId(req.params.studentId)
+    }, function(err){
 
-        if (err)  { return res.sendError(err); }
+        if(err){
+            return res.sendError(err);
+        }
 
         User.findOne({ _id: req.user._id }, function(err, user){
 
-            if (err)  { return res.sendError(err); }
+            if(err){
+                return res.sendError(err);
+            }
 
-            if(!user) {
-                return res.sendError('User not update successfully');
+            if(!user){
+                return res.sendError(res.__('data_updated_failed'));
             }
 
             _.each(user.permissions, function(permission, key){
@@ -846,9 +1088,38 @@ StudentController.deleteStudentById = function (req, res) {
 
             user.save(function(err){
 
-                if (err) { return res.sendError(err); }
+                if(err){
+                    return res.sendError(err);
+                }
 
-                res.sendSuccess('Successfully deleted');
+                cache.get(prefixListStudent + orgId, function(err, xsre){
+
+                    if(err || !xsre){
+
+                        return res.sendSuccess(res.__('data_deleted'));
+
+                    }
+
+                    if(studentId.toString() in xsre){
+
+                        delete xsre[studentId.toString()];
+                        /**
+                         * Restore cache again
+                         */
+                        cache.set(prefixListStudent + orgId, xsre, { ttl: 86400 }, function(){
+
+                            res.sendSuccess(res.__('data_deleted'));
+
+                        });
+
+                    } else{
+
+                        res.sendSuccess(res.__('data_deleted'));
+
+                    }
+
+                });
+
 
             });
 
@@ -868,40 +1139,73 @@ StudentController.putStudentById = function(req, res){
 
     var studentId = ObjectId(req.params.studentId);
 
-    Student.protect(req.user.role, { students: studentId }, req.user).findOne({_id: studentId, organization: ObjectId(req.params.organizationId)}, function (err, obj) {
+    var orgId = ObjectId(req.params.organizationId);
 
-        if (err) { return res.sendError(err); }
+    Organization.findOne({ _id: orgId }, function(err, organization){
 
-        if (!obj) {
-            return res.sendError('Data not found');
+        if(err){
+            return res.sendError(err);
+        }
+        /**
+         * If organization is empty from database
+         */
+        if(!organization){
+            return res.sendError(res.__('record_not_found', 'Organization'));
         }
 
-        for (var prop in req.body) {
-
-            if(prop in obj) {
-
-                obj[prop] = req.body[prop];
-
-            }
-
-        }
-        // set update time and update by user
-        obj.last_updated = new Date();
-
-        obj.last_updated_by = req.user.userId;
-
-        obj.protect(req.user.role, null, req.user).save(function (err) {
-
-            if (err)  { return res.sendError(err); }
-
-            res.sendSuccess('Successfully updated!', obj);
-
+        var brokerRequest = new Request({
+            externalServiceId: organization.externalServiceId,
+            personnelId: organization.personnelId,
+            authorizedEntityId: organization.authorizedEntityId
         });
 
+        Student.protect(req.user.role, { students: studentId }, req.user).findOne({
+            _id: studentId,
+            organization: orgId
+        }, function(err, obj){
+
+            if(err){
+                return res.sendError(err);
+            }
+
+            if(!obj){
+                return res.sendError(res.__('data_not_found'));
+            }
+
+            for(var prop in req.body){
+
+                if(prop in obj){
+
+                    obj[prop] = req.body[prop];
+
+                }
+
+            }
+            // set update time and update by user
+            obj.last_updated = new Date();
+
+            obj.last_updated_by = req.user.userId;
+
+            obj.protect(req.user.role, null, req.user).save(function(err){
+
+                if(err){
+
+                    return res.sendError(err);
+
+                }
+
+                StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(){
+
+                    res.sendSuccess(res.__('data_updated'), obj);
+
+                });
+
+            });
+
+        });
     });
 
 };
-
 
 
 /**

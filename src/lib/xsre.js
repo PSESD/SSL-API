@@ -15,8 +15,11 @@ var pd = require('pretty-data').pd;
  * @param result
  * @param raw
  * @param separate
+ * @param params
  */
-function xSre(result, raw, separate){
+function xSre(result, raw, separate, params){
+
+    this.params = params || {};
 
     this.config = new CodeSet().get();
 
@@ -258,7 +261,11 @@ xSre.prototype.toObject = function(){
 
     } else {
 
-        json.attendanceBehaviors = this.getAttendanceBehavior().getAttendances();
+        var attendance = this.getAttendanceBehavior();
+
+        json.attendanceBehaviors = attendance.getAttendances();
+
+        json.attendanceYears = attendance.getAvailableYears();
 
         json.transcripts = this.getTranscript().getTranscript();
 

@@ -55,10 +55,12 @@ fs.readFile(xmlFile, function(err, data) {
                     if(t.n > 0) t.weekly = t.total/t.n;
 
                     attendanceSummary.push(obj);
-                    console.log(JSON.stringify(t));
+                    //console.log(JSON.stringify(t));
                 }
             });
-            //console.log(require('prettyjson').render(attendance));
+
+            console.log(require('prettyjson').render(xsre.getStudentSummary()));
+            //console.log(require('prettyjson').render(transcript));
             //console.log(require('prettyjson').render(attendanceSummary));
       });
 
