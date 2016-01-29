@@ -9,6 +9,8 @@ var moment = require('moment');
 var uuid = require('node-uuid');
 var CryptoJS = require("crypto-js");
 var TIME = 1321644961388;
+var _ = require('underscore');
+var l = require('lodash');
 /**
  *
  * @param options
@@ -159,9 +161,9 @@ Request.prototype = {
      * @returns {Request}
      */
     clearParam: function(){
-      this.body = [];
-      this.lastPage = 0;
-      return this;
+        this.body = [];
+        this.lastPage = 0;
+        return this;
     },
     /**
      *
@@ -169,8 +171,9 @@ Request.prototype = {
      * @param serviceNumber
      * @param where
      * @param zoneId
+     * @param headers
      */
-    get: function(callback, serviceNumber, where, zoneId){
+    get: function(callback, serviceNumber, where, zoneId, headers){
 
         var config = this.config.CBOStudent.get;
 
@@ -193,8 +196,8 @@ Request.prototype = {
         }
         url += 'json=true';
 
-        this.headers.navigationpage = self.lastPage;
         this.headers.navigationpagesize = 10;
+        this.headers.queryIntention = 'ALL'; //(ALL, ONE-OFF, NO-CACHING)
 
 
         if('headers' in config){
@@ -202,6 +205,15 @@ Request.prototype = {
             for(var name in config.headers){
 
                 self.addHeader(name, config.headers[name]);
+
+            }
+        }
+
+        if(headers){
+
+            for(var name in headers){
+
+                self.addHeader(name, headers[name]);
 
             }
         }
@@ -217,9 +229,124 @@ Request.prototype = {
      * @param zoneId
      */
     getBulk: function(done, serviceNumber, where, zoneId){
-        var items = [];
         var me = this;
-        
+        var students = [];
+        var studentPrograms = [];
+        var navigationId = null;
+        var pageId = 0;
+        me.clearParam();
+        /**
+         *
+         * @param studentList
+         * @returns {Array}
+         */
+        function processStudent(studentList){
+            var slist = [];
+            if(studentList){
+                _.each(studentList, function(student){
+                    var xSre = l.get(student, 'xSre');
+                    var s1 = {
+                        id: student.organization.refId,
+                        org_name: student.organization.organizationName,
+                        student_id: student.id,
+                        school_district: (student.organization.zoneId + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1){
+                            return $1.toUpperCase();
+                        }),
+                        school: "",
+                        first_name: "",
+                        last_name: "",
+                        grade_level: "",
+                        ethnicity: "",
+                        gender: ""
+                    };
+
+                    if(xSre){
+                        s1.gender = l.get(xSre, 'demographics.sex');
+                        s1.school = l.get(xSre, 'enrollment.school.schoolName');
+                        s1.first_name = l.get(xSre, 'name.givenName');
+                        s1.last_name = l.get(xSre, 'name.familyName');
+                        s1.grade_level = l.get(xSre, 'enrollment.gradeLevel');
+                        s1.ethnicity = l.get(xSre, 'demographics.races.race.race');
+                    }
+                    slist.push(s1);
+
+                });
+            }
+            return slist;
+        }
+
+        /**
+         *
+         * @param studentList
+         * @returns {Array}
+         */
+        function processStudentProgram(studentList){
+            var slist = [];
+            if(studentList){
+                _.each(studentList, function(student){
+                    var studentPrograms = {};
+
+                    if(student.studentActivity){
+                        if(_.isObject(student.studentActivity)){
+                            _.values(student.studentActivity).forEach(function(programs){
+                                if(programs.title){
+                                    studentPrograms[programs.refId] = programs.title;
+                                }
+                            });
+                        }
+                    }
+
+                    if(student.programs && student.programs.activities && student.programs.activities.activity){
+                        if(_.isObject(student.programs.activities.activity)){
+                            _.values(student.programs.activities.activity).forEach(function(activity){
+                                if(activity.studentActivityRefId in studentPrograms){
+                                    var tags = [];
+                                    if(activity.tags){
+                                        if(_.isObject(activity.tags.tag)){
+                                            tags = _.values(activity.tags.tag);
+                                        } else{
+                                            tags = activity.tags.tag;
+                                        }
+                                    }
+                                    slist.push({
+                                        program_id: activity.studentActivityRefId,
+                                        student_id: student.id,
+                                        program_name: studentPrograms[activity.studentActivityRefId],
+                                        cohorts: tags.join(",")
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+            return slist;
+        }
+        /**
+         *
+         * @param c
+         */
+        function grab(c){
+            me.get(function(e, r, b){
+                var ret = JSON.parse(b);
+                students = students.concat(processStudent(ret));
+                studentPrograms = studentPrograms.concat(processStudentProgram(ret));
+                c();
+                navigationId = r.headers.navigationid;
+                pageId = parseInt(r.headers.navigationpage) + 1;
+                if((parseInt(r.headers.navigationcount) === students.length) || r.headers.navigationlastpage === 'true'){
+                    done(students, studentPrograms);
+                } else {
+                    grab(function(){
+                        console.log('On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+                    });
+                }
+            }, serviceNumber, where, zoneId, { navigationid: navigationId, navigationpage: pageId });
+        }
+
+        grab(function() {
+            console.log('On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+        });
     },
     /**
      *
@@ -246,13 +373,13 @@ Request.prototype = {
             headers: this.getHeaders()
         };
 
-        console.log('OPTIONS: ', JSON.stringify(options));
+        //console.log('OPTIONS: ', JSON.stringify(options));
 
 
         if(data){
             options.multipart = {
                 chunked: true,
-                    data: [
+                data: [
                     {
                         'content-type': 'text/xml',
                         body: data
@@ -264,14 +391,14 @@ Request.prototype = {
 
         request(options,
             function(error, response, body){
-                console.log(response.headers);
+                //console.log(response.headers);
                 if(error){
                     callback(error, response, body);
                     return console.error('upload failed:', error);
                 }
-                console.log('Response Header:', JSON.stringify(response.headers));
-                console.log('Response STATUS CODE:', response.statusCode);
-                console.log('Server responded with:', body);
+                //console.log('Response Header:', JSON.stringify(response.headers));
+                //console.log('Response STATUS CODE:', response.statusCode);
+                //console.log('Server responded with:', body);
                 callback(error, response, body);
             });
     },

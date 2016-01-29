@@ -119,6 +119,7 @@ ReportController.getFilters = function(req, res){
     sql += 'FROM students s ';
     sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
     sql += 'WHERE s.id = ? ';
+
     con.query(sql, [ orgId ], function(err, rows){
 
         var rowsets = {
