@@ -473,7 +473,7 @@ function collectCacheListStudentsAsync(force, done) {
             }
 
             benchmark.info(
-              '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
+                '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
             );
             done(err, data);
         });
@@ -487,6 +487,7 @@ function queue(done){
 /**
  *
  * @param done
+ * @deprecated
  */
 function pullStudent(done){
     var masterTable = '`students`';
@@ -677,96 +678,42 @@ function pullStudentAsync(ok){
              */
             function pullMap(organization, callback){
 
-                //if(organization.name === 'Helping Hand CBO') return callback(null, organization);
+                //if(organization.name !== 'Helping Hand CBO') return callback(null, organization);
 
-                new request().getBulk(function(studentList){
-
+                new request().getBulk(function(studentList, studentProgramList){
+                    //console.log(studentList);
                     if(studentList){
-                        console.log(organization.name, ' >>> STUDENT LIST: ', studentList.length);
                         async.each(studentList, function(student, cb){
-                            var xSre = l.get(student, 'xSre');
-                            var students = {
-                                id: student.organization.refId,
-                                org_name: student.organization.organizationName,
-                                student_id: student.id,
-                                school_district: (student.organization.zoneId + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1){
-                                    return $1.toUpperCase();
-                                }),
-                                school: "",
-                                first_name: "",
-                                last_name: "",
-                                grade_level: "",
-                                ethnicity: "",
-                                gender: ""
-                            };
-
-                            if(xSre){
-                                students.gender = l.get(xSre, 'demographics.sex');
-                                students.school = l.get(xSre, 'enrollment.school.schoolName');
-                                students.first_name = l.get(xSre, 'name.givenName');
-                                students.last_name = l.get(xSre, 'name.familyName');
-                                students.grade_level = l.get(xSre, 'enrollment.gradeLevel');
-                                students.ethnicity = l.get(xSre, 'demographics.races.race.race');
-                            }
-
-                            var studentPrograms = {};
-                            var studentProgramData = [];
-
-                            if(student.studentActivity){
-                                if(_.isObject(student.studentActivity)){
-                                    _.values(student.studentActivity).forEach(function(programs){
-                                        if(programs.title){
-                                            studentPrograms[programs.refId] = programs.title;
-                                        }
-                                    });
-                                }
-                            }
-
-                            if(student.programs && student.programs.activities && student.programs.activities.activity){
-                                if(_.isObject(student.programs.activities.activity)){
-                                    _.values(student.programs.activities.activity).forEach(function(activity){
-                                        if(activity.studentActivityRefId in studentPrograms){
-                                            var tags = [];
-                                            if(activity.tags){
-                                                if(!_.isArray(activity.tags.tag)){
-                                                    tags.push(activity.tags.tag);
-                                                } else if(_.isObject(activity.tags.tag)){
-                                                    tags = _.values(activity.tags.tag);
-                                                } else{
-                                                    tags = activity.tags.tag;
-                                                }
-                                            }
-                                            studentProgramData.push({
-                                                program_id: activity.studentActivityRefId,
-                                                student_id: students.student_id,
-                                                program_name: studentPrograms[activity.studentActivityRefId],
-                                                cohorts: tags.join(",")
-                                            });
-                                        }
-                                    });
-                                }
-                            }
-                            //console.log(students);
-                            con.query('INSERT INTO ' + backupTable + ' SET ?', students, function(err, result){
+                            con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
                                 if(err){
-                                    console.log('INSERT ERROR: ', err);
+                                    console.log('INSERT ' + backupTable + ' ERROR: ', err);
                                 }
-                                if(studentProgramData.length > 0){
-                                    con.query('INSERT INTO ' + t2 + ' SET ?', studentProgramData, function(err, result){
-                                        cb(null, result);
-                                    });
-                                } else{
-                                    cb(null, result);
-                                }
+                                cb(null, result);
+
                             });
                         }, function(err, data){
-                            callback(null, organization);
+                            if(studentProgramList.length > 0){
+                                async.each(studentProgramList, function(stdp, cb1){
+                                    con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
+                                        if(err){
+                                            console.log('INSERT ' + t2 + ' ERROR: ', err);
+                                        }
+                                        cb1(null, result1);
+                                    });
+                                }, function(err, data){
+                                    callback(null, organization);
+                                });
+                            } else {
+                                callback(null, organization);
+                            }
+
                         });
                     } else{
                         callback(null, organization);
                     }
 
-                }, 2, "(organization/organizationName='" + organization.name + "')");
+                    }, 2, "(organization/organizationName='" + organization.name + "')");
+                //}, 2, "(organization/districtStudentId='10651041')");
             }
 
 
