@@ -311,6 +311,36 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
+            /**
+             * Add filter for other and Authenticate
+             */
+
+            switch (obj.attendanceStatus){
+                case 'Present':
+                    obj.attendanceStatus = 'Present';
+                    break;
+                case 'Tardy':
+                case 'Late':
+                    obj.attendanceStatus = 'Tardy';
+                    break;
+                case 'ExcusedAbsence':
+                case 'Excused':
+                    obj.attendanceStatus = 'Excused';
+                    break;
+                case 'UnexcusedAbsence':
+                case 'Unexcused':
+                    obj.attendanceStatus = 'Unexcused';
+                    break;
+                case 'EarlyDeparture':
+                case 'Authorized':
+                    obj.attendanceStatus = 'Other';
+                    break;
+                default :
+                    obj.attendanceStatus = 'Unknown';
+                    break;
+
+            }
+
             event.calendarEventDate = mm.format('MM-DD-YYYY');
 
             delete event.school;
@@ -367,6 +397,12 @@ Attendance.prototype.getAttendances = function(){
                     obj.incidentCategory = parseInt(discipline.incidentCategory);
 
                     obj.incidentCategoryTitle = (''+obj.incidentCategory) in me.facets ? me.facets[''+obj.incidentCategory] : '';
+
+                } else {
+
+                    obj.incidentCategory = '';
+
+                    obj.incidentCategoryTitle = '';
 
                 }
 
@@ -705,7 +741,7 @@ Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, da
 
     var e = events[0];
 
-    if(e.attendanceStatus && (''+e.attendanceStatus).toLowerCase() === 'present'){
+    if(e.attendanceStatus && ((''+e.attendanceStatus).toLowerCase() === 'present' || (''+e.attendanceStatus).toLowerCase() === 'tardy')){
 
         summary[n].value = parseFloat(isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue) * 100);
 
@@ -833,6 +869,8 @@ Attendance.prototype.calculateSummary = function(){
         behavior: 0
     };
 
+    var c = {};
+
     if(_.isObject(me.attendances) && _.isObject(me.attendances.events) && !_.isUndefined(me.attendances.events.event)){
 
         if(!_.isArray(me.attendances.events.event)){
@@ -849,7 +887,7 @@ Attendance.prototype.calculateSummary = function(){
 
             event.calendarEventDateTime = mm.valueOf();
 
-            var passed = true;
+            var passed = false;
 
             if(me.academicStart && me.academicEnd){
 
@@ -865,11 +903,25 @@ Attendance.prototype.calculateSummary = function(){
 
                 }
 
-                var attendanceStatus = me.slug(event.attendanceStatus);
+                if('attendanceEventType' in event && event.attendanceEventType === 'DailyAttendance'){
 
-                if(attendanceStatus === 'excused' || attendanceStatus === 'unexcused' || attendanceStatus === 'unexcusedabsence' || attendanceStatus === 'excusedabsence' ){
+                    var attendanceStatus = me.slug(event.attendanceStatus);
 
-                    me.currentSummary.attendance++;
+                    //var m = mm.format('YYYY-MM-DD');
+                    //
+                    //if(Object.keys(c).indexOf(m) === -1){
+                    //
+                    //    c[m] = [];
+                    //
+                    //}
+                    //
+                    //c[m].push(attendanceStatus);
+
+                    if(attendanceStatus === 'excused' || attendanceStatus === 'unexcused'){
+
+                        me.currentSummary.attendance++;
+
+                    }
 
                 }
 
@@ -878,8 +930,12 @@ Attendance.prototype.calculateSummary = function(){
         });
 
     }
+    //console.log((function(s){var t={};Object.keys(s).sort().reverse().forEach(function(k){t[k]=s[k]});return t;})(c));
+    //console.log(me.academicStart.format('YYYY-MM-DD'), me.academicEnd.format('YYYY-MM-DD'), c);
 
     if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
+
+        var n = [];
 
         if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
 
@@ -903,7 +959,17 @@ Attendance.prototype.calculateSummary = function(){
 
             if(passed && mm.isValid()){
 
-                me.currentSummary.behavior++;
+                var m = mm.format('YYYY-MM-DD');
+
+                if(n.indexOf(m) === -1){
+
+                    n.push(m);
+
+                    me.currentSummary.behavior++;
+
+                }
+
+
 
             }
 

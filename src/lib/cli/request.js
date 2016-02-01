@@ -132,29 +132,7 @@ Request.prototype = {
         //self.addHeader('queueId', uuid.v1({msecs: TIME + 1}));
         self.addHeader('requestId', uuid.v1({msecs: TIME + 28*24*3600*1000}));
 
-        self.create(config.url + url, 'PUT', data, callback);
-    },
-    /**
-     *
-     * @param queueId
-     * @param done
-     */
-    queue: function(queueId, done){
-
-        var config = this.config.CBOStudent.get;
-
-        var self = this;
-
-        var url = '/queues/'+ queueId +'/messages;deleteMessageId=';
-        self.addHeader('queueId', queueId);
-        self.addHeader('requestId', queueId);
-
-        self.create(config.url + url, 'GET', null, function(error, response, body){
-            console.log('RESPONSE CODE: ', response.statusCode);
-            console.log('BODY: ' + body);
-            console.log('ERROR: ' + error);
-            done();
-        });
+        self.create(config.url + url, 'POST', data, callback);
     },
     /**
      *
@@ -374,7 +352,7 @@ Request.prototype = {
         };
 
         //console.log('OPTIONS: ', JSON.stringify(options));
-
+        console.log('OPTIONS: ', (options));
 
         if(data){
             options.multipart = {

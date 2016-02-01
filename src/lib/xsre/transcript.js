@@ -467,11 +467,22 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
         me.subject.push(uniqueStr);
     }
 
-    var mark = /*course.progressMark || */course.finalMarkValue;
+    var mark = null;
+
+    //if(current){
+    //
+    //    mark = course.progressMark || course.finalMarkValue;
+    //
+    //} else {
+    //
+    //    mark = course.finalMarkValue;
+    //
+    //}
+
+    mark = course.progressMark || course.finalMarkValue;
 
     if(!mark) {
 
-        //return;
         mark = '';
 
     }
@@ -529,11 +540,22 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
         me.subject.push(uniqueStr);
     }
 
-    var mark = /*course.progressMark || */course.finalMarkValue;
+    var mark = null;
+
+    //if(current){
+    //
+    //    mark = course.progressMark || course.finalMarkValue;
+    //
+    //} else {
+    //
+    //    mark = course.finalMarkValue;
+    //
+    //}
+
+    mark = course.progressMark || course.finalMarkValue;
 
     if(!mark) {
 
-        //return;
         mark = '';
 
     }
