@@ -740,6 +740,18 @@ StudentController.getStudents = function(req, res){
 
     crit.organization = orgId;
 
+    var filter = null;
+
+    if(req.query.assign){
+
+        filter = {
+
+            onlyAssign: true
+
+        };
+
+    }
+
 
     Organization.findOne({ _id: orgId }, function(err, organization){
 
@@ -754,7 +766,7 @@ StudentController.getStudents = function(req, res){
         }
 
 
-        Student.protect(req.user.role, null, req.user).find(crit, function(err, students){
+        Student.protect(req.user.role, filter, req.user).find(crit, function(err, students){
 
             if(err){
                 return res.sendError(err);

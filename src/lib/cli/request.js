@@ -316,14 +316,14 @@ Request.prototype = {
                     done(students, studentPrograms);
                 } else {
                     grab(function(){
-                        console.log('On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+                        console.log(where + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
                     });
                 }
             }, serviceNumber, where, zoneId, { navigationid: navigationId, navigationpage: pageId });
         }
 
         grab(function() {
-            console.log('On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+            console.log(where + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
         });
     },
     /**
@@ -352,7 +352,7 @@ Request.prototype = {
         };
 
         //console.log('OPTIONS: ', JSON.stringify(options));
-        console.log('OPTIONS: ', (options));
+        //console.log('OPTIONS: ', (options));
 
         if(data){
             options.multipart = {
