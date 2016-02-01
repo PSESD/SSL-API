@@ -56,7 +56,7 @@ StudentController.getStudentsBackpack = function(req, res){
     }
     benchmark.info('XSRE - GET STUDENT');
 
-    Student.protect(req.user.role, { value: studentId }, req.user).findOne({
+    Student.protect(req.user.role, { students: studentId, value: studentId }, req.user).findOne({
         _id: studentId,
         organization: orgId
     }, function(err, student){
@@ -517,7 +517,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
     }
 
-    Student.protect(req.user.role, { value: studentId }, req.user).findOne({
+    Student.protect(req.user.role, { students: studentId, value: studentId }, req.user).findOne({
         _id: studentId,
         organization: orgId
     }, function(err, student){
@@ -740,6 +740,18 @@ StudentController.getStudents = function(req, res){
 
     crit.organization = orgId;
 
+    var filter = null;
+
+    if(req.query.assign){
+
+        filter = {
+
+            onlyAssign: true
+
+        };
+
+    }
+
 
     Organization.findOne({ _id: orgId }, function(err, organization){
 
@@ -754,7 +766,7 @@ StudentController.getStudents = function(req, res){
         }
 
 
-        Student.protect(req.user.role, null, req.user).find(crit, function(err, students){
+        Student.protect(req.user.role, filter, req.user).find(crit, function(err, students){
 
             if(err){
                 return res.sendError(err);
@@ -764,7 +776,7 @@ StudentController.getStudents = function(req, res){
 
             cache.get(key, function(err, results){
 
-                console.log(key, ' DATA ', results);
+                //console.log(key, ' DATA ', results);
 
                 var studentsList = [];
 
@@ -1011,7 +1023,7 @@ StudentController.getStudentById = function(req, res){
             authorizedEntityId: organization.authorizedEntityId
         });
 
-        Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function(err, student){
+        Student.protect(req.user.role, { students: studentId, value: studentId }, req.user).findOne(crit, function(err, student){
 
             if(err){
                 return res.sendError(err);
