@@ -509,7 +509,7 @@ function pullStudentAsync(ok){
                 new request().getBulk(function(studentList, studentProgramList){
                     //console.log(studentList);
                     if(studentList){
-                        async.each(studentList, function(student, cb){
+                        async.eachSeries(studentList, function(student, cb){
                             con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
                                 if(err){
                                     console.log('INSERT ' + backupTable + ' ERROR: ', err);
@@ -519,7 +519,7 @@ function pullStudentAsync(ok){
                             });
                         }, function(err, data){
                             if(studentProgramList.length > 0){
-                                async.each(studentProgramList, function(stdp, cb1){
+                                async.eachSeries(studentProgramList, function(stdp, cb1){
                                     con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
                                         if(err){
                                             console.log('INSERT ' + t2 + ' ERROR: ', err);
@@ -546,7 +546,7 @@ function pullStudentAsync(ok){
             Organization.find(organizationWhere, function(err, organizations){
                 var sql = 'TRUNCATE TABLE ' + backupTable;
                 con.query(sql, function(err, results){
-                    async.each(organizations, pullMap, function(err, data){
+                    async.eachSeries(organizations, pullMap, function(err, data){
                         if(err){
                             benchmark.info(err);
                         }

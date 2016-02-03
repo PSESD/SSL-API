@@ -3,7 +3,8 @@
  */
 'use strict';
 var fs = require('fs');
-var file = __dirname + '/data/cedarlabs';
+//var file = __dirname + '/data/cedarlabs';
+var file = __dirname + '/../../data/raw';
 var json = require(file);
 var _ = require('underscore');
 var l = require('lodash');

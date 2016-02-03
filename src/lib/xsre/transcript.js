@@ -192,7 +192,41 @@ Transcript.prototype.getTranscript = function(){
 
             if(histories.indexOf(schoolName+':'+schoolYear) === -1){
 
-                me.history.push({ schoolName: schoolName, schoolYear: schoolYear });
+                var his = { schoolName: schoolName, schoolYear: schoolYear };
+
+                var status = null;
+
+                var description = null;
+
+                if('enrollmentStatus' in enrollment){
+
+                    status = enrollment.enrollmentStatus;
+
+                } else if('psesd:enrollmentStatus' in enrollment){
+
+                    status = enrollment['psesd:enrollmentStatus'];
+
+                }
+
+                if('enrollmentStatusDescription' in enrollment){
+
+                    description = enrollment.enrollmentStatusDescription;
+
+                } else if('psesd:enrollmentStatusDescription' in enrollment){
+
+                    description = enrollment['psesd:enrollmentStatusDescription'];
+
+                }
+
+                his.currentSchool = l.get(enrollment, 'school.schoolName') || me.notAvailable;
+                his.expectedGraduationYear = l.get(enrollment, 'projectedGraduationYear') || me.notAvailable;
+                his.gradeLevel = l.get(enrollment, 'gradeLevel') || me.notAvailable;
+                his.entryDate = l.get(enrollment, 'entryDate') || me.notAvailable;
+                his.exitDate = l.get(enrollment, 'exitDate') || me.notAvailable;
+                his.status = status || me.notAvailable;
+                his.description = description || me.notAvailable;
+
+                me.history.push(his);
 
                 histories.push(schoolName+':'+schoolYear);
 
