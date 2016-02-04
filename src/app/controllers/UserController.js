@@ -13,7 +13,8 @@ var util = require('util');
 var extend = util._extend;
 var _ = require('underscore');
 var UserController = new BaseController(User).crud();
-var sorter = function(st){
+
+UserController.sorter = function(st){
     return [st.first_name, st.last_name];
 };
 
@@ -367,7 +368,7 @@ UserController.getByUserId = function(req, res){
 
                 if (err)  { return res.sendError(err); }
 
-                res.sendSuccess(null, _.sortBy(students, sorter));
+                res.sendSuccess(null, _.sortBy(students, UserController.sorter));
 
             });
 
@@ -389,7 +390,7 @@ UserController.getByUserId = function(req, res){
 
                 if (err)  { return res.sendError(err); }
 
-                res.sendSuccess(null, _.sortBy(students, sorter));
+                res.sendSuccess(null, _.sortBy(students, UserController.sorter));
 
             });
 
@@ -488,7 +489,7 @@ UserController.getStudentUserById = function(req, res){
 
             if (err)  { return res.sendError(err); }
 
-            res.sendSuccess(null, _.sortBy(students, sorter));
+            res.sendSuccess(null, _.sortBy(students, UserController.sorter));
 
         });
 
