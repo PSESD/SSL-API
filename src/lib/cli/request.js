@@ -352,7 +352,7 @@ Request.prototype = {
         };
 
         //console.log('OPTIONS: ', JSON.stringify(options));
-        //console.log('OPTIONS: ', (options));
+        console.log('OPTIONS: ', (options));
 
         if(data){
             options.multipart = {

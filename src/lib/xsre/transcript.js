@@ -225,6 +225,12 @@ Transcript.prototype.getTranscript = function(){
                 his.exitDate = l.get(enrollment, 'exitDate') || me.notAvailable;
                 his.status = status || me.notAvailable;
                 his.description = description || me.notAvailable;
+                if(his.entryDate !== me.notAvailable){
+                    his.entryDate = moment(his.entryDate).format('MM/DD/YYYY');
+                }
+                if(his.exitDate !== me.notAvailable){
+                    his.exitDate = moment(his.exitDate).format('MM/DD/YYYY');
+                }
 
                 me.history.push(his);
 
