@@ -13,6 +13,10 @@ var util = require('util');
 var extend = util._extend;
 var _ = require('underscore');
 var UserController = new BaseController(User).crud();
+var sorter = function(st){
+    return [st.first_name, st.last_name];
+};
+
 /**
  * Get Current User Login
  * @param req
@@ -363,7 +367,7 @@ UserController.getByUserId = function(req, res){
 
                 if (err)  { return res.sendError(err); }
 
-                res.sendSuccess(null, students);
+                res.sendSuccess(null, _.sortBy(students, sorter));
 
             });
 
@@ -385,7 +389,7 @@ UserController.getByUserId = function(req, res){
 
                 if (err)  { return res.sendError(err); }
 
-                res.sendSuccess(null, students);
+                res.sendSuccess(null, _.sortBy(students, sorter));
 
             });
 
@@ -484,7 +488,7 @@ UserController.getStudentUserById = function(req, res){
 
             if (err)  { return res.sendError(err); }
 
-            res.sendSuccess(null, students);
+            res.sendSuccess(null, _.sortBy(students, sorter));
 
         });
 
