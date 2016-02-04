@@ -736,7 +736,11 @@ StudentController.getStudents = function(req, res){
 
     var crit = Student.crit(req.query, ['organization']);
 
-    var withXsre = parseInt(req.query.xsre) > 0;
+    var withNoXsre = parseInt(req.query.noxsre) > 0;
+
+    var withNoProgram = parseInt(req.query.noprogram) > 0;
+
+    var userId = 'userId' in req.query ? req.query.userId : null;
 
     crit.organization = orgId;
 
@@ -751,6 +755,10 @@ StudentController.getStudents = function(req, res){
         };
 
     }
+
+    var sorter = function(st){
+        return [st.first_name, st.last_name];
+    };
 
 
     Organization.findOne({ _id: orgId }, function(err, organization){
@@ -770,6 +778,52 @@ StudentController.getStudents = function(req, res){
 
             if(err){
                 return res.sendError(err);
+            }
+
+            if(userId !== null){
+
+                User.findOne({
+                    _id: ObjectId(userId),
+                    permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
+                }, function (err, user) {
+
+                    var stdlist = [];
+
+                    if(!err && user){
+
+                        user.getCurrentPermission(req.params.organizationId);
+
+                        var obj = user.toJSON();
+
+                        stdlist = _.map(obj.allStudentsByOrganization, function(v, k){
+                            return v + '';
+                        });
+
+                    }
+                    return res.sendSuccess(null, _.sortBy(_.map(students, function(val, key){
+                        var o = val.toObject();
+                        delete o.programs;
+                        delete o.__v;
+                        o.added = stdlist.indexOf(o._id + '') !== -1;
+                        return o;
+                    }), sorter));
+
+                });
+                return;
+
+            }
+
+            if(withNoProgram){
+                return res.sendSuccess(null, _.sortBy(_.map(students, function(val, key){
+                    var o = val.toObject();
+                    delete o.programs;
+                    delete o.__v;
+                    return o;
+                }), sorter));
+            }
+
+            if(withNoXsre){
+                return res.sendSuccess(null, _.sortBy(students, sorter));
             }
 
             var key = prefixListStudent + orgId;
@@ -802,10 +856,8 @@ StudentController.getStudents = function(req, res){
                     studentsList.push(newObject);
 
                 });
-                //res.sendSuccess(null, studentsList);
-                res.sendSuccess(null, _.sortBy(studentsList, function(st){
-                  return [st.first_name, st.last_name];
-                }));
+
+                res.sendSuccess(null, _.sortBy(studentsList, sorter));
 
             });
 
