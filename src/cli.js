@@ -15,6 +15,7 @@ var tokenCleaner = require('./lib/cli/tokenCleaner');
 var request = require('./lib/cli/request');
 var utils = require('./lib/utils');
 var con = require('./lib/cli/mysql');
+var codeSet = require('./lib/xsre/codeset');
 var parseString = require('xml2js').parseString;
 
 function processJob(job, callback){
@@ -111,16 +112,19 @@ switch(what){
             process.exit();
         });
         break;
-    //case 'pull-cedarlabs':
-    //    studentCollector.pullStudent(function(err){
-    //        if(err){
-    //            utils.log(err, 'error');
-    //        } else {
-    //            utils.log('Pull Done !', 'info');
-    //        }
-    //        process.exit();
-    //    });
-    //    break;
+    case 'codeset':
+        (new request()).codeSet(function(err, res, body){
+            if(err){
+                utils.log(err, 'error');
+                process.exit();
+            } else {
+                new codeSet(JSON.parse(body)).parse(function(){
+                    utils.log('Pull all Done !', 'info');
+                    process.exit();
+                });
+            }
+        });
+        break;
     case 'queue-cedarlabs':
         studentCollector.queue(function(){
             console.log('Queue done');

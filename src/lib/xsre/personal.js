@@ -16,6 +16,8 @@ function Personal(xsre){
 
     me.xSre = xsre.json;
 
+    me.config = xsre.config;
+
     me.personal = {};
 
     me.notAvailable = 'N/A';
@@ -72,18 +74,18 @@ Personal.prototype.getPersonal = function(){
     me.personal.enrollment.exitDate = l.get(me.xSre, 'enrollment.exitDate') || me.notAvailable;
     me.personal.enrollment.status = me.notAvailable;
     me.personal.enrollment.description = me.notAvailable;
-    var enrollment = l.get(me.xSre, 'enrollment');
+    var enrollment = l.get(me.xSre, 'enrollment') || [];
     var status = null;
     var description = null;
+
     if('enrollmentStatus' in enrollment){
         status = enrollment.enrollmentStatus;
     } else if('psesd:enrollmentStatus' in enrollment){
         status = enrollment['psesd:enrollmentStatus'];
     }
-    if('enrollmentStatusDescription' in enrollment){
-        description = enrollment.enrollmentStatusDescription;
-    } else if('psesd:enrollmentStatusDescription' in enrollment){
-        description = enrollment['psesd:enrollmentStatusDescription'];
+
+    if(status && 'EnrollmentStatus' in me.config && status in me.config.EnrollmentStatus){
+        description = l.get(me.config.EnrollmentStatus[status], 'description') || null;
     }
 
     if(status !== null){

@@ -222,22 +222,6 @@ xSre.prototype.extractRawSource = function(object){
 
     return object;
 
-    //if('raw:source' in object && object['raw:source']){
-    //
-    //    _.each(object['raw:source'], function(value, key){
-    //
-    //        var ikey = (key+'').substring(4);
-    //
-    //        object[ikey] = value;
-    //
-    //    });
-    //
-    //    delete object['raw:source'];
-    //
-    //}
-    //
-    //return object;
-
 };
 /**
  *

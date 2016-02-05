@@ -282,7 +282,7 @@ StudentController.getStudentsBackpack = function(req, res){
 
                 if(!_.isEmpty(programsId)){
                     benchmark.info('XSRE - EMBED PROGRAM');
-                    Program.find({ _id: { $in: programId } }, function(err, programs){
+                    Program.find({ _id: { $in: programId } }).sort({ participation_end_date: -1}).exec(function(err, programs){
 
                         if(err){
                             return res.sendError(err);

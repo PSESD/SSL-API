@@ -12,15 +12,17 @@ var l = require('lodash');
  */
 function Transcript(xsre){
 
-    this.transcriptTerm = null;
-
-    this.transcriptTermOther = null;
-
-    this.enrollments = xsre.json.enrollment ? [xsre.json.enrollment] : [];
-
-    this.transcriptFilterMark = [];
-
     var me = this;
+
+    me.config = xsre.config;
+
+    me.transcriptTerm = null;
+
+    me.transcriptTermOther = null;
+
+    me.enrollments = xsre.json.enrollment ? [xsre.json.enrollment] : [];
+
+    me.transcriptFilterMark = [];
 
     if(xsre.json.otherEnrollments && _.isArray(xsre.json.otherEnrollments.enrollment)){
 
@@ -34,26 +36,26 @@ function Transcript(xsre){
     if(xsre.json) {
 
         if(xsre.json.transcriptTerm) {
-            this.transcriptTerm = xsre.json.transcriptTerm;
+            me.transcriptTerm = xsre.json.transcriptTerm;
         }
 
         if(xsre.json.otherTranscriptTerms && xsre.json.otherTranscriptTerms.transcriptTerm) {
-            this.transcriptTermOther = xsre.json.otherTranscriptTerms.transcriptTerm;
+            me.transcriptTermOther = xsre.json.otherTranscriptTerms.transcriptTerm;
         }
 
     }
 
-    this.extractRawSource = xsre.extractRawSource;
+    me.extractRawSource = xsre.extractRawSource;
 
-    this.subject = [];
+    me.subject = [];
 
-    this.history = [];
+    me.history = [];
 
-    this.course = {};
+    me.course = {};
 
-    this.notAvailable = 'N/A';
+    me.notAvailable = 'N/A';
 
-    this.summary = {
+    me.summary = {
         totalCreditsEarned: 0,
         termWeightedGpa: 0,
         cumulativeGpa: 0,
@@ -62,7 +64,7 @@ function Transcript(xsre){
         gpaScale: 0
     };
 
-    this.facets = xsre.facets;
+    me.facets = xsre.facets;
 
     var scedId = {};
 
@@ -78,21 +80,21 @@ function Transcript(xsre){
 
     }
 
-    this.scedId = scedId;
+    me.scedId = scedId;
 
-    this.scedSort = scedSort;
+    me.scedSort = scedSort;
 
-    this.scedNotFound = {};
+    me.scedNotFound = {};
 
-    this.totalCreditsEarned = 0;
+    me.totalCreditsEarned = 0;
 
-    this.gradeLevel = this.notAvailable;
+    me.gradeLevel = me.notAvailable;
 
-    this.credits = 1;
+    me.credits = 1;
 
-    this.totalCreditsAttempted = 0;
+    me.totalCreditsAttempted = 0;
 
-    this.info = { totalEarned: 0, totalAttempted: 0, gradeLevel: 0, currentSchoolYear: null, courseTitle: [] };
+    me.info = { totalEarned: 0, totalAttempted: 0, gradeLevel: 0, currentSchoolYear: null, courseTitle: [] };
 
 }
 /**
@@ -200,21 +202,21 @@ Transcript.prototype.getTranscript = function(){
 
                 if('enrollmentStatus' in enrollment){
 
-                    status = enrollment.enrollmentStatus;
+                    status = enrollment.enrollmentStatus || me.notAvailable;
 
                 } else if('psesd:enrollmentStatus' in enrollment){
 
-                    status = enrollment['psesd:enrollmentStatus'];
+                    status = enrollment['psesd:enrollmentStatus'] || me.notAvailable;
 
                 }
 
-                if('enrollmentStatusDescription' in enrollment){
+                if(status && 'EnrollmentStatus' in me.config && status in me.config.EnrollmentStatus){
 
-                    description = enrollment.enrollmentStatusDescription;
+                    description = l.get(me.config.EnrollmentStatus[status], 'description') || me.notAvailable;
 
-                } else if('psesd:enrollmentStatusDescription' in enrollment){
+                } else {
 
-                    description = enrollment['psesd:enrollmentStatusDescription'];
+                    description = me.notAvailable;
 
                 }
 
