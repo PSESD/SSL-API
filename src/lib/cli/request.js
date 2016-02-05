@@ -37,6 +37,10 @@ function Request(options, env){
 
     this.body = [];
 
+    this.sessionToken = null;
+
+    this.secret = null;
+
 }
 
 Request.prototype = {
@@ -114,6 +118,10 @@ Request.prototype = {
 
         var config = this.config.CBOStudent.push;
 
+        this.secret = config.sharedSecret;
+
+        this.sessionToken = config.sessionToken;
+
         var self = this;
 
         zoneId = zoneId || config.zoneId;
@@ -155,9 +163,11 @@ Request.prototype = {
 
         var config = this.config.CBOStudent.get;
 
-        var serviceName = serviceNumber === 1 ? config.service1 : config.service2;
+        this.secret = config.sharedSecret;
 
-        var self = this;
+        this.sessionToken = config.sessionToken;
+
+        var serviceName = serviceNumber === 1 ? config.service1 : config.service2;
 
         zoneId = zoneId || config.zoneId;
 
@@ -172,11 +182,13 @@ Request.prototype = {
         } else {
             url += '&';
         }
+
         url += 'json=true';
 
         this.headers.navigationpagesize = 10;
         this.headers.queryIntention = 'ALL'; //(ALL, ONE-OFF, NO-CACHING)
 
+        var self = this;
 
         if('headers' in config){
 
@@ -198,6 +210,34 @@ Request.prototype = {
 
         self.create(config.url + url, 'GET', null, callback);
 
+    },
+    /**
+     *
+     * @param done
+     */
+    codeSet: function(done){
+
+        var config = this.config.CBOStudent.get;
+
+        this.secret = config.sharedSecret;
+
+        this.sessionToken = config.sessionToken;
+
+        var self = this;
+
+
+        var url = '/requestProvider/codeSets';
+
+        if('headers' in config){
+
+            for(var name in config.headers){
+
+                self.addHeader(name, config.headers[name]);
+
+            }
+        }
+
+        self.create(config.url + url, 'GET', null, done);
     },
     /**
      *
@@ -279,6 +319,7 @@ Request.prototype = {
                             _.values(student.programs.activities.activity).forEach(function(activity){
                                 if(activity.studentActivityRefId in studentPrograms){
                                     var tags = [];
+
                                     if(activity.tags){
                                         if(_.isObject(activity.tags.tag)){
                                             tags = _.values(activity.tags.tag);
@@ -286,11 +327,16 @@ Request.prototype = {
                                             tags = activity.tags.tag;
                                         }
                                     }
+
+                                    if(typeof tags === 'string' && tags !== ""){
+                                        tags = [ tags ];
+                                    }
+
                                     slist.push({
                                         program_id: activity.studentActivityRefId,
                                         student_id: student.id,
                                         program_name: studentPrograms[activity.studentActivityRefId],
-                                        cohorts: tags.join(",")
+                                        cohorts: _.isArray(tags) ? tags.join(",") : ""
                                     });
                                 }
                             });
@@ -305,6 +351,7 @@ Request.prototype = {
          * @param c
          */
         function grab(c){
+
             me.get(function(e, r, b){
                 var ret = JSON.parse(b);
                 students = students.concat(processStudent(ret));
@@ -339,7 +386,7 @@ Request.prototype = {
 
         var timestamp = this.headers.timestamp = this.getTimezone();
 
-        var token = this.generateXSREAuthToken(timestamp);
+        var token = this._generateAuthToken(timestamp, this.sessionToken, this.secret);
 
         this.headers.Authorization = 'SIF_HMACSHA256 ' + token;
 

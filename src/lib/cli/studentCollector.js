@@ -46,40 +46,6 @@ function cacheDebug(done){
 }
 /**
  *
- */
-//function dumpDataDistrictId(done){
-//    readline.createInterface({
-//        input: fs.createReadStream(filename),
-//        terminal: false
-//    }).on('line', function(line) {
-//        return;
-//        Student.findOne({first_name: "Student " + line, last_name: "Test"}, function(err, student){
-//            console.log('MASUP');
-//            if(err){
-//                return console.log(err);
-//            }
-//            if(!student){
-//                student = new Student();
-//                student.district_student_id = line;
-//                student.emergency1_phone = "";
-//                student.emergency2_phone = "";
-//                student.first_name = "Student " + line;
-//                student.last_name = "Test";
-//                student.organization =  mongoose.Types.ObjectId("55913fc817aac10c2bbfe1e8");
-//                student.phone = "";
-//                student.school_district = "seattle";
-//                student.save(function(){
-//                    console.log('Add student: ', line, ' => ', student._id);
-//                });
-//            } else {
-//                console.log('GET ', line);
-//            }
-//
-//        });
-//    });
-//}
-/**
- *
  * @param callback
  */
 function collectDataStudents(callback) {
@@ -102,7 +68,9 @@ function collectDataStudents(callback) {
                 return done('Data students not found');
             }
 
-            async.each(students, function (student, cb) {
+            console.log('STUDENT DATA OF ORG (' + organization.name + '): ' + students.length);
+
+            async.eachSeries(students, function (student, cb) {
                 var CBOStudent = {
                     '@': {
                         id: student._id.toString()
@@ -129,11 +97,6 @@ function collectDataStudents(callback) {
                     }
 
                 };
-
-                //var orgName = organization.name;
-                //var website = organization.website;
-                //var url = organization.url;
-                //var studentId = student._id.toString();
 
                 var programsId = {};
 
@@ -219,7 +182,7 @@ function collectDataStudents(callback) {
         }
 
 
-        async.each(organizations, processStudent, function (err) {
+        async.eachSeries(organizations, processStudent, function (err) {
             console.log('PUSH STUDENTS: ' + collections.length);
             callback(xmlParser('CBOStudents', {CBOStudent: collections}, {
                 declaration: {
@@ -509,7 +472,7 @@ function pullStudentAsync(ok){
                 new request().getBulk(function(studentList, studentProgramList){
                     //console.log(studentList);
                     if(studentList){
-                        async.each(studentList, function(student, cb){
+                        async.eachSeries(studentList, function(student, cb){
                             con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
                                 if(err){
                                     console.log('INSERT ' + backupTable + ' ERROR: ', err);
@@ -519,7 +482,7 @@ function pullStudentAsync(ok){
                             });
                         }, function(err, data){
                             if(studentProgramList.length > 0){
-                                async.each(studentProgramList, function(stdp, cb1){
+                                async.eachSeries(studentProgramList, function(stdp, cb1){
                                     con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
                                         if(err){
                                             console.log('INSERT ' + t2 + ' ERROR: ', err);
@@ -538,7 +501,8 @@ function pullStudentAsync(ok){
                         callback(null, organization);
                     }
 
-                    }, 2, "(organization/organizationName='" + organization.name + "')");
+                    }, 2, "(organization/organizationName='" + organization.name + "')&sort=organization/districtStudentId:asc");
+                    //}, 2, "(organization/organizationName='" + organization.name + "')");
                 //}, 2, "(organization/districtStudentId='10651041')");
             }
 
@@ -546,7 +510,7 @@ function pullStudentAsync(ok){
             Organization.find(organizationWhere, function(err, organizations){
                 var sql = 'TRUNCATE TABLE ' + backupTable;
                 con.query(sql, function(err, results){
-                    async.each(organizations, pullMap, function(err, data){
+                    async.eachSeries(organizations, pullMap, function(err, data){
                         if(err){
                             benchmark.info(err);
                         }

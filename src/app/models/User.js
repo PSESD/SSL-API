@@ -532,6 +532,7 @@ UserSchema.method('toJSON', function(){
     }
 
     user.full_name = fullname.join(' ');
+    user.studentCount = user.allStudentsByOrganization.length;
 
     return user;
 });

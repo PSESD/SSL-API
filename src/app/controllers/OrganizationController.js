@@ -5,10 +5,12 @@
 var mongoose = require('mongoose');
 var Organization = require('../models/Organization');
 var Program = require('../models/Program');
+var Student = require('../models/Student');
 var User = require('../models/User');
 var Access = require('../access/access').getInstance();
 var BaseController = require('./BaseController');
 var php = require('phpjs');
+var async = require('async');
 var _ = require('underscore');
 var ObjectId = mongoose.Types.ObjectId;
 var OrganizationController = new BaseController(Organization).crud('organizationId');
@@ -425,11 +427,63 @@ OrganizationController.allProgram = function (req, res) {
 
     crit.organization = ObjectId(req.params.organizationId);
 
-    Program.find(crit, function (err, objs) {
+    Program.find(crit, function (err, programs) {
 
-        if (err) { return res.sendError(err); }
+        if (err) {
+            return res.sendError(err);
+        }
 
-        res.sendSuccess(null, objs);
+        var ids = [];
+        var ps = [];
+        var psi = {};
+        var i = 0;
+        programs.forEach(function(p){
+            ids.push(p._id);
+            var c = {
+                _id: p._id,
+                name: p.name,
+                organization: p.organization,
+                totalStudent: 0,
+                totalActive: 0,
+                cohorts: [],
+                created: p.created,
+                creator: p.creator,
+                last_updated: p.last_updated,
+                last_updated_by: p.last_updated_by
+            };
+            psi[p._id.toString()] = i;
+            ps.push(c);
+            i++;
+        });
+
+        Student.protect(req.user.role, { onlyAssign: true }, req.user).find({ organization: crit.organization, programs: { $elemMatch: { program: { $in: ids } } } }, function(err, students){
+
+            if (err)  { return res.sendError(err); }
+
+            students.forEach(function(s){
+                s.programs.forEach(function(sp){
+                    var id = sp.program + '';
+                    if(id in psi){
+                        var j = psi[id];
+                        ps[j].totalStudent++;
+                        if(sp.active === true){
+                            ps[j].totalActive++;
+                        }
+                        if(sp.cohort){
+                            sp.cohort.forEach(function(c){
+                                if(ps[j].cohorts.indexOf(c) === -1){
+                                    ps[j].cohorts.push(c);
+                                }
+                            });
+                        }
+
+                    }
+                });
+            });
+
+            res.sendSuccess(null, ps);
+
+        });
 
     });
 
