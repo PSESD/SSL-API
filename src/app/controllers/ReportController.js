@@ -175,6 +175,8 @@ ReportController.getFilters = function(req, res){
             }
         });
 
+        rowsets.cohorts = _.uniq(rowsets.cohorts);
+
         res.sendSuccess(rowsets);
 
     });

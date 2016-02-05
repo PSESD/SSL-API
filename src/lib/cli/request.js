@@ -319,6 +319,7 @@ Request.prototype = {
                             _.values(student.programs.activities.activity).forEach(function(activity){
                                 if(activity.studentActivityRefId in studentPrograms){
                                     var tags = [];
+
                                     if(activity.tags){
                                         if(_.isObject(activity.tags.tag)){
                                             tags = _.values(activity.tags.tag);
@@ -326,11 +327,16 @@ Request.prototype = {
                                             tags = activity.tags.tag;
                                         }
                                     }
+
+                                    if(typeof tags === 'string' && tags !== ""){
+                                        tags = [ tags ];
+                                    }
+
                                     slist.push({
                                         program_id: activity.studentActivityRefId,
                                         student_id: student.id,
                                         program_name: studentPrograms[activity.studentActivityRefId],
-                                        cohorts: tags.join(",")
+                                        cohorts: _.isArray(tags) ? tags.join(",") : ""
                                     });
                                 }
                             });

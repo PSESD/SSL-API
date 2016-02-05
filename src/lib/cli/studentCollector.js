@@ -501,7 +501,8 @@ function pullStudentAsync(ok){
                         callback(null, organization);
                     }
 
-                    }, 2, "(organization/organizationName='" + organization.name + "')");
+                    }, 2, "(organization/organizationName='" + organization.name + "')&sort=organization/districtStudentId:asc");
+                    //}, 2, "(organization/organizationName='" + organization.name + "')");
                 //}, 2, "(organization/districtStudentId='10651041')");
             }
 
