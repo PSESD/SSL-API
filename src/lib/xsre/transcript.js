@@ -182,7 +182,7 @@ Transcript.prototype.getTranscript = function(){
 
             var school = enrollment.school;
 
-            var schoolName = school.schoolName;
+            var schoolName = l.get(school, 'schoolName');
 
             var schoolYear = enrollment.schoolYear || me.notAvailable;
 
