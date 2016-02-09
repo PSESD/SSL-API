@@ -537,7 +537,7 @@ Request.prototype = {
             headers: this.getHeaders()
         };
 
-        console.log('OPTIONS: ', JSON.stringify(options));
+        //console.log('OPTIONS: ', JSON.stringify(options));
         //console.log('OPTIONS: ', (options));
 
         if(data){
