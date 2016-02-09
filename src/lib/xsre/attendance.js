@@ -311,6 +311,16 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
+            if('absentReasonDescription' in event){
+
+                obj.absentReasonDescription = event.absentReasonDescription;
+
+            } else if('psesd:absentReasonDescription' in event){
+
+                obj.absentReasonDescription = event['psesd:absentReasonDescription'];
+
+            }
+
             /**
              * Add filter for other and Authenticate
              */
@@ -971,8 +981,6 @@ Attendance.prototype.calculateSummary = function(){
                     me.currentSummary.behavior++;
 
                 }
-
-
 
             }
 
