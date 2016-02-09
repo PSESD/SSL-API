@@ -405,14 +405,17 @@ Attendance.prototype.getAttendances = function(){
                     obj.incidentCategoryTitle = '';
 
                 }
+                if(obj.incidentCategoryTitle !== ''){
 
-                discipline.incidentDate = mm.format('MM-DD-YYYY');
+                    discipline.incidentDate = mm.format('MM-DD-YYYY');
 
-                if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1) {
-                    me.allDisciplines[discipline.incidentDate] = [];
+                    if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1){
+                        me.allDisciplines[discipline.incidentDate] = [];
+                    }
+
+                    me.allDisciplines[discipline.incidentDate].push(obj);
+
                 }
-
-                me.allDisciplines[discipline.incidentDate].push(obj);
 
             }
 

@@ -118,6 +118,21 @@
 			</activities>
 		</programs>
 	</CBOStudent>
+	<CBOStudent id="56b4fabca51d38b700aa1a99">
+		<organization refId="55913fc817aac10c2bbfe1e8">
+			<organizationName>Helping Hand CBO</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>123</districtStudentId>
+			<zoneId>seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
 	<CBOStudent id="55c0f385f912c488008de29b">
 		<organization refId="55913fc817aac10c2bbfe1e8">
 			<organizationName>Helping Hand CBO</organizationName>
@@ -4985,6 +5000,36 @@
 			<authorizedEntityId>2</authorizedEntityId>
 			<districtStudentId>sample1</districtStudentId>
 			<zoneId>Seattle</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56b48d12d303867400a00c50">
+		<organization refId="55913fc817aac10c2bbfe1e7">
+			<organizationName>Super Athletes</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>highline</zoneId>
+			<contextId>CBO</contextId>
+		</organization>
+		<programs>
+			<activities>
+			</activities>
+		</programs>
+	</CBOStudent>
+	<CBOStudent id="56b49d80a51d38b700aa1a7e">
+		<organization refId="55913fc817aac10c2bbfe1e7">
+			<organizationName>Super Athletes</organizationName>
+			<externalServiceId>5</externalServiceId>
+			<personnelId></personnelId>
+			<authorizedEntityId>2</authorizedEntityId>
+			<districtStudentId>sample1</districtStudentId>
+			<zoneId>highline</zoneId>
 			<contextId>CBO</contextId>
 		</organization>
 		<programs>
