@@ -157,6 +157,45 @@ OrganizationController.allUsers = function (req, res) {
 };
 
 /**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.pending = function (req, res) {
+
+    var crit = { pending: req.params.organizationId };
+
+    User.find(crit, function (err, users) {
+
+        if (err)  { return res.sendError(err); }
+
+        var tmp = [];
+
+        users.forEach(function(user){
+
+            user.getCurrentPermission(req.params.organizationId);
+
+            var obj = user.toJSON();
+
+            if(obj._id.toString() !== req.user._id.toString()){
+
+                delete obj.permissions;
+
+            }
+
+            tmp.push(obj);
+
+        });
+
+        res.xmlKey = 'users';
+
+        res.sendSuccess(null, tmp);
+
+    });
+
+};
+
+/**
  * Find organization by user id
  * @param req
  * @param res

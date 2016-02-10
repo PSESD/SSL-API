@@ -121,6 +121,8 @@ Rest.prototype.routeOrganizationUser = function(){
         .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.organizationController.getUser)
         .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.organizationController.deleteUser)
     ;
+    this.router.route('/:organizationId/pending/users' + this.format)
+        .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.organizationController.pending);
 };
 /**
  *
