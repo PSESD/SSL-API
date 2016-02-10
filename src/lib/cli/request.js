@@ -11,6 +11,7 @@ var CryptoJS = require("crypto-js");
 var TIME = 1321644961388;
 var _ = require('underscore');
 var l = require('lodash');
+var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
 /**
  *
  * @param options
@@ -21,6 +22,7 @@ function Request(options, env){
 
     if(!config.has('hzb')){
 
+        log("config HZ not found!", err);
         throw new Error("config HZ not found!");
 
     }
@@ -370,14 +372,14 @@ Request.prototype = {
                     done(students, studentPrograms);
                 } else {
                     grab(function(){
-                        console.log(where + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+                        log(where + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
                     });
                 }
             }, serviceNumber, where, zoneId, { navigationid: navigationId, navigationpage: pageId });
         }
 
         grab(function() {
-            console.log(where + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+            log(where + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
         });
     },
     /**
@@ -502,14 +504,14 @@ Request.prototype = {
                     done(students, studentPrograms);
                 } else {
                     grab(function(){
-                        console.log((where || 'All') + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+                        log((where || 'All') + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
                     });
                 }
             }, serviceNumber, where, zoneId, { noNavigationPage: true, navigationpage: pageId });
         }
 
         grab(function() {
-            console.log((where || 'All') + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+            log((where || 'All') + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
         });
     },
     /**
@@ -558,7 +560,7 @@ Request.prototype = {
                 //console.log(response.headers);
                 if(error){
                     callback(error, response, body);
-                    return console.error('upload failed:', error);
+                    return log(error, 'error');
                 }
                 //console.log('Response Header:', JSON.stringify(response.headers));
                 //console.log('Response STATUS CODE:', response.statusCode);

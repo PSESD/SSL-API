@@ -183,7 +183,7 @@ function collectDataStudents(callback) {
 
 
         async.eachSeries(organizations, processStudent, function (err) {
-            console.log('PUSH STUDENTS: ' + collections.length);
+            log('PUSH STUDENTS TO CEDARLABS: ' + collections.length);
             callback(xmlParser('CBOStudents', {CBOStudent: collections}, {
                 declaration: {
                     encoding: 'utf-8'
@@ -342,6 +342,7 @@ function collectCacheListStudentsAsync(force, done) {
 
                             if (err) {
                                 benchmark.info(err);
+                                log(err, 'error');
                                 return cb(null, data);
                             }
                             var msg;
@@ -365,6 +366,7 @@ function collectCacheListStudentsAsync(force, done) {
                                     msg = 'Data not found!';
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                log('XSRE - ERROR BODY RESULT: ' + msg, 'error');
                                 return cb(null, data);
 
                             }
@@ -408,11 +410,13 @@ function collectCacheListStudentsAsync(force, done) {
                 async.series(studentAsync, function(err, stds){
                     if(err){
                         benchmark.info('ERROR: ', err);
+                        log(err, 'error');
                     }
                     if(!stds){
                         benchmark.info(
                             'FAILED POPULATE THE DATA'
                         );
+                        log('FAILED TO POPULATE DATA', 'error');
                     }
                     benchmark.info('Store student into the cache: ', stds.length);
                     /**
@@ -438,6 +442,7 @@ function collectCacheListStudentsAsync(force, done) {
         async.each(organizations, map, function (err, data) {
             if(err){
                 benchmark.info(err);
+                log(err, 'error');
             }
 
             benchmark.info(
@@ -452,7 +457,7 @@ function collectCacheListStudentsAsync(force, done) {
  *
  * @param ok
  */
-function pullStudentAsync(ok){
+/*function pullStudentAsync(ok){
     var masterTable = '`students`';
     var backupTable = '`students__`';
     var t1 = '`student_programs`';
@@ -460,14 +465,12 @@ function pullStudentAsync(ok){
 
     con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
         con.query('create table ' + t2 + ' like ' + t1, function(err, results){
-            /**
+            *//**
              *
              * @param organization
              * @param callback
-             */
+             *//*
             function pullMap(organization, callback){
-
-                //if(organization.name !== 'Helping Hand CBO') return callback(null, organization);
 
                 new request().getBulk(function(studentList, studentProgramList){
                     //console.log(studentList);
@@ -550,7 +553,7 @@ function pullStudentAsync(ok){
             });
         });
     });
-}
+}*/
 /**
  *
  * @param ok
@@ -575,7 +578,7 @@ function pullStudentAsyncWithoutOrg(ok){
                         async.eachSeries(studentList, function(student, cb){
                             con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
                                 if(err && err.errno !== 1062){
-                                    console.log('INSERT ' + backupTable + ' ERROR: ', err);
+                                    log('INSERT ' + backupTable + ' ERROR: ' + err, 'error');
                                 }
                                 cb(null, result);
 
@@ -585,7 +588,7 @@ function pullStudentAsyncWithoutOrg(ok){
                                 async.eachSeries(studentProgramList, function(stdp, cb1){
                                     con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
                                         if(err && err.errno !== 1062){
-                                            console.log('INSERT ' + t2 + ' ERROR: ', err);
+                                            log('INSERT ' + t2 + ' ERROR: ' + err, 'error');
                                         }
                                         cb1(null, result1);
                                     });
@@ -617,24 +620,27 @@ function pullStudentAsyncWithoutOrg(ok){
                     var sql = 'DROP TABLE ' + masterTable;
                     con.query(sql, function(err, results){
                         if(err){
-                            console.log(err);
+                            log(sql + 'WITH ERR: ' + err, 'error');
                         }
                         sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
                         con.query(sql, function(err, results){
                             if(err){
-                                console.log(err);
+                                log(sql + 'WITH ERR: ' + err, 'error');
                             }
                             var sql = 'DROP TABLE ' + t1;
                             con.query(sql, function(err, results){
                                 if(err){
-                                    console.log(err);
+                                    log(sql + 'WITH ERR: ' + err, 'error');
                                 }
                                 sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
                                 con.query(sql, function(err, results){
                                     if(err){
-                                        console.log(err);
+                                        log(sql + 'WITH ERR: ' + err, 'error');
                                     }
                                     con.end(function(err){
+                                        if(err) {
+                                            log('DISCONECT WITH ERR: ' + err, 'error');
+                                        }
                                         ok();
                                     });
                                 });
