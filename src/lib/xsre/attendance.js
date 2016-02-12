@@ -133,15 +133,6 @@ function Attendance(xsre){
     this.allDates = [];
     this.weeks = [];
     this.availableYear = [moment().year()];
-
-    this.legend = [
-        'Present',
-        'Excused',
-        'Tardy',
-        'Other',
-        'Unexcused'
-    ];
-
     this.filterYear = xsre.params.year || null;
 
     if(this.filterYear){
@@ -175,10 +166,23 @@ function Attendance(xsre){
     this.currentSummary = null;
 
     this.facets = xsre.facets;
-
+    this.legend = {};
+    this.legend.present = this.facets.Present;
+    this.legend.excused = this.facets.ExcusedAbsence;
+    this.legend.unexcused = this.facets.UnexcusedAbsence;
+    this.legend.present = this.facets.Tardy;
+    this.legend.other = this.facets.EarlyDeparture;
+    this.legend.unknown = this.facets.Unknown;
     this.extractRawSource = xsre.extractRawSource;
 
 }
+/**
+ *
+ * @returns {behavior.legend|{present, excused, tardy, other, unexcused}|htmltag.legend|{parent}|{present: Array, excused: Array, tardy: Array, other: Array, unexcused: Array}|*}
+ */
+Attendance.prototype.getLegend = function(){
+    return this.legend;
+};
 /**
  *
  * @returns {Array}
@@ -590,7 +594,7 @@ Attendance.prototype.getAttendances = function(){
 
         });
 
-        behavior.legend = legend;
+        //behavior.legend = legend;
 
         var columns = [];
 
