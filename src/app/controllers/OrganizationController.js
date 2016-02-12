@@ -124,8 +124,16 @@ OrganizationController.updateProfile = function(req, res){
  */
 OrganizationController.allUsers = function (req, res) {
 
+    var criteria = { permissions: { $elemMatch: {organization: ObjectId(req.params.organizationId) }}};
 
-    User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
+    if(req.query.pending){
+        criteria = { $or: [
+            criteria,
+            { pending: req.params.organizationId }
+        ]};
+    }
+    //User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
+    User.find(criteria, function (err, users) {
 
         if (err)  { return res.sendError(err); }
 
@@ -142,6 +150,8 @@ OrganizationController.allUsers = function (req, res) {
                 delete obj.permissions;
 
             }
+
+            obj.activate = obj.pending.indexOf(req.params.organizationId) !== -1;
 
             tmp.push(obj);
 
