@@ -170,7 +170,7 @@ function Attendance(xsre){
     this.legend.present = this.facets.Present;
     this.legend.excused = this.facets.ExcusedAbsence;
     this.legend.unexcused = this.facets.UnexcusedAbsence;
-    this.legend.present = this.facets.Tardy;
+    this.legend.tardy = this.facets.Tardy;
     this.legend.other = this.facets.EarlyDeparture;
     this.legend.unknown = this.facets.Unknown;
     this.extractRawSource = xsre.extractRawSource;
