@@ -134,6 +134,14 @@ function Attendance(xsre){
     this.weeks = [];
     this.availableYear = [moment().year()];
 
+    this.legend = [
+        'Present',
+        'Excused',
+        'Tardy',
+        'Other',
+        'Unexcused'
+    ];
+
     this.filterYear = xsre.params.year || null;
 
     if(this.filterYear){
@@ -466,6 +474,14 @@ Attendance.prototype.getAttendances = function(){
             { name: 'F', value: me.notAvailable, date: me.notAvailable, periods: [] }
         ];
 
+        var legend = {
+            present: [],
+            excused: [],
+            tardy: [],
+            other: [],
+            unexcused: []
+        };
+
         behavior = {
             weekDate: ikey,
             summary: {
@@ -486,6 +502,13 @@ Attendance.prototype.getAttendances = function(){
                 W: [],
                 TH: [],
                 F: []
+            },
+            legend: {
+                present: [],
+                excused: [],
+                tardy: [],
+                other: [],
+                unexcused: []
             },
             weeklyChange: me.notAvailable,
             raw: {}
@@ -555,17 +578,19 @@ Attendance.prototype.getAttendances = function(){
 
             if(dailyEvent.length > 0){
 
-                me.calculateDailyAttendance(behavior, dailyEvent, nday, day, summary);
+                me.calculateDailyAttendance(behavior, dailyEvent, nday, day, summary, legend);
 
             }
 
             if(classSectionEvent.length > 0){
 
-                me.calculateClassSectionAttendance(behavior, classSectionEvent, nday, day, summary);
+                me.calculateClassSectionAttendance(behavior, classSectionEvent, nday, day, summary, legend);
 
             }
 
         });
+
+        behavior.legend = legend;
 
         var columns = [];
 
@@ -747,8 +772,9 @@ Attendance.prototype.getAttendances = function(){
  * @param n
  * @param day
  * @param summary
+ * @param legend
  */
-Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary){
+Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary, legend){
 
     var me = this;
 
@@ -797,8 +823,9 @@ Attendance.prototype.slug = function(value){
  * @param n
  * @param day
  * @param summary
+ * @param legend
  */
-Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary){
+Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary, legend){
 
     var me = this;
 
@@ -813,6 +840,10 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
             });
 
             //value += isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue).toFixed(2);
+
+            if(e.attendanceStatus){
+                legend[e.attendanceStatus.toLowerCase()].push(e);
+            }
 
         }
 
