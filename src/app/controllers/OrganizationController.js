@@ -124,8 +124,58 @@ OrganizationController.updateProfile = function(req, res){
  */
 OrganizationController.allUsers = function (req, res) {
 
+    var criteria = { permissions: { $elemMatch: {organization: ObjectId(req.params.organizationId) }}};
 
-    User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
+    if(req.query.pending){
+        criteria = { $or: [
+            criteria,
+            { pending: req.params.organizationId }
+        ]};
+    }
+    //User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
+    User.find(criteria, function (err, users) {
+
+        if (err)  { return res.sendError(err); }
+
+        var tmp = [];
+
+        users.forEach(function(user){
+
+            user.getCurrentPermission(req.params.organizationId);
+
+            var obj = user.toJSON();
+
+            if(obj._id.toString() !== req.user._id.toString()){
+
+                delete obj.permissions;
+
+            }
+
+            obj.activate = obj.pending.indexOf(req.params.organizationId) !== -1;
+
+            tmp.push(obj);
+
+        });
+
+        res.xmlKey = 'users';
+
+        res.sendSuccess(null, tmp);
+
+    });
+
+
+};
+
+/**
+ *
+ * @param req
+ * @param res
+ */
+OrganizationController.pending = function (req, res) {
+
+    var crit = { pending: req.params.organizationId };
+
+    User.find(crit, function (err, users) {
 
         if (err)  { return res.sendError(err); }
 
@@ -152,7 +202,6 @@ OrganizationController.allUsers = function (req, res) {
         res.sendSuccess(null, tmp);
 
     });
-
 
 };
 

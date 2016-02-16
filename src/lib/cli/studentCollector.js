@@ -183,7 +183,7 @@ function collectDataStudents(callback) {
 
 
         async.eachSeries(organizations, processStudent, function (err) {
-            console.log('PUSH STUDENTS: ' + collections.length);
+            log('PUSH STUDENTS TO CEDARLABS: ' + collections.length);
             callback(xmlParser('CBOStudents', {CBOStudent: collections}, {
                 declaration: {
                     encoding: 'utf-8'
@@ -342,6 +342,7 @@ function collectCacheListStudentsAsync(force, done) {
 
                             if (err) {
                                 benchmark.info(err);
+                                log(err, 'error');
                                 return cb(null, data);
                             }
                             var msg;
@@ -365,6 +366,7 @@ function collectCacheListStudentsAsync(force, done) {
                                     msg = 'Data not found!';
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                log('XSRE - ERROR BODY RESULT: ' + msg, 'error');
                                 return cb(null, data);
 
                             }
@@ -408,11 +410,13 @@ function collectCacheListStudentsAsync(force, done) {
                 async.series(studentAsync, function(err, stds){
                     if(err){
                         benchmark.info('ERROR: ', err);
+                        log(err, 'error');
                     }
                     if(!stds){
                         benchmark.info(
                             'FAILED POPULATE THE DATA'
                         );
+                        log('FAILED TO POPULATE DATA', 'error');
                     }
                     benchmark.info('Store student into the cache: ', stds.length);
                     /**
@@ -438,6 +442,7 @@ function collectCacheListStudentsAsync(force, done) {
         async.each(organizations, map, function (err, data) {
             if(err){
                 benchmark.info(err);
+                log(err, 'error');
             }
 
             benchmark.info(
@@ -452,7 +457,7 @@ function collectCacheListStudentsAsync(force, done) {
  *
  * @param ok
  */
-function pullStudentAsync(ok){
+/*function pullStudentAsync(ok){
     var masterTable = '`students`';
     var backupTable = '`students__`';
     var t1 = '`student_programs`';
@@ -460,21 +465,19 @@ function pullStudentAsync(ok){
 
     con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
         con.query('create table ' + t2 + ' like ' + t1, function(err, results){
-            /**
+            *//**
              *
              * @param organization
              * @param callback
-             */
+             *//*
             function pullMap(organization, callback){
-
-                //if(organization.name !== 'Helping Hand CBO') return callback(null, organization);
 
                 new request().getBulk(function(studentList, studentProgramList){
                     //console.log(studentList);
                     if(studentList){
                         async.eachSeries(studentList, function(student, cb){
                             con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
-                                if(err){
+                                if(err && err.errno !== 1062){
                                     console.log('INSERT ' + backupTable + ' ERROR: ', err);
                                 }
                                 cb(null, result);
@@ -484,7 +487,7 @@ function pullStudentAsync(ok){
                             if(studentProgramList.length > 0){
                                 async.eachSeries(studentProgramList, function(stdp, cb1){
                                     con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
-                                        if(err){
+                                        if(err && err.errno !== 1062){
                                             console.log('INSERT ' + t2 + ' ERROR: ', err);
                                         }
                                         cb1(null, result1);
@@ -501,8 +504,8 @@ function pullStudentAsync(ok){
                         callback(null, organization);
                     }
 
-                    }, 2, "(organization/organizationName='" + organization.name + "')&sort=organization/districtStudentId:asc");
-                    //}, 2, "(organization/organizationName='" + organization.name + "')");
+                    //}, 2, "(organization/organizationName='" + organization.name + "')&sort=organization/districtStudentId:asc");
+                    }, 2, "(organization/organizationName='" + organization.name + "')");
                 //}, 2, "(organization/districtStudentId='10651041')");
             }
 
@@ -550,6 +553,104 @@ function pullStudentAsync(ok){
             });
         });
     });
+}*/
+/**
+ *
+ * @param ok
+ */
+function pullStudentAsyncWithoutOrg(ok){
+    var masterTable = '`students`';
+    var backupTable = '`students__`';
+    var t1 = '`student_programs`';
+    var t2 = '`student_programs__`';
+
+    con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
+        con.query('create table ' + t2 + ' like ' + t1, function(err, results){
+            /**
+             *
+             * @param callback
+             */
+            function pullMap(callback){
+                new request().getBulkWithoutNavigationPage(function(studentList, studentProgramList){
+                    console.log('TOTAL STUDENTS FROM CEDAREXPERT: ' + studentList.length);
+                    console.log('TOTAL STUDENT PROGRAMS FROM CEDAREXPERT: ' + studentProgramList.length);
+                    if(studentList){
+                        async.eachSeries(studentList, function(student, cb){
+                            con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
+                                if(err && err.errno !== 1062){
+                                    log('INSERT ' + backupTable + ' ERROR: ' + err, 'error');
+                                }
+                                cb(null, result);
+
+                            });
+                        }, function(err, data){
+                            if(studentProgramList.length > 0){
+                                async.eachSeries(studentProgramList, function(stdp, cb1){
+                                    con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
+                                        if(err && err.errno !== 1062){
+                                            log('INSERT ' + t2 + ' ERROR: ' + err, 'error');
+                                        }
+                                        cb1(null, result1);
+                                    });
+                                }, function(err, data){
+                                    callback(null, studentList);
+                                });
+                            } else {
+                                callback(null, studentList);
+                            }
+
+                        });
+                    } else{
+                        callback(null, studentList);
+                    }
+
+                }, 2);
+            }
+
+
+            var sql = 'TRUNCATE TABLE ' + backupTable;
+            con.query(sql, function(err, results){
+                pullMap(function(err, students){
+                    if(err){
+                        benchmark.info(err);
+                    }
+                    benchmark.info(
+                        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
+                    );
+                    var sql = 'DROP TABLE ' + masterTable;
+                    con.query(sql, function(err, results){
+                        if(err){
+                            log(sql + 'WITH ERR: ' + err, 'error');
+                        }
+                        sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
+                        con.query(sql, function(err, results){
+                            if(err){
+                                log(sql + 'WITH ERR: ' + err, 'error');
+                            }
+                            var sql = 'DROP TABLE ' + t1;
+                            con.query(sql, function(err, results){
+                                if(err){
+                                    log(sql + 'WITH ERR: ' + err, 'error');
+                                }
+                                sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
+                                con.query(sql, function(err, results){
+                                    if(err){
+                                        log(sql + 'WITH ERR: ' + err, 'error');
+                                    }
+                                    con.end(function(err){
+                                        if(err) {
+                                            log('DISCONECT WITH ERR: ' + err, 'error');
+                                        }
+                                        ok();
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
 }
 
 module.exports = {
@@ -558,5 +659,6 @@ module.exports = {
     cacheList: collectCacheListStudentsAsync,
     cacheDebug: cacheDebug,
     //dumpDataDistrictId: dumpDataDistrictId,
-    pullStudentAsync: pullStudentAsync
+    //pullStudentAsync: pullStudentAsync
+    pullStudentAsync: pullStudentAsyncWithoutOrg
 };

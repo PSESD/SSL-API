@@ -133,7 +133,6 @@ function Attendance(xsre){
     this.allDates = [];
     this.weeks = [];
     this.availableYear = [moment().year()];
-
     this.filterYear = xsre.params.year || null;
 
     if(this.filterYear){
@@ -167,10 +166,23 @@ function Attendance(xsre){
     this.currentSummary = null;
 
     this.facets = xsre.facets;
-
+    this.legend = {};
+    this.legend.present = this.facets.Present;
+    this.legend.excused = this.facets.ExcusedAbsence;
+    this.legend.unexcused = this.facets.UnexcusedAbsence;
+    this.legend.tardy = this.facets.Tardy;
+    this.legend.other = this.facets.EarlyDeparture;
+    this.legend.unknown = this.facets.Unknown;
     this.extractRawSource = xsre.extractRawSource;
 
 }
+/**
+ *
+ * @returns {behavior.legend|{present, excused, tardy, other, unexcused}|htmltag.legend|{parent}|{present: Array, excused: Array, tardy: Array, other: Array, unexcused: Array}|*}
+ */
+Attendance.prototype.getLegend = function(){
+    return this.legend;
+};
 /**
  *
  * @returns {Array}
@@ -311,6 +323,16 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
+            if('absentReasonDescription' in event){
+
+                obj.absentReasonDescription = event.absentReasonDescription;
+
+            } else if('psesd:absentReasonDescription' in event){
+
+                obj.absentReasonDescription = event['psesd:absentReasonDescription'];
+
+            }
+
             /**
              * Add filter for other and Authenticate
              */
@@ -405,14 +427,17 @@ Attendance.prototype.getAttendances = function(){
                     obj.incidentCategoryTitle = '';
 
                 }
+                if(obj.incidentCategoryTitle !== ''){
 
-                discipline.incidentDate = mm.format('MM-DD-YYYY');
+                    discipline.incidentDate = mm.format('MM-DD-YYYY');
 
-                if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1) {
-                    me.allDisciplines[discipline.incidentDate] = [];
+                    if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1){
+                        me.allDisciplines[discipline.incidentDate] = [];
+                    }
+
+                    me.allDisciplines[discipline.incidentDate].push(obj);
+
                 }
-
-                me.allDisciplines[discipline.incidentDate].push(obj);
 
             }
 
@@ -453,6 +478,14 @@ Attendance.prototype.getAttendances = function(){
             { name: 'F', value: me.notAvailable, date: me.notAvailable, periods: [] }
         ];
 
+        var legend = {
+            present: [],
+            excused: [],
+            tardy: [],
+            other: [],
+            unexcused: []
+        };
+
         behavior = {
             weekDate: ikey,
             summary: {
@@ -473,6 +506,13 @@ Attendance.prototype.getAttendances = function(){
                 W: [],
                 TH: [],
                 F: []
+            },
+            legend: {
+                present: [],
+                excused: [],
+                tardy: [],
+                other: [],
+                unexcused: []
             },
             weeklyChange: me.notAvailable,
             raw: {}
@@ -542,17 +582,19 @@ Attendance.prototype.getAttendances = function(){
 
             if(dailyEvent.length > 0){
 
-                me.calculateDailyAttendance(behavior, dailyEvent, nday, day, summary);
+                me.calculateDailyAttendance(behavior, dailyEvent, nday, day, summary, legend);
 
             }
 
             if(classSectionEvent.length > 0){
 
-                me.calculateClassSectionAttendance(behavior, classSectionEvent, nday, day, summary);
+                me.calculateClassSectionAttendance(behavior, classSectionEvent, nday, day, summary, legend);
 
             }
 
         });
+
+        //behavior.legend = legend;
 
         var columns = [];
 
@@ -734,8 +776,9 @@ Attendance.prototype.getAttendances = function(){
  * @param n
  * @param day
  * @param summary
+ * @param legend
  */
-Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary){
+Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary, legend){
 
     var me = this;
 
@@ -784,8 +827,9 @@ Attendance.prototype.slug = function(value){
  * @param n
  * @param day
  * @param summary
+ * @param legend
  */
-Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary){
+Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary, legend){
 
     var me = this;
 
@@ -800,6 +844,10 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
             });
 
             //value += isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue).toFixed(2);
+
+            if(e.attendanceStatus){
+                legend[e.attendanceStatus.toLowerCase()].push(e);
+            }
 
         }
 
@@ -968,8 +1016,6 @@ Attendance.prototype.calculateSummary = function(){
                     me.currentSummary.behavior++;
 
                 }
-
-
 
             }
 

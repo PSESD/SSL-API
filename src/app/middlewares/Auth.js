@@ -78,6 +78,12 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, acces
 
       }
 
+      if(typeof token.ip === 'undefined' && clientIp === '127.0.0.1'){
+
+          clientIp = token.ip;
+
+      }
+
       //check for ip token
       if(token.ip !== clientIp){
 

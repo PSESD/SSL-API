@@ -123,6 +123,7 @@ StudentController.getStudentsBackpack = function(req, res){
                 if(separate === 'attendance'){
 
                     paginate.source.years = results.years;
+                    paginate.source.legend = results.legend;
 
                     delete results.years;
 
@@ -423,6 +424,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                             var attendance = xsre.getAttendanceBehavior();
                                             object = attendance.getAttendances();
                                             object.years = attendance.getAvailableYears();
+                                            object.legend = attendance.getLegend();
                                             break;
                                         case 'transcript':
                                             object = xsre.getTranscript().getTranscript();
