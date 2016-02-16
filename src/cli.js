@@ -9,7 +9,7 @@ var bs = require('nodestalker'),
     tube = 'test_tube',
     what = process.argv.slice(2)[0],
     client = bs.Client('127.0.0.1:11300');
-
+var config = require('config');
 var studentCollector = require('./lib/cli/studentCollector');
 var tokenCleaner = require('./lib/cli/tokenCleaner');
 var request = require('./lib/cli/request');
@@ -17,6 +17,15 @@ var utils = require('./lib/utils');
 var con = require('./lib/cli/mysql');
 var codeSet = require('./lib/xsre/codeset');
 var parseString = require('xml2js').parseString;
+var rollbar = require('rollbar');
+var rollbarEnv = config.util.getEnv('NODE_ENV');
+
+var rollbarAccessToken = config.get('rollbar.access_token');
+rollbar.init(rollbarAccessToken, {
+    environment: rollbarEnv
+});
+// Configure the library to send errors to api.rollbar.com
+rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
 
 function processJob(job, callback){
     // doing something really expensive
