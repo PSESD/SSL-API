@@ -27,6 +27,12 @@ function processJob(job, callback){
          //request.push(objectData.content, callback);
     }, 1000);
 }
+
+process.on('uncaughtException', function (err) {
+
+    utils.log(err, 'error');
+
+});
 /**
  *
  */

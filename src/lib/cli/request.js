@@ -2,6 +2,9 @@
  * Created by zaenal on 13/11/15.
  */
 'use strict';
+var rootPath = __dirname + '/../../';
+var appPath = rootPath + 'app';
+var libPath = rootPath + 'lib';
 var config = require('config');
 var request = require('request');
 var qs = require('querystring');
