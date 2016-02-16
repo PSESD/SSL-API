@@ -35,7 +35,7 @@ StudentProgramController.getByStudentId = function (req, res) {
 
     var stdId = req.params.studentId;
 
-    Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
+    Student.protect(req.user.role, { students: stdId, value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
         if (err)  { return res.sendError(err); }
 
@@ -118,7 +118,7 @@ StudentProgramController.addByStudentId = function (req, res) {
 
     }
 
-    Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
+    Student.protect(req.user.role, { students: stdId, value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
         if (err)  { return res.sendError(err); }
 
@@ -219,7 +219,7 @@ StudentProgramController.addByProgramId = function(req, res){
 
     }
 
-    Student.protect(req.user.role, { value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
+    Student.protect(req.user.role, { students: stdId, value: stdId }, req.user).findOne({ _id: ObjectId(stdId), organization: ObjectId(orgId) }, function(err, student){
 
         if (err)  { return res.sendError(err); }
 
@@ -266,7 +266,7 @@ StudentProgramController.getStudentById = function(req, res){
         _id: ObjectId(stdId)
     };
 
-    Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function (err, student) {
+    Student.protect(req.user.role, { students: stdId, value: stdId }, req.user).findOne(crit, function (err, student) {
 
         if (err)  { return res.sendError(err); }
         /**
@@ -299,7 +299,7 @@ StudentProgramController.putStudentById = function(req, res){
         _id: ObjectId(stdId)
     };
 
-    Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
+    Student.protect(req.user.role, { students: stdId, value: stdId }, req.user).findOne(crit, function(err, student){
 
         if (err)  { return res.sendError(err); }
 
@@ -387,7 +387,7 @@ StudentProgramController.deleteStudentById = function(req, res){
         _id: ObjectId(stdId)
     };
 
-    Student.protect(req.user.role, { students: stdId }, req.user).findOne(crit, function(err, student){
+    Student.protect(req.user.role, { students: stdId, value: stdId }, req.user).findOne(crit, function(err, student){
 
         if (err)  { return res.sendError(err); }
 

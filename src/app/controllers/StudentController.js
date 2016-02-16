@@ -56,7 +56,7 @@ StudentController.getStudentsBackpack = function(req, res){
     }
     benchmark.info('XSRE - GET STUDENT');
 
-    Student.protect(req.user.role, { value: studentId }, req.user).findOne({
+    Student.protect(req.user.role, { students: studentId, value: studentId }, req.user).findOne({
         _id: studentId,
         organization: orgId
     }, function(err, student){
@@ -123,6 +123,7 @@ StudentController.getStudentsBackpack = function(req, res){
                 if(separate === 'attendance'){
 
                     paginate.source.years = results.years;
+                    paginate.source.legend = results.legend;
 
                     delete results.years;
 
@@ -182,7 +183,7 @@ StudentController.getStudentsBackpack = function(req, res){
             results.personal.lastName = student.last_name;
             results.personal.middleName = student.middle_name;
             results.personal.schoolDistrict = student.school_district;
-            results.personal.address = student.addresses;
+            results.personal.address = student.address;
 
             results.personal.emergency1 = {
                 name: student.emergency1_name,
@@ -282,7 +283,7 @@ StudentController.getStudentsBackpack = function(req, res){
 
                 if(!_.isEmpty(programsId)){
                     benchmark.info('XSRE - EMBED PROGRAM');
-                    Program.find({ _id: { $in: programId } }, function(err, programs){
+                    Program.find({ _id: { $in: programId } }).sort({ participation_end_date: -1}).exec(function(err, programs){
 
                         if(err){
                             return res.sendError(err);
@@ -423,6 +424,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                             var attendance = xsre.getAttendanceBehavior();
                                             object = attendance.getAttendances();
                                             object.years = attendance.getAvailableYears();
+                                            object.legend = attendance.getLegend();
                                             break;
                                         case 'transcript':
                                             object = xsre.getTranscript().getTranscript();
@@ -517,7 +519,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
 
     }
 
-    Student.protect(req.user.role, { value: studentId }, req.user).findOne({
+    Student.protect(req.user.role, { students: studentId, value: studentId }, req.user).findOne({
         _id: studentId,
         organization: orgId
     }, function(err, student){
@@ -736,9 +738,29 @@ StudentController.getStudents = function(req, res){
 
     var crit = Student.crit(req.query, ['organization']);
 
-    var withXsre = parseInt(req.query.xsre) > 0;
+    var withNoXsre = parseInt(req.query.noxsre) > 0;
+
+    var withNoProgram = parseInt(req.query.noprogram) > 0;
+
+    var userId = 'userId' in req.query ? req.query.userId : null;
 
     crit.organization = orgId;
+
+    var filter = null;
+
+    if(req.query.assign){
+
+        filter = {
+
+            onlyAssign: true
+
+        };
+
+    }
+
+    var sorter = function(st){
+        return [st.first_name, st.last_name];
+    };
 
 
     Organization.findOne({ _id: orgId }, function(err, organization){
@@ -754,17 +776,63 @@ StudentController.getStudents = function(req, res){
         }
 
 
-        Student.protect(req.user.role, null, req.user).find(crit, function(err, students){
+        Student.protect(req.user.role, filter, req.user).find(crit, function(err, students){
 
             if(err){
                 return res.sendError(err);
+            }
+
+            if(userId !== null){
+
+                User.findOne({
+                    _id: ObjectId(userId),
+                    permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
+                }, function (err, user) {
+
+                    var stdlist = [];
+
+                    if(!err && user){
+
+                        user.getCurrentPermission(req.params.organizationId);
+
+                        var obj = user.toJSON();
+
+                        stdlist = _.map(obj.allStudentsByOrganization, function(v, k){
+                            return v + '';
+                        });
+
+                    }
+                    return res.sendSuccess(null, _.sortBy(_.map(students, function(val, key){
+                        var o = val.toObject();
+                        delete o.programs;
+                        delete o.__v;
+                        o.added = stdlist.indexOf(o._id + '') !== -1;
+                        return o;
+                    }), sorter));
+
+                });
+                return;
+
+            }
+
+            if(withNoProgram){
+                return res.sendSuccess(null, _.sortBy(_.map(students, function(val, key){
+                    var o = val.toObject();
+                    delete o.programs;
+                    delete o.__v;
+                    return o;
+                }), sorter));
+            }
+
+            if(withNoXsre){
+                return res.sendSuccess(null, _.sortBy(students, sorter));
             }
 
             var key = prefixListStudent + orgId;
 
             cache.get(key, function(err, results){
 
-                console.log(key, ' DATA ', results);
+                //console.log(key, ' DATA ', results);
 
                 var studentsList = [];
 
@@ -790,10 +858,8 @@ StudentController.getStudents = function(req, res){
                     studentsList.push(newObject);
 
                 });
-                //res.sendSuccess(null, studentsList);
-                res.sendSuccess(null, _.sortBy(studentsList, function(st){
-                  return [st.first_name, st.last_name];
-                }));
+
+                res.sendSuccess(null, _.sortBy(studentsList, sorter));
 
             });
 
@@ -1011,7 +1077,7 @@ StudentController.getStudentById = function(req, res){
             authorizedEntityId: organization.authorizedEntityId
         });
 
-        Student.protect(req.user.role, { students: studentId }, req.user).findOne(crit, function(err, student){
+        Student.protect(req.user.role, { students: studentId, value: studentId }, req.user).findOne(crit, function(err, student){
 
             if(err){
                 return res.sendError(err);

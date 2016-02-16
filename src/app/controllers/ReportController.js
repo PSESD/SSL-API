@@ -23,52 +23,54 @@ ReportController.getStudentBy = function (req, res) {
         cohort: req.query.cohort,
         caseload: req.query.caseload
     };
+    //console.log(filters);
     var sql = null;
     var group = null;
     var params = [ orgId ];
+    var innerWhere = [];
 
     switch(by){
         case 'school_district':
             sql = 'SELECT IF(s.school = "" OR s.school IS NULL, "N/A", s.school) as schoolName, s.school_district as schoolDistrict ';
             sql += 'FROM students s ';
-            sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
             group = 'schoolName, schoolDistrict';
             break;
         case 'grade':
             sql = 'SELECT IF(s.grade_level IS NULL, "N/A", s.grade_level) as gradeLevel ';
             sql += 'FROM students s ';
-            sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
             group = 'gradeLevel';
             break;
         case 'gender':
             sql = 'SELECT IF(s.gender = "" OR s.gender IS NULL,  "N/A", s.gender) as genderName ';
             sql += 'FROM students s ';
-            sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
             group = 'genderName';
             break;
         case 'race':
             sql = 'SELECT IF(s.ethnicity = "" OR s.ethnicity IS NULL, "N/A", s.ethnicity) as ethnicityName ';
             sql += 'FROM students s ';
-            sql += 'LEFT JOIN student_programs sp ON s.student_id = sp.student_id ';
             sql += 'WHERE s.id = ? ';
             group = 'ethnicityName';
             break;
         default:
             return res.sendError(res.__('request_not_valid'));
     }
-
+    var iwhere = null;
+    var innerParams = [];
     if(sql !== null){
         if(filters.program){
-            sql += ' AND sp.program_name';
+            //sql += ' AND sp.program_name';
+            iwhere = 'sp.program_name';
             if(_.isArray(filters.program)){
-                sql += ' IN( ? )';
+                iwhere += ' IN( ? )';
             } else {
-                sql += ' = ?';
+                iwhere += ' = ?';
             }
-            params.push(filters.program);
+            innerParams.push(filters.program);
+            innerWhere.push(iwhere);
+
         }
         if(filters.district){
             sql += ' AND s.school_district';
@@ -84,21 +86,20 @@ ReportController.getStudentBy = function (req, res) {
                 var orWhere = [];
                 filters.cohort.forEach(function(c){
                     orWhere.push('FIND_IN_SET(?, sp.cohorts) > 0');
-                    params.push(c);
+                    innerParams.push(c);
                 });
                 if(orWhere.length > 0){
-                    sql += ' AND (' + orWhere.join(' OR ') + ')';
+                    innerWhere.push(' (' + orWhere.join(' OR ') + ')');
                 }
             } else {
-                sql += ' AND FIND_IN_SET(?, sp.cohorts) > 0';
-                params.push(filters.cohort);
+                innerWhere.push('FIND_IN_SET(?, sp.cohorts) > 0');
+                innerParams.push(filters.cohort);
             }
         }
-        if(filters.caseload){
-            //sql += ' AND sp.caseload = ?';
-            //params.push(filters.caseload);
-        }
 
+        if(innerWhere.length > 0){
+            sql += con.format(' AND s.student_id IN(SELECT sp.student_id FROM student_programs sp WHERE ' + innerWhere.join(' AND ') + ')', innerParams);
+        }
         if(group){
             sql = 'SELECT *, COUNT(*) as total FROM (' + sql + ') as t GROUP BY ' + group;
         }
@@ -152,6 +153,8 @@ ReportController.getFilters = function(req, res){
                 rowsets.districts.push(row.school_district);
             }
         });
+
+        rowsets.cohorts = _.uniq(rowsets.cohorts);
 
         res.sendSuccess(rowsets);
 

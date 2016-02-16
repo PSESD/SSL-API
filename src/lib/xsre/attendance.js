@@ -133,7 +133,6 @@ function Attendance(xsre){
     this.allDates = [];
     this.weeks = [];
     this.availableYear = [moment().year()];
-
     this.filterYear = xsre.params.year || null;
 
     if(this.filterYear){
@@ -167,10 +166,23 @@ function Attendance(xsre){
     this.currentSummary = null;
 
     this.facets = xsre.facets;
-
+    this.legend = {};
+    this.legend.present = this.facets.Present;
+    this.legend.excused = this.facets.ExcusedAbsence;
+    this.legend.unexcused = this.facets.UnexcusedAbsence;
+    this.legend.tardy = this.facets.Tardy;
+    this.legend.other = this.facets.EarlyDeparture;
+    this.legend.unknown = this.facets.Unknown;
     this.extractRawSource = xsre.extractRawSource;
 
 }
+/**
+ *
+ * @returns {behavior.legend|{present, excused, tardy, other, unexcused}|htmltag.legend|{parent}|{present: Array, excused: Array, tardy: Array, other: Array, unexcused: Array}|*}
+ */
+Attendance.prototype.getLegend = function(){
+    return this.legend;
+};
 /**
  *
  * @returns {Array}
@@ -311,6 +323,46 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
+            if('absentReasonDescription' in event){
+
+                obj.absentReasonDescription = event.absentReasonDescription;
+
+            } else if('psesd:absentReasonDescription' in event){
+
+                obj.absentReasonDescription = event['psesd:absentReasonDescription'];
+
+            }
+
+            /**
+             * Add filter for other and Authenticate
+             */
+
+            switch (obj.attendanceStatus){
+                case 'Present':
+                    obj.attendanceStatus = 'Present';
+                    break;
+                case 'Tardy':
+                case 'Late':
+                    obj.attendanceStatus = 'Tardy';
+                    break;
+                case 'ExcusedAbsence':
+                case 'Excused':
+                    obj.attendanceStatus = 'Excused';
+                    break;
+                case 'UnexcusedAbsence':
+                case 'Unexcused':
+                    obj.attendanceStatus = 'Unexcused';
+                    break;
+                case 'EarlyDeparture':
+                case 'Authorized':
+                    obj.attendanceStatus = 'Other';
+                    break;
+                default :
+                    obj.attendanceStatus = 'Unknown';
+                    break;
+
+            }
+
             event.calendarEventDate = mm.format('MM-DD-YYYY');
 
             delete event.school;
@@ -368,15 +420,24 @@ Attendance.prototype.getAttendances = function(){
 
                     obj.incidentCategoryTitle = (''+obj.incidentCategory) in me.facets ? me.facets[''+obj.incidentCategory] : '';
 
+                } else {
+
+                    obj.incidentCategory = '';
+
+                    obj.incidentCategoryTitle = '';
+
                 }
+                if(obj.incidentCategoryTitle !== ''){
 
-                discipline.incidentDate = mm.format('MM-DD-YYYY');
+                    discipline.incidentDate = mm.format('MM-DD-YYYY');
 
-                if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1) {
-                    me.allDisciplines[discipline.incidentDate] = [];
+                    if(Object.keys(me.allDisciplines).indexOf(discipline.incidentDate) === -1){
+                        me.allDisciplines[discipline.incidentDate] = [];
+                    }
+
+                    me.allDisciplines[discipline.incidentDate].push(obj);
+
                 }
-
-                me.allDisciplines[discipline.incidentDate].push(obj);
 
             }
 
@@ -417,6 +478,14 @@ Attendance.prototype.getAttendances = function(){
             { name: 'F', value: me.notAvailable, date: me.notAvailable, periods: [] }
         ];
 
+        var legend = {
+            present: [],
+            excused: [],
+            tardy: [],
+            other: [],
+            unexcused: []
+        };
+
         behavior = {
             weekDate: ikey,
             summary: {
@@ -437,6 +506,13 @@ Attendance.prototype.getAttendances = function(){
                 W: [],
                 TH: [],
                 F: []
+            },
+            legend: {
+                present: [],
+                excused: [],
+                tardy: [],
+                other: [],
+                unexcused: []
             },
             weeklyChange: me.notAvailable,
             raw: {}
@@ -506,17 +582,19 @@ Attendance.prototype.getAttendances = function(){
 
             if(dailyEvent.length > 0){
 
-                me.calculateDailyAttendance(behavior, dailyEvent, nday, day, summary);
+                me.calculateDailyAttendance(behavior, dailyEvent, nday, day, summary, legend);
 
             }
 
             if(classSectionEvent.length > 0){
 
-                me.calculateClassSectionAttendance(behavior, classSectionEvent, nday, day, summary);
+                me.calculateClassSectionAttendance(behavior, classSectionEvent, nday, day, summary, legend);
 
             }
 
         });
+
+        //behavior.legend = legend;
 
         var columns = [];
 
@@ -698,14 +776,15 @@ Attendance.prototype.getAttendances = function(){
  * @param n
  * @param day
  * @param summary
+ * @param legend
  */
-Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary){
+Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, day, summary, legend){
 
     var me = this;
 
     var e = events[0];
 
-    if(e.attendanceStatus && (''+e.attendanceStatus).toLowerCase() === 'present'){
+    if(e.attendanceStatus && ((''+e.attendanceStatus).toLowerCase() === 'present' || (''+e.attendanceStatus).toLowerCase() === 'tardy')){
 
         summary[n].value = parseFloat(isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue) * 100);
 
@@ -748,8 +827,9 @@ Attendance.prototype.slug = function(value){
  * @param n
  * @param day
  * @param summary
+ * @param legend
  */
-Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary){
+Attendance.prototype.calculateClassSectionAttendance = function(behavior, events, n, day, summary, legend){
 
     var me = this;
 
@@ -764,6 +844,10 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
             });
 
             //value += isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue).toFixed(2);
+
+            if(e.attendanceStatus){
+                legend[e.attendanceStatus.toLowerCase()].push(e);
+            }
 
         }
 
@@ -833,6 +917,8 @@ Attendance.prototype.calculateSummary = function(){
         behavior: 0
     };
 
+    var c = {};
+
     if(_.isObject(me.attendances) && _.isObject(me.attendances.events) && !_.isUndefined(me.attendances.events.event)){
 
         if(!_.isArray(me.attendances.events.event)){
@@ -849,7 +935,7 @@ Attendance.prototype.calculateSummary = function(){
 
             event.calendarEventDateTime = mm.valueOf();
 
-            var passed = true;
+            var passed = false;
 
             if(me.academicStart && me.academicEnd){
 
@@ -865,11 +951,25 @@ Attendance.prototype.calculateSummary = function(){
 
                 }
 
-                var attendanceStatus = me.slug(event.attendanceStatus);
+                if('attendanceEventType' in event && event.attendanceEventType === 'DailyAttendance'){
 
-                if(attendanceStatus === 'excused' || attendanceStatus === 'unexcused' || attendanceStatus === 'unexcusedabsence' || attendanceStatus === 'excusedabsence' ){
+                    var attendanceStatus = me.slug(event.attendanceStatus);
 
-                    me.currentSummary.attendance++;
+                    //var m = mm.format('YYYY-MM-DD');
+                    //
+                    //if(Object.keys(c).indexOf(m) === -1){
+                    //
+                    //    c[m] = [];
+                    //
+                    //}
+                    //
+                    //c[m].push(attendanceStatus);
+
+                    if(attendanceStatus === 'excused' || attendanceStatus === 'unexcused'){
+
+                        me.currentSummary.attendance++;
+
+                    }
 
                 }
 
@@ -878,8 +978,12 @@ Attendance.prototype.calculateSummary = function(){
         });
 
     }
+    //console.log((function(s){var t={};Object.keys(s).sort().reverse().forEach(function(k){t[k]=s[k]});return t;})(c));
+    //console.log(me.academicStart.format('YYYY-MM-DD'), me.academicEnd.format('YYYY-MM-DD'), c);
 
     if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
+
+        var n = [];
 
         if(!_.isArray(me.disciplineIncidents.disciplineIncident)){
 
@@ -903,7 +1007,15 @@ Attendance.prototype.calculateSummary = function(){
 
             if(passed && mm.isValid()){
 
-                me.currentSummary.behavior++;
+                var m = mm.format('YYYY-MM-DD');
+
+                if(n.indexOf(m) === -1){
+
+                    n.push(m);
+
+                    me.currentSummary.behavior++;
+
+                }
 
             }
 

@@ -9,13 +9,23 @@ var bs = require('nodestalker'),
     tube = 'test_tube',
     what = process.argv.slice(2)[0],
     client = bs.Client('127.0.0.1:11300');
-
+var config = require('config');
 var studentCollector = require('./lib/cli/studentCollector');
 var tokenCleaner = require('./lib/cli/tokenCleaner');
 var request = require('./lib/cli/request');
 var utils = require('./lib/utils');
 var con = require('./lib/cli/mysql');
+var codeSet = require('./lib/xsre/codeset');
 var parseString = require('xml2js').parseString;
+var rollbar = require('rollbar');
+var rollbarEnv = config.util.getEnv('NODE_ENV');
+
+var rollbarAccessToken = config.get('rollbar.access_token');
+rollbar.init(rollbarAccessToken, {
+    environment: rollbarEnv
+});
+// Configure the library to send errors to api.rollbar.com
+rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
 
 function processJob(job, callback){
     // doing something really expensive
@@ -26,6 +36,12 @@ function processJob(job, callback){
          //request.push(objectData.content, callback);
     }, 1000);
 }
+
+process.on('uncaughtException', function (err) {
+
+    utils.log(err, 'error');
+
+});
 /**
  *
  */
@@ -111,16 +127,19 @@ switch(what){
             process.exit();
         });
         break;
-    //case 'pull-cedarlabs':
-    //    studentCollector.pullStudent(function(err){
-    //        if(err){
-    //            utils.log(err, 'error');
-    //        } else {
-    //            utils.log('Pull Done !', 'info');
-    //        }
-    //        process.exit();
-    //    });
-    //    break;
+    case 'codeset':
+        (new request()).codeSet(function(err, res, body){
+            if(err){
+                utils.log(err, 'error');
+                process.exit();
+            } else {
+                new codeSet(JSON.parse(body)).parse(function(){
+                    utils.log('Pull all Done !', 'info');
+                    process.exit();
+                });
+            }
+        });
+        break;
     case 'queue-cedarlabs':
         studentCollector.queue(function(){
             console.log('Queue done');

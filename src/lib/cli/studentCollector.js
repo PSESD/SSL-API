@@ -28,10 +28,15 @@ var xSre = require(libPath+'/xsre');
 var async = require('async');
 var districtFile = rootPath + '/test/data/districts';
 var fs = require('fs');
-var readline = require('readline');
 var filename = districtFile;
 var prefixListStudent = '_xsre_list_students_';
+var organizationWhere = {};
 
+//organizationWhere = {
+//    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
+//};
+
+console.log('WHERE: ', organizationWhere);
 function cacheDebug(done){
     var key = prefixListStudent + '*';
     cache.get(key, function(err, data){
@@ -39,40 +44,6 @@ function cacheDebug(done){
         done();
     });
 }
-/**
- *
- */
-//function dumpDataDistrictId(done){
-//    readline.createInterface({
-//        input: fs.createReadStream(filename),
-//        terminal: false
-//    }).on('line', function(line) {
-//        return;
-//        Student.findOne({first_name: "Student " + line, last_name: "Test"}, function(err, student){
-//            console.log('MASUP');
-//            if(err){
-//                return console.log(err);
-//            }
-//            if(!student){
-//                student = new Student();
-//                student.district_student_id = line;
-//                student.emergency1_phone = "";
-//                student.emergency2_phone = "";
-//                student.first_name = "Student " + line;
-//                student.last_name = "Test";
-//                student.organization =  mongoose.Types.ObjectId("55913fc817aac10c2bbfe1e8");
-//                student.phone = "";
-//                student.school_district = "seattle";
-//                student.save(function(){
-//                    console.log('Add student: ', line, ' => ', student._id);
-//                });
-//            } else {
-//                console.log('GET ', line);
-//            }
-//
-//        });
-//    });
-//}
 /**
  *
  * @param callback
@@ -97,7 +68,9 @@ function collectDataStudents(callback) {
                 return done('Data students not found');
             }
 
-            async.each(students, function (student, cb) {
+            console.log('STUDENT DATA OF ORG (' + organization.name + '): ' + students.length);
+
+            async.eachSeries(students, function (student, cb) {
                 var CBOStudent = {
                     '@': {
                         id: student._id.toString()
@@ -124,11 +97,6 @@ function collectDataStudents(callback) {
                     }
 
                 };
-
-                //var orgName = organization.name;
-                //var website = organization.website;
-                //var url = organization.url;
-                //var studentId = student._id.toString();
 
                 var programsId = {};
 
@@ -203,7 +171,7 @@ function collectDataStudents(callback) {
         });
     }
 
-    Organization.find({}, function (err, organizations) {
+    Organization.find(organizationWhere, function (err, organizations) {
 
         if (err) {
             throw new Error(err);
@@ -214,8 +182,8 @@ function collectDataStudents(callback) {
         }
 
 
-        async.each(organizations, processStudent, function (err) {
-            console.log('PUSH STUDENTS: ' + collections.length);
+        async.eachSeries(organizations, processStudent, function (err) {
+            log('PUSH STUDENTS TO CEDARLABS: ' + collections.length);
             callback(xmlParser('CBOStudents', {CBOStudent: collections}, {
                 declaration: {
                     encoding: 'utf-8'
@@ -234,7 +202,7 @@ function collectDataStudents(callback) {
 function collectCacheStudents(done) {
 
     benchmark.info('CACHE-STUDENT: START');
-    Organization.find({}, function (err, organizations) {
+    Organization.find(organizationWhere, function (err, organizations) {
 
         if (err) {
             return benchmark.info(err);
@@ -312,7 +280,7 @@ function collectCacheStudents(done) {
 function collectCacheListStudentsAsync(force, done) {
 
     benchmark.info("CACHE-LIST-STUDENT\tSTART");
-    Organization.find({}, function (err, organizations) {
+    Organization.find(organizationWhere, function (err, organizations) {
 
         if (err) {
             return benchmark.info(err);
@@ -374,6 +342,7 @@ function collectCacheListStudentsAsync(force, done) {
 
                             if (err) {
                                 benchmark.info(err);
+                                log(err, 'error');
                                 return cb(null, data);
                             }
                             var msg;
@@ -397,6 +366,7 @@ function collectCacheListStudentsAsync(force, done) {
                                     msg = 'Data not found!';
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
+                                log('XSRE - ERROR BODY RESULT: ' + msg, 'error');
                                 return cb(null, data);
 
                             }
@@ -440,11 +410,13 @@ function collectCacheListStudentsAsync(force, done) {
                 async.series(studentAsync, function(err, stds){
                     if(err){
                         benchmark.info('ERROR: ', err);
+                        log(err, 'error');
                     }
                     if(!stds){
                         benchmark.info(
                             'FAILED POPULATE THE DATA'
                         );
+                        log('FAILED TO POPULATE DATA', 'error');
                     }
                     benchmark.info('Store student into the cache: ', stds.length);
                     /**
@@ -470,6 +442,7 @@ function collectCacheListStudentsAsync(force, done) {
         async.each(organizations, map, function (err, data) {
             if(err){
                 benchmark.info(err);
+                log(err, 'error');
             }
 
             benchmark.info(
@@ -480,190 +453,11 @@ function collectCacheListStudentsAsync(force, done) {
 
     });
 }
-
-function queue(done){
-    new request().clearParam().queue('d9979ac0-a36a-4f71-8fc4-331153d92e57', done);
-}
-/**
- *
- * @param done
- * @deprecated
- */
-function pullStudent(done){
-    var masterTable = '`students`';
-    var backupTable = '`students__`';
-    var t1 = '`student_programs`';
-    var t2 = '`student_programs__`';
-
-    con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
-        con.query('create table ' + t2 + ' like ' + t1, function(err, results){
-            /**
-             *
-             * @param organization
-             * @param callback
-             */
-            function pullMap(organization, callback){
-
-                new request().clearParam().get(function(err, res, body){
-                    if(err){
-                        callback(null, organization);
-                        return;
-                    }
-                    var result;
-                    //console.log(body);
-                    try{
-                        result = JSON.parse(body);
-                    } catch(e){
-                        callback(null, organization);
-                        return;
-                    }
-                    //var result = JSON.parse(fs.readFileSync(rootPath + '/data/response.json', 'utf8'));
-                    //require('fs').writeFile(rootPath + '/data/' + organization.name + '.json', body, function(err){});
-
-                    var studentList = null;
-
-                    if(result){
-                        studentList = result;
-                    }
-
-                    if(studentList !== null){
-                        console.log(organization.name, ' >>> STUDENT LIST: ', studentList.length);
-                        async.each(studentList, function(student, cb){
-                            var xSre = l.get(student, 'xSre');
-                            var students = {
-                                id: student.organization.refId,
-                                org_name: student.organization.organizationName,
-                                student_id: student.id,
-                                school_district: (student.organization.zoneId + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function($1){
-                                    return $1.toUpperCase();
-                                }),
-                                school: "",
-                                first_name: "",
-                                last_name: "",
-                                grade_level: "",
-                                ethnicity: "",
-                                gender: ""
-                            };
-
-                            if(xSre){
-                                students.gender = l.get(xSre, 'demographics.sex');
-                                students.school = l.get(xSre, 'enrollment.school.schoolName');
-                                students.first_name = l.get(xSre, 'name.givenName');
-                                students.last_name = l.get(xSre, 'name.familyName');
-                                students.grade_level = l.get(xSre, 'enrollment.gradeLevel');
-                                students.ethnicity = l.get(xSre, 'demographics.races.race.race');
-                            }
-
-                            var studentPrograms = {};
-                            var studentProgramData = [];
-
-                            if(student.studentActivity){
-                                if(_.isObject(student.studentActivity)){
-                                    _.values(student.studentActivity).forEach(function(programs){
-                                        if(programs.title){
-                                            studentPrograms[programs.refId] = programs.title;
-                                        }
-                                    });
-                                }
-                            }
-
-                            if(student.programs && student.programs.activities && student.programs.activities.activity){
-                                if(_.isObject(student.programs.activities.activity)){
-                                    _.values(student.programs.activities.activity).forEach(function(activity){
-                                        if(activity.studentActivityRefId in studentPrograms){
-                                            var tags = [];
-                                            if(activity.tags){
-                                                if(!_.isArray(activity.tags.tag)){
-                                                    tags.push(activity.tags.tag);
-                                                } else if(_.isObject(activity.tags.tag)){
-                                                    tags = _.values(activity.tags.tag);
-                                                } else{
-                                                    tags = activity.tags.tag;
-                                                }
-                                            }
-                                            studentProgramData.push({
-                                                program_id: activity.studentActivityRefId,
-                                                student_id: students.student_id,
-                                                program_name: studentPrograms[activity.studentActivityRefId],
-                                                cohorts: tags.join(",")
-                                            });
-                                        }
-                                    });
-                                }
-                            }
-                            //console.log(students);
-                            con.query('INSERT INTO ' + backupTable + ' SET ?', students, function(err, result){
-                                if(err){
-                                    console.log('INSERT ERROR: ', err);
-                                }
-                                if(studentProgramData.length > 0){
-                                    con.query('INSERT INTO ' + t2 + ' SET ?', studentProgramData, function(err, result){
-                                        cb(null, result);
-                                    });
-                                } else{
-                                    cb(null, result);
-                                }
-                            });
-                        }, function(err, data){
-                            callback(null, organization);
-                        });
-                    } else{
-                        callback(null, organization);
-                    }
-
-                }, 2, "(organization/organizationName='" + organization.name + "')");
-            }
-
-
-            Organization.find({}, function(err, organizations){
-                var sql = 'TRUNCATE TABLE ' + backupTable;
-                con.query(sql, function(err, results){
-                    async.each(organizations, pullMap, function(err, data){
-                        if(err){
-                            benchmark.info(err);
-                        }
-
-                        benchmark.info(
-                            '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
-                        );
-                        var sql = 'DROP TABLE ' + masterTable;
-                        con.query(sql, function(err, results){
-                            if(err){
-                                console.log(err);
-                            }
-                            sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
-                            con.query(sql, function(err, results){
-                                if(err){
-                                    console.log(err);
-                                }
-                                var sql = 'DROP TABLE ' + t1;
-                                con.query(sql, function(err, results){
-                                    if(err){
-                                        console.log(err);
-                                    }
-                                    sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
-                                    con.query(sql, function(err, results){
-                                        if(err){
-                                            console.log(err);
-                                        }
-                                        con.end(function(err){
-                                            done();
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
-}
 /**
  *
  * @param ok
  */
-function pullStudentAsync(ok){
+/*function pullStudentAsync(ok){
     var masterTable = '`students`';
     var backupTable = '`students__`';
     var t1 = '`student_programs`';
@@ -671,21 +465,19 @@ function pullStudentAsync(ok){
 
     con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
         con.query('create table ' + t2 + ' like ' + t1, function(err, results){
-            /**
+            *//**
              *
              * @param organization
              * @param callback
-             */
+             *//*
             function pullMap(organization, callback){
-
-                //if(organization.name !== 'Helping Hand CBO') return callback(null, organization);
 
                 new request().getBulk(function(studentList, studentProgramList){
                     //console.log(studentList);
                     if(studentList){
-                        async.each(studentList, function(student, cb){
+                        async.eachSeries(studentList, function(student, cb){
                             con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
-                                if(err){
+                                if(err && err.errno !== 1062){
                                     console.log('INSERT ' + backupTable + ' ERROR: ', err);
                                 }
                                 cb(null, result);
@@ -693,9 +485,9 @@ function pullStudentAsync(ok){
                             });
                         }, function(err, data){
                             if(studentProgramList.length > 0){
-                                async.each(studentProgramList, function(stdp, cb1){
+                                async.eachSeries(studentProgramList, function(stdp, cb1){
                                     con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
-                                        if(err){
+                                        if(err && err.errno !== 1062){
                                             console.log('INSERT ' + t2 + ' ERROR: ', err);
                                         }
                                         cb1(null, result1);
@@ -712,15 +504,16 @@ function pullStudentAsync(ok){
                         callback(null, organization);
                     }
 
+                    //}, 2, "(organization/organizationName='" + organization.name + "')&sort=organization/districtStudentId:asc");
                     }, 2, "(organization/organizationName='" + organization.name + "')");
                 //}, 2, "(organization/districtStudentId='10651041')");
             }
 
 
-            Organization.find({}, function(err, organizations){
+            Organization.find(organizationWhere, function(err, organizations){
                 var sql = 'TRUNCATE TABLE ' + backupTable;
                 con.query(sql, function(err, results){
-                    async.each(organizations, pullMap, function(err, data){
+                    async.eachSeries(organizations, pullMap, function(err, data){
                         if(err){
                             benchmark.info(err);
                         }
@@ -760,6 +553,104 @@ function pullStudentAsync(ok){
             });
         });
     });
+}*/
+/**
+ *
+ * @param ok
+ */
+function pullStudentAsyncWithoutOrg(ok){
+    var masterTable = '`students`';
+    var backupTable = '`students__`';
+    var t1 = '`student_programs`';
+    var t2 = '`student_programs__`';
+
+    con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
+        con.query('create table ' + t2 + ' like ' + t1, function(err, results){
+            /**
+             *
+             * @param callback
+             */
+            function pullMap(callback){
+                new request().getBulkWithoutNavigationPage(function(studentList, studentProgramList){
+                    console.log('TOTAL STUDENTS FROM CEDAREXPERT: ' + studentList.length);
+                    console.log('TOTAL STUDENT PROGRAMS FROM CEDAREXPERT: ' + studentProgramList.length);
+                    if(studentList){
+                        async.eachSeries(studentList, function(student, cb){
+                            con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
+                                if(err && err.errno !== 1062){
+                                    log('INSERT ' + backupTable + ' ERROR: ' + err, 'error');
+                                }
+                                cb(null, result);
+
+                            });
+                        }, function(err, data){
+                            if(studentProgramList.length > 0){
+                                async.eachSeries(studentProgramList, function(stdp, cb1){
+                                    con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
+                                        if(err && err.errno !== 1062){
+                                            log('INSERT ' + t2 + ' ERROR: ' + err, 'error');
+                                        }
+                                        cb1(null, result1);
+                                    });
+                                }, function(err, data){
+                                    callback(null, studentList);
+                                });
+                            } else {
+                                callback(null, studentList);
+                            }
+
+                        });
+                    } else{
+                        callback(null, studentList);
+                    }
+
+                }, 2);
+            }
+
+
+            var sql = 'TRUNCATE TABLE ' + backupTable;
+            con.query(sql, function(err, results){
+                pullMap(function(err, students){
+                    if(err){
+                        benchmark.info(err);
+                    }
+                    benchmark.info(
+                        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
+                    );
+                    var sql = 'DROP TABLE ' + masterTable;
+                    con.query(sql, function(err, results){
+                        if(err){
+                            log(sql + 'WITH ERR: ' + err, 'error');
+                        }
+                        sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
+                        con.query(sql, function(err, results){
+                            if(err){
+                                log(sql + 'WITH ERR: ' + err, 'error');
+                            }
+                            var sql = 'DROP TABLE ' + t1;
+                            con.query(sql, function(err, results){
+                                if(err){
+                                    log(sql + 'WITH ERR: ' + err, 'error');
+                                }
+                                sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
+                                con.query(sql, function(err, results){
+                                    if(err){
+                                        log(sql + 'WITH ERR: ' + err, 'error');
+                                    }
+                                    con.end(function(err){
+                                        if(err) {
+                                            log('DISCONECT WITH ERR: ' + err, 'error');
+                                        }
+                                        ok();
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
 }
 
 module.exports = {
@@ -767,8 +658,7 @@ module.exports = {
     cache: collectCacheStudents,
     cacheList: collectCacheListStudentsAsync,
     cacheDebug: cacheDebug,
-    queue: queue,
     //dumpDataDistrictId: dumpDataDistrictId,
-    pullStudent: pullStudent,
-    pullStudentAsync: pullStudentAsync
+    //pullStudentAsync: pullStudentAsync
+    pullStudentAsync: pullStudentAsyncWithoutOrg
 };
