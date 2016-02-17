@@ -31,7 +31,7 @@ var bodyEmail = 'On ${datetime} the following scheduled tasks have been performe
 var emailCacheList = '${status} pulling ${number_of_students} students from the P2 Broker and pushing it to ${redis_host}';
 var emailPullCedarExpert = '${status} pulling ${number_of_students} students from CedarExperts';
 var emailPushCedarExpert = '${status} pushing ${number_of_students} students to CedarExperts';
-var emailPushSqlReport = '${status} pushing ${number_of_students} students to MySQL DB: ${mysql_host}.';
+var emailPushSqlReport = '${status} pushing ${number_of_students} students from CedarExperts to MySQL DB: ${mysql_host}.';
 var emailPullCodeSet = '${status} pulling codeset done.';
 // Configure the library to send errors to api.rollbar.com
 rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
@@ -143,6 +143,7 @@ function sentItEmail(message, params, done, err){
 
     var subject = php.str_replace( iregex, ireplace, subjectEmail);
     message = php.str_replace(iregex, ireplace, message);
+    bodyEmail = php.str_replace(iregex, ireplace, bodyEmail);
     message = bodyEmail + "<br>" + message;
     if(err){
         message += '<br><strong>' +
@@ -159,7 +160,7 @@ switch(what){
 
         break;
     case 'test':
-        withSuccess(emailPushSqlReport, {}, function(){
+        withSuccess(emailPushSqlReport, { number_of_students: 200 }, function(){
             process.exit();
         });
         break;
@@ -189,9 +190,9 @@ switch(what){
         studentCollector.collect(function(bulkStudent){
                 require('fs').writeFile(__dirname + '/data/REQUEST-CBOStudents.xml', bulkStudent, function (err) {});
                 (new request()).push(bulkStudent, function(error, response, body){
-                    require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
-                        if (err) {
-                            withError(err, emailPushCedarExpert, { number_of_students: bulkStudent.length }, function (err) {
+                    //require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
+                        if (error) {
+                            withError(error, emailPushCedarExpert, { number_of_students: bulkStudent.length }, function (err) {
                                 process.exit();
                             });
                         } else {
@@ -199,7 +200,7 @@ switch(what){
                                 process.exit();
                             });
                         }
-                    });
+                    //});
                 });
 
         });
@@ -207,11 +208,11 @@ switch(what){
     case 'pull-cedarlabs':
         studentCollector.pullStudentAsync(function(err, studentNumber){
             if (err) {
-                withError(err, emailPullCedarExpert, { number_of_students: studentNumber }, function (err) {
+                withError(err, emailPushSqlReport, { number_of_students: studentNumber }, function (err) {
                     process.exit();
                 });
             } else {
-                withSuccess(emailPullCedarExpert, { number_of_students: studentNumber }, function (err) {
+                withSuccess(emailPushSqlReport, { number_of_students: studentNumber }, function (err) {
                     process.exit();
                 });
             }
