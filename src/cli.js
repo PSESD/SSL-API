@@ -75,10 +75,29 @@ function pullJob(){
 
     });
 }
+/**
+ *
+ * @param err
+ * @param subject
+ * @param done
+ */
+function withError(err, subject, done){
+    utils.mailDev(err, subject, done);
+}
+/**
+ *
+ * @param success
+ * @param subject
+ * @param done
+ */
+function withSuccess(success, subject, done){
+    utils.mailDev(success, subject, done);
+}
 
 switch(what){
-    case 'test':
-        console.log('HALLO');
+    case 'env':
+        console.log('Environment: ', config.util.getEnv('NODE_ENV'));
+        process.exit();
         break;
     case 'pull':
         pullJob();
@@ -109,9 +128,12 @@ switch(what){
                 (new request()).push(bulkStudent, function(error, response, body){
                     require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
                         if (err) {
-                            throw err;
+                            withError(err, 'PUSH CEDARLABS', function (err) {
+                                process.exit();
+                            });
+                        } else {
+                            process.exit();
                         }
-                        process.exit();
                     });
                 });
 
@@ -119,22 +141,29 @@ switch(what){
         break;
     case 'pull-cedarlabs':
         studentCollector.pullStudentAsync(function(err){
-            if(err){
+            if (err) {
                 utils.log(err, 'error');
+                withError(err, 'PULL CEDARLABS', function (err) {
+                    process.exit();
+                });
             } else {
                 utils.log('Pull all Done !', 'info');
+                withSuccess('Pull all from cedarlabs Done!', 'PUSH CEDARLABS', function (err) {
+                    process.exit();
+                });
             }
-            process.exit();
         });
         break;
     case 'codeset':
         (new request()).codeSet(function(err, res, body){
-            if(err){
+            if (err) {
                 utils.log(err, 'error');
-                process.exit();
+                withError(err, 'PULL CODE SET', function (err) {
+                    process.exit();
+                });
             } else {
-                new codeSet(JSON.parse(body)).parse(function(){
-                    utils.log('Pull all Done !', 'info');
+                utils.log('Pull all Done !', 'info');
+                withSuccess('Pull code set Done!', 'PULL CODE SET', function (err) {
                     process.exit();
                 });
             }
@@ -148,9 +177,18 @@ switch(what){
         break;
     case 'cache-list':
         var args = process.argv.slice(3)[0] ? true : false;
-        studentCollector.cacheList(args, function(data){
-            console.log('Cache list done');
-            process.exit();
+        studentCollector.cacheList(args, function(err, data){
+            if (err) {
+                utils.log(err, 'error');
+                withError(err, 'CACHE LIST OF STUDENTS', function (err) {
+                    process.exit();
+                });
+            } else {
+                utils.log('Pull all data and store into cache Done !', 'info');
+                withSuccess('Pull all data and store into cache Done !', 'CACHE LIST OF STUDENTS', function (err) {
+                    process.exit();
+                });
+            }
         });
         break;
     case 'token-cleaner':
