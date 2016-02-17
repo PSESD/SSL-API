@@ -99,6 +99,11 @@ switch(what){
         console.log('Environment: ', config.util.getEnv('NODE_ENV'));
         process.exit();
         break;
+    case 'test':
+        withSuccess('Test Mail && Rollbar ', 'Test', function(){
+            process.exit();
+        });
+        break;
     case 'pull':
         pullJob();
         break;

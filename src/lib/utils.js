@@ -344,6 +344,11 @@ var utils = {
     mailDev: function(body, subject, done){
         var cfg = config.get('devMail');
         var mails = [];
+        if(body instanceof Error){
+
+            body = body.stack.split("\n");
+
+        }
 
         mandrill_client.templates.info(cfg.options, function (result) {
 
