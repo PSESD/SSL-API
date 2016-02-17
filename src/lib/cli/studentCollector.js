@@ -36,7 +36,7 @@ var organizationWhere = {};
 //    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
 //};
 
-console.log('WHERE: ', organizationWhere);
+//console.log('WHERE: ', organizationWhere);
 function cacheDebug(done){
     var key = prefixListStudent + '*';
     cache.get(key, function(err, data){
@@ -278,7 +278,7 @@ function collectCacheStudents(done) {
  * @param done
  */
 function collectCacheListStudentsAsync(force, done) {
-
+    var studentNumber = 0;
     benchmark.info("CACHE-LIST-STUDENT\tSTART");
     Organization.find(organizationWhere, function (err, organizations) {
 
@@ -394,7 +394,7 @@ function collectCacheListStudentsAsync(force, done) {
                     benchmark.warn(err);
                     return callback(null, organization);
                 }
-
+                studentNumber += students.length;
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
 
                 var key = prefixListStudent + organization._id;
@@ -448,7 +448,7 @@ function collectCacheListStudentsAsync(force, done) {
             benchmark.info(
                 '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
             );
-            done(err, data);
+            done(err, data, studentNumber);
         });
 
     });
@@ -563,6 +563,7 @@ function pullStudentAsyncWithoutOrg(ok){
     var backupTable = '`students__`';
     var t1 = '`student_programs`';
     var t2 = '`student_programs__`';
+    var studentNumber = 0;
 
     con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
         con.query('create table ' + t2 + ' like ' + t1, function(err, results){
@@ -572,6 +573,7 @@ function pullStudentAsyncWithoutOrg(ok){
              */
             function pullMap(callback){
                 new request().getBulkWithoutNavigationPage(function(studentList, studentProgramList){
+                    studentNumber = studentList.length;
                     console.log('TOTAL STUDENTS FROM CEDAREXPERT: ' + studentList.length);
                     console.log('TOTAL STUDENT PROGRAMS FROM CEDAREXPERT: ' + studentProgramList.length);
                     if(studentList){
@@ -641,7 +643,7 @@ function pullStudentAsyncWithoutOrg(ok){
                                         if(err) {
                                             log('DISCONECT WITH ERR: ' + err, 'error');
                                         }
-                                        ok();
+                                        ok(null, studentNumber);
                                     });
                                 });
                             });
