@@ -366,6 +366,7 @@ var utils = {
 
                 if (result[0].status == 'sent') {
                     utils.log('Email was sent ' + message.subject, 'info');
+                    if(done) done();
                 } else {
 
                     utils.log('A mandrill error occurred: ' + result[0].reject_reason, 'error');
@@ -420,13 +421,12 @@ var utils = {
 
         }
 
-        if(rollbarAccessToken){
+        console.log(message);
 
-            rollbar.reportMessage(message, type || 'info', callback);
+        if(rollbarAccessToken){
+            rollbar.reportMessage(message, type || 'info', null, callback);
 
         }
-
-        console.log(message);
 
     },
 

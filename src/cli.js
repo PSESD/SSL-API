@@ -10,11 +10,13 @@ var bs = require('nodestalker'),
     what = process.argv.slice(2)[0],
     client = bs.Client('127.0.0.1:11300');
 var config = require('config');
+var os = require('os');
 var studentCollector = require('./lib/cli/studentCollector');
 var tokenCleaner = require('./lib/cli/tokenCleaner');
 var request = require('./lib/cli/request');
 var utils = require('./lib/utils');
 var con = require('./lib/cli/mysql');
+var php = require('phpjs');
 var codeSet = require('./lib/xsre/codeset');
 var parseString = require('xml2js').parseString;
 var rollbar = require('rollbar');
@@ -24,6 +26,13 @@ var rollbarAccessToken = config.get('rollbar.access_token');
 rollbar.init(rollbarAccessToken, {
     environment: rollbarEnv
 });
+var subjectEmail = '[SSL] Scheduled Task Report for ${environment}:${hostname} on ${datetime}';
+var bodyEmail = 'On ${datetime} the following scheduled tasks have been performed in ${environment}:';
+var emailCacheList = '${status} pulling ${number_of_students} students from the P2 Broker and pushing it to ${redis_host}';
+var emailPullCedarExpert = '${status} pulling ${number_of_students} students from CedarExperts';
+var emailPushCedarExpert = '${status} pushing ${number_of_students} students to CedarExperts';
+var emailPushSqlReport = '${status} pushing ${number_of_students} students to MySQL DB: ${mysql_host}.';
+var emailPullCodeSet = '${status} pulling codeset done.';
 // Configure the library to send errors to api.rollbar.com
 rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
 
@@ -78,29 +87,79 @@ function pullJob(){
 /**
  *
  * @param err
- * @param subject
+ * @param message
+ * @param params
  * @param done
  */
-function withError(err, subject, done){
-    utils.mailDev(err, subject, done);
+function withError(err, message, params, done){
+    params = params || {};
+    params.status = 'Failed';
+
+    if(err){
+        utils.log('Error: ' + err, 'error', function () {
+            sentItEmail(message, params, done, err);
+        });
+    } else {
+        sentItEmail(message, params, done);
+    }
 }
 /**
  *
- * @param success
- * @param subject
+ * @param message
+ * @param params
  * @param done
  */
-function withSuccess(success, subject, done){
-    utils.mailDev(success, subject, done);
+function withSuccess(message, params, done){
+    params = params || {};
+    params.status = 'Successfully';
+    sentItEmail(message, params, done);
+}
+/**
+ *
+ * @param message
+ * @param params
+ * @param done
+ * @param err
+ */
+function sentItEmail(message, params, done, err){
+    var iregex = [
+        '${environment}',
+        '${hostname}',
+        '${datetime}',
+        '${redis_host}',
+        '${mysql_host}'
+    ];
+    var ireplace = [
+        process.env.NODE_ENV,
+        os.hostname(),
+        new Date().toString(),
+        config.get('cache.redis.host'),
+        config.get('db.mysql.host')
+    ];
+    for(var i in params){
+        iregex.push('${'+i+'}');
+        ireplace.push(params[i]);
+    }
+
+    var subject = php.str_replace( iregex, ireplace, subjectEmail);
+    message = php.str_replace(iregex, ireplace, message);
+    message = bodyEmail + "<br>" + message;
+    if(err){
+        message += '<br><strong>' +
+        'With Error: ' + err + '<strong>';
+    }
+    utils.mailDev(message, subject, done);
 }
 
 switch(what){
     case 'env':
-        console.log('Environment: ', config.util.getEnv('NODE_ENV'));
-        process.exit();
+        utils.log('Environment: '+ config.util.getEnv('NODE_ENV'), 'info', function(){
+            process.exit();
+        });
+
         break;
     case 'test':
-        withSuccess('Test Mail && Rollbar ', 'Test', function(){
+        withSuccess(emailPushSqlReport, {}, function(){
             process.exit();
         });
         break;
@@ -128,16 +187,17 @@ switch(what){
         break;
     case 'push-cedarlabs':
         studentCollector.collect(function(bulkStudent){
-                require('fs').writeFile(__dirname + '/data/REQUEST-CBOStudents.xml', bulkStudent, function (err) {
-                });
+                require('fs').writeFile(__dirname + '/data/REQUEST-CBOStudents.xml', bulkStudent, function (err) {});
                 (new request()).push(bulkStudent, function(error, response, body){
                     require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
                         if (err) {
-                            withError(err, 'PUSH CEDARLABS', function (err) {
+                            withError(err, emailPushCedarExpert, { number_of_students: bulkStudent.length }, function (err) {
                                 process.exit();
                             });
                         } else {
-                            process.exit();
+                            withSuccess(emailPushCedarExpert, { number_of_students: bulkStudent.length }, function (err) {
+                                process.exit();
+                            });
                         }
                     });
                 });
@@ -145,15 +205,13 @@ switch(what){
         });
         break;
     case 'pull-cedarlabs':
-        studentCollector.pullStudentAsync(function(err){
+        studentCollector.pullStudentAsync(function(err, studentNumber){
             if (err) {
-                utils.log(err, 'error');
-                withError(err, 'PULL CEDARLABS', function (err) {
+                withError(err, emailPullCedarExpert, { number_of_students: studentNumber }, function (err) {
                     process.exit();
                 });
             } else {
-                utils.log('Pull all Done !', 'info');
-                withSuccess('Pull all from cedarlabs Done!', 'PUSH CEDARLABS', function (err) {
+                withSuccess(emailPullCedarExpert, { number_of_students: studentNumber }, function (err) {
                     process.exit();
                 });
             }
@@ -162,13 +220,11 @@ switch(what){
     case 'codeset':
         (new request()).codeSet(function(err, res, body){
             if (err) {
-                utils.log(err, 'error');
-                withError(err, 'PULL CODE SET', function (err) {
+                withError(err, emailPullCodeSet, {}, function (err) {
                     process.exit();
                 });
             } else {
-                utils.log('Pull all Done !', 'info');
-                withSuccess('Pull code set Done!', 'PULL CODE SET', function (err) {
+                withSuccess(emailPullCodeSet, {}, function (err) {
                     process.exit();
                 });
             }
@@ -182,15 +238,13 @@ switch(what){
         break;
     case 'cache-list':
         var args = process.argv.slice(3)[0] ? true : false;
-        studentCollector.cacheList(args, function(err, data){
+        studentCollector.cacheList(args, function(err, data, studentNumber){
             if (err) {
-                utils.log(err, 'error');
-                withError(err, 'CACHE LIST OF STUDENTS', function (err) {
+                withError(err, emailCacheList, { number_of_students: studentNumber }, function (err) {
                     process.exit();
                 });
             } else {
-                utils.log('Pull all data and store into cache Done !', 'info');
-                withSuccess('Pull all data and store into cache Done !', 'CACHE LIST OF STUDENTS', function (err) {
+                withSuccess(emailCacheList, { number_of_students: studentNumber }, function (err) {
                     process.exit();
                 });
             }
