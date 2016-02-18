@@ -96,7 +96,10 @@ function withError(err, message, params, done){
     params.status = 'Failed';
 
     if(err){
-        utils.log('Error: ' + err, 'error', function () {
+        if(err instanceof Error){
+            err = err.stack.split("\n");
+        }
+        utils.log('Error: ' + php.nl2br(err), 'error', function () {
             sentItEmail(message, params, done, err);
         });
     } else {
@@ -144,12 +147,12 @@ function sentItEmail(message, params, done, err){
     var subject = php.str_replace( iregex, ireplace, subjectEmail);
     message = php.str_replace(iregex, ireplace, message);
     bodyEmail = php.str_replace(iregex, ireplace, bodyEmail);
-    message = bodyEmail + "<br>" + message;
+    message = bodyEmail + "<br><br>" + message;
     if(err){
         message += '<br><strong>' +
-        'With Error: ' + err + '<strong>';
+        '\nWith Error: ' + err + '<strong>';
     }
-    utils.mailDev(message, subject, done);
+    utils.mailDev(php.nl2br(message), subject, done);
 }
 
 switch(what){
@@ -164,39 +167,39 @@ switch(what){
             process.exit();
         });
         break;
-    case 'pull':
-        pullJob();
-        break;
-    case 'dump-districtid':
-        studentCollector.dumpDataDistrictId(function(){
-            process.exit();
-        });
-        break;
-    case 'cache-debug':
-        studentCollector.cacheDebug(function(){
-            process.exit();
-        });
-        break;
-    case 'generate-xml':
-        studentCollector.collect(function(bulkStudent){
-            require('fs').writeFile(__dirname + '/data/CBOStudents-data.xml', bulkStudent, function (err) {
-                if (err) throw err;
-                console.log('It\'s saved!');
-                process.exit();
-            });
-        });
-        break;
+    //case 'pull':
+    //    pullJob();
+    //    break;
+    //case 'dump-districtid':
+    //    studentCollector.dumpDataDistrictId(function(){
+    //        process.exit();
+    //    });
+    //    break;
+    //case 'cache-debug':
+    //    studentCollector.cacheDebug(function(){
+    //        process.exit();
+    //    });
+    //    break;
+    //case 'generate-xml':
+    //    studentCollector.collect(function(bulkStudent){
+    //        require('fs').writeFile(__dirname + '/data/CBOStudents-data.xml', bulkStudent, function (err) {
+    //            if (err) throw err;
+    //            console.log('It\'s saved!');
+    //            process.exit();
+    //        });
+    //    });
+    //    break;
     case 'push-cedarlabs':
-        studentCollector.collect(function(bulkStudent){
+        studentCollector.collect(function(bulkStudent, studentNumber){
                 require('fs').writeFile(__dirname + '/data/REQUEST-CBOStudents.xml', bulkStudent, function (err) {});
-                (new request()).push(bulkStudent, function(error, response, body){
+                (new request()).push(bulkStudent, function(err, response, body){
                     //require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
-                        if (error) {
-                            withError(error, emailPushCedarExpert, { number_of_students: bulkStudent.length }, function (err) {
+                        if (err && err !== null && err !== 'null') {
+                            withError(err, emailPushCedarExpert, { number_of_students: studentNumber }, function (err) {
                                 process.exit();
                             });
                         } else {
-                            withSuccess(emailPushCedarExpert, { number_of_students: bulkStudent.length }, function (err) {
+                            withSuccess(emailPushCedarExpert, { number_of_students: studentNumber }, function (err) {
                                 process.exit();
                             });
                         }
@@ -207,7 +210,7 @@ switch(what){
         break;
     case 'pull-cedarlabs':
         studentCollector.pullStudentAsync(function(err, studentNumber){
-            if (err) {
+            if (err && err !== null && err !== 'null') {
                 withError(err, emailPushSqlReport, { number_of_students: studentNumber }, function (err) {
                     process.exit();
                 });
@@ -220,7 +223,7 @@ switch(what){
         break;
     case 'codeset':
         (new request()).codeSet(function(err, res, body){
-            if (err) {
+            if (err && err !== null && err !== 'null') {
                 withError(err, emailPullCodeSet, {}, function (err) {
                     process.exit();
                 });
@@ -231,16 +234,16 @@ switch(what){
             }
         });
         break;
-    case 'queue-cedarlabs':
-        studentCollector.queue(function(){
-            console.log('Queue done');
-            process.exit();
-        });
-        break;
+    //case 'queue-cedarlabs':
+    //    studentCollector.queue(function(){
+    //        console.log('Queue done');
+    //        process.exit();
+    //    });
+    //    break;
     case 'cache-list':
         var args = process.argv.slice(3)[0] ? true : false;
         studentCollector.cacheList(args, function(err, data, studentNumber){
-            if (err) {
+            if (err && err !== null && err !== 'null') {
                 withError(err, emailCacheList, { number_of_students: studentNumber }, function (err) {
                     process.exit();
                 });
@@ -253,7 +256,7 @@ switch(what){
         break;
     case 'token-cleaner':
         tokenCleaner.clean(function(err){
-            if(err){
+            if (err && err !== null && err !== 'null') {
                 console.log('Remove expire token fails: ', err);
             } else{
                 console.log('Remove expire token done');
@@ -263,6 +266,6 @@ switch(what){
         break;
     default:
         throw 'Not valid command';
-        resJob();
-        break;
+        //resJob();
+        //break;
 }

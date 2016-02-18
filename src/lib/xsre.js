@@ -5,6 +5,7 @@
 var moment = require('moment');
 var Transcript = require(__dirname + '/xsre/transcript');
 var Attendance = require(__dirname + '/xsre/attendance');
+var Report = require(__dirname + '/xsre/report');
 var Assessment = require(__dirname + '/xsre/assessment');
 var Personal = require(__dirname + '/xsre/personal');
 var CodeSet = require(__dirname + '/xsre/codeset');
@@ -136,6 +137,11 @@ xSre.prototype.getTranscript= function(){
     this.justlog.info('XSRE - START TRANSCRIPT');
     return new Transcript(this);
     
+};
+xSre.prototype.getReport= function(){
+    this.justlog.info('XSRE - START REPORT');
+    return new Report(this);
+
 };
 /**
  *

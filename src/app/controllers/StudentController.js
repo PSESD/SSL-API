@@ -432,6 +432,9 @@ StudentController.getStudentsBackpack = function(req, res){
                                         case 'assessment':
                                             object = xsre.getAssessment().getAssessment();
                                             break;
+                                        case 'report':
+                                            object = xsre.getReport();
+                                            break;
 
                                     }
 
