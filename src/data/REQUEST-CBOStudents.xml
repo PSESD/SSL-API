@@ -375,7 +375,7 @@
 			<personnelId></personnelId>
 			<authorizedEntityId>2</authorizedEntityId>
 			<districtStudentId>sample2</districtStudentId>
-			<zoneId>test</zoneId>
+			<zoneId>tukwila</zoneId>
 			<contextId>CBO</contextId>
 		</organization>
 		<studentActivity refId="5592d25c23ab6a4800d0e94f">
@@ -4436,32 +4436,6 @@
 			</activities>
 		</programs>
 	</CBOStudent>
-	<CBOStudent id="5694ed14a8ae6c8d00a3b5fd">
-		<organization refId="55913fc817aac10c2bbfe1e8">
-			<organizationName>Helping Hand CBO</organizationName>
-			<externalServiceId>5</externalServiceId>
-			<personnelId></personnelId>
-			<authorizedEntityId>2</authorizedEntityId>
-			<districtStudentId>123456789</districtStudentId>
-			<zoneId>seattle</zoneId>
-			<contextId>CBO</contextId>
-		</organization>
-		<studentActivity refId="55946d30db82d427002df84a">
-			<title>After-school Sports</title>
-		</studentActivity>
-		<programs>
-			<activities>
-				<activity>
-					<studentActivityRefId>55946d30db82d427002df84a</studentActivityRefId>
-					<startDate>02/01/2016</startDate>
-					<endDate>02/29/2016</endDate>
-					<active>true</active>
-					<tags>
-					</tags>
-				</activity>
-			</activities>
-		</programs>
-	</CBOStudent>
 	<CBOStudent id="5660c70cd2c7f709005cc80b">
 		<organization refId="55913fc817aac10c2bbfe1e8">
 			<organizationName>Helping Hand CBO</organizationName>
@@ -4756,7 +4730,6 @@
 					<endDate>11/30/2015</endDate>
 					<active>true</active>
 					<tags>
-						<tag>A</tag>
 						<tag>Athletes3</tag>
 					</tags>
 				</activity>

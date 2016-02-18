@@ -24,7 +24,7 @@ db.prototype.connect = function(){
 
     this.mongo.connection.once('open', function (callback) {
 
-        console.log("[%s] DB URI: " + me.dbUri, me.env);
+        console.log("[%s] DB MongoDB", me.env);
 
     });
 };
