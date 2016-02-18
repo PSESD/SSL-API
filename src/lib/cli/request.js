@@ -498,7 +498,35 @@ Request.prototype = {
         function grab(c){
 
             me.get(function(e, r, b){
-                var ret = JSON.parse(b);
+                var ret = [];
+                try{
+                    ret = JSON.parse(b);
+                } catch(ex){
+                    var msg = "";
+                    if(ex instanceof Error){
+
+                        msg += ex.stack.split("\n");
+
+                    } else {
+
+                        msg += ex + "";
+
+                    }
+                    msg += "\nError: ";
+                    if(e instanceof Error){
+
+                        msg += e.stack.split("\n");
+
+                    } else {
+
+                        msg += e + "";
+
+                    }
+
+                    msg += "\nBODY: " + b;
+
+                    log(msg, 'error');
+                }
                 students = students.concat(processStudent(ret));
                 studentPrograms = studentPrograms.concat(processStudentProgram(ret));
                 c();

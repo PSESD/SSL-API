@@ -28,6 +28,7 @@ var xSre = require(libPath+'/xsre');
 var async = require('async');
 var districtFile = rootPath + '/test/data/districts';
 var fs = require('fs');
+var php = require('phpjs');
 var filename = districtFile;
 var prefixListStudent = '_xsre_list_students_';
 var organizationWhere = {};
@@ -36,7 +37,7 @@ var organizationWhere = {};
 //    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
 //};
 
-console.log('WHERE: ', organizationWhere);
+//console.log('WHERE: ', organizationWhere);
 function cacheDebug(done){
     var key = prefixListStudent + '*';
     cache.get(key, function(err, data){
@@ -188,7 +189,7 @@ function collectDataStudents(callback) {
                 declaration: {
                     encoding: 'utf-8'
                 }
-            }));
+            }), collections.length);
 
         });
 
@@ -278,7 +279,7 @@ function collectCacheStudents(done) {
  * @param done
  */
 function collectCacheListStudentsAsync(force, done) {
-
+    var studentNumber = 0;
     benchmark.info("CACHE-LIST-STUDENT\tSTART");
     Organization.find(organizationWhere, function (err, organizations) {
 
@@ -327,12 +328,12 @@ function collectCacheListStudentsAsync(force, done) {
 
                     if (error) {
                         benchmark.info(error);
-                        return cb(null, data);
+                        return cb(error, data);
                     }
 
                     if (!body) {
                         benchmark.info(error);
-                        return cb(null, data);
+                        return cb('Body was empty reponse', data);
 
                     }
 
@@ -343,7 +344,7 @@ function collectCacheListStudentsAsync(force, done) {
                             if (err) {
                                 benchmark.info(err);
                                 log(err, 'error');
-                                return cb(null, data);
+                                return cb(err, data);
                             }
                             var msg;
 
@@ -355,7 +356,7 @@ function collectCacheListStudentsAsync(force, done) {
                                     msg = 'Data not found!';
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
-                                return cb(null, data);
+                                return cb(msg, data);
 
                             }
 
@@ -367,7 +368,7 @@ function collectCacheListStudentsAsync(force, done) {
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
                                 log('XSRE - ERROR BODY RESULT: ' + msg, 'error');
-                                return cb(null, data);
+                                return cb(msg, data);
 
                             }
 
@@ -394,7 +395,7 @@ function collectCacheListStudentsAsync(force, done) {
                     benchmark.warn(err);
                     return callback(null, organization);
                 }
-
+                studentNumber += students.length;
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
 
                 var key = prefixListStudent + organization._id;
@@ -448,7 +449,7 @@ function collectCacheListStudentsAsync(force, done) {
             benchmark.info(
                 '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
             );
-            done(err, data);
+            done(err, data, studentNumber);
         });
 
     });
@@ -563,85 +564,148 @@ function pullStudentAsyncWithoutOrg(ok){
     var backupTable = '`students__`';
     var t1 = '`student_programs`';
     var t2 = '`student_programs__`';
+    var studentNumber = 0;
+    /**
+     *
+     * @param err1
+     * @param msg
+     */
+    var okDone = function(err1){
+        var ee = null;
+        if(err1){
+            ee = "\nError Progress: ";
+            if(err1 instanceof Error){
 
-    con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
-        con.query('create table ' + t2 + ' like ' + t1, function(err, results){
-            /**
-             *
-             * @param callback
-             */
-            function pullMap(callback){
-                new request().getBulkWithoutNavigationPage(function(studentList, studentProgramList){
-                    console.log('TOTAL STUDENTS FROM CEDAREXPERT: ' + studentList.length);
-                    console.log('TOTAL STUDENT PROGRAMS FROM CEDAREXPERT: ' + studentProgramList.length);
-                    if(studentList){
-                        async.eachSeries(studentList, function(student, cb){
-                            con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
-                                if(err && err.errno !== 1062){
-                                    log('INSERT ' + backupTable + ' ERROR: ' + err, 'error');
-                                }
-                                cb(null, result);
+                ee += err1.stack.split("\n");
 
-                            });
-                        }, function(err, data){
-                            if(studentProgramList.length > 0){
-                                async.eachSeries(studentProgramList, function(stdp, cb1){
-                                    con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
+            } else{
+
+                ee += err1 + "";
+
+            }
+        }
+
+        con.end(function(err2){
+            if(err2) {
+                if(ee === null){
+                    ee = "";
+                }
+                ee += "\nError Disconnect: ";
+                if(err2 instanceof Error){
+
+                    ee += err2.stack.split("\n");
+
+                } else {
+
+                    ee += err2 + "";
+
+                }
+            }
+            ok(php.nl2br(ee), studentNumber);
+        });
+    };
+
+    con.query('drop table if exists ' + backupTable, function(err){
+        if(err){
+            return okDone(err);
+        }
+        con.query('drop table if exists ' + t2, function(err){
+            if(err){
+                return okDone(err);
+            }
+            con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
+                if(err){
+                    return okDone(err);
+                }
+                con.query('create table ' + t2 + ' like ' + t1, function(err, results){
+                    if(err){
+                        return okDone(err);
+                    }
+                    /**
+                     *
+                     * @param callback
+                     */
+                    function pullMap(callback){
+                        new request().getBulkWithoutNavigationPage(function(studentList, studentProgramList){
+                            studentNumber = studentList.length;
+                            console.log('TOTAL STUDENTS FROM CEDAREXPERT: ' + studentList.length);
+                            console.log('TOTAL STUDENT PROGRAMS FROM CEDAREXPERT: ' + studentProgramList.length);
+                            if(studentList){
+                                async.eachSeries(studentList, function(student, cb){
+                                    con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
                                         if(err && err.errno !== 1062){
-                                            log('INSERT ' + t2 + ' ERROR: ' + err, 'error');
+                                            //log('INSERT ' + backupTable + ' ERROR: ' + err, 'error');
+                                            cb(err, result);
+                                        } else{
+                                            cb(null, result);
                                         }
-                                        cb1(null, result1);
                                     });
                                 }, function(err, data){
-                                    callback(null, studentList);
+                                    if(err){
+                                        return callback(err, studentList);
+                                    }
+                                    if(studentProgramList.length > 0){
+                                        async.eachSeries(studentProgramList, function(stdp, cb1){
+                                            con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
+                                                if(err && err.errno !== 1062){
+                                                    //log('INSERT ' + t2 + ' ERROR: ' + err, 'error');
+                                                    cb1(err, result1);
+                                                } else{
+                                                    cb1(null, result1);
+                                                }
+                                            });
+                                        }, function(err, data){
+                                            callback(err, studentList);
+                                        });
+                                    } else{
+                                        callback(err, studentList);
+                                    }
+
                                 });
-                            } else {
+                            } else{
                                 callback(null, studentList);
                             }
 
-                        });
-                    } else{
-                        callback(null, studentList);
+                        }, 2);
                     }
 
-                }, 2);
-            }
 
-
-            var sql = 'TRUNCATE TABLE ' + backupTable;
-            con.query(sql, function(err, results){
-                pullMap(function(err, students){
-                    if(err){
-                        benchmark.info(err);
-                    }
-                    benchmark.info(
-                        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
-                    );
-                    var sql = 'DROP TABLE ' + masterTable;
+                    var sql = 'TRUNCATE TABLE ' + backupTable;
                     con.query(sql, function(err, results){
                         if(err){
-                            log(sql + 'WITH ERR: ' + err, 'error');
+                            return okDone(err);
                         }
-                        sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
-                        con.query(sql, function(err, results){
+                        pullMap(function(err, students){
+
                             if(err){
-                                log(sql + 'WITH ERR: ' + err, 'error');
+                                benchmark.info(err);
+                                return okDone(err);
                             }
-                            var sql = 'DROP TABLE ' + t1;
+                            benchmark.info(
+                                '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
+                            );
+                            var sql = 'DROP TABLE ' + masterTable;
                             con.query(sql, function(err, results){
                                 if(err){
-                                    log(sql + 'WITH ERR: ' + err, 'error');
+                                    //log(sql + ' WITH ERR: ' + err, 'error');
+                                    return okDone(err, studentNumber);
                                 }
-                                sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
+                                sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
                                 con.query(sql, function(err, results){
                                     if(err){
-                                        log(sql + 'WITH ERR: ' + err, 'error');
+                                        //log(sql + 'WITH ERR: ' + err, 'error');
+                                        return okDone(err, studentNumber);
                                     }
-                                    con.end(function(err){
-                                        if(err) {
-                                            log('DISCONECT WITH ERR: ' + err, 'error');
+                                    var sql = 'DROP TABLE ' + t1;
+                                    con.query(sql, function(err, results){
+                                        if(err){
+                                            //log(sql + 'WITH ERR: ' + err, 'error');
+                                            return okDone(err, studentNumber);
                                         }
-                                        ok();
+                                        sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
+                                        con.query(sql, function(err, results){
+                                            return okDone(err, studentNumber);
+                                        });
                                     });
                                 });
                             });

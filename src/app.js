@@ -281,7 +281,6 @@ Api.prototype.configureExpress = function (db) {
 
                     return res.send(xmlmodel(data, res.xmlOptions || 'response'));
 
-
             }
 
             return res.send(data);
