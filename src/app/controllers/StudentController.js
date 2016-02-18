@@ -98,6 +98,81 @@ StudentController.getStudentsBackpack = function(req, res){
                     delete results.raw;
 
                 }
+                /**
+                 * Only for REPORT HERE START
+                 * @type {{total: number, pageSize: number, pageCount: number, currentPage: number, data: Array, source: {}}}
+                 */
+                if(separate === 'report'){
+
+                    console.log('REPORT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', results);
+                    var programsId = [];
+                    var programId = [];
+
+                    _.each(student.programs, function(program){
+
+                        if(Object.keys(programsId).indexOf(program.program.toString()) === -1){
+                            programsId[program.program.toString()] = [];
+                        }
+
+                        programsId[program.program.toString()].push(program.toObject());
+
+                        programId.push(program.program);
+
+                    });
+
+                    if(!_.isEmpty(programsId)){
+
+                        var reportCrit = { _id: { $in: programId } };
+
+                        if(req.query.from && req.query.to){
+
+                            reportCrit.participation_start_date = { $gte : new Date(req.query.from )};
+                            reportCrit.participation_end_date = { $lte : new Date(req.query.to )};
+
+                        }
+
+                        console.log('REPORT CRIT: ', reportCrit);
+                        Program.find(reportCrit).sort({ participation_end_date: -1 }).exec(function(err, programs){
+
+                            if(err){
+                                return res.sendError(err);
+                            }
+
+                            _.each(programs, function(program){
+
+                                if(program._id.toString() in programsId){
+
+                                    programsId[program._id.toString()].forEach(function(prgm){
+
+                                        results.programs.push({
+                                            name: program.name,
+                                            from: prgm.participation_start_date,
+                                            to: prgm.participation_start_date
+                                        });
+
+                                    });
+
+                                }
+
+                            });
+
+                            benchmark.info('XSRE - FINISH 1');
+
+                            return res.sendSuccess(null, new hal.Resource(results, req.originalUrl).toJSON());
+
+                        });
+
+
+                    } else{
+
+                        benchmark.info('XSRE - FINISH 2');
+
+                        return res.sendSuccess(null, new hal.Resource(results, req.originalUrl).toJSON());
+
+                    }
+                    return;
+                }
+                 /** END OF REPORT **/
 
                 var paginate = {
                     total: 0,
@@ -433,7 +508,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                             object = xsre.getAssessment().getAssessment();
                                             break;
                                         case 'report':
-                                            object = xsre.getReport();
+                                            object = xsre.getReport().serialize();
                                             break;
 
                                     }
