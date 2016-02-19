@@ -1,8 +1,3 @@
 # system-wide crontab
-0 0 * * * root NODE_CONFIG_DIR=/config /usr/bin/node /src/cli.js cache-list true >> /var/log/cron.log 2>&1
-0 */3 * * * root NODE_CONFIG_DIR=/config /usr/bin/node /src/cli.js cache-list >> /var/log/cron.log 2>&1
-0 0 * * * root NODE_CONFIG_DIR=/config /usr/bin/node /src/cli.js push-cedarlabs >> /var/log/cron.log 2>&1
-0 4 * * * root NODE_CONFIG_DIR=/config /usr/bin/node /src/cli.js pull-cedarlabs >> /var/log/cron.log 2>&1
-0 1 * * * root NODE_CONFIG_DIR=/config /usr/bin/node /src/cli.js codeset >> /var/log/cron.log 2>&1
-* * * * * root echo "Hello world" >> /var/log/cron.log 2>&1
+* * * * * root echo $(date +"%m-%d-%Y %H:%i:%s") + "Hello world" >> /var/log/cron.log 2>&1
 # Don't remove the empty line at the end of this file. It is required to run the cron job
