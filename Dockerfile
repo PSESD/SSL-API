@@ -34,8 +34,18 @@ RUN npm install
 
 # Setup crontab
 RUN apt-get -y install rsyslog
-ADD cronjob/files/etc/ssl-cron /etc/cron.d/ssl-cron
-RUN chmod 0644 /etc/cron.d/ssl-cron
+#ADD cronjob/files/etc/ssl-cron /etc/cron.d/ssl-cron
+ADD cronjob/files/etc/cache-list /etc/cron.d/cache-list
+ADD cronjob/files/etc/cache-list-force /etc/cron.d/cache-list-force
+ADD cronjob/files/etc/codeset /etc/cron.d/codeset
+ADD cronjob/files/etc/pull-cedarlabs /etc/cron.d/pull-cedarlabs
+ADD cronjob/files/etc/push-cedarlabs /etc/cron.d/push-cedarlabs
+#RUN chmod 0644 /etc/cron.d/ssl-cron
+RUN chmod 0644 /etc/cron.d/cache-list
+RUN chmod 0644 /etc/cron.d/cache-list-force
+RUN chmod 0644 /etc/cron.d/codeset
+RUN chmod 0644 /etc/cron.d/pull-cedarlabs
+RUN chmod 0644 /etc/cron.d/push-cedarlabs
 RUN touch /var/log/cron.log
 
 # Run Supervisord
