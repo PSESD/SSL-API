@@ -104,8 +104,7 @@ StudentController.getStudentsBackpack = function(req, res){
                  */
                 if(separate === 'report'){
 
-                    console.log('REPORT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', results);
-                    var programsId = [];
+                    var programsId = {};
                     var programId = [];
 
                     _.each(student.programs, function(program){
@@ -119,8 +118,7 @@ StudentController.getStudentsBackpack = function(req, res){
                         programId.push(program.program);
 
                     });
-
-                    if(!_.isEmpty(programsId)){
+                    if(programId.length > 0){
 
                         var reportCrit = { _id: { $in: programId } };
 

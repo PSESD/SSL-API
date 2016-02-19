@@ -28,6 +28,7 @@ function Report(xsre){
     this.notAvailable = 'N/A';
 
     this.facets = xsre.facets;
+    this.attendances = xsre.json.attendance || null;
 
 }
 /**
@@ -72,7 +73,6 @@ Report.prototype.attendance = function(){
         'December'
     ];
 
-
     if(_.isObject(me.attendances) && _.isObject(me.attendances.events) && !_.isUndefined(me.attendances.events.event)){
 
         if(!_.isArray(me.attendances.events.event)){
@@ -87,7 +87,7 @@ Report.prototype.attendance = function(){
 
             event.calendarEventDateTime = mm.valueOf();
 
-            var passed = false;
+            var passed = true;
 
             if(me.from){
 
@@ -140,6 +140,7 @@ Report.prototype.attendance = function(){
         var startYear = parseInt(start.format('YYYY'));
         var startMonth = start.format('MMMM');
 
+        console.log(startYear, endYear);
 
         for(var d = startYear; d <= endYear; d++){
             var index = 0;
