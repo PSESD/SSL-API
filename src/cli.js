@@ -5,6 +5,9 @@
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 //process.env.NODE_ENV = 'test';
+var memwatch = require('memwatch');
+// Take first snapshot
+var hd = new memwatch.HeapDiff();
 var bs = require('nodestalker'),
     tube = 'test_tube',
     what = process.argv.slice(2)[0],
@@ -152,7 +155,17 @@ function sentItEmail(message, params, done, err){
         message += '<br><strong>' +
         '\nWith Error: ' + err + '<strong>';
     }
-    utils.mailDev(php.nl2br(message), subject, done);
+    //add Memory information usage
+    var diff = hd.end();
+    if(diff.change && diff.change.details){
+        delete diff.change.details;
+    }
+    message = php.nl2br(message) + "<br><br>" +
+        "Leak Detection and Heap Diffing:<br>" +
+        "<pre><code>Before: " + JSON.stringify(diff.before) + '</code></pre>' +
+        "<pre><code>After: " + JSON.stringify(diff.after) + '</code></pre>' +
+        "<pre><code>Change: " + JSON.stringify(diff.change) + '</code></pre>';
+    utils.mailDev(message, subject, done);
 }
 
 switch(what){
