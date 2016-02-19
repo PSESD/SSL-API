@@ -98,6 +98,79 @@ StudentController.getStudentsBackpack = function(req, res){
                     delete results.raw;
 
                 }
+                /**
+                 * Only for REPORT HERE START
+                 * @type {{total: number, pageSize: number, pageCount: number, currentPage: number, data: Array, source: {}}}
+                 */
+                if(separate === 'report'){
+
+                    var programsId = {};
+                    var programId = [];
+
+                    _.each(student.programs, function(program){
+
+                        if(Object.keys(programsId).indexOf(program.program.toString()) === -1){
+                            programsId[program.program.toString()] = [];
+                        }
+
+                        programsId[program.program.toString()].push(program.toObject());
+
+                        programId.push(program.program);
+
+                    });
+                    if(programId.length > 0){
+
+                        var reportCrit = { _id: { $in: programId } };
+
+                        if(req.query.from && req.query.to){
+
+                            reportCrit.participation_start_date = { $gte : new Date(req.query.from )};
+                            reportCrit.participation_end_date = { $lte : new Date(req.query.to )};
+
+                        }
+
+                        console.log('REPORT CRIT: ', reportCrit);
+                        Program.find(reportCrit).sort({ participation_end_date: -1 }).exec(function(err, programs){
+
+                            if(err){
+                                return res.sendError(err);
+                            }
+
+                            _.each(programs, function(program){
+
+                                if(program._id.toString() in programsId){
+
+                                    programsId[program._id.toString()].forEach(function(prgm){
+
+                                        results.programs.push({
+                                            name: program.name,
+                                            from: prgm.participation_start_date,
+                                            to: prgm.participation_start_date
+                                        });
+
+                                    });
+
+                                }
+
+                            });
+
+                            benchmark.info('XSRE - FINISH 1');
+
+                            return res.sendSuccess(null, new hal.Resource(results, req.originalUrl).toJSON());
+
+                        });
+
+
+                    } else{
+
+                        benchmark.info('XSRE - FINISH 2');
+
+                        return res.sendSuccess(null, new hal.Resource(results, req.originalUrl).toJSON());
+
+                    }
+                    return;
+                }
+                 /** END OF REPORT **/
 
                 var paginate = {
                     total: 0,
@@ -433,7 +506,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                             object = xsre.getAssessment().getAssessment();
                                             break;
                                         case 'report':
-                                            object = xsre.getReport();
+                                            object = xsre.getReport().serialize();
                                             break;
 
                                     }
@@ -778,7 +851,6 @@ StudentController.getStudents = function(req, res){
             return res.sendError('The organization not found in database');
         }
 
-
         Student.protect(req.user.role, filter, req.user).find(crit, function(err, students){
 
             if(err){
@@ -833,36 +905,40 @@ StudentController.getStudents = function(req, res){
 
             var key = prefixListStudent + orgId;
 
-            cache.get(key, function(err, results){
+            async.map(students, function(student, callback){
 
-                //console.log(key, ' DATA ', results);
+                var newObject = student.toObject();
 
-                var studentsList = [];
+                newObject.xsre = {
+                    "gradeLevel": "N/A",
+                    "schoolYear": "N/A",
+                    "schoolName": "N/A",
+                    "attendance": 0,
+                    "behavior": 0,
+                    "onTrackToGraduate": "N/A"
+                };
 
-                students.forEach(function(student){
+                cache.get(key + '_' + student._id, function(err, std){
 
-                    var newObject = student.toObject();
+                    if(err){
 
-                    newObject.xsre = {
-                        "gradeLevel": "N/A",
-                        "schoolYear": "N/A",
-                        "schoolName": "N/A",
-                        "attendance": 0,
-                        "behavior": 0,
-                        "onTrackToGraduate": "N/A"
-                    };
-
-                    if(!_.isUndefined(results) && student._id.toString() in results){
-
-                        newObject.xsre = results[student._id.toString()];
+                        return callback(null, newObject);
 
                     }
 
-                    studentsList.push(newObject);
+                    if(!_.isUndefined(std)){
+
+                        newObject.xsre = std;
+
+                    }
+
+                    callback(null, newObject);
 
                 });
 
-                res.sendSuccess(null, _.sortBy(studentsList, sorter));
+            }, function(err, results){
+
+                res.sendSuccess(null, _.sortBy(results, sorter));
 
             });
 

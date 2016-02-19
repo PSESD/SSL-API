@@ -314,8 +314,6 @@ function collectCacheListStudentsAsync(force, done) {
                 var studentId = student._id.toString();
 
                 var data = {};
-
-                data[studentId] = null;
                 /**
                  * If student is empty from database
                  */
@@ -374,9 +372,14 @@ function collectCacheListStudentsAsync(force, done) {
 
                             benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
 
-                            data[studentId] = new xSre(result).getStudentSummary();
+                            data = new xSre(result).getStudentSummary();
 
-                            cb(null, data);
+                            var key = prefixListStudent + organization._id + '_' + student._id;
+
+                            cache.set(key, data, {ttl: 86400}, function () {
+                                benchmark.info('Cache student from org: ', organization.name, ' Student ID: ' + student._id.toString());
+                                cb(null, data);
+                            });
 
                         });
 
@@ -398,43 +401,14 @@ function collectCacheListStudentsAsync(force, done) {
                 studentNumber += students.length;
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
 
-                var key = prefixListStudent + organization._id;
-
-                var studentAsync = [];
-
-                students.forEach(function(student){
-                    studentAsync.push(function(pop){
-                        mapStudent(student, pop);
-                    });
-                });
-
-                async.series(studentAsync, function(err, stds){
+                async.eachSeries(students, mapStudent, function(err){
                     if(err){
                         benchmark.info('ERROR: ', err);
                         log(err, 'error');
                     }
-                    if(!stds){
-                        benchmark.info(
-                            'FAILED POPULATE THE DATA'
-                        );
-                        log('FAILED TO POPULATE DATA', 'error');
-                    }
-                    benchmark.info('Store student into the cache: ', stds.length);
-                    /**
-                     * Filter stds
-                     */
-                    var datas = {};
-                    stds.forEach(function(std){
-                        for(var sk in std){
-                            datas[sk] = std[sk];
-                        }
-                    });
 
-                    benchmark.info('Store student into the cache after filter: ', Object.keys(datas).length);
-                    cache.set(key, datas, {ttl: 86400}, function () {
-                        benchmark.info('Cache student from org: ', organization.name);
-                        callback(null, organization);
-                    });
+                    benchmark.info('Cache student from org: ', organization.name , ' Done!!');
+                    callback(null, organization);
                 });
 
             });
