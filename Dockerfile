@@ -28,6 +28,7 @@ ADD /config/default.conf /etc/nginx/sites-available/default
 RUN useradd -M node
 ADD /src /src
 RUN chown -R node:node /src
+RUN chown -R node:node /config
 WORKDIR /src
 RUN npm -g update npm
 RUN npm install

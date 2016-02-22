@@ -6,6 +6,7 @@ var rootPath = __dirname + '/../../';
 var appPath = rootPath + 'app';
 var libPath = rootPath + 'lib';
 var config = require('config');
+var async = require('async');
 var request = require('request');
 var qs = require('querystring');
 var moment = require('moment');
@@ -387,15 +388,19 @@ Request.prototype = {
     },
     /**
      *
+     * @param storeStudent
+     * @param storeStudentProgram
      * @param done
      * @param serviceNumber
      * @param where
      * @param zoneId
      */
-    getBulkWithoutNavigationPage: function(done, serviceNumber, where, zoneId){
+    getBulkWithoutNavigationPage: function(storeStudent, storeStudentProgram, done, serviceNumber, where, zoneId){
         var me = this;
-        var students = [];
-        var studentPrograms = [];
+        //var students = [];
+        //var studentPrograms = [];
+        var totalStudent = 0;
+        var totalStudentProgram = 0;
         var pageId = 0;
         me.clearParam();
         /**
@@ -527,22 +532,36 @@ Request.prototype = {
 
                     log(msg, 'error');
                 }
-                students = students.concat(processStudent(ret));
-                studentPrograms = studentPrograms.concat(processStudentProgram(ret));
-                c();
+
                 pageId++;
                 if(ret.length === 0){
-                    done(students, studentPrograms);
+                    done(totalStudent, totalStudentProgram);
                 } else {
-                    grab(function(){
-                        log((where || 'All') + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+                    var students = processStudent(ret);
+                    var studentPrograms = processStudentProgram(ret);
+                    totalStudent += students.length;
+                    totalStudentProgram += studentPrograms.length;
+                    c();
+                    async.eachSeries(students, storeStudent, function(err){
+                        if(err){
+                            log(err, 'error');
+                        }
+                        async.eachSeries(studentPrograms, storeStudentProgram, function(err){
+                            if(err){
+                                log(err, 'error');
+                            }
+                            grab(function(){
+                                log((where || 'All') + ' ::: On page: ' + pageId + ' =>  Total of Students Get: ' + totalStudent + ' Total of Student Programs Get: ' + totalStudentProgram);
+                            });
+                        });
                     });
+
                 }
             }, serviceNumber, where, zoneId, { noNavigationPage: true, navigationpage: pageId });
         }
 
         grab(function() {
-            log((where || 'All') + ' ::: On page: ' + pageId + ' =>  Student Get: ' + students.length + ' Student Program Get: ' + studentPrograms.length);
+            log((where || 'All') + ' ::: On page: ' + pageId + ' =>  Total of Students Get: ' + totalStudent + ' Total of Student Programs Get: ' + totalStudentProgram);
         });
     },
     /**
