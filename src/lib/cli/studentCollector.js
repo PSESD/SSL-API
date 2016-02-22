@@ -21,7 +21,20 @@ var config = require('config'), xsreConfig = config.get('hzb').xsre;
 
 var Request = require(libPath+'/broker/request');
 var request = require('./request');
-var con = require('./mysql');
+//var con = require('./mysql');
+var mysql = require('mysql');
+var dbConfig = config.get('db').mysql;
+
+console.log('CONFIG MYSQL: ', dbConfig);
+console.log('NODE_CONFIG_DIR: ' + config.util.getEnv('NODE_CONFIG_DIR'));
+console.log('NODE_APP_INSTANCE: ' + config.util.getEnv('NODE_APP_INSTANCE'));
+console.log('ALLOW_CONFIG_MUTATIONS: ' + config.util.getEnv('ALLOW_CONFIG_MUTATIONS'));
+var con = mysql.createConnection({
+    host     : dbConfig.host,
+    user     : dbConfig.user,
+    password : dbConfig.password,
+    database : dbConfig.database
+});
 var parseString = require('xml2js').parseString;
 var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
 var xSre = require(libPath+'/xsre');
