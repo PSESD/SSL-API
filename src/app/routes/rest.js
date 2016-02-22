@@ -152,6 +152,23 @@ Rest.prototype.routeOrganizationStudent = function(){
         .put(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.putStudentById)
         .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.deleteStudentById);
 
+
+    this.router.route('/:organizationId/students/:studentId/xsre' + this.format)
+        .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.deleteCacheStudentsBackpack);
+    //.get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
+
+    function separateFilter (req, res, next){
+        var separate = req.params.separate;
+        var whiteList = [ 'general', 'xsre', 'report', 'attendance', 'transcript', 'assessment' ];
+        if(whiteList.indexOf(separate) === -1){
+            return next(new Error('Hacking attemp!!'));
+        }
+        return next();
+    }
+
+    this.router.route('/:organizationId/students/:studentId/:separate' + this.format)
+        .get(separateFilter, this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
+
 };
 /**
  *
@@ -168,11 +185,6 @@ Rest.prototype.routeOrganizationUserStudent = function(){
         .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.userController.deleteStudentUserById)
     ;
 
-    this.router.route('/:organizationId/students/:studentId/xsre' + this.format)
-        .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.deleteCacheStudentsBackpack);
-    //.get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
-    this.router.route('/:organizationId/students/:studentId/:separate' + this.format)
-        .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
 };
 /**
  *
@@ -242,10 +254,10 @@ Rest.prototype.routeTest = function(){
 
 Rest.prototype.routeReport = function(){
 
-    this.router.route('/:organizationId/report/students/:by' + this.format)
+    this.router.route('/:organizationId/reports/students/:by' + this.format)
         .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.reportController.getStudentBy)
     ;
-    this.router.route('/:organizationId/report/filters' + this.format)
+    this.router.route('/:organizationId/reports/students/filters' + this.format)
         .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.reportController.getFilters)
     ;
 

@@ -414,7 +414,8 @@ function collectCacheListStudentsAsync(force, done) {
                 studentNumber += students.length;
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
 
-                async.eachSeries(students, mapStudent, function(err){
+                //async.eachSeries(students, mapStudent, function(err){
+                async.eachLimit(students, 10, mapStudent, function(err){
                     if(err){
                         benchmark.info('ERROR: ', err);
                         log(err, 'error');
@@ -610,49 +611,37 @@ function pullStudentAsyncWithoutOrg(ok){
                     }
                     /**
                      *
+                     * @param studentData
+                     * @param cb
+                     */
+                    function storeDataStudent(studentData, cb){
+                        con.query('INSERT INTO ' + backupTable + ' SET ?', studentData, function(err, result){
+                            if(err && err.errno !== 1062){
+                                cb(err, result);
+                            } else{
+                                cb(null, result);
+                            }
+                        });
+                    }
+
+                    function storeDataStudentProgram(studentProgramData, cb){
+                        con.query('INSERT INTO ' + t2 + ' SET ?', studentProgramData, function(err, result1){
+                            if(err && err.errno !== 1062){
+                                cb(err, result1);
+                            } else{
+                                cb(null, result1);
+                            }
+                        });
+                    }
+
+                    /**
+                     *
                      * @param callback
                      */
                     function pullMap(callback){
-                        new request().getBulkWithoutNavigationPage(function(studentList, studentProgramList){
-                            studentNumber = studentList.length;
-                            console.log('TOTAL STUDENTS FROM CEDAREXPERT: ' + studentList.length);
-                            console.log('TOTAL STUDENT PROGRAMS FROM CEDAREXPERT: ' + studentProgramList.length);
-                            if(studentList){
-                                async.eachSeries(studentList, function(student, cb){
-                                    con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
-                                        if(err && err.errno !== 1062){
-                                            //log('INSERT ' + backupTable + ' ERROR: ' + err, 'error');
-                                            cb(err, result);
-                                        } else{
-                                            cb(null, result);
-                                        }
-                                    });
-                                }, function(err, data){
-                                    if(err){
-                                        return callback(err, studentList);
-                                    }
-                                    if(studentProgramList.length > 0){
-                                        async.eachSeries(studentProgramList, function(stdp, cb1){
-                                            con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
-                                                if(err && err.errno !== 1062){
-                                                    //log('INSERT ' + t2 + ' ERROR: ' + err, 'error');
-                                                    cb1(err, result1);
-                                                } else{
-                                                    cb1(null, result1);
-                                                }
-                                            });
-                                        }, function(err, data){
-                                            callback(err, studentList);
-                                        });
-                                    } else{
-                                        callback(err, studentList);
-                                    }
-
-                                });
-                            } else{
-                                callback(null, studentList);
-                            }
-
+                        new request().getBulkWithoutNavigationPage(storeDataStudent, storeDataStudentProgram, function(totalStudent, totalStudentProgram){
+                            studentNumber = totalStudent;
+                            callback();
                         }, 2);
                     }
 

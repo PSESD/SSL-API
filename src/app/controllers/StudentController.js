@@ -488,8 +488,7 @@ StudentController.getStudentsBackpack = function(req, res){
 
                                     object = xsre.toObject();
 
-                                } else{
-
+                                } else {
 
                                     switch(separate){
 
@@ -738,68 +737,39 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
  */
 StudentController.refreshStudentSummary = function(brokerRequest, student, orgId, callback){
 
-    var key = prefixListStudent + orgId;
+    var key = prefixListStudent + orgId + '_' + student._id.toString();
 
-    cache.get(key, function(err, result){
+    brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
 
-        if(err){
+        if(error){
             return callback(err);
         }
 
-        if(!result){
-            result = {};
+        if(!body){
+            return callback('Empty response');
         }
+        console.log('COUNT 3: ' + Object.keys(result).length);
+        if(response && response.statusCode === 200){
 
-        console.log('COUNT 1: ' + Object.keys(result).length);
+            utils.xml2js(body, function(err, xmlResult){
 
-        if(!(student._id.toString() in result)){
+                if(err){
+                    return callback(err, null);
+                }
 
+                var updateObject = new xSre(xmlResult).getStudentSummary();
 
-            result[student._id.toString()] = {};
+                cache.set(key, updateObject, {ttl: 86400}, callback);
+
+            });
+
+        } else{
+
+            callback();
         }
-        console.log('COUNT 2: ' + Object.keys(result).length);
-
-        brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
-
-            var studentId = student._id.toString();
-            if(error){
-                return callback(err);
-            }
-
-            if(!body){
-                return callback('Empty response');
-            }
-            console.log('COUNT 3: ' + Object.keys(result).length);
-            if(response && response.statusCode === 200){
-
-                utils.xml2js(body, function(err, xmlResult){
-
-                    if(err){
-                        return callback(err, null);
-                    }
-
-                    var updateObject = new xSre(xmlResult).getStudentSummary();
-
-                    var newObject = {};
-
-                    newObject[studentId] = updateObject;
-
-                    result = __.merge(result, newObject);
-
-                    //console.log(key, 'RESULT >>>>>>>>>>>>>>>>>>>', Object.keys(result).length, JSON.stringify(result));callback();
-
-                    cache.set(key, result, {ttl: 86400}, callback);
-
-                });
-
-            } else{
-
-                callback();
-            }
-
-        });
 
     });
+
 };
 /**
  * Get all student in organization
@@ -1237,7 +1207,7 @@ StudentController.deleteStudentById = function(req, res){
                     return res.sendError(err);
                 }
 
-                cache.get(prefixListStudent + orgId, function(err, xsre){
+                cache.get(prefixListStudent + orgId + '_' + req.params.studentId, function(err, xsre){
 
                     if(err || !xsre){
 
@@ -1251,7 +1221,7 @@ StudentController.deleteStudentById = function(req, res){
                         /**
                          * Restore cache again
                          */
-                        cache.set(prefixListStudent + orgId, xsre, { ttl: 86400 }, function(){
+                        cache.set(prefixListStudent + orgId + '_' + req.params.studentId, xsre, { ttl: 86400 }, function(){
 
                             res.sendSuccess(res.__('data_deleted'));
 
