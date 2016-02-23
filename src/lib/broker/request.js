@@ -2,13 +2,12 @@
 /**
  * Created by zaenal on 03/06/15.
  */
-var config = require('config');
 //var request = require('request');
 var retryRequest = require('retry-request');
 var moment = require('moment');
 var uuid = require('node-uuid');
 var CryptoJS = require("crypto-js");
-var utils = require('../utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark  = utils.benchmark();
+var utils = require('../utils'), config = utils.config(), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark  = utils.benchmark();
 /**
  *
  * @param options

@@ -5,7 +5,6 @@
 var rootPath = __dirname + '/../../';
 var appPath = rootPath + 'app';
 var libPath = rootPath + 'lib';
-var config = require('config');
 var async = require('async');
 var request = require('request');
 var qs = require('querystring');
@@ -15,7 +14,7 @@ var CryptoJS = require("crypto-js");
 var TIME = 1321644961388;
 var _ = require('underscore');
 var l = require('lodash');
-var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
+var utils = require(libPath+'/utils'), config = utils.config(), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
 /**
  *
  * @param options
@@ -140,10 +139,14 @@ Request.prototype = {
 
                 self.addHeader(name, config.headers[name]);
 
+                if(name === 'requestType' && config.headers[name] === 'DELAYED'){
+
+                    self.addHeader('queueId', uuid.v1({msecs: TIME + 1}));
+
+                }
+
             }
         }
-
-        //self.addHeader('queueId', uuid.v1({msecs: TIME + 1}));
         self.addHeader('requestId', uuid.v1({msecs: TIME + 28*24*3600*1000}));
 
         self.create(config.url + url, 'POST', data, callback);

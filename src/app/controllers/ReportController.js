@@ -5,21 +5,9 @@
 /**
  * Created by zaenal on 21/05/15.
  */
-var config = require('config');
-//var con = require('../../lib/cli/mysql');
-var mysql = require('mysql');
-var dbConfig = config.get('db').mysql;
-
-//console.log('CONFIG MYSQL: ', dbConfig);
-//console.log('NODE_CONFIG_DIR: ' + config.util.getEnv('NODE_CONFIG_DIR'));
-//console.log('NODE_APP_INSTANCE: ' + config.util.getEnv('NODE_APP_INSTANCE'));
-//console.log('ALLOW_CONFIG_MUTATIONS: ' + config.util.getEnv('ALLOW_CONFIG_MUTATIONS'));
-var con = mysql.createConnection({
-    host     : dbConfig.host,
-    user     : dbConfig.user,
-    password : dbConfig.password,
-    database : dbConfig.database
-});
+var utils = require('../../lib/utils');
+var config = utils.config();
+var con = require('../../lib/sql');
 var _ = require('underscore');
 var ReportController = {};
 /**
@@ -37,7 +25,6 @@ ReportController.getStudentBy = function (req, res) {
         cohort: req.query.cohort,
         caseload: req.query.caseload
     };
-    //console.log(filters);
     var sql = null;
     var group = null;
     var params = [ orgId ];
