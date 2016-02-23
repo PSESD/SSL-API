@@ -2,9 +2,19 @@
  * Created by zaenal on 08/01/16.
  */
 'use strict';
+/**
+ *
+ */
+(function(){
+    var dotenv = require('dotenv').config({ path: process.env.NODE_CONFIG_DIR + '/.env' });
+    if(dotenv){
+        for(var env in dotenv){
+            process.env[env] = dotenv[env];
+        }
+    }
+})();
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-//process.env.NODE_ENV = 'test';
+
 var memwatch = require('memwatch');
 // Take first snapshot
 var hd = new memwatch.HeapDiff();
@@ -187,37 +197,15 @@ switch(what){
         if(!config.has('db')){
             console.log(JSON.stringify(config.util.getConfigSources()));
         } else {
-            console.log('OK', config.get('db'));
+            console.log('OK', config);
         }
         process.exit();
         break;
-    //case 'pull':
-    //    pullJob();
-    //    break;
-    //case 'dump-districtid':
-    //    studentCollector.dumpDataDistrictId(function(){
-    //        process.exit();
-    //    });
-    //    break;
-    //case 'cache-debug':
-    //    studentCollector.cacheDebug(function(){
-    //        process.exit();
-    //    });
-    //    break;
-    //case 'generate-xml':
-    //    studentCollector.collect(function(bulkStudent){
-    //        require('fs').writeFile(__dirname + '/data/CBOStudents-data.xml', bulkStudent, function (err) {
-    //            if (err) throw err;
-    //            console.log('It\'s saved!');
-    //            process.exit();
-    //        });
-    //    });
-    //    break;
     case 'push-cedarlabs':
         studentCollector.collect(function(bulkStudent, studentNumber){
                 require('fs').writeFile(__dirname + '/data/REQUEST-CBOStudents.xml', bulkStudent, function (err) {});
                 (new request()).push(bulkStudent, function(err, response, body){
-                    //require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
+                    require('fs').writeFile(__dirname + '/data/RESPONSE-CBOStudents.xml', body, function (err) {
                         if (err && err !== null && err !== 'null') {
                             withError(err, emailPushCedarExpert, { number_of_students: studentNumber }, function (err) {
                                 process.exit();
@@ -227,7 +215,7 @@ switch(what){
                                 process.exit();
                             });
                         }
-                    //});
+                    });
                 });
 
         });
@@ -258,12 +246,6 @@ switch(what){
             }
         });
         break;
-    //case 'queue-cedarlabs':
-    //    studentCollector.queue(function(){
-    //        console.log('Queue done');
-    //        process.exit();
-    //    });
-    //    break;
     case 'cache-list':
         var args = process.argv.slice(3)[0] ? true : false;
         studentCollector.cacheList(args, function(err, data, studentNumber){

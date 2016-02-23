@@ -139,10 +139,14 @@ Request.prototype = {
 
                 self.addHeader(name, config.headers[name]);
 
+                if(name === 'requestType' && config.headers[name] === 'DELAYED'){
+
+                    self.addHeader('queueId', uuid.v1({msecs: TIME + 1}));
+
+                }
+
             }
         }
-
-        //self.addHeader('queueId', uuid.v1({msecs: TIME + 1}));
         self.addHeader('requestId', uuid.v1({msecs: TIME + 28*24*3600*1000}));
 
         self.create(config.url + url, 'POST', data, callback);

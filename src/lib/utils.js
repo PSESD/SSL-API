@@ -9,7 +9,8 @@ var justlog = require('justlog');
  * @returns {Config|exports|module.exports}
  */
 function getConfig(){
-    return require('config-uncached')(true);
+    //return require('config-uncached')(true);
+    return require('config');
 }
 
 var config = getConfig();
