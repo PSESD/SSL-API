@@ -34,9 +34,9 @@ var filename = districtFile;
 var prefixListStudent = '_xsre_list_students_';
 var organizationWhere = {};
 
-//organizationWhere = {
-//    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
-//};
+organizationWhere = {
+    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
+};
 
 //console.log('WHERE: ', organizationWhere);
 function cacheDebug(done){
@@ -430,107 +430,7 @@ function collectCacheListStudentsAsync(force, done) {
 
     });
 }
-/**
- *
- * @param ok
- */
-/*function pullStudentAsync(ok){
-    var masterTable = '`students`';
-    var backupTable = '`students__`';
-    var t1 = '`student_programs`';
-    var t2 = '`student_programs__`';
 
-    con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
-        con.query('create table ' + t2 + ' like ' + t1, function(err, results){
-            *//**
-             *
-             * @param organization
-             * @param callback
-             *//*
-            function pullMap(organization, callback){
-
-                new request().getBulk(function(studentList, studentProgramList){
-                    //console.log(studentList);
-                    if(studentList){
-                        async.eachSeries(studentList, function(student, cb){
-                            con.query('INSERT INTO ' + backupTable + ' SET ?', student, function(err, result){
-                                if(err && err.errno !== 1062){
-                                    console.log('INSERT ' + backupTable + ' ERROR: ', err);
-                                }
-                                cb(null, result);
-
-                            });
-                        }, function(err, data){
-                            if(studentProgramList.length > 0){
-                                async.eachSeries(studentProgramList, function(stdp, cb1){
-                                    con.query('INSERT INTO ' + t2 + ' SET ?', stdp, function(err, result1){
-                                        if(err && err.errno !== 1062){
-                                            console.log('INSERT ' + t2 + ' ERROR: ', err);
-                                        }
-                                        cb1(null, result1);
-                                    });
-                                }, function(err, data){
-                                    callback(null, organization);
-                                });
-                            } else {
-                                callback(null, organization);
-                            }
-
-                        });
-                    } else{
-                        callback(null, organization);
-                    }
-
-                    //}, 2, "(organization/organizationName='" + organization.name + "')&sort=organization/districtStudentId:asc");
-                    }, 2, "(organization/organizationName='" + organization.name + "')");
-                //}, 2, "(organization/districtStudentId='10651041')");
-            }
-
-
-            Organization.find(organizationWhere, function(err, organizations){
-                var sql = 'TRUNCATE TABLE ' + backupTable;
-                con.query(sql, function(err, results){
-                    async.eachSeries(organizations, pullMap, function(err, data){
-                        if(err){
-                            benchmark.info(err);
-                        }
-
-                        benchmark.info(
-                            '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
-                        );
-                        var sql = 'DROP TABLE ' + masterTable;
-                        con.query(sql, function(err, results){
-                            if(err){
-                                console.log(err);
-                            }
-                            sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
-                            con.query(sql, function(err, results){
-                                if(err){
-                                    console.log(err);
-                                }
-                                var sql = 'DROP TABLE ' + t1;
-                                con.query(sql, function(err, results){
-                                    if(err){
-                                        console.log(err);
-                                    }
-                                    sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
-                                    con.query(sql, function(err, results){
-                                        if(err){
-                                            console.log(err);
-                                        }
-                                        con.end(function(err){
-                                            ok();
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
-}*/
 /**
  *
  * @param ok
@@ -544,7 +444,6 @@ function pullStudentAsyncWithoutOrg(ok){
     /**
      *
      * @param err1
-     * @param msg
      */
     var okDone = function(err1){
         var ee = null;
