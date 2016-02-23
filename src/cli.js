@@ -12,13 +12,15 @@ var bs = require('nodestalker'),
     tube = 'test_tube',
     what = process.argv.slice(2)[0],
     client = bs.Client('127.0.0.1:11300');
-var config = require('config');
+var utils = require('./lib/utils');
+
+
+var config = utils.config();
 var os = require('os');
+//var con = require('./lib/sql');
 var studentCollector = require('./lib/cli/studentCollector');
 var tokenCleaner = require('./lib/cli/tokenCleaner');
 var request = require('./lib/cli/request');
-var utils = require('./lib/utils');
-//var con = require('./lib/cli/mysql');
 var php = require('phpjs');
 var codeSet = require('./lib/xsre/codeset');
 var parseString = require('xml2js').parseString;
@@ -29,6 +31,7 @@ var rollbarAccessToken = config.get('rollbar.access_token');
 rollbar.init(rollbarAccessToken, {
     environment: rollbarEnv
 });
+
 var subjectEmail = '[SSL] Scheduled Task Report for ${environment}:${hostname} on ${datetime}';
 var bodyEmail = 'On ${datetime} the following scheduled tasks have been performed in ${environment}:';
 var emailCacheList = '${status} pulling ${number_of_students} students from the P2 Broker and pushing it to ${redis_host}';
@@ -179,6 +182,14 @@ switch(what){
         withSuccess(emailPushSqlReport, { number_of_students: 200 }, function(){
             process.exit();
         });
+        break;
+    case 'checking':
+        if(!config.has('db')){
+            console.log(JSON.stringify(config.util.getConfigSources()));
+        } else {
+            console.log('OK', config.get('db'));
+        }
+        process.exit();
         break;
     //case 'pull':
     //    pullJob();
