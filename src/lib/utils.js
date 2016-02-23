@@ -4,7 +4,15 @@
  */
 var crypto = require('crypto');
 var justlog = require('justlog');
-var config = require('config');
+/**
+ *
+ * @returns {Config|exports|module.exports}
+ */
+function getConfig(){
+    return require('config-uncached')(true);
+}
+
+var config = getConfig();
 var rollbar = require('rollbar');
 var saltStatic = config.get('salt');
 var cacheManager = require('cache-manager');
@@ -265,6 +273,12 @@ var utils = {
 
     },
     /**
+     *
+     * @param useCache
+     * @returns {*}
+     */
+    config: getConfig,
+    /**
      * Return a unique identifier with the given `len`.
      *
      *     uid(10);
@@ -333,7 +347,7 @@ var utils = {
      */
     calculateExp: function(){
 
-        return new Date(new Date().getTime() + (require('config').get('token.expires_in') * 1000));
+        return new Date(new Date().getTime() + (config.get('token.expires_in') * 1000));
 
     },
     /**

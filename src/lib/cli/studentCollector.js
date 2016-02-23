@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 var rootPath = __dirname + '/../../';
 var appPath = rootPath + 'app';
 var libPath = rootPath + 'lib';
-require('./db');
+require(libPath + '/cli/db');
 var Student = require(appPath+'/models/Student');
 var StudentProgram = require(appPath+'/models/StudentProgram');
 var Organization = require(appPath+'/models/Organization');
@@ -17,26 +17,14 @@ var _ = require('underscore');
 var l = require('lodash');
 var xmlParser = require('js2xmlparser');
 var moment = require('moment');
-var config = require('config'), xsreConfig = config.get('hzb').xsre;
+var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
 
+var config = utils.config(), xsreConfig = config.get('hzb').xsre;
 var Request = require(libPath+'/broker/request');
 var request = require('./request');
-//var con = require('./mysql');
-var mysql = require('mysql');
-var dbConfig = config.get('db').mysql;
 
-//console.log('CONFIG MYSQL: ', dbConfig);
-//console.log('NODE_CONFIG_DIR: ' + config.util.getEnv('NODE_CONFIG_DIR'));
-//console.log('NODE_APP_INSTANCE: ' + config.util.getEnv('NODE_APP_INSTANCE'));
-//console.log('ALLOW_CONFIG_MUTATIONS: ' + config.util.getEnv('ALLOW_CONFIG_MUTATIONS'));
-var con = mysql.createConnection({
-    host     : dbConfig.host,
-    user     : dbConfig.user,
-    password : dbConfig.password,
-    database : dbConfig.database
-});
+var con = require(libPath + '/sql');
 var parseString = require('xml2js').parseString;
-var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
 var xSre = require(libPath+'/xsre');
 var async = require('async');
 var districtFile = rootPath + '/test/data/districts';

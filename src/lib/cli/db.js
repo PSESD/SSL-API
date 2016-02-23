@@ -2,7 +2,7 @@
  * Created by zaenal on 22/09/15.
  */
 var mongoose = require('mongoose');
-var config = require('config');
+var utils = require('../utils'), config = utils.config();
 
 function db() {
 
