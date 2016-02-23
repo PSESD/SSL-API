@@ -232,6 +232,13 @@ The following examples configuration in JSON format.
             }
         }
     }
+    
+    
+**Edit config environment variable, this will be used on the cronjob CLI process**
+    
+    $ vi src/config/.env
+    
+    NODE_ENV=development
 
 **Edit config overrides for production deployment:**
 
@@ -396,6 +403,13 @@ The following examples configuration in JSON format.
                 }
             }
         }
+        
+**Edit config environment variable, this will be used on the cronjob CLI process**        
+        
+        $ vi src/config/.env
+            
+        NODE_ENV=production
+        
 
 **Use configs in your code:**
 
