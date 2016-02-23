@@ -232,6 +232,10 @@ The following examples configuration in JSON format.
             }
         }
     }
+    
+    $ vi src/config/.env
+    
+    NODE_ENV=development
 
 **Edit config overrides for production deployment:**
 
@@ -396,6 +400,11 @@ The following examples configuration in JSON format.
                 }
             }
         }
+        
+        $ vi src/config/.env
+            
+        NODE_ENV=production
+        
 
 **Use configs in your code:**
 
