@@ -145,7 +145,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                         results.programs.push({
                                             name: program.name,
                                             from: prgm.participation_start_date,
-                                            to: prgm.participation_start_date
+                                            to: prgm.participation_end_date
                                         });
 
                                     });
