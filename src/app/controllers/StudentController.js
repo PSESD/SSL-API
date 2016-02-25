@@ -145,7 +145,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                         results.programs.push({
                                             name: program.name,
                                             from: prgm.participation_start_date,
-                                            to: prgm.participation_start_date
+                                            to: prgm.participation_end_date
                                         });
 
                                     });
@@ -742,13 +742,13 @@ StudentController.refreshStudentSummary = function(brokerRequest, student, orgId
     brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
 
         if(error){
-            return callback(err);
+            return callback(error);
         }
 
         if(!body){
             return callback('Empty response');
         }
-        console.log('COUNT 3: ' + Object.keys(result).length);
+        //console.log('COUNT 3: ' + Object.keys(result).length);
         if(response && response.statusCode === 200){
 
             utils.xml2js(body, function(err, xmlResult){
