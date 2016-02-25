@@ -257,7 +257,7 @@ Rest.prototype.routeReport = function(){
     this.router.route('/:organizationId/reports/students/:by' + this.format)
         .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.reportController.getStudentBy)
     ;
-    this.router.route('/:organizationId/reports/students/filters' + this.format)
+    this.router.route('/:organizationId/reports/student-filters' + this.format)
         .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.reportController.getFilters)
     ;
 
