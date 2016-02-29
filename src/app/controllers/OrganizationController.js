@@ -124,13 +124,10 @@ OrganizationController.updateProfile = function(req, res){
  */
 OrganizationController.allUsers = function (req, res) {
 
-    var criteria = { permissions: { $elemMatch: {organization: ObjectId(req.params.organizationId) }}};
+    var criteria = { permissions: { $elemMatch: { organization: ObjectId(req.params.organizationId), activate: true }}};
 
     if(req.query.pending){
-        criteria = { $or: [
-            criteria,
-            { pending: req.params.organizationId }
-        ]};
+        criteria = { permissions: { $elemMatch: { organization: ObjectId(req.params.organizationId) }}};
     }
     //User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
     User.find(criteria, function (err, users) {
@@ -141,7 +138,7 @@ OrganizationController.allUsers = function (req, res) {
 
         users.forEach(function(user){
 
-            user.getCurrentPermission(req.params.organizationId);
+            var permission = user.getCurrentPermission(req.params.organizationId);
 
             var obj = user.toJSON();
 
@@ -150,8 +147,6 @@ OrganizationController.allUsers = function (req, res) {
                 delete obj.permissions;
 
             }
-
-            obj.activate = obj.pending.indexOf(req.params.organizationId) !== -1;
 
             tmp.push(obj);
 
@@ -173,7 +168,7 @@ OrganizationController.allUsers = function (req, res) {
  */
 OrganizationController.pending = function (req, res) {
 
-    var crit = { pending: req.params.organizationId };
+    var crit = { permissions: { $elemMatch: { organization: ObjectId(req.params.organizationId), activate: false }}};
 
     User.find(crit, function (err, users) {
 
@@ -258,6 +253,10 @@ OrganizationController.postUser = function (req, res) {
     permissions.role = req.body.role || 'case-worker';
 
     permissions.is_special_case_worker = req.body.is_special_case_worker || false;
+
+    permissions.activate = req.body.activate || true;
+
+    permissions.activateStatus = permissions.activate ? 'Active' : 'Pending';
 
     permissions.students = req.body.students || [];
 
@@ -402,7 +401,15 @@ OrganizationController.putUser = function (req, res) {
 
             }
 
-            obj.saveWithRole(req.user, req.params.organizationId, role, function (err, user) {
+            var fields = { role: role };
+
+            if(req.body.activate){
+
+                fields.activate = req.body.activate ? true : false;
+
+            }
+
+            obj.saveWithRole(req.user, req.params.organizationId, fields, function (err, user) {
 
                 if (err)  { return res.sendError(err); }
 
