@@ -260,6 +260,14 @@ switch(what){
             }
         });
         break;
+    case 'activate':
+        studentCollector.activateUser(function(err){
+            if(err){
+                console.log(err);
+            }
+            process.exit();
+        });
+        break;
     case 'token-cleaner':
         tokenCleaner.clean(function(err){
             if (err && err !== null && err !== 'null') {
