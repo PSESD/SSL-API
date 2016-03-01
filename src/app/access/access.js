@@ -173,6 +173,14 @@ Access.hasAccess = function(req, res, next){
 
         var clientUrl = req.headers.origin;
 
+        var hackUrl = 'x-cbo-client-url';
+
+        if(hackUrl in req.headers){
+
+            clientUrl = req.headers[hackUrl];
+
+        }
+
         var parse_url = php.parse_url(clientUrl);
 
         if (parse_url.host) {
