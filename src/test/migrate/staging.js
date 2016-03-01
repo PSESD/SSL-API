@@ -196,7 +196,7 @@ describe('Migrate Staging', function () {
             request(urlApi)
                 .post('/organizations')
                 .set('authorization', grantToken)
-                .set('x-cbo-client-url', 'https://helpinghand.sslstaging.studentsuccesslink.upward.st')
+                .set('origin', 'https://helpinghand.sslstaging.studentsuccesslink.upward.st')
                 .send(orgData)
                 .expect(function (res) {
                     if (!res.body.success) {
@@ -216,7 +216,7 @@ describe('Migrate Staging', function () {
             request(urlApi)
                 .get('/user')
                 .set('authorization', grantToken)
-                .set('x-cbo-client-url', 'https://helpinghand.sslstaging.studentsuccesslink.upward.st')
+                .set('origin', 'https://helpinghand.sslstaging.studentsuccesslink.upward.st')
                 .expect(function (res) {
                     console.log(res.body);
                     assert.equal(email, res.body.email);
@@ -231,7 +231,7 @@ describe('Migrate Staging', function () {
             request(urlApi)
                 .put('/user/role/'+userId)
                 .set('authorization', grantToken)
-                .set('x-cbo-client-url', 'https://helpinghand.sslstaging.studentsuccesslink.upward.st')
+                .set('origin', 'https://helpinghand.sslstaging.studentsuccesslink.upward.st')
                 .send({ role: 'admin' })
                 .expect(function (res) {
                     if (!res.body.success) {

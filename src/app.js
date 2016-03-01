@@ -244,7 +244,6 @@ Api.prototype.configureExpress = function (db) {
 
     app.use(function (req, res, next) {
 
-
         var resource = null;
         /**
          *

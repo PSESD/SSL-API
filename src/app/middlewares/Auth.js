@@ -66,18 +66,6 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, acces
 
       }
 
-      /**
-       * Skipped email
-       * @type {string}
-       */
-      var hackIp = 'x-cbo-ip-skipped';
-
-      if(hackIp in req.headers && req.headers[hackIp]){
-
-        clientIp = token.ip;
-
-      }
-
       if(typeof token.ip === 'undefined' && clientIp === '127.0.0.1'){
 
           clientIp = token.ip;
@@ -85,7 +73,7 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, acces
       }
 
       //check for ip token
-      if(token.ip !== clientIp){
+      if(token.ip !== clientIp && (token.app_name + '') === ''){
 
         console.log('IP TOKEN: ', token.ip, ' => CLIENT IP: ', clientIp);
 
@@ -112,7 +100,7 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, function(req, acces
           if (!user) { return callback(null, false); }
 
           // Simple example with no scope
-          callback(null, user, { scope: '*' });
+          callback(null, user, { scope: '*', token: token });
 
         });
 
