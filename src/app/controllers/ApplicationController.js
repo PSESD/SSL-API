@@ -25,7 +25,7 @@ var ApplicationController = new BaseController(Token).crud();
  * @param req
  * @param res
  */
-ApplicationController.getTokens = function (req, res) {
+ApplicationController.get = function (req, res) {
 
     res.xmlKey = 'applications';
 
@@ -97,15 +97,15 @@ ApplicationController.post = function (req, res) {
 
     var token = utils.uid(256);
 
-    var expired = moment().add(100, 'years').valueOf(); // set 100th from now
+    var tokenHash = utils.tokenHash(token);
 
-
+    var expired = new Date(moment().add(100, 'years').valueOf()); // set 100th from now
     // Create a new access token
     var tokenModel = new Token({
-        token: utils.tokenHash(token),
+        token: tokenHash,
         clientId: req.authInfo.token.clientId,
         app_name: req.body.app_name,
-        userId: req.body.userId,
+        userId: req.body.user_id,
         created_by: req.user.userId,
         expired: expired
     });
@@ -116,7 +116,15 @@ ApplicationController.post = function (req, res) {
             return res.sendError(err);
         }
 
-        res.sendSuccess(res.__('data_added'), tokenModel);
+
+
+        res.sendSuccess(res.__('data_added'), {
+            token: token,
+            clientId: tokenModel.clientId,
+            app_name: tokenModel.app_name,
+            userId: tokenModel.userId,
+            date_created: tokenModel.created
+        });
 
     });
 
