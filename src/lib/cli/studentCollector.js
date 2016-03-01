@@ -48,6 +48,44 @@ function cacheDebug(done){
 }
 /**
  *
+ * @param done
+ */
+function activateUser(done){
+    User.find({/*email: 'demo@upwardstech.com'*/}, function(err, users){
+        if(err){
+            return done(err);
+        }
+
+        async.eachSeries(users, function(user, cb){
+            var allpermission = [];
+
+            for(var i = 0; i < user.permissions.length; i++){
+                user.permissions[i].activate = true;
+                user.permissions[i].activateStatus = 'Active';
+                user.permissions[i].activateDate = new Date();
+                allpermission.push(user.permissions[i]);
+            }
+            //console.log(allpermission);
+            if(allpermission.length === 0) {
+                return cb(null, user);
+            }
+
+            var updated = {
+                //$unset: { pending:"" },
+                $set: {
+                    permissions: allpermission,
+                    last_updated: new Date()
+                }
+            };
+            User.where({_id: user._id}).update(updated, function(err){
+                console.log(err);
+                cb(null);
+            });
+        }, done);
+    });
+}
+/**
+ *
  * @param callback
  */
 function collectDataStudents(callback) {
@@ -587,5 +625,6 @@ module.exports = {
     cacheDebug: cacheDebug,
     //dumpDataDistrictId: dumpDataDistrictId,
     //pullStudentAsync: pullStudentAsync
-    pullStudentAsync: pullStudentAsyncWithoutOrg
+    pullStudentAsync: pullStudentAsyncWithoutOrg,
+    activateUser: activateUser
 };

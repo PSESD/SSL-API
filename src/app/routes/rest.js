@@ -27,6 +27,8 @@ function Rest(router, Api){
 
     this.studentProgramController = this.Api.controller('StudentProgramController');
 
+    this.applicationController = this.Api.controller('ApplicationController');
+
     this.reportController = this.Api.controller('ReportController');
 
     this.auth = this.Api.middleware('Auth');
@@ -62,6 +64,8 @@ Rest.prototype.handleRoutes = function(){
     this.routeTest();
 
     this.routeReport();
+
+    this.routeApplication();
 
 };
 
@@ -259,6 +263,18 @@ Rest.prototype.routeReport = function(){
     ;
     this.router.route('/:organizationId/reports/student-filters' + this.format)
         .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.reportController.getFilters)
+    ;
+
+};
+
+Rest.prototype.routeApplication = function(){
+
+    this.router.route('/:organizationId/applications' + this.format)
+        .post(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.applicationController.post)
+        .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.applicationController.get)
+    ;
+    this.router.route('/:organizationId/applications/:applicationId' + this.format)
+        .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.applicationController.delete)
     ;
 
 };
