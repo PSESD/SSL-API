@@ -14,6 +14,7 @@ var User = require('../models/User');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
+var php = require('phpjs');
 var Request = require('../../lib/broker/request');
 var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache();
@@ -30,7 +31,9 @@ ApplicationController.get = function (req, res) {
 
     res.xmlKey = 'applications';
 
-    Token.find({app_name: { $exists: true }, clientId: req.authInfo.token.clientId }, function (err, tokens) {
+    var orgId = req.params.organizationId;
+
+    Token.find({app_name: { $exists: true }, clientId: new RegExp("/^" + orgId + "\_/") }, function (err, tokens) {
 
         if (err)  { return res.sendError(err); }
 
@@ -105,38 +108,88 @@ ApplicationController.post = function (req, res) {
 
     res.xmlOptions = 'application';
 
+    var orgId = req.params.organizationId;
+
     var token = utils.uid(256);
 
     var tokenHash = utils.tokenHash(token);
 
     var expired = new Date(moment().add(100, 'years').valueOf()); // set 100th from now
-    // Create a new access token
-    var tokenModel = new Token({
-        token: tokenHash,
-        clientId: req.authInfo.token.clientId,
-        app_name: req.body.app_name,
-        userId: req.body.user_id,
-        created_by: req.user.userId,
-        expired: expired
+
+    var clientId = orgId + '_' + slugify(req.body.app_name);
+
+    var userId = req.body.user_id;
+
+    var secret = utils.tokenHash(utils.uid(16));
+
+    var clientUrl = req.headers.origin;
+
+    var hackUrl = 'x-cbo-client-url';
+
+    var redirectUri = '';
+
+    if(hackUrl in req.headers){
+
+        clientUrl = req.headers[hackUrl];
+
+    }
+
+    var parse_url = php.parse_url(clientUrl);
+
+    if (parse_url.host) {
+
+        redirectUri = parse_url.host;
+
+    } else {
+
+        redirectUri = parse_url.path;
+
+    }
+
+    var client = new Client({
+        id: clientId,
+        userId: userId,
+        secret: secret,
+        redirectUri: redirectUri
     });
 
-    tokenModel.save(function (err) {
+    client.save(function (err) {
 
-        if (err)  {
+        if(err){
             return res.sendError(err);
         }
 
-
-
-        res.sendSuccess(res.__('data_added'), {
-            token: token,
-            clientId: tokenModel.clientId,
-            app_name: tokenModel.app_name,
-            userId: tokenModel.userId,
-            date_created: tokenModel.created
+        // Create a new access token
+        var tokenModel = new Token({
+            token: tokenHash,
+            //clientId: req.authInfo.token.clientId,
+            clientId: clientId,
+            app_name: req.body.app_name,
+            userId: userId,
+            created_by: req.user.userId,
+            expired: expired
         });
 
-    });
+        tokenModel.save(function (err) {
+
+            if (err)  {
+                return res.sendError(err);
+            }
+
+            res.sendSuccess(res.__('data_added'), {
+                token: token,
+                clientId: tokenModel.clientId,
+                secretKey: client.secret,
+                redirectUri: client.redirectUri,
+                appName: tokenModel.app_name,
+                userId: tokenModel.userId,
+                dateCreated: tokenModel.created
+            });
+
+        });
+
+    })
+
 
 };
 /**
