@@ -164,7 +164,9 @@ ApplicationController.delete = function (req, res) {
 
     var client = Client.findOne({ _id: applicationId }, function(err, client){
 
-        if (err)  { return res.sendError(err); }
+        if (err)  {
+            return res.sendError(err);
+        }
 
         var clientId = client.id;
 
