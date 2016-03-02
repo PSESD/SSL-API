@@ -966,6 +966,8 @@ Attendance.prototype.calculateSummary = function(){
 
         lastMonth = maxDate.month();
 
+        console.log('LAST MONTH: ', lastMonth);
+
         me.attendances.events.event.forEach(function(event){
 
             event = me.injectRawSource(event);
@@ -1000,13 +1002,16 @@ Attendance.prototype.calculateSummary = function(){
 
                             attendance++;
 
+                            if(mm.month() === lastMonth){
+
+                                //console.log('2- CURR MONTH: ', mm.month());
+                                lastMonthAttendance++;
+
+                            }
+
                         }
 
-                        if(mm.month() === lastMonth){
 
-                            lastMonthAttendance++;
-
-                        }
 
                     }
 
