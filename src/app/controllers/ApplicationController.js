@@ -6,21 +6,22 @@
  * Created by zaenal on 03/06/15.
  */
 var mongoose = require('mongoose');
-var Token = require('../models/Token');
 var async = require('async');
 var moment = require('moment');
 var crypto = require('crypto');
 var User = require('../models/User');
+var Client = require('../models/Client');
+var Token = require('../models/Token');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
 var php = require('phpjs');
 var Request = require('../../lib/broker/request');
 var parseString = require('xml2js').parseString;
-var utils = require('../../lib/utils'), cache = utils.cache();
+var utils = require('../../lib/utils'), cache = utils.cache(), redirectUri = utils.getOrganizationUri;
 var ObjectId = mongoose.Types.ObjectId;
 var slug = require('slug');
-var ApplicationController = new BaseController(Token).crud();
+var ApplicationController = new BaseController(Client).crud();
 
 /**
  * Get all application in organization
@@ -33,19 +34,19 @@ ApplicationController.get = function (req, res) {
 
     var orgId = req.params.organizationId;
 
-    Token.find({app_name: { $exists: true }, clientId: new RegExp("/^" + orgId + "\_/") }, function (err, tokens) {
+    Client.find({ redirectUri: redirectUri(req) }, function (err, clients) {
 
         if (err)  { return res.sendError(err); }
 
-        async.map(tokens, function(token, cb){
+        async.map(clients, function(client, cb){
 
-            User.findOne({ _id: ObjectId(token.userId) }, function(e, u){
+            User.findOne({ _id: ObjectId(client.userId) }, function(e, u){
 
                 cb(null, {
-                    _id: token._id,
-                    app_name: token.app_name,
-                    created_by: token.created_by,
-                    created: token.created,
+                    _id: client._id,
+                    app_name: client.name,
+                    created_by: client.created_by,
+                    created: client.created,
                     email: u.email
                 });
 
@@ -110,86 +111,46 @@ ApplicationController.post = function (req, res) {
 
     var orgId = req.params.organizationId;
 
-    var token = utils.uid(256);
-
-    var tokenHash = utils.tokenHash(token);
-
-    var expired = new Date(moment().add(100, 'years').valueOf()); // set 100th from now
-
     var clientId = orgId + '_' + slugify(req.body.app_name);
 
     var userId = req.body.user_id;
 
-    var secret = utils.tokenHash(utils.uid(16));
+    var secret = utils.tokenHash(utils.uid(12));
 
-    var clientUrl = req.headers.origin;
-
-    var hackUrl = 'x-cbo-client-url';
-
-    var redirectUri = '';
-
-    if(hackUrl in req.headers){
-
-        clientUrl = req.headers[hackUrl];
-
-    }
-
-    var parse_url = php.parse_url(clientUrl);
-
-    if (parse_url.host) {
-
-        redirectUri = parse_url.host;
-
-    } else {
-
-        redirectUri = parse_url.path;
-
-    }
-
-    var client = new Client({
-        id: clientId,
-        userId: userId,
-        secret: secret,
-        redirectUri: redirectUri
-    });
-
-    client.save(function (err) {
+    Organization.findOne({ _id: ObjectId(orgId)}, function(err, organization){
 
         if(err){
             return res.sendError(err);
         }
 
-        // Create a new access token
-        var tokenModel = new Token({
-            token: tokenHash,
-            //clientId: req.authInfo.token.clientId,
-            clientId: clientId,
-            app_name: req.body.app_name,
+        var client = new Client({
+            name: organization.name + ' - ' + req.body.app_name, //name must unique
+            id: clientId,
             userId: userId,
-            created_by: req.user.userId,
-            expired: expired
+            secret: secret,
+            redirectUri: redirectUri(req),
+            created_by: req.user.userId
         });
 
-        tokenModel.save(function (err) {
+        client.save(function (err) {
 
-            if (err)  {
+            if(err){
                 return res.sendError(err);
             }
 
             res.sendSuccess(res.__('data_added'), {
-                token: token,
-                clientId: tokenModel.clientId,
+                clientId: client.id,
                 secretKey: client.secret,
                 redirectUri: client.redirectUri,
-                appName: tokenModel.app_name,
-                userId: tokenModel.userId,
-                dateCreated: tokenModel.created
+                appName: client.name,
+                userId: client.userId,
+                dateCreated: client.created
             });
 
-        });
 
-    })
+        })
 
+    });
 
 };
 /**
@@ -201,11 +162,27 @@ ApplicationController.delete = function (req, res) {
 
     var applicationId = ObjectId(req.params.applicationId);
 
-    Token.remove({ _id: applicationId }, function (err) {
+    var client = Client.findOne({ _id: applicationId }, function(err, client){
 
         if (err)  { return res.sendError(err); }
 
-        res.sendSuccess(res.__('data_deleted'));
+        var clientId = client.id;
+
+        client.remove(function (err) {
+
+            if (err)  { return res.sendError(err); }
+
+            Token.remove({ clientId: clientId }, function (err) {
+
+                if (err) {
+                    return res.sendError(err);
+                }
+
+                res.sendSuccess(res.__('data_deleted'));
+
+            });
+
+        });
 
     });
 
