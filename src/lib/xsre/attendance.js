@@ -117,6 +117,10 @@ moment.fn.weeksTo = function (target, formatString) {
     }
     return result;
 };
+
+var OK = 'OK';
+var DANGER = 'DANGER';
+var WARNING = 'WARNING';
 /**
  *
  * @param xsre
@@ -367,7 +371,7 @@ Attendance.prototype.getAttendances = function(){
 
             delete event.school;
 
-            if(me.allDates.indexOf(event.calendarEventDate) === -1) {
+            if(me.allDates.indexOf(event.calendarEventDateTime) === -1) {
                 me.allDates.push(event.calendarEventDateTime);
             }
 
@@ -909,12 +913,29 @@ Attendance.prototype.calculateSummary = function(){
 
     var mm = null;
 
+    var lastMonth = null;
+
+    var allDates = [];
+
+    var attendance = 0;
+
+    var lastMonthAttendance = 0;
+
+
     me.currentSummary = {
-        attendance: 0,
+        attendance: {
+            flag: OK,
+            absents: {
+                attendance: 0,
+                lastMontAttendance: 0
+            },
+            notes: {
+                title: "",
+                items: []
+            }
+        },
         behavior: 0
     };
-
-    var c = {};
 
     if(_.isObject(me.attendances) && _.isObject(me.attendances.events) && !_.isUndefined(me.attendances.events.event)){
 
@@ -923,6 +944,27 @@ Attendance.prototype.calculateSummary = function(){
             me.attendances.events.event = [me.attendances.events.event];
 
         }
+
+        me.attendances.events.event.forEach(function(event) {
+            mm = moment(new Date(event.calendarEventDate));
+
+            if (me.availableYear.indexOf(mm.year()) === -1) {
+
+                me.availableYear.push(mm.year());
+
+            }
+
+            event.calendarEventDateTime = mm.valueOf();
+
+            if(allDates.indexOf(event.calendarEventDateTime) === -1) {
+                allDates.push(event.calendarEventDateTime);
+            }
+
+        });
+
+        var maxDate = moment(_.max(allDates));
+
+        lastMonth = maxDate.month();
 
         me.attendances.events.event.forEach(function(event){
 
@@ -940,7 +982,7 @@ Attendance.prototype.calculateSummary = function(){
 
             }
 
-            if(passed && mm.isValid()){
+            if(mm.isValid()){
 
                 if('dailyAttendanceStatus' in event){
 
@@ -952,19 +994,19 @@ Attendance.prototype.calculateSummary = function(){
 
                     var attendanceStatus = me.slug(event.attendanceStatus);
 
-                    //var m = mm.format('YYYY-MM-DD');
-                    //
-                    //if(Object.keys(c).indexOf(m) === -1){
-                    //
-                    //    c[m] = [];
-                    //
-                    //}
-                    //
-                    //c[m].push(attendanceStatus);
-
                     if(attendanceStatus === 'excused' || attendanceStatus === 'unexcused'){
 
-                        me.currentSummary.attendance++;
+                        if(passed) {
+
+                            attendance++;
+
+                        }
+
+                        if(mm.month() === lastMonth){
+
+                            lastMonthAttendance++;
+
+                        }
 
                     }
 
@@ -1020,8 +1062,87 @@ Attendance.prototype.calculateSummary = function(){
 
     }
 
-    return me.currentSummary;
+    /**
+     * Calculate Rules
+     */
 
+    me.currentSummary.attendance.absents.attendance = attendance;
+    me.currentSummary.attendance.absents.lastMontAttendance = lastMonthAttendance;
+
+    return me._threshold();
+
+};
+/**
+ *
+ * @returns {Attendance}
+ * @private
+ * @todo Rules:
+ *
+ * OR RULES
+ *
+ * 1st Threshold:
+ * · WARNING: 2 - 4 Missed days within the last month of the most latest date we have the student data on XSRE
+ * . DANGER: More than 4 missed days within the last month of the most latest date we have the student data on XSRE
+
+ * 2nd Threshold:
+ * . WARNING: In the current academic year have 6–19 missed days
+ * . DANGER: In the current academic year have more than 19 missed days.
+
+ * SAMPLE CASE 1:
+ * - Student missed 6 days in the last month
+ * - Student missed 6 days in the current academic year
+ * Flag: DANGER
+
+ * SAMPLE CASE 2:
+ * - Student missed 0 days in the last month
+ * - Student missed 7 days in the current academic year
+ * flag: WARNING
+
+ * SAMPLE CASE 3:
+ * - Student missed 0 days in the last month
+ * - Student missed 0 days in the current academic year
+ * flag: OK
+ */
+Attendance.prototype._threshold = function(){
+
+    var error1 = OK;
+    var error2 = OK;
+    var absents = this.currentSummary.attendance.absents;
+    var totalAlerts = 0;
+
+    if(absents.lastMontAttendance >= 2 && absents.lastMontAttendance <= 6){
+        error1 = WARNING;
+        totalAlerts++;
+    } else if(absents.lastMontAttendance >= 4){
+        error1 = DANGER;
+        totalAlerts++;
+    }
+
+    if(absents.attendance >= 6 && absents.attendance <= 19){
+        error2 = WARNING;
+        totalAlerts++;
+    } else if(absents.attendance >= 19){
+        error2 = DANGER;
+        totalAlerts++;
+    }
+
+    if(error1 === WARNING && error2 === WARNING){
+        this.currentSummary.attendance.flag = WARNING;
+    } else if(error1 === DANGER || error2 === DANGER){
+        this.currentSummary.attendance.flag = DANGER;
+    }
+
+    if(this.currentSummary.attendance.flag !== OK && totalAlerts > 0){
+        this.currentSummary.attendance.notes.title = 'This student has ' + totalAlerts + ' attendance alert' + (totalAlerts > 1 ? 's' : '') + ' because:';
+        if(error1 !== OK){
+            this.currentSummary.attendance.notes.items.push('Student has missed more than 2 days in the latest month of which we have data.');
+        }
+        if(error2 !== OK){
+            this.currentSummary.attendance.notes.items.push('Student has missed more than 30 days in the current academic year.');
+        }
+    }
+
+    return this.currentSummary;
 };
 /**
  *
