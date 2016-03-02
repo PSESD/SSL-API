@@ -7,6 +7,7 @@
  */
 var mongoose = require('mongoose');
 var Token = require('../models/Token');
+var async = require('async');
 var moment = require('moment');
 var crypto = require('crypto');
 var User = require('../models/User');
@@ -33,20 +34,29 @@ ApplicationController.get = function (req, res) {
 
         if (err)  { return res.sendError(err); }
 
-        var temp = [];
+        async.map(tokens, function(token, cb){
 
-        tokens.forEach(function(token){
+            User.findOne({ _id: ObjectId(token.userId) }, function(e, u){
 
-            temp.push({
-                _id: token._id,
-                app_name: token.app_name,
-                created_by: token.created_by,
-                created: token.created
+                cb(null, {
+                    _id: token._id,
+                    app_name: token.app_name,
+                    created_by: token.created_by,
+                    created: token.created,
+                    email: u.email
+                });
+
             });
 
-        });
 
-        res.sendSuccess(null, temp);
+        }, function(err, results){
+
+            if(err){
+                return res.sendError(err);
+            }
+
+            res.sendSuccess(null, results);
+        });
 
     });
 
