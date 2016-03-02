@@ -966,7 +966,7 @@ Attendance.prototype.calculateSummary = function(){
 
         lastMonth = maxDate.month();
 
-        console.log('LAST MONTH: ', lastMonth);
+        //console.log('LAST MONTH: ', lastMonth);
 
         me.attendances.events.event.forEach(function(event){
 
