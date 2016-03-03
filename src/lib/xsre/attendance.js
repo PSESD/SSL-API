@@ -1185,23 +1185,21 @@ Attendance.prototype._thresholdAcademic = function(){
 
     this.currentSummary.attendance.flag = error2;
 
-    if(this.currentSummary.attendance.flag !== SUCCESS){
-        this.currentSummary.attendance.notes.title = null;
-        var days = '';
-        if(error1 !== SUCCESS){
-            days = 'day';
-            if(absents.lastMontAttendance > 1){
-                days += 's';
-            }
-            this.currentSummary.attendance.notes.items.push('Student has missed '+absents.lastMontAttendance+' '+ days +' in the latest month of which we have data.');
+    this.currentSummary.attendance.notes.title = null;
+    var days = '';
+    if(error1 !== SUCCESS){
+        days = 'day';
+        if(absents.lastMontAttendance > 1){
+            days += 's';
         }
-        if(error2 !== SUCCESS){
-            days = 'day';
-            if(absents.attendanceAcademicYear > 1){
-                days += 's';
-            }
-            this.currentSummary.attendance.notes.items.push('Student has missed '+absents.attendanceAcademicYear+' '+ days +' in the current academic year.');
+        this.currentSummary.attendance.notes.items.push('Student has missed '+absents.lastMontAttendance+' '+ days +' in the latest month of which we have data.');
+    }
+    if(error2 !== SUCCESS){
+        days = 'day';
+        if(absents.attendanceAcademicYear > 1){
+            days += 's';
         }
+        this.currentSummary.attendance.notes.items.push('Student has missed '+absents.attendanceAcademicYear+' '+ days +' in the current academic year.');
     }
 
     return this.currentSummary;
