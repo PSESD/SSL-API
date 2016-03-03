@@ -247,7 +247,7 @@ UserController.save = function (req, res) {
 
                 if (err)  { return res.sendError(err); }
 
-                res.sendSuccess(res.__('data_updated'), user);
+                res.sendSuccess(res.__('data_updated'), user.toJSON());
 
             });
 
@@ -257,7 +257,7 @@ UserController.save = function (req, res) {
 
                 if (err)  { return res.sendError(err); }
 
-                res.sendSuccess(res.__('data_updated'), user);
+                res.sendSuccess(res.__('data_updated'), user.toJSON());
 
             });
         }

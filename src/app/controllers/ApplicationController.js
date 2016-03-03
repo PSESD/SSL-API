@@ -148,7 +148,7 @@ ApplicationController.post = function (req, res) {
             });
 
 
-        })
+        });
 
     });
 

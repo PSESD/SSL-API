@@ -121,6 +121,7 @@ moment.fn.weeksTo = function (target, formatString) {
 var OK = 'OK';
 var DANGER = 'DANGER';
 var WARNING = 'WARNING';
+var SUCCESS = 'SUCCESS';
 /**
  *
  * @param xsre
@@ -921,12 +922,11 @@ Attendance.prototype.calculateSummary = function(){
 
     var lastMonthAttendance = 0;
 
-
     me.currentSummary = {
         attendance: {
             flag: OK,
             absents: {
-                attendance: 0,
+                attendanceAcademicYear: 0,
                 lastMontAttendance: 0
             },
             notes: {
@@ -1071,10 +1071,10 @@ Attendance.prototype.calculateSummary = function(){
      * Calculate Rules
      */
 
-    me.currentSummary.attendance.absents.attendance = attendance;
+    me.currentSummary.attendance.absents.attendanceAcademicYear = attendance;
     me.currentSummary.attendance.absents.lastMontAttendance = lastMonthAttendance;
 
-    return me._threshold();
+    return me._thresholdAcademic();
 
 };
 /**
@@ -1123,10 +1123,10 @@ Attendance.prototype._threshold = function(){
         totalAlerts++;
     }
 
-    if(absents.attendance >= 6 && absents.attendance <= 19){
+    if(absents.attendanceAcademicYear >= 6 && absents.attendanceAcademicYear <= 19){
         error2 = WARNING;
         totalAlerts++;
-    } else if(absents.attendance >= 19){
+    } else if(absents.attendanceAcademicYear >= 19){
         error2 = DANGER;
         totalAlerts++;
     }
@@ -1144,6 +1144,63 @@ Attendance.prototype._threshold = function(){
         }
         if(error2 !== OK){
             this.currentSummary.attendance.notes.items.push('Student has missed more than 30 days in the current academic year.');
+        }
+    }
+
+    return this.currentSummary;
+};
+/**
+ *
+ * @returns {Attendance}
+ * @private
+ * @todo Flag Rules:
+ *
+ * The label would be determined based on two thresholds and would show the worse of the two:
+ * . SUCCESS: In the current academic year have less than 6 missed days.
+ * . WARNING: In the current academic year have 6–19 missed days.
+ * . DANGER: In the current academic year have more than 19 missed days.
+ */
+Attendance.prototype._thresholdAcademic = function(){
+
+    var error1 = SUCCESS;
+    var error2 = SUCCESS;
+    var absents = this.currentSummary.attendance.absents;
+    var totalAlerts = 0;
+
+    if(absents.lastMontAttendance >= 2 && absents.lastMontAttendance <= 6){
+        error1 = WARNING;
+        totalAlerts++;
+    } else if(absents.lastMontAttendance >= 4){
+        error1 = DANGER;
+        totalAlerts++;
+    }
+
+    if(absents.attendanceAcademicYear >= 6 && absents.attendanceAcademicYear <= 19){
+        error2 = WARNING;
+        totalAlerts++;
+    } else if(absents.attendanceAcademicYear >= 19){
+        error2 = DANGER;
+        totalAlerts++;
+    }
+
+    this.currentSummary.attendance.flag = error2;
+
+    if(this.currentSummary.attendance.flag !== SUCCESS){
+        this.currentSummary.attendance.notes.title = null;
+        var days = '';
+        if(error1 !== SUCCESS){
+            days = 'day';
+            if(absents.lastMontAttendance > 1){
+                days += 's';
+            }
+            this.currentSummary.attendance.notes.items.push('Student has missed '+absents.lastMontAttendance+' '+ days +' in the latest month of which we have data.');
+        }
+        if(error2 !== SUCCESS){
+            days = 'day';
+            if(absents.attendanceAcademicYear > 1){
+                days += 's';
+            }
+            this.currentSummary.attendance.notes.items.push('Student has missed '+absents.attendanceAcademicYear+' '+ days +' in the current academic year.');
         }
     }
 
