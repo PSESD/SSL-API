@@ -556,7 +556,7 @@ Attendance.prototype.getAttendances = function(){
                 'S'
             ];
 
-            if(summary.indexOf(nday) === -1) {
+            if(summary[nday] === undefined) {
                 return;
             }
 
@@ -1143,6 +1143,7 @@ Attendance.prototype.calculateSummary = function(){
  * - Student missed 0 days in the last month
  * - Student missed 0 days in the current academic year
  * flag: OK
+ * @deprecated
  */
 Attendance.prototype._threshold = function(){
 
