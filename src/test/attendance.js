@@ -27,9 +27,9 @@ fs.readFile(xmlFile, function(err, data) {
             return console.log(err);
         }
 
-        new xSre(result).getAttendanceBehavior().getAttendances();
+        //new xSre(result).getAttendanceBehavior().getAttendances();
         //console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().getAttendances()));
-        //console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().calculateSummary()));
+        console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().calculateSummary()));
     });
 
 });
