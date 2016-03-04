@@ -1226,20 +1226,16 @@ Attendance.prototype._thresholdAcademic = function(){
 
     this.currentSummary.attendance.notes.title = null;
     var days = '';
-    if(error1 !== SUCCESS){
-        days = 'day';
-        if(absents.lastMonthAttendance > 1){
-            days += 's';
-        }
-        this.currentSummary.attendance.notes.items.push('Student has missed '+absents.lastMonthAttendance+' '+ days +' in the latest month of which we have data.');
+    days = 'day';
+    if(absents.lastMonthAttendance > 1){
+        days += 's';
     }
-    if(error2 !== SUCCESS){
-        days = 'day';
-        if(absents.attendanceAcademicYear > 1){
-            days += 's';
-        }
-        this.currentSummary.attendance.notes.items.push('Student has missed '+absents.attendanceAcademicYear+' '+ days +' in the current academic year.');
+    this.currentSummary.attendance.notes.items.push('Student has missed '+(absents.lastMonthAttendance === 0 ? 'zero' : absents.lastMonthAttendance)+' '+ days +' in the latest month of which we have data.');
+    days = 'day';
+    if(absents.attendanceAcademicYear > 1){
+        days += 's';
     }
+    this.currentSummary.attendance.notes.items.push('Student has missed '+(absents.attendanceAcademicYear === 0 ? 'zero' : absents.attendanceAcademicYear)+' '+ days +' in the current academic year.');
 
     return this._thresholdBehavior()
                 .currentSummary;
@@ -1268,20 +1264,17 @@ Attendance.prototype._thresholdBehavior = function(){
 
     this.currentSummary.behavior.notes.title = null;
     var days = '';
-    if(error1 !== SUCCESS){
-        days = 'incident';
-        if(incidents.lastMonthIncident > 1){
-            days += 's';
-        }
-        this.currentSummary.behavior.notes.items.push('Student has '+incidents.lastMonthIncident+' '+ days +' in the latest month of which we have data.');
+    days = 'incident';
+    if(incidents.lastMonthIncident > 1){
+        days += 's';
     }
-    if(error2 !== SUCCESS){
-        days = 'incident';
-        if(incidents.behaviorAcademicYear > 1){
-            days += 's';
-        }
-        this.currentSummary.behavior.notes.items.push('Student has '+incidents.behaviorAcademicYear+' '+ days +' in the current academic year.');
+    this.currentSummary.behavior.notes.items.push('Student has '+(incidents.lastMonthIncident === 0 ? 'zero' : incidents.lastMonthIncident ) +' '+ days +' in the latest term of which we have data.');
+
+    days = 'incident';
+    if(incidents.behaviorAcademicYear > 1){
+        days += 's';
     }
+    this.currentSummary.behavior.notes.items.push('Student has '+(incidents.behaviorAcademicYear === 0 ? 'zero' : incidents.behaviorAcademicYear)+' '+ days +' in the current academic year.');
 
     return this;
 };
