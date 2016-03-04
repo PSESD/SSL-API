@@ -473,11 +473,13 @@ Attendance.prototype.getAttendances = function(){
         weeklyChange = null;
 
         summary = [
+            { name: 'SU', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'M', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'T', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'W', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'TH', value: me.notAvailable, date: me.notAvailable, periods: [] },
-            { name: 'F', value: me.notAvailable, date: me.notAvailable, periods: [] }
+            { name: 'F', value: me.notAvailable, date: me.notAvailable, periods: [] },
+            { name: 'S', value: me.notAvailable, date: me.notAvailable, periods: [] }
         ];
 
         var legend = {
@@ -492,22 +494,26 @@ Attendance.prototype.getAttendances = function(){
             weekDate: ikey,
             summary: {
                 title: ikey,
+                SU: me.notAvailable,
                 M: me.notAvailable,
                 T: me.notAvailable,
                 W: me.notAvailable,
                 TH: me.notAvailable,
                 F: me.notAvailable,
+                S: me.notAvailable,
                 weeklyChange: me.notAvailable
             },
             detailColumns: [],
             details: [],
             periods: [],
             behaviors: {
+                SU: [],
                 M: [],
                 T: [],
                 W: [],
                 TH: [],
-                F: []
+                F: [],
+                S: []
             },
             legend: {
                 present: [],
@@ -522,11 +528,13 @@ Attendance.prototype.getAttendances = function(){
 
         var calendar = {
             title: behavior.weekDate,
+            SU: me.notAvailable,
             M: me.notAvailable,
             T: me.notAvailable,
             W: me.notAvailable,
             TH: me.notAvailable,
             F: me.notAvailable,
+            S: me.notAvailable,
             weeklyChange: me.notAvailable
         };
 
@@ -539,14 +547,16 @@ Attendance.prototype.getAttendances = function(){
             var nday = day.isISO ? day.dayISO() : day.day();
 
             var ndays = [
+                'SU',
                 'M',
                 'T',
                 'W',
                 'TH',
-                'F'
+                'F',
+                'S'
             ];
 
-            if(summary[nday] === undefined) {
+            if(summary.indexOf(nday) === -1) {
                 return;
             }
 
@@ -622,20 +632,6 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
-            //if(s.periods.length > 0) {
-            //
-            //    s.periods.forEach(function(p){
-            //
-            //        if(p.period !== me.notAvailable && periodsColumns.indexOf(p.period) === -1){
-            //
-            //            periodsColumns.push(p.period);
-            //
-            //        }
-            //
-            //    });
-            //
-            //}
-
         });
 
         if(maxDay.length > 0){
@@ -658,15 +654,17 @@ Attendance.prototype.getAttendances = function(){
 
             var b = {
                 title: p,
+                SU: { value: me.notAvailable, event: null, slug: '' },
                 M: { value: me.notAvailable, event: null, slug: '' },
                 T: { value: me.notAvailable, event: null, slug: '' },
                 W: { value: me.notAvailable, event: null, slug: '' },
                 TH: { value: me.notAvailable, event: null, slug: '' },
-                F: { value: me.notAvailable, event: null, slug: '' }
+                F: { value: me.notAvailable, event: null, slug: '' },
+                S: { value: me.notAvailable, event: null, slug: '' }
             }, title = null;
 
 
-            ['M', 'T', 'W', 'TH', 'F'].forEach(function(column){
+            ['SU', 'M', 'T', 'W', 'TH', 'F', 'S'].forEach(function(column){
 
                 if((column in collects) && !_.isEmpty(collects[column].periods)){
 
@@ -701,27 +699,27 @@ Attendance.prototype.getAttendances = function(){
 
         behavior.detailColumns = {
             periods: [],
+            SU: [],
             M: [],
             T: [],
             W: [],
             TH: [],
             F: [],
+            S: [],
             weeklyChange: []
         };
 
         for(var c = 0; c < columns.length; c++){
 
-            //if(columns[c].M.value === me.notAvailable && !columns[c].M.event && columns[c].T.value === me.notAvailable && !columns[c].T.event && columns[c].W.value === me.notAvailable && !columns[c].W.event && columns[c].TH.value === me.notAvailable && !columns[c].TH.event && columns[c].F.value === me.notAvailable && !columns[c].F.event){
-            //    continue;
-            //}
-
             behavior.periods.push(columns[c].title);
             behavior.detailColumns.periods.push(columns[c].title);
+            behavior.detailColumns.SU.push(columns[c].SU);
             behavior.detailColumns.M.push(columns[c].M);
             behavior.detailColumns.T.push(columns[c].T);
             behavior.detailColumns.W.push(columns[c].W);
             behavior.detailColumns.TH.push(columns[c].TH);
             behavior.detailColumns.F.push(columns[c].F);
+            behavior.detailColumns.S.push(columns[c].S);
             behavior.detailColumns.weeklyChange.push(columns[c].weeklyChange);
 
         }
@@ -1037,7 +1035,7 @@ Attendance.prototype.calculateSummary = function(){
 
     }
     //console.log((function(s){var t={};Object.keys(s).sort().reverse().forEach(function(k){t[k]=s[k]});return t;})(c));
-    //console.log(me.academicStart.format('YYYY-MM-DD'), me.academicEnd.format('YYYY-MM-DD'), c);
+    //console.log(me.academicStart.format('YY-MM-DD'), me.academicEnd.format('YY-MM-DD'), c);
     allDates = [];
     if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
 
@@ -1081,7 +1079,7 @@ Attendance.prototype.calculateSummary = function(){
 
             if(passed && mm.isValid()){
 
-                var m = mm.format('YYYY-MM-DD');
+                var m = mm.format('YY-MM-DD');
 
                 if(n.indexOf(m) === -1){
 

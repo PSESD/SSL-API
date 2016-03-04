@@ -168,7 +168,7 @@ ApplicationController.delete = function (req, res) {
             return res.sendError(err);
         }
 
-        var clientId = client.id;
+        var clientId = client._id;
 
         client.remove(function (err) {
 
