@@ -920,21 +920,35 @@ Attendance.prototype.calculateSummary = function(){
 
     var attendance = 0;
 
+    var incident = 0;
+
     var lastMonthAttendance = 0;
+
+    var lastMonthIncident = 0;
 
     me.currentSummary = {
         attendance: {
-            flag: OK,
+            flag: SUCCESS,
             absents: {
                 attendanceAcademicYear: 0,
-                lastMontAttendance: 0
+                lastMonthAttendance: 0
             },
             notes: {
                 title: "",
                 items: []
             }
         },
-        behavior: 0
+        behavior: {
+            flag: SUCCESS,
+            incidents: {
+                incidentAcademicYear: 0,
+                lastMonthIncident: 0
+            },
+            notes: {
+                title: "",
+                items: []
+            }
+        }
     };
 
     if(_.isObject(me.attendances) && _.isObject(me.attendances.events) && !_.isUndefined(me.attendances.events.event)){
@@ -1024,7 +1038,7 @@ Attendance.prototype.calculateSummary = function(){
     }
     //console.log((function(s){var t={};Object.keys(s).sort().reverse().forEach(function(k){t[k]=s[k]});return t;})(c));
     //console.log(me.academicStart.format('YYYY-MM-DD'), me.academicEnd.format('YYYY-MM-DD'), c);
-
+    allDates = [];
     if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
 
         var n = [];
@@ -1034,6 +1048,22 @@ Attendance.prototype.calculateSummary = function(){
             me.disciplineIncidents.disciplineIncident = [me.disciplineIncidents.disciplineIncident];
 
         }
+
+        me.disciplineIncidents.disciplineIncident.forEach(function(discipline) {
+
+            mm = moment(new Date(discipline.incidentDate));
+
+            discipline.incidentDateTime = mm.valueOf();
+
+            if(allDates.indexOf(discipline.incidentDateTime) === -1) {
+                allDates.push(discipline.incidentDateTime);
+            }
+
+        });
+
+        var maxIncidentDate = moment(_.max(allDates));
+
+        lastMonth = maxIncidentDate.month();
 
         me.disciplineIncidents.disciplineIncident.forEach(function(discipline){
 
@@ -1057,7 +1087,13 @@ Attendance.prototype.calculateSummary = function(){
 
                     n.push(m);
 
-                    me.currentSummary.behavior++;
+                    incident++;
+
+                    if(mm.month() === lastMonth){
+
+                        lastMonthIncident++;
+
+                    }
 
                 }
 
@@ -1072,7 +1108,9 @@ Attendance.prototype.calculateSummary = function(){
      */
 
     me.currentSummary.attendance.absents.attendanceAcademicYear = attendance;
-    me.currentSummary.attendance.absents.lastMontAttendance = lastMonthAttendance;
+    me.currentSummary.attendance.absents.lastMonthAttendance = lastMonthAttendance;
+    me.currentSummary.behavior.incidents.incidentAcademicYear = incident;
+    me.currentSummary.behavior.incidents.lastMonthIncident = lastMonthIncident;
 
     return me._thresholdAcademic();
 
@@ -1115,10 +1153,10 @@ Attendance.prototype._threshold = function(){
     var absents = this.currentSummary.attendance.absents;
     var totalAlerts = 0;
 
-    if(absents.lastMontAttendance >= 2 && absents.lastMontAttendance <= 6){
+    if(absents.lastMonthAttendance >= 2 && absents.lastMonthAttendance <= 6){
         error1 = WARNING;
         totalAlerts++;
-    } else if(absents.lastMontAttendance >= 4){
+    } else if(absents.lastMonthAttendance >= 4){
         error1 = DANGER;
         totalAlerts++;
     }
@@ -1147,7 +1185,8 @@ Attendance.prototype._threshold = function(){
         }
     }
 
-    return this.currentSummary;
+    return this._thresholdBehavior()
+                .currentSummary;
 };
 /**
  *
@@ -1167,10 +1206,10 @@ Attendance.prototype._thresholdAcademic = function(){
     var absents = this.currentSummary.attendance.absents;
     var totalAlerts = 0;
 
-    if(absents.lastMontAttendance >= 2 && absents.lastMontAttendance <= 6){
+    if(absents.lastMonthAttendance >= 2 && absents.lastMonthAttendance <= 6){
         error1 = WARNING;
         totalAlerts++;
-    } else if(absents.lastMontAttendance >= 4){
+    } else if(absents.lastMonthAttendance >= 4){
         error1 = DANGER;
         totalAlerts++;
     }
@@ -1189,10 +1228,10 @@ Attendance.prototype._thresholdAcademic = function(){
     var days = '';
     if(error1 !== SUCCESS){
         days = 'day';
-        if(absents.lastMontAttendance > 1){
+        if(absents.lastMonthAttendance > 1){
             days += 's';
         }
-        this.currentSummary.attendance.notes.items.push('Student has missed '+absents.lastMontAttendance+' '+ days +' in the latest month of which we have data.');
+        this.currentSummary.attendance.notes.items.push('Student has missed '+absents.lastMonthAttendance+' '+ days +' in the latest month of which we have data.');
     }
     if(error2 !== SUCCESS){
         days = 'day';
@@ -1202,7 +1241,49 @@ Attendance.prototype._thresholdAcademic = function(){
         this.currentSummary.attendance.notes.items.push('Student has missed '+absents.attendanceAcademicYear+' '+ days +' in the current academic year.');
     }
 
-    return this.currentSummary;
+    return this._thresholdBehavior()
+                .currentSummary;
+};
+/**
+ *
+ * @returns {Attendance}
+ * @private
+ */
+Attendance.prototype._thresholdBehavior = function(){
+
+    var error1 = SUCCESS;
+    var error2 = SUCCESS;
+    var incidents = this.currentSummary.behavior.incidents;
+    var totalAlerts = 0;
+
+    if(incidents.lastMonthIncident > 0){
+        error1 = DANGER;
+    }
+
+    if(incidents.behaviorAcademicYear > 0){
+        error2 = DANGER;
+    }
+
+    this.currentSummary.behavior.flag = error2;
+
+    this.currentSummary.behavior.notes.title = null;
+    var days = '';
+    if(error1 !== SUCCESS){
+        days = 'incident';
+        if(incidents.lastMonthIncident > 1){
+            days += 's';
+        }
+        this.currentSummary.behavior.notes.items.push('Student has '+incidents.lastMonthIncident+' '+ days +' in the latest month of which we have data.');
+    }
+    if(error2 !== SUCCESS){
+        days = 'incident';
+        if(incidents.behaviorAcademicYear > 1){
+            days += 's';
+        }
+        this.currentSummary.behavior.notes.items.push('Student has '+incidents.behaviorAcademicYear+' '+ days +' in the current academic year.');
+    }
+
+    return this;
 };
 /**
  *
