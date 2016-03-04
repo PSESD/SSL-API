@@ -248,7 +248,9 @@ StudentController.getStudentsBackpack = function(req, res){
                 return res.sendSuccess(null, resource.toJSON());
 
             }
-
+            /**
+             * Set personal
+             */
             results.personal.collageBound = _.isUndefined(student.college_bound) ? "N/A" : student.college_bound;
             results.personal.phone = _.isUndefined(student.phone) ? "N/A" : student.phone;
             results.personal.email = _.isUndefined(student.email) ? "N/A" : student.email;
