@@ -34,7 +34,7 @@ ApplicationController.get = function (req, res) {
 
     var orgId = req.params.organizationId;
 
-    Client.find({ redirectUri: redirectUri(req) }, function (err, clients) {
+    Client.find({ id: { $regex: '^' + orgId + '_', $options: 'i' } }, function (err, clients) {
 
         if (err)  { return res.sendError(err); }
 
