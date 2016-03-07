@@ -1274,7 +1274,7 @@ Attendance.prototype._thresholdBehavior = function(){
     if(incidents.behaviorAcademicYear > 1){
         days += 's';
     }
-    this.currentSummary.behavior.notes.items.push('Student has '+(incidents.behaviorAcademicYear === 0 ? 'zero' : incidents.behaviorAcademicYear)+' '+ days +' in the current academic year.');
+    this.currentSummary.behavior.notes.items.push('Student has '+(incidents.incidentAcademicYear === 0 ? 'zero' : incidents.incidentAcademicYear)+' '+ days +' in the current academic year.');
 
     return this;
 };
