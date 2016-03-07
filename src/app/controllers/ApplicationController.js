@@ -47,7 +47,8 @@ ApplicationController.get = function (req, res) {
                     app_name: client.name,
                     created_by: client.created_by,
                     created: client.created,
-                    email: u.email
+                    email: u.email,
+                    callback_url: client.redirectUri
                 });
 
             });
