@@ -167,6 +167,7 @@ function Attendance(xsre){
     }
 
     this.notAvailable = 'N/A';
+    //this.notAvailable = '';
 
     this.currentSummary = null;
 
@@ -473,12 +474,12 @@ Attendance.prototype.getAttendances = function(){
         weeklyChange = null;
 
         summary = [
-            { name: 'SU', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'M', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'T', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'W', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'TH', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'F', value: me.notAvailable, date: me.notAvailable, periods: [] },
+            { name: 'SA', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'S', value: me.notAvailable, date: me.notAvailable, periods: [] }
         ];
 
@@ -494,12 +495,12 @@ Attendance.prototype.getAttendances = function(){
             weekDate: ikey,
             summary: {
                 title: ikey,
-                SU: me.notAvailable,
                 M: me.notAvailable,
                 T: me.notAvailable,
                 W: me.notAvailable,
                 TH: me.notAvailable,
                 F: me.notAvailable,
+                SA: me.notAvailable,
                 S: me.notAvailable,
                 weeklyChange: me.notAvailable
             },
@@ -507,12 +508,12 @@ Attendance.prototype.getAttendances = function(){
             details: [],
             periods: [],
             behaviors: {
-                SU: [],
                 M: [],
                 T: [],
                 W: [],
                 TH: [],
                 F: [],
+                SA: [],
                 S: []
             },
             legend: {
@@ -528,12 +529,12 @@ Attendance.prototype.getAttendances = function(){
 
         var calendar = {
             title: behavior.weekDate,
-            SU: me.notAvailable,
             M: me.notAvailable,
             T: me.notAvailable,
             W: me.notAvailable,
             TH: me.notAvailable,
             F: me.notAvailable,
+            SA: me.notAvailable,
             S: me.notAvailable,
             weeklyChange: me.notAvailable
         };
@@ -547,12 +548,12 @@ Attendance.prototype.getAttendances = function(){
             var nday = day.isISO ? day.dayISO() : day.day();
 
             var ndays = [
-                'SU',
                 'M',
                 'T',
                 'W',
                 'TH',
                 'F',
+                'SA',
                 'S'
             ];
 
@@ -654,17 +655,17 @@ Attendance.prototype.getAttendances = function(){
 
             var b = {
                 title: p,
-                SU: { value: me.notAvailable, event: null, slug: '' },
                 M: { value: me.notAvailable, event: null, slug: '' },
                 T: { value: me.notAvailable, event: null, slug: '' },
                 W: { value: me.notAvailable, event: null, slug: '' },
                 TH: { value: me.notAvailable, event: null, slug: '' },
                 F: { value: me.notAvailable, event: null, slug: '' },
+                SA: { value: me.notAvailable, event: null, slug: '' },
                 S: { value: me.notAvailable, event: null, slug: '' }
             }, title = null;
 
 
-            ['SU', 'M', 'T', 'W', 'TH', 'F', 'S'].forEach(function(column){
+            ['M', 'T', 'W', 'TH', 'F', 'SA', 'S'].forEach(function(column){
 
                 if((column in collects) && !_.isEmpty(collects[column].periods)){
 
@@ -699,12 +700,12 @@ Attendance.prototype.getAttendances = function(){
 
         behavior.detailColumns = {
             periods: [],
-            SU: [],
             M: [],
             T: [],
             W: [],
             TH: [],
             F: [],
+            SA: [],
             S: [],
             weeklyChange: []
         };
@@ -713,12 +714,12 @@ Attendance.prototype.getAttendances = function(){
 
             behavior.periods.push(columns[c].title);
             behavior.detailColumns.periods.push(columns[c].title);
-            behavior.detailColumns.SU.push(columns[c].SU);
             behavior.detailColumns.M.push(columns[c].M);
             behavior.detailColumns.T.push(columns[c].T);
             behavior.detailColumns.W.push(columns[c].W);
             behavior.detailColumns.TH.push(columns[c].TH);
             behavior.detailColumns.F.push(columns[c].F);
+            behavior.detailColumns.SA.push(columns[c].SA);
             behavior.detailColumns.S.push(columns[c].S);
             behavior.detailColumns.weeklyChange.push(columns[c].weeklyChange);
 
@@ -1255,7 +1256,7 @@ Attendance.prototype._thresholdBehavior = function(){
         error1 = DANGER;
     }
 
-    if(incidents.behaviorAcademicYear > 0){
+    if(incidents.incidentAcademicYear > 0){
         error2 = DANGER;
     }
 
@@ -1270,7 +1271,7 @@ Attendance.prototype._thresholdBehavior = function(){
     this.currentSummary.behavior.notes.items.push('Student has '+(incidents.lastMonthIncident === 0 ? 'zero' : incidents.lastMonthIncident ) +' '+ days +' in the latest term of which we have data.');
 
     days = 'incident';
-    if(incidents.behaviorAcademicYear > 1){
+    if(incidents.incidentAcademicYear > 1){
         days += 's';
     }
     this.currentSummary.behavior.notes.items.push('Student has '+(incidents.incidentAcademicYear === 0 ? 'zero' : incidents.incidentAcademicYear)+' '+ days +' in the current academic year.');

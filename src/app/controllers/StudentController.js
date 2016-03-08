@@ -251,29 +251,29 @@ StudentController.getStudentsBackpack = function(req, res){
             /**
              * Set personal
              */
-            results.personal.collegeBound = _.isUndefined(student.college_bound) ? "N/A" : student.college_bound;
-            results.personal.phone = _.isUndefined(student.phone) ? "N/A" : student.phone;
-            results.personal.email = _.isUndefined(student.email) ? "N/A" : student.email;
-            results.personal.firstName = _.isUndefined(student.first_name) ? "N/A" : student.first_name;
-            results.personal.lastName = _.isUndefined(student.last_name) ? "N/A" : student.last_name;
-            results.personal.middleName = _.isUndefined(student.middle_name) ? "N/A" : student.middle_name;
-            results.personal.schoolDistrict = _.isUndefined(student.school_district) ? "N/A" : student.school_district;
-            results.personal.address = _.isUndefined(student.address) ? "N/A" : student.address;
+            results.personal.collegeBound = _.isUndefined(student.college_bound) ? /*"N/A"*/"" : student.college_bound;
+            results.personal.phone = _.isUndefined(student.phone) ? /*"N/A"*/"" : student.phone;
+            results.personal.email = _.isUndefined(student.email) ? /*"N/A"*/"" : student.email;
+            results.personal.firstName = _.isUndefined(student.first_name) ? /*"N/A"*/"" : student.first_name;
+            results.personal.lastName = _.isUndefined(student.last_name) ? /*"N/A"*/"" : student.last_name;
+            results.personal.middleName = _.isUndefined(student.middle_name) ? /*"N/A"*/"" : student.middle_name;
+            results.personal.schoolDistrict = _.isUndefined(student.school_district) ? /*"N/A"*/"" : student.school_district;
+            results.personal.address = _.isUndefined(student.address) ? /*"N/A"*/"" : student.address;
 
             results.personal.emergency1 = {
-                name: _.isUndefined(student.emergency1_name) ? "N/A" : student.emergency1_name,
-                relationship: _.isUndefined(student.emergency1_relationship) ? "N/A" : student.emergency1_relationship,
-                email: _.isUndefined(student.emergency1_email) ? "N/A" : student.emergency1_email,
-                phone: _.isUndefined(student.emergency1_phone) ? "N/A" : student.emergency1_phone,
-                mentor: _.isUndefined(student.mentor1_name) ? "N/A" : student.mentor1_name
+                name: _.isUndefined(student.emergency1_name) ? /*"N/A"*/"" : student.emergency1_name,
+                relationship: _.isUndefined(student.emergency1_relationship) ? /*"N/A"*/"" : student.emergency1_relationship,
+                email: _.isUndefined(student.emergency1_email) ? /*"N/A"*/"" : student.emergency1_email,
+                phone: _.isUndefined(student.emergency1_phone) ? /*"N/A"*/"" : student.emergency1_phone,
+                mentor: _.isUndefined(student.mentor1_name) ? /*"N/A"*/"" : student.mentor1_name
             };
 
             results.personal.emergency2 = {
-                name: _.isUndefined(student.emergency2_name) ? "N/A" : student.emergency2_name,
-                relationship: _.isUndefined(student.emergency2_relationship) ? "N/A" : student.emergency2_relationship,
-                email: _.isUndefined(student.emergency2_email) ? "N/A" : student.emergency2_email,
-                phone: _.isUndefined(student.emergency2_phone) ? "N/A" : student.emergency2_phone,
-                mentor: _.isUndefined(student.mentor2_name) ? "N/A" : student.mentor2_name
+                name: _.isUndefined(student.emergency2_name) ? /*"N/A"*/"" : student.emergency2_name,
+                relationship: _.isUndefined(student.emergency2_relationship) ? /*"N/A"*/"" : student.emergency2_relationship,
+                email: _.isUndefined(student.emergency2_email) ? /*"N/A"*/"" : student.emergency2_email,
+                phone: _.isUndefined(student.emergency2_phone) ? /*"N/A"*/"" : student.emergency2_phone,
+                mentor: _.isUndefined(student.mentor2_name) ? /*"N/A"*/"" : student.mentor2_name
             };
 
             if(showRaw){
@@ -881,12 +881,12 @@ StudentController.getStudents = function(req, res){
                 var newObject = student.toObject();
 
                 newObject.xsre = {
-                    "gradeLevel": "N/A",
-                    "schoolYear": "N/A",
-                    "schoolName": "N/A",
-                    "attendance": "N/A",
+                    "gradeLevel": /*"N/A"*/"",
+                    "schoolYear": /*"N/A"*/"",
+                    "schoolName": /*"N/A"*/"",
+                    "attendance": /*"N/A"*/"",
                     "behavior": 0,
-                    "onTrackToGraduate": "N/A"
+                    "onTrackToGraduate": /*"N/A"*/""
                 };
 
                 cache.get(key + '_' + student._id, function(err, std){
