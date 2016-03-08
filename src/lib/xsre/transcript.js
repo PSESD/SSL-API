@@ -53,7 +53,8 @@ function Transcript(xsre){
 
     me.course = {};
 
-    me.notAvailable = 'N/A';
+    //me.notAvailable = 'N/A';
+    me.notAvailable = '';
 
     me.summary = {
         totalCreditsEarned: 0,
@@ -192,54 +193,52 @@ Transcript.prototype.getTranscript = function(){
 
             }
 
-            if(histories.indexOf(schoolName+':'+schoolYear) === -1){
+            var his = { schoolName: schoolName, schoolYear: schoolYear };
 
-                var his = { schoolName: schoolName, schoolYear: schoolYear };
+            var status = null;
 
-                var status = null;
+            var description = null;
 
-                var description = null;
+            if('enrollmentStatus' in enrollment){
 
-                if('enrollmentStatus' in enrollment){
+                status = enrollment.enrollmentStatus || me.notAvailable;
 
-                    status = enrollment.enrollmentStatus || me.notAvailable;
+            } else if('psesd:enrollmentStatus' in enrollment){
 
-                } else if('psesd:enrollmentStatus' in enrollment){
-
-                    status = enrollment['psesd:enrollmentStatus'] || me.notAvailable;
-
-                }
-
-                if(status && 'EnrollmentStatus' in me.config && status in me.config.EnrollmentStatus){
-
-                    description = l.get(me.config.EnrollmentStatus[status], 'description') || me.notAvailable;
-
-                } else {
-
-                    description = me.notAvailable;
-
-                }
-
-                his.currentSchool = l.get(enrollment, 'school.schoolName') || me.notAvailable;
-                his.expectedGraduationYear = l.get(enrollment, 'projectedGraduationYear') || me.notAvailable;
-                his.gradeLevel = l.get(enrollment, 'gradeLevel') || me.notAvailable;
-                his.entryDate = l.get(enrollment, 'entryDate') || me.notAvailable;
-                his.exitDate = l.get(enrollment, 'exitDate') || me.notAvailable;
-                his.status = status || me.notAvailable;
-                his.description = description || me.notAvailable;
-                if(his.entryDate !== me.notAvailable){
-                    his.entryDate = moment(his.entryDate).format('MM/DD/YYYY');
-                }
-                if(his.exitDate !== me.notAvailable){
-                    his.exitDate = moment(his.exitDate).format('MM/DD/YYYY');
-                }
-
-                me.history.push(his);
-
-                histories.push(schoolName+':'+schoolYear);
+                status = enrollment['psesd:enrollmentStatus'] || me.notAvailable;
 
             }
 
+            if(status && 'EnrollmentStatus' in me.config && status in me.config.EnrollmentStatus){
+
+                description = l.get(me.config.EnrollmentStatus[status], 'description') || me.notAvailable;
+
+            } else {
+
+                description = me.notAvailable;
+
+            }
+
+            his.currentSchool = l.get(enrollment, 'school.schoolName') || me.notAvailable;
+            his.expectedGraduationYear = l.get(enrollment, 'projectedGraduationYear') || me.notAvailable;
+            his.gradeLevel = l.get(enrollment, 'gradeLevel') || me.notAvailable;
+            his.entryDate = l.get(enrollment, 'entryDate') || me.notAvailable;
+            his.exitDate = l.get(enrollment, 'exitDate') || me.notAvailable;
+            his.status = status || me.notAvailable;
+            his.description = description || me.notAvailable;
+            if(his.entryDate !== me.notAvailable){
+                his.entryDate = moment(his.entryDate).format('MM/DD/YYYY');
+            }
+            if(his.exitDate !== me.notAvailable){
+                his.exitDate = moment(his.exitDate).format('MM/DD/YYYY');
+                his.exitDateTime = moment(his.exitDate).valueOf();
+            }
+
+            if('projectedGraduationYear' in enrollment){
+                //current enrollment
+            } else{
+                me.history.push(his);
+            }
 
         });
 
@@ -315,7 +314,7 @@ Transcript.prototype.getTranscript = function(){
     }
 
     return {
-        history: _.sortBy(me.history, 'schoolYear').reverse(),
+        history: _.sortBy(me.history, 'exitDateTime').reverse(),
         details: me.course,
         credits: me.credits,
         subject: subjectModified,

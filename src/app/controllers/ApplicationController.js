@@ -34,7 +34,7 @@ ApplicationController.get = function (req, res) {
 
     var orgId = req.params.organizationId;
 
-    Client.find({ redirectUri: redirectUri(req) }, function (err, clients) {
+    Client.find({ id: { $regex: '^' + orgId + '_', $options: 'i' } }, function (err, clients) {
 
         if (err)  { return res.sendError(err); }
 
@@ -47,7 +47,8 @@ ApplicationController.get = function (req, res) {
                     app_name: client.name,
                     created_by: client.created_by,
                     created: client.created,
-                    email: u.email
+                    email: u.email,
+                    callback_url: client.redirectUri
                 });
 
             });
@@ -115,6 +116,8 @@ ApplicationController.post = function (req, res) {
 
     var userId = req.body.user_id;
 
+    var callbackUrl = req.body.callback_url;
+
     var secret = utils.tokenHash(utils.uid(12));
 
     Organization.findOne({ _id: ObjectId(orgId)}, function(err, organization){
@@ -128,7 +131,7 @@ ApplicationController.post = function (req, res) {
             id: clientId,
             userId: userId,
             secret: secret,
-            redirectUri: redirectUri(req),
+            redirectUri: callbackUrl || redirectUri(req),
             created_by: req.user.userId
         });
 

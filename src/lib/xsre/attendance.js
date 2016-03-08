@@ -167,6 +167,7 @@ function Attendance(xsre){
     }
 
     this.notAvailable = 'N/A';
+    //this.notAvailable = '';
 
     this.currentSummary = null;
 
@@ -179,6 +180,7 @@ function Attendance(xsre){
     this.legend.other = this.facets.EarlyDeparture;
     this.legend.unknown = this.facets.Unknown;
     this.extractRawSource = xsre.extractRawSource;
+    this.maxEventDate = null;
 
 }
 /**
@@ -477,7 +479,9 @@ Attendance.prototype.getAttendances = function(){
             { name: 'T', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'W', value: me.notAvailable, date: me.notAvailable, periods: [] },
             { name: 'TH', value: me.notAvailable, date: me.notAvailable, periods: [] },
-            { name: 'F', value: me.notAvailable, date: me.notAvailable, periods: [] }
+            { name: 'F', value: me.notAvailable, date: me.notAvailable, periods: [] },
+            { name: 'SA', value: me.notAvailable, date: me.notAvailable, periods: [] },
+            { name: 'S', value: me.notAvailable, date: me.notAvailable, periods: [] }
         ];
 
         var legend = {
@@ -497,6 +501,8 @@ Attendance.prototype.getAttendances = function(){
                 W: me.notAvailable,
                 TH: me.notAvailable,
                 F: me.notAvailable,
+                SA: me.notAvailable,
+                S: me.notAvailable,
                 weeklyChange: me.notAvailable
             },
             detailColumns: [],
@@ -507,7 +513,9 @@ Attendance.prototype.getAttendances = function(){
                 T: [],
                 W: [],
                 TH: [],
-                F: []
+                F: [],
+                SA: [],
+                S: []
             },
             legend: {
                 present: [],
@@ -517,6 +525,7 @@ Attendance.prototype.getAttendances = function(){
                 unexcused: []
             },
             weeklyChange: me.notAvailable,
+            weeklyStatus: null,
             raw: {}
         };
 
@@ -527,6 +536,8 @@ Attendance.prototype.getAttendances = function(){
             W: me.notAvailable,
             TH: me.notAvailable,
             F: me.notAvailable,
+            SA: me.notAvailable,
+            S: me.notAvailable,
             weeklyChange: me.notAvailable
         };
 
@@ -543,7 +554,9 @@ Attendance.prototype.getAttendances = function(){
                 'T',
                 'W',
                 'TH',
-                'F'
+                'F',
+                'SA',
+                'S'
             ];
 
             if(summary[nday] === undefined) {
@@ -622,20 +635,6 @@ Attendance.prototype.getAttendances = function(){
 
             }
 
-            //if(s.periods.length > 0) {
-            //
-            //    s.periods.forEach(function(p){
-            //
-            //        if(p.period !== me.notAvailable && periodsColumns.indexOf(p.period) === -1){
-            //
-            //            periodsColumns.push(p.period);
-            //
-            //        }
-            //
-            //    });
-            //
-            //}
-
         });
 
         if(maxDay.length > 0){
@@ -662,11 +661,13 @@ Attendance.prototype.getAttendances = function(){
                 T: { value: me.notAvailable, event: null, slug: '' },
                 W: { value: me.notAvailable, event: null, slug: '' },
                 TH: { value: me.notAvailable, event: null, slug: '' },
-                F: { value: me.notAvailable, event: null, slug: '' }
+                F: { value: me.notAvailable, event: null, slug: '' },
+                SA: { value: me.notAvailable, event: null, slug: '' },
+                S: { value: me.notAvailable, event: null, slug: '' }
             }, title = null;
 
 
-            ['M', 'T', 'W', 'TH', 'F'].forEach(function(column){
+            ['M', 'T', 'W', 'TH', 'F', 'SA', 'S'].forEach(function(column){
 
                 if((column in collects) && !_.isEmpty(collects[column].periods)){
 
@@ -706,14 +707,12 @@ Attendance.prototype.getAttendances = function(){
             W: [],
             TH: [],
             F: [],
+            SA: [],
+            S: [],
             weeklyChange: []
         };
 
         for(var c = 0; c < columns.length; c++){
-
-            //if(columns[c].M.value === me.notAvailable && !columns[c].M.event && columns[c].T.value === me.notAvailable && !columns[c].T.event && columns[c].W.value === me.notAvailable && !columns[c].W.event && columns[c].TH.value === me.notAvailable && !columns[c].TH.event && columns[c].F.value === me.notAvailable && !columns[c].F.event){
-            //    continue;
-            //}
 
             behavior.periods.push(columns[c].title);
             behavior.detailColumns.periods.push(columns[c].title);
@@ -722,6 +721,8 @@ Attendance.prototype.getAttendances = function(){
             behavior.detailColumns.W.push(columns[c].W);
             behavior.detailColumns.TH.push(columns[c].TH);
             behavior.detailColumns.F.push(columns[c].F);
+            behavior.detailColumns.SA.push(columns[c].SA);
+            behavior.detailColumns.S.push(columns[c].S);
             behavior.detailColumns.weeklyChange.push(columns[c].weeklyChange);
 
         }
@@ -731,9 +732,20 @@ Attendance.prototype.getAttendances = function(){
 
         behavior.raw.lastWeeklyChange = lastWeeklyChange;
 
+
         if(lastWeeklyChange !== me.notAvailable && lastWeeklyChange > 0 && !isNaN(weeklyChange)){
 
             behavior.weeklyChange = weeklyChange - lastWeeklyChange;
+
+            if(lastWeeklyChange < weeklyChange){
+
+                behavior.weeklyStatus = 'increase';
+
+            } else {
+
+                behavior.weeklyStatus = 'decrease';
+
+            }
 
         } else {
 
@@ -927,6 +939,11 @@ Attendance.prototype.calculateSummary = function(){
     var lastMonthIncident = 0;
 
     me.currentSummary = {
+        date: {
+            min: null,
+            max: null,
+            latest: null
+        },
         attendance: {
             flag: SUCCESS,
             absents: {
@@ -977,6 +994,11 @@ Attendance.prototype.calculateSummary = function(){
         });
 
         var maxDate = moment(_.max(allDates));
+        var minDate = moment(_.min(allDates));
+
+        me.currentSummary.date.latest = maxDate.format('MM/DD/YYYY');
+        me.currentSummary.date.min = minDate.valueOf();
+        me.currentSummary.date.max = maxDate.valueOf();
 
         lastMonth = maxDate.month();
 
@@ -1025,8 +1047,6 @@ Attendance.prototype.calculateSummary = function(){
 
                         }
 
-
-
                     }
 
                 }
@@ -1037,7 +1057,7 @@ Attendance.prototype.calculateSummary = function(){
 
     }
     //console.log((function(s){var t={};Object.keys(s).sort().reverse().forEach(function(k){t[k]=s[k]});return t;})(c));
-    //console.log(me.academicStart.format('YYYY-MM-DD'), me.academicEnd.format('YYYY-MM-DD'), c);
+    //console.log(me.academicStart.format('YY-MM-DD'), me.academicEnd.format('YY-MM-DD'), c);
     allDates = [];
     if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
 
@@ -1081,7 +1101,7 @@ Attendance.prototype.calculateSummary = function(){
 
             if(passed && mm.isValid()){
 
-                var m = mm.format('YYYY-MM-DD');
+                var m = mm.format('YY-MM-DD');
 
                 if(n.indexOf(m) === -1){
 
@@ -1145,6 +1165,7 @@ Attendance.prototype.calculateSummary = function(){
  * - Student missed 0 days in the last month
  * - Student missed 0 days in the current academic year
  * flag: OK
+ * @deprecated
  */
 Attendance.prototype._threshold = function(){
 
@@ -1256,7 +1277,7 @@ Attendance.prototype._thresholdBehavior = function(){
         error1 = DANGER;
     }
 
-    if(incidents.behaviorAcademicYear > 0){
+    if(incidents.incidentAcademicYear > 0){
         error2 = DANGER;
     }
 
@@ -1271,10 +1292,10 @@ Attendance.prototype._thresholdBehavior = function(){
     this.currentSummary.behavior.notes.items.push('Student has '+(incidents.lastMonthIncident === 0 ? 'zero' : incidents.lastMonthIncident ) +' '+ days +' in the latest term of which we have data.');
 
     days = 'incident';
-    if(incidents.behaviorAcademicYear > 1){
+    if(incidents.incidentAcademicYear > 1){
         days += 's';
     }
-    this.currentSummary.behavior.notes.items.push('Student has '+(incidents.behaviorAcademicYear === 0 ? 'zero' : incidents.behaviorAcademicYear)+' '+ days +' in the current academic year.');
+    this.currentSummary.behavior.notes.items.push('Student has '+(incidents.incidentAcademicYear === 0 ? 'zero' : incidents.incidentAcademicYear)+' '+ days +' in the current academic year.');
 
     return this;
 };
@@ -1297,6 +1318,22 @@ Attendance.prototype.print = function(message){
     console.log(require('prettyjson').render(message));
 
 };
+/**
+ *
+ * @returns {number|*}
+ */
+Attendance.prototype.getMaxDateCalendarTime = function(){
+    return this.maxDateCalendar;
+};
+/**
+ *
+ * @returns {number|*}
+ */
+Attendance.prototype.getMinDateCalendarTime = function(){
+    return this.minDateCalendar;
+};
+
+
 
 /**
  *

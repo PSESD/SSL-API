@@ -20,7 +20,8 @@ function Personal(xsre){
 
     me.personal = {};
 
-    me.notAvailable = 'N/A';
+    //me.notAvailable = 'N/A';
+    me.notAvailable = '';
 
 
 }
@@ -112,6 +113,17 @@ Personal.prototype.getPersonal = function(){
     me.personal.languageHome = me.notAvailable;
     if(_.isArray(languages) && languages.length > 1){
         me.personal.languageHome = l.get(languages[1], 'code') || me.notAvailable;
+    }
+
+    if(me.personal.languageHome && me.personal.languageHome !== me.notAvailable){
+
+        var code = l.find(me.config.languageCode, function(o){
+            return o.value === me.personal.languageHome;
+        });
+        if(code && code.description){
+            me.personal.languageHome = code.description;
+        }
+
     }
 
     return me.personal;
