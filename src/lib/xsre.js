@@ -161,7 +161,9 @@ xSre.prototype.getStudentSummary = function(){
         schoolName: null,
         attendance: null,
         behavior: null,
-        onTrackToGraduate: null
+        onTrackToGraduate: null,
+        latestDate: null,
+        latestDateTime: null
     };
 
     var json = this.getJson();
@@ -178,6 +180,9 @@ xSre.prototype.getStudentSummary = function(){
 
     summary.attendance = attendance.getCurrentTotalAttendance();
     summary.behavior = attendance.getCurrentTotalBehavior();
+    var attendanceSummary = attendance.calculateSummary();
+    summary.latestDate = attendanceSummary.date.latest;
+    summary.latestDateTime = attendanceSummary.date.max;
     summary.onTrackToGraduate = null;
 
     var academicSummary = _.get(json, 'transcriptTerm.academicSummary');

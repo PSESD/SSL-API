@@ -34,8 +34,8 @@ fs.readFile(xmlFile, function(err, data) {
 
         //new xSre(result).getAttendanceBehavior().getAttendances();
         //console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().getAttendances()), color);
-        console.log(JSON.stringify(new xSre(result).getAttendanceBehavior().getAttendances()));
-        //console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().calculateSummary()));
+        //console.log(JSON.stringify(new xSre(result).getAttendanceBehavior().getAttendances()));
+        console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().calculateSummary()));
     });
 
 });

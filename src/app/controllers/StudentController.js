@@ -18,7 +18,6 @@ var hal = require('hal');
 var xSre = require('../../lib/xsre');
 var async = require('async');
 var prefixListStudent = '_xsre_list_students_';
-
 /**
  * Get the list of all organizations that this user have access to in our system.
  * @param req
@@ -783,6 +782,23 @@ StudentController.getStudents = function(req, res){
 
     var orgId = ObjectId(req.params.organizationId);
 
+    /**
+     * Finding summary
+     */
+    if(req.query.summary){
+
+        cache.get('summary_student_list_date_' + orgId, function(err, results){
+
+            if(err){
+                return res.sendError(err);
+            }
+
+            return res.sendSuccess(null, results);
+
+        });
+        return;
+    }
+
     var crit = Student.crit(req.query, ['organization']);
 
     var withNoXsre = parseInt(req.query.noxsre) > 0;
@@ -886,7 +902,8 @@ StudentController.getStudents = function(req, res){
                     "schoolName": /*"N/A"*/"",
                     "attendance": /*"N/A"*/"",
                     "behavior": 0,
-                    "onTrackToGraduate": /*"N/A"*/""
+                    "onTrackToGraduate": /*"N/A"*/"",
+                    "latestDate": ""
                 };
 
                 cache.get(key + '_' + student._id, function(err, std){

@@ -180,6 +180,7 @@ function Attendance(xsre){
     this.legend.other = this.facets.EarlyDeparture;
     this.legend.unknown = this.facets.Unknown;
     this.extractRawSource = xsre.extractRawSource;
+    this.maxEventDate = null;
 
 }
 /**
@@ -524,6 +525,7 @@ Attendance.prototype.getAttendances = function(){
                 unexcused: []
             },
             weeklyChange: me.notAvailable,
+            weeklyStatus: null,
             raw: {}
         };
 
@@ -730,9 +732,20 @@ Attendance.prototype.getAttendances = function(){
 
         behavior.raw.lastWeeklyChange = lastWeeklyChange;
 
+
         if(lastWeeklyChange !== me.notAvailable && lastWeeklyChange > 0 && !isNaN(weeklyChange)){
 
             behavior.weeklyChange = weeklyChange - lastWeeklyChange;
+
+            if(lastWeeklyChange < weeklyChange){
+
+                behavior.weeklyStatus = 'increase';
+
+            } else {
+
+                behavior.weeklyStatus = 'decrease';
+
+            }
 
         } else {
 
@@ -926,6 +939,11 @@ Attendance.prototype.calculateSummary = function(){
     var lastMonthIncident = 0;
 
     me.currentSummary = {
+        date: {
+            min: null,
+            max: null,
+            latest: null
+        },
         attendance: {
             flag: SUCCESS,
             absents: {
@@ -976,6 +994,11 @@ Attendance.prototype.calculateSummary = function(){
         });
 
         var maxDate = moment(_.max(allDates));
+        var minDate = moment(_.min(allDates));
+
+        me.currentSummary.date.latest = maxDate.format('MM/DD/YYYY');
+        me.currentSummary.date.min = minDate.valueOf();
+        me.currentSummary.date.max = maxDate.valueOf();
 
         lastMonth = maxDate.month();
 
@@ -1023,8 +1046,6 @@ Attendance.prototype.calculateSummary = function(){
                             }
 
                         }
-
-
 
                     }
 
@@ -1297,6 +1318,22 @@ Attendance.prototype.print = function(message){
     console.log(require('prettyjson').render(message));
 
 };
+/**
+ *
+ * @returns {number|*}
+ */
+Attendance.prototype.getMaxDateCalendarTime = function(){
+    return this.maxDateCalendar;
+};
+/**
+ *
+ * @returns {number|*}
+ */
+Attendance.prototype.getMinDateCalendarTime = function(){
+    return this.minDateCalendar;
+};
+
+
 
 /**
  *
