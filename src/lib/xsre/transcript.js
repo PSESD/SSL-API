@@ -348,7 +348,7 @@ Transcript.prototype.getTranscript = function(){
         currentSchoolId = history.schoolId;
         return history;
     });
-    
+
     return {
         history: historiesPromotionChanges.reverse(),
         details: me.course,
