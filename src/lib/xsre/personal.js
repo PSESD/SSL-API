@@ -67,6 +67,7 @@ Personal.prototype.getPersonal = function(){
         entryDate: null,
         exitDate: null
     };
+    me.personal.languages = [];
     me.personal.enrollment.schoolYear = l.get(me.xSre, 'enrollment.schoolYear') || me.notAvailable;
     me.personal.enrollment.currentSchool = l.get(me.xSre, 'enrollment.school.schoolName') || me.notAvailable;
     me.personal.enrollment.expectedGraduationYear = l.get(me.xSre, 'enrollment.projectedGraduationYear') || me.notAvailable;
@@ -105,24 +106,26 @@ Personal.prototype.getPersonal = function(){
     me.personal.eligibilityStatus = l.get(me.xSre, 'programs.foodService.eligibilityStatus') || me.notAvailable;
     me.personal.enrollmentStatus = l.get(me.xSre, 'programs.foodService.enrollmentStatus') || me.notAvailable;
     var specialEducationServices = l.get(me.xSre, 'programs.specialEducation.services');
+
     if(_.isArray(specialEducationServices)){
         specialEducationServices = specialEducationServices[0];
     }
     me.personal.ideaIndicator = l.get(specialEducationServices, 'service.ideaIndicator') || me.notAvailable;
     var languages = l.get(me.xSre, 'languages.language');
-    me.personal.languageHome = me.notAvailable;
+
     if(_.isArray(languages) && languages.length > 1){
-        me.personal.languageHome = l.get(languages[1], 'code') || me.notAvailable;
-    }
 
-    if(me.personal.languageHome && me.personal.languageHome !== me.notAvailable){
+        languages.forEach(function(language){
+            var newLang = { type: language.type, code: language.code, description: "" };
+            var code = l.find(me.config.languageCode, function(o){
+                return o.value === language.code;
+            });
+            if(code && code.description){
+                newLang.description = code.description;
+            }
 
-        var code = l.find(me.config.languageCode, function(o){
-            return o.value === me.personal.languageHome;
+            me.personal.languages.push(newLang);
         });
-        if(code && code.description){
-            me.personal.languageHome = code.description;
-        }
 
     }
 

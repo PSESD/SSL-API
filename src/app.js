@@ -393,6 +393,15 @@ Api.prototype.configureExpress = function (db) {
 
             }
 
+            /**
+             * Mongoose error duplicate
+             */
+            if(err.code && (err.code === 11000 || 11001)){
+
+                err = '';
+
+            }
+
             var response = { success: false, error: err };
 
             resource = new hal.Resource(response, req.originalUrl);

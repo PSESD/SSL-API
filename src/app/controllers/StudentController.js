@@ -900,8 +900,9 @@ StudentController.getStudents = function(req, res){
                     "gradeLevel": /*"N/A"*/"",
                     "schoolYear": /*"N/A"*/"",
                     "schoolName": /*"N/A"*/"",
-                    "attendance": /*"N/A"*/"",
-                    "behavior": 0,
+                    "attendanceCount": [],
+                    "behaviorCount": [],
+                    "riskFlag": [],
                     "onTrackToGraduate": /*"N/A"*/"",
                     "latestDate": ""
                 };

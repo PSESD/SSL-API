@@ -468,7 +468,7 @@ function collectCacheListStudentsAsync(force, done) {
                     }
 
                     var latestDateMap = [];
-                    console.log(latestDateAvailable);
+                    //console.log(latestDateAvailable);
                     for(var l in latestDateAvailable){
                         if(latestDateAvailable[l] === 0){
                             latestDateMap.push({

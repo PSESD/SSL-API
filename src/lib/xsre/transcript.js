@@ -234,11 +234,7 @@ Transcript.prototype.getTranscript = function(){
                 his.exitDateTime = moment(his.exitDate).valueOf();
             }
 
-            if('projectedGraduationYear' in enrollment){
-                //current enrollment
-            } else{
-                me.history.push(his);
-            }
+            me.history.push(his);
 
         });
 
