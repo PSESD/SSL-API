@@ -1183,9 +1183,9 @@ Attendance.prototype._thresholdAcademic = function(){
 
     var attendances = this._currentSummary.attendances;
 
-    if(attendances.lastMonth >= 2 && attendances.lastMonth <= 6){
+    if(attendances.lastMonth.count >= 2 && attendances.lastMonth.count <= 6){
         this._currentSummary.attendances.lastMonth.flag = WARNING;
-    } else if(attendances.lastMonth >= 4){
+    } else if(attendances.lastMonth.count >= 4){
         this._currentSummary.attendances.lastMonth.flag = DANGER;
     }
 
@@ -1246,11 +1246,11 @@ Attendance.prototype._thresholdBehavior = function(){
 
     var incidents = this._currentSummary.incidents;
 
-    if(incidents.lastMonth > 0){
+    if(incidents.lastMonth.count > 0){
         this._currentSummary.incidents.lastMonth.flag = DANGER;
     }
 
-    if(incidents.currentAcademicYear > 0){
+    if(incidents.currentAcademicYear.count > 0){
         this._currentSummary.incidents.currentAcademicYear.flag = DANGER;
     }
 

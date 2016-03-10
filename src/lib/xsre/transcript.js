@@ -193,7 +193,7 @@ Transcript.prototype.getTranscript = function(){
 
             }
 
-            var his = { schoolName: schoolName, schoolYear: schoolYear };
+            var his = { leaId: enrollment.leaRefId, schoolId: enrollment.schoolRefId, schoolName: schoolName, schoolYear: schoolYear };
 
             var status = null;
 
@@ -219,6 +219,26 @@ Transcript.prototype.getTranscript = function(){
 
             }
 
+            if(description === me.notAvailable){
+
+                if('raw:source' in enrollment && enrollment['raw:source']){
+
+                    _.each(enrollment['raw:source'], function(value, key){
+
+                        var ikey = (key+'').substring(4);
+
+                        if('enrollmentStatusDescription' === ikey){
+
+                            description = value;
+
+                        }
+
+                    });
+
+                }
+
+            }
+
             his.currentSchool = l.get(enrollment, 'school.schoolName') || me.notAvailable;
             his.expectedGraduationYear = l.get(enrollment, 'projectedGraduationYear') || me.notAvailable;
             his.gradeLevel = l.get(enrollment, 'gradeLevel') || me.notAvailable;
@@ -233,6 +253,10 @@ Transcript.prototype.getTranscript = function(){
                 his.exitDate = moment(his.exitDate).format('MM/DD/YYYY');
                 his.exitDateTime = moment(his.exitDate).valueOf();
             }
+
+            /**
+             * Check Non-promotional changes
+             */
 
             me.history.push(his);
 
@@ -309,8 +333,23 @@ Transcript.prototype.getTranscript = function(){
 
     }
 
+    var histories = _.sortBy(me.history, 'exitDateTime');
+    var currentSchoolId = null;
+    histories = _.map(histories, function(history){
+        history.promotionalChanges = false;
+        if(currentSchoolId === null){
+            currentSchoolId = history.schoolId;
+        }
+
+        if(history.schoolId !== currentSchoolId){
+            history.promotionalChanges = true;
+        }
+
+        currentSchoolId = history.schoolId;
+        return history;
+    });
     return {
-        history: _.sortBy(me.history, 'exitDateTime').reverse(),
+        history: histories.reverse(),
         details: me.course,
         credits: me.credits,
         subject: subjectModified,

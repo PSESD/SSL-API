@@ -398,7 +398,7 @@ Api.prototype.configureExpress = function (db) {
              */
             if(err.code && (err.code === 11000 || 11001)){
 
-                err = '';
+                err.message = 'Duplicate data should not be allowed';
 
             }
 
