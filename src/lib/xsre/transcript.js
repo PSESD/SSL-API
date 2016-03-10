@@ -333,9 +333,9 @@ Transcript.prototype.getTranscript = function(){
 
     }
 
-    var histories = _.sortBy(me.history, 'exitDateTime');
+    var historiesPromotionChanges = _.sortBy(me.history, 'exitDateTime');
     var currentSchoolId = null;
-    histories = _.map(histories, function(history){
+    historiesPromotionChanges = _.map(historiesPromotionChanges, function(history){
         history.promotionalChanges = false;
         if(currentSchoolId === null){
             currentSchoolId = history.schoolId;
@@ -348,8 +348,9 @@ Transcript.prototype.getTranscript = function(){
         currentSchoolId = history.schoolId;
         return history;
     });
+    
     return {
-        history: histories.reverse(),
+        history: historiesPromotionChanges.reverse(),
         details: me.course,
         credits: me.credits,
         subject: subjectModified,
