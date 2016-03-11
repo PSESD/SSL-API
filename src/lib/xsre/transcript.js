@@ -179,12 +179,14 @@ Transcript.prototype.getHistory = function(){
             his.exitDate = l.get(enrollment, 'exitDate') || me.notAvailable;
             his.status = status || me.notAvailable;
             his.description = description || me.notAvailable;
-            if(his.entryDate !== me.notAvailable){
-                his.entryDate = moment(his.entryDate).format('MM/DD/YYYY');
+            var entryDate = moment(his.entryDate);
+            if(his.entryDate !== me.notAvailable && entryDate.isValid()){
+                his.entryDate = entryDate.format('MM/DD/YYYY');
             }
-            if(his.exitDate !== me.notAvailable){
-                his.exitDate = moment(his.exitDate).format('MM/DD/YYYY');
-                his.exitDateTime = moment(his.exitDate).valueOf();
+            var exitDate = moment(his.exitDate);
+            if(his.exitDate !== me.notAvailable && exitDate.isValid()){
+                his.exitDate = exitDate.format('MM/DD/YYYY');
+                his.exitDateTime = exitDate.valueOf();
             }
 
             /**

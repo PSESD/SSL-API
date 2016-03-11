@@ -448,8 +448,7 @@ function collectCacheListStudentsAsync(force, done) {
 
             };
 
-            latestDateAvailable = {}; //reset it back
-
+            
             Student.find({
                 organization: organization._id
             }, function (err, students) {
@@ -458,7 +457,10 @@ function collectCacheListStudentsAsync(force, done) {
                     benchmark.warn(err);
                     return callback(null, organization);
                 }
+                latestDateAvailable = {}; //reset it back
+
                 studentNumber += students.length;
+
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
 
                 async.eachLimit(students, 10, mapStudent, function(err){
@@ -468,7 +470,7 @@ function collectCacheListStudentsAsync(force, done) {
                     }
 
                     var latestDateMap = [];
-                    //console.log(latestDateAvailable);
+                    // console.log(latestDateAvailable);
                     for(var l in latestDateAvailable){
                         if(latestDateAvailable[l] === 0){
                             latestDateMap.push({
@@ -488,7 +490,7 @@ function collectCacheListStudentsAsync(force, done) {
                     cache.set(prefixListStudentDate+organization._id, latestDateMap, {ttl: 86400}, function () {
                         benchmark.info('Cache student summary date from org: ', organization.name);
                         benchmark.info('Cache student from org: ', organization.name , ' Done!!');
-                        latestDateAvailable = {}; //reset it back
+                        // latestDateAvailable = {}; //reset it back
                         callback(null, organization);
                     });
 
