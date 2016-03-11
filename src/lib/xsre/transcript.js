@@ -102,76 +102,9 @@ function Transcript(xsre){
  *
  * @returns {Array}
  */
-Transcript.prototype.getTranscript = function(){
+Transcript.prototype.getHistory = function(){
 
     var me = this;
-
-    if(null !== me.transcriptTerm) {
-
-        me.info.currentSchoolYear = me.transcriptTerm.schoolYear;
-
-        me.processTranscript(me.transcriptTerm, true);
-
-    }
-
-
-    if(null !== me.transcriptTermOther) {
-
-        _.each(me.transcriptTermOther, function (transcript) {
-
-            me.processTranscript(transcript, false);
-
-        });
-
-    }
-
-    /**
-     * Verify the data
-     */
-
-    var subjectModified = [];
-
-    var subjectObject = {};
-
-    _.each(me.scedSort, function(scedId){
-
-        if(me.subject.indexOf(scedId) !== -1){
-
-            subjectModified.push(scedId);
-
-            subjectObject[scedId] = 0;
-
-        }
-
-    });
-    /**
-     * Add sort when scedAreaCode not in map config
-     * @see src/lib/xsre/config.js
-     *
-     */
-    if(Object.keys(me.scedNotFound).length > 0){
-
-        _.each(_.sortBy(Object.keys(me.scedNotFound)), function(scedId){
-
-            if(me.subject.indexOf(scedId) !== -1){
-
-                subjectModified.push(scedId);
-
-                subjectObject[scedId] = 0;
-
-            }
-
-        });
-
-    }
-
-    me.subject = subjectModified;
-
-    //console.log(me.subject);
-
-    me.course = _.sortBy(me.course, function(o){
-        return o.startDateTime * -1;
-    });
 
     if(me.enrollments.length > 0){
 
@@ -262,7 +195,104 @@ Transcript.prototype.getTranscript = function(){
 
         });
 
+
+
     }
+
+    var historiesPromotionChanges = _.sortBy(me.history, 'exitDateTime');
+    var currentSchoolId = null;
+    historiesPromotionChanges = _.map(historiesPromotionChanges, function(history){
+        history.nonPromotionalChange = false;
+        if(currentSchoolId === null){
+            currentSchoolId = history.schoolId;
+        }
+
+        if(history.schoolId !== currentSchoolId){
+            history.nonPromotionalChange = true;
+        }
+
+        currentSchoolId = history.schoolId;
+        return history;
+    });
+
+    return historiesPromotionChanges;
+};
+/**
+ *
+ * @returns {Array}
+ */
+Transcript.prototype.getTranscript = function(){
+
+    var me = this;
+
+    if(null !== me.transcriptTerm) {
+
+        me.info.currentSchoolYear = me.transcriptTerm.schoolYear;
+
+        me.processTranscript(me.transcriptTerm, true);
+
+    }
+
+
+    if(null !== me.transcriptTermOther) {
+
+        _.each(me.transcriptTermOther, function (transcript) {
+
+            me.processTranscript(transcript, false);
+
+        });
+
+    }
+
+    /**
+     * Verify the data
+     */
+
+    var subjectModified = [];
+
+    var subjectObject = {};
+
+    _.each(me.scedSort, function(scedId){
+
+        if(me.subject.indexOf(scedId) !== -1){
+
+            subjectModified.push(scedId);
+
+            subjectObject[scedId] = 0;
+
+        }
+
+    });
+    /**
+     * Add sort when scedAreaCode not in map config
+     * @see src/lib/xsre/config.js
+     *
+     */
+    if(Object.keys(me.scedNotFound).length > 0){
+
+        _.each(_.sortBy(Object.keys(me.scedNotFound)), function(scedId){
+
+            if(me.subject.indexOf(scedId) !== -1){
+
+                subjectModified.push(scedId);
+
+                subjectObject[scedId] = 0;
+
+            }
+
+        });
+
+    }
+
+    me.subject = subjectModified;
+
+    //console.log(me.subject);
+
+    me.course = _.sortBy(me.course, function(o){
+        return o.startDateTime * -1;
+    });
+
+
 
     //console.log(me.history);
 
@@ -333,24 +363,8 @@ Transcript.prototype.getTranscript = function(){
 
     }
 
-    var historiesPromotionChanges = _.sortBy(me.history, 'exitDateTime');
-    var currentSchoolId = null;
-    historiesPromotionChanges = _.map(historiesPromotionChanges, function(history){
-        history.promotionalChanges = false;
-        if(currentSchoolId === null){
-            currentSchoolId = history.schoolId;
-        }
-
-        if(history.schoolId !== currentSchoolId){
-            history.promotionalChanges = true;
-        }
-
-        currentSchoolId = history.schoolId;
-        return history;
-    });
-
     return {
-        history: historiesPromotionChanges.reverse(),
+        history: me.getHistory().reverse(),
         details: me.course,
         credits: me.credits,
         subject: subjectModified,

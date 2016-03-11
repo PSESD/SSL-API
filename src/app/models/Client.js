@@ -11,7 +11,7 @@ var ClientSchema = new mongoose.Schema({
     redirectUri: { type: String, required: true },
     created: {type: Date, required: true, default: Date.now},
     created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-}, { autoIndex: true });
+});
 
 ClientSchema.virtual('clientId')
     .get(function(){

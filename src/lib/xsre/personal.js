@@ -23,6 +23,8 @@ function Personal(xsre){
     //me.notAvailable = 'N/A';
     me.notAvailable = '';
 
+    me.histories = xsre.getTranscript().getHistory().reverse();
+
 
 }
 /**
@@ -76,6 +78,7 @@ Personal.prototype.getPersonal = function(){
     me.personal.enrollment.exitDate = l.get(me.xSre, 'enrollment.exitDate') || me.notAvailable;
     me.personal.enrollment.status = me.notAvailable;
     me.personal.enrollment.description = me.notAvailable;
+    me.personal.enrollmentHistories = me.histories;
     var enrollment = l.get(me.xSre, 'enrollment') || [];
     var status = null;
     var description = null;
