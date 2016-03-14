@@ -23,7 +23,8 @@ function Personal(xsre){
     //me.notAvailable = 'N/A';
     me.notAvailable = '';
 
-    me.histories = xsre.getTranscript().getHistory().reverse();
+    me.personal.enrollmentHistories = xsre.getTranscript().getHistory().reverse();
+    me.personal.summary = xsre.getAttendanceBehavior().calculateSummary();
 
 
 }
@@ -35,13 +36,43 @@ Personal.prototype.getPersonal = function(){
 
     var me = this;
 
-    me.personal.districtID = l.get(me.xSre, 'localId') || me.notAvailable;
-    me.personal.birthday = l.get(me.xSre, 'demographics.birthDate') || me.notAvailable;
+    me.personal.localId = l.get(me.xSre, 'localId') || me.notAvailable;
+    me.personal.birthDate = l.get(me.xSre, 'demographics.birthDate') || me.notAvailable;
     me.personal.race = l.get(me.xSre, 'demographics.races.race.race') || me.notAvailable;
-    me.personal.gender = l.get(me.xSre, 'demographics.sex') || me.notAvailable;
+    me.personal.sex = l.get(me.xSre, 'demographics.sex') || me.notAvailable;
     me.personal.collegeBound = null;
     me.personal.phone = null;
     me.personal.email = null;
+    me.personal.xSre = {
+        email: [],
+        address: l.get(me.xSre, 'address') || null,
+        phoneNumber: []
+    };
+
+    var phoneNumber = l.get(me.xSre, 'phoneNumber');
+    if(l.get(phoneNumber, 'number')){
+        me.personal.xSre.phoneNumber.push(phoneNumber);
+    }
+
+    l.get(me.xSre, 'otherPhoneNumbers.phoneNumber', []).forEach(function(phoneNumber){
+        if(l.get(phoneNumber, 'number')){
+            me.personal.xSre.phoneNumber.push(phoneNumber);
+        }
+    });
+
+    var email = l.get(me.xSre, 'email');
+    if(l.get(email, 'emailAddress')){
+        me.personal.xSre.email.push(email);
+    }
+    l.get(me.xSre, 'otherEmails.email', []).forEach(function(email){
+        if(l.get(email, 'emailAddress')){
+            me.personal.xSre.email.push(email);
+        }
+    });
+    /**
+     * Check XSRE
+     * @type {null}
+     */
     me.personal.address = null;
     me.personal.firstName = null;
     me.personal.lastName = null;
@@ -71,14 +102,13 @@ Personal.prototype.getPersonal = function(){
     };
     me.personal.languages = [];
     me.personal.enrollment.schoolYear = l.get(me.xSre, 'enrollment.schoolYear') || me.notAvailable;
-    me.personal.enrollment.currentSchool = l.get(me.xSre, 'enrollment.school.schoolName') || me.notAvailable;
-    me.personal.enrollment.expectedGraduationYear = l.get(me.xSre, 'enrollment.projectedGraduationYear') || me.notAvailable;
+    me.personal.enrollment.schoolName = l.get(me.xSre, 'enrollment.school.schoolName') || me.notAvailable;
+    me.personal.enrollment.projectedGraduationYear = l.get(me.xSre, 'enrollment.projectedGraduationYear') || me.notAvailable;
     me.personal.enrollment.gradeLevel = l.get(me.xSre, 'enrollment.gradeLevel') || me.notAvailable;
     me.personal.enrollment.entryDate = l.get(me.xSre, 'enrollment.entryDate') || me.notAvailable;
     me.personal.enrollment.exitDate = l.get(me.xSre, 'enrollment.exitDate') || me.notAvailable;
     me.personal.enrollment.status = me.notAvailable;
     me.personal.enrollment.description = me.notAvailable;
-    me.personal.enrollmentHistories = me.histories;
     var enrollment = l.get(me.xSre, 'enrollment') || [];
     var status = null;
     var description = null;
