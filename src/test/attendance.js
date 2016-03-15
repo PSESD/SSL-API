@@ -26,9 +26,15 @@ fs.readFile(xmlFile, function(err, data) {
         if(err) {
             return console.log(err);
         }
+        var color = {
+            keysColor: 'rainbow',
+            dashColor: 'magenta',
+            stringColor: 'white'
+        };
 
         //new xSre(result).getAttendanceBehavior().getAttendances();
-        //console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().getAttendances()));
+        //console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().getAttendances()), color);
+        //console.log(JSON.stringify(new xSre(result).getAttendanceBehavior().getAttendances()));
         console.log(require('prettyjson').render(new xSre(result).getAttendanceBehavior().calculateSummary()));
     });
 

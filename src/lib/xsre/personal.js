@@ -20,7 +20,11 @@ function Personal(xsre){
 
     me.personal = {};
 
-    me.notAvailable = 'N/A';
+    //me.notAvailable = 'N/A';
+    me.notAvailable = '';
+
+    me.personal.enrollmentHistories = xsre.getTranscript().getHistory().reverse();
+    me.personal.summary = xsre.getAttendanceBehavior().calculateSummary();
 
 
 }
@@ -32,13 +36,43 @@ Personal.prototype.getPersonal = function(){
 
     var me = this;
 
-    me.personal.districtID = l.get(me.xSre, 'localId') || me.notAvailable;
-    me.personal.birthday = l.get(me.xSre, 'demographics.birthDate') || me.notAvailable;
+    me.personal.localId = l.get(me.xSre, 'localId') || me.notAvailable;
+    me.personal.birthDate = l.get(me.xSre, 'demographics.birthDate') || me.notAvailable;
     me.personal.race = l.get(me.xSre, 'demographics.races.race.race') || me.notAvailable;
-    me.personal.gender = l.get(me.xSre, 'demographics.sex') || me.notAvailable;
+    me.personal.sex = l.get(me.xSre, 'demographics.sex') || me.notAvailable;
     me.personal.collegeBound = null;
     me.personal.phone = null;
     me.personal.email = null;
+    me.personal.xSre = {
+        email: [],
+        address: l.get(me.xSre, 'address') || null,
+        phoneNumber: []
+    };
+
+    var phoneNumber = l.get(me.xSre, 'phoneNumber');
+    if(l.get(phoneNumber, 'number')){
+        me.personal.xSre.phoneNumber.push(phoneNumber);
+    }
+
+    l.get(me.xSre, 'otherPhoneNumbers.phoneNumber', []).forEach(function(phoneNumber){
+        if(l.get(phoneNumber, 'number')){
+            me.personal.xSre.phoneNumber.push(phoneNumber);
+        }
+    });
+
+    var email = l.get(me.xSre, 'email');
+    if(l.get(email, 'emailAddress')){
+        me.personal.xSre.email.push(email);
+    }
+    l.get(me.xSre, 'otherEmails.email', []).forEach(function(email){
+        if(l.get(email, 'emailAddress')){
+            me.personal.xSre.email.push(email);
+        }
+    });
+    /**
+     * Check XSRE
+     * @type {null}
+     */
     me.personal.address = null;
     me.personal.firstName = null;
     me.personal.lastName = null;
@@ -66,9 +100,10 @@ Personal.prototype.getPersonal = function(){
         entryDate: null,
         exitDate: null
     };
+    me.personal.languages = [];
     me.personal.enrollment.schoolYear = l.get(me.xSre, 'enrollment.schoolYear') || me.notAvailable;
-    me.personal.enrollment.currentSchool = l.get(me.xSre, 'enrollment.school.schoolName') || me.notAvailable;
-    me.personal.enrollment.expectedGraduationYear = l.get(me.xSre, 'enrollment.projectedGraduationYear') || me.notAvailable;
+    me.personal.enrollment.schoolName = l.get(me.xSre, 'enrollment.school.schoolName') || me.notAvailable;
+    me.personal.enrollment.projectedGraduationYear = l.get(me.xSre, 'enrollment.projectedGraduationYear') || me.notAvailable;
     me.personal.enrollment.gradeLevel = l.get(me.xSre, 'enrollment.gradeLevel') || me.notAvailable;
     me.personal.enrollment.entryDate = l.get(me.xSre, 'enrollment.entryDate') || me.notAvailable;
     me.personal.enrollment.exitDate = l.get(me.xSre, 'enrollment.exitDate') || me.notAvailable;
@@ -104,14 +139,27 @@ Personal.prototype.getPersonal = function(){
     me.personal.eligibilityStatus = l.get(me.xSre, 'programs.foodService.eligibilityStatus') || me.notAvailable;
     me.personal.enrollmentStatus = l.get(me.xSre, 'programs.foodService.enrollmentStatus') || me.notAvailable;
     var specialEducationServices = l.get(me.xSre, 'programs.specialEducation.services');
+
     if(_.isArray(specialEducationServices)){
         specialEducationServices = specialEducationServices[0];
     }
     me.personal.ideaIndicator = l.get(specialEducationServices, 'service.ideaIndicator') || me.notAvailable;
     var languages = l.get(me.xSre, 'languages.language');
-    me.personal.languageHome = me.notAvailable;
+
     if(_.isArray(languages) && languages.length > 1){
-        me.personal.languageHome = l.get(languages[1], 'code') || me.notAvailable;
+
+        languages.forEach(function(language){
+            var newLang = { type: language.type, code: language.code, description: "" };
+            var code = l.find(me.config.languageCode, function(o){
+                return o.value === language.code;
+            });
+            if(code && code.description){
+                newLang.description = code.description;
+            }
+
+            me.personal.languages.push(newLang);
+        });
+
     }
 
     return me.personal;

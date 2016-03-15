@@ -53,7 +53,8 @@ function Transcript(xsre){
 
     me.course = {};
 
-    me.notAvailable = 'N/A';
+    //me.notAvailable = 'N/A';
+    me.notAvailable = '';
 
     me.summary = {
         totalCreditsEarned: 0,
@@ -97,6 +98,127 @@ function Transcript(xsre){
     me.info = { totalEarned: 0, totalAttempted: 0, gradeLevel: 0, currentSchoolYear: null, courseTitle: [] };
 
 }
+/**
+ *
+ * @returns {Array}
+ */
+Transcript.prototype.getHistory = function(){
+
+    var me = this;
+
+    if(me.enrollments.length > 0){
+
+        var schools = [];
+
+        var histories = [];
+
+        _.each(me.enrollments, function(enrollment){
+
+            var school = enrollment.school;
+
+            var schoolName = l.get(school, 'schoolName');
+
+            var schoolYear = enrollment.schoolYear || me.notAvailable;
+
+            if(schoolName && schools.indexOf(schoolName) === -1){
+
+                schools.push(schoolName);
+
+            }
+
+            var his = { leaId: enrollment.leaRefId, schoolId: enrollment.schoolRefId, schoolName: schoolName, schoolYear: schoolYear };
+
+            var status = null;
+
+            var description = null;
+
+            if('enrollmentStatus' in enrollment){
+
+                status = enrollment.enrollmentStatus || me.notAvailable;
+
+            } else if('psesd:enrollmentStatus' in enrollment){
+
+                status = enrollment['psesd:enrollmentStatus'] || me.notAvailable;
+
+            }
+
+            if(status && 'EnrollmentStatus' in me.config && status in me.config.EnrollmentStatus){
+
+                description = l.get(me.config.EnrollmentStatus[status], 'description') || me.notAvailable;
+
+            } else {
+
+                description = me.notAvailable;
+
+            }
+
+            if(description === me.notAvailable){
+
+                if('raw:source' in enrollment && enrollment['raw:source']){
+
+                    _.each(enrollment['raw:source'], function(value, key){
+
+                        var ikey = (key+'').substring(4);
+
+                        if('enrollmentStatusDescription' === ikey){
+
+                            description = value;
+
+                        }
+
+                    });
+
+                }
+
+            }
+
+            his.currentSchool = l.get(enrollment, 'school.schoolName') || me.notAvailable;
+            his.expectedGraduationYear = l.get(enrollment, 'projectedGraduationYear') || me.notAvailable;
+            his.gradeLevel = l.get(enrollment, 'gradeLevel') || me.notAvailable;
+            his.entryDate = l.get(enrollment, 'entryDate') || me.notAvailable;
+            his.exitDate = l.get(enrollment, 'exitDate') || me.notAvailable;
+            his.status = status || me.notAvailable;
+            his.description = description || me.notAvailable;
+            var entryDate = moment(his.entryDate);
+            if(his.entryDate !== me.notAvailable && entryDate.isValid()){
+                his.entryDate = entryDate.format('MM/DD/YYYY');
+            }
+            var exitDate = moment(his.exitDate);
+            if(his.exitDate !== me.notAvailable && exitDate.isValid()){
+                his.exitDate = exitDate.format('MM/DD/YYYY');
+                his.exitDateTime = exitDate.valueOf();
+            }
+
+            /**
+             * Check Non-promotional changes
+             */
+
+            me.history.push(his);
+
+        });
+
+
+
+    }
+
+    var historiesPromotionChanges = _.sortBy(me.history, 'exitDateTime');
+    var currentSchoolId = null;
+    historiesPromotionChanges = _.map(historiesPromotionChanges, function(history){
+        history.nonPromotionalChange = false;
+        if(currentSchoolId === null){
+            currentSchoolId = history.schoolId;
+        }
+
+        if(history.schoolId !== currentSchoolId){
+            history.nonPromotionalChange = true;
+        }
+
+        currentSchoolId = history.schoolId;
+        return history;
+    });
+
+    return historiesPromotionChanges;
+};
 /**
  *
  * @returns {Array}
@@ -172,78 +294,7 @@ Transcript.prototype.getTranscript = function(){
         return o.startDateTime * -1;
     });
 
-    if(me.enrollments.length > 0){
 
-        var schools = [];
-
-        var histories = [];
-
-        _.each(me.enrollments, function(enrollment){
-
-            var school = enrollment.school;
-
-            var schoolName = l.get(school, 'schoolName');
-
-            var schoolYear = enrollment.schoolYear || me.notAvailable;
-
-            if(schoolName && schools.indexOf(schoolName) === -1){
-
-                schools.push(schoolName);
-
-            }
-
-            if(histories.indexOf(schoolName+':'+schoolYear) === -1){
-
-                var his = { schoolName: schoolName, schoolYear: schoolYear };
-
-                var status = null;
-
-                var description = null;
-
-                if('enrollmentStatus' in enrollment){
-
-                    status = enrollment.enrollmentStatus || me.notAvailable;
-
-                } else if('psesd:enrollmentStatus' in enrollment){
-
-                    status = enrollment['psesd:enrollmentStatus'] || me.notAvailable;
-
-                }
-
-                if(status && 'EnrollmentStatus' in me.config && status in me.config.EnrollmentStatus){
-
-                    description = l.get(me.config.EnrollmentStatus[status], 'description') || me.notAvailable;
-
-                } else {
-
-                    description = me.notAvailable;
-
-                }
-
-                his.currentSchool = l.get(enrollment, 'school.schoolName') || me.notAvailable;
-                his.expectedGraduationYear = l.get(enrollment, 'projectedGraduationYear') || me.notAvailable;
-                his.gradeLevel = l.get(enrollment, 'gradeLevel') || me.notAvailable;
-                his.entryDate = l.get(enrollment, 'entryDate') || me.notAvailable;
-                his.exitDate = l.get(enrollment, 'exitDate') || me.notAvailable;
-                his.status = status || me.notAvailable;
-                his.description = description || me.notAvailable;
-                if(his.entryDate !== me.notAvailable){
-                    his.entryDate = moment(his.entryDate).format('MM/DD/YYYY');
-                }
-                if(his.exitDate !== me.notAvailable){
-                    his.exitDate = moment(his.exitDate).format('MM/DD/YYYY');
-                }
-
-                me.history.push(his);
-
-                histories.push(schoolName+':'+schoolYear);
-
-            }
-
-
-        });
-
-    }
 
     //console.log(me.history);
 
@@ -315,7 +366,7 @@ Transcript.prototype.getTranscript = function(){
     }
 
     return {
-        history: _.sortBy(me.history, 'schoolYear').reverse(),
+        history: me.getHistory().reverse(),
         details: me.course,
         credits: me.credits,
         subject: subjectModified,

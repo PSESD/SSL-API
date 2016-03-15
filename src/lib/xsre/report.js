@@ -25,7 +25,8 @@ function Report(xsre){
         this.to = this.dateTime(this.filterTo);
     }
 
-    this.notAvailable = 'N/A';
+    //this.notAvailable = 'N/A';
+    this.notAvailable = '';
 
     this.facets = xsre.facets;
     this.attendances = xsre.json.attendance || null;

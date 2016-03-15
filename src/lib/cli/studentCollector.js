@@ -32,6 +32,8 @@ var fs = require('fs');
 var php = require('phpjs');
 var filename = districtFile;
 var prefixListStudent = '_xsre_list_students_';
+var prefixListStudentDate = 'summary_student_list_date_';
+var latestDateAvailable = {};
 var organizationWhere = {};
 
 //organizationWhere = {
@@ -335,6 +337,7 @@ function collectCacheListStudentsAsync(force, done) {
          */
         var map = function(organization, callback){
             var orgId = organization._id;
+            var orgIdString = orgId.toString();
             benchmark.info('ORGID: ' + orgId);
             prefix = "CACHE-LIST-STUDENT";
             var brokerRequest = new Request({
@@ -349,6 +352,14 @@ function collectCacheListStudentsAsync(force, done) {
              * @param cb
              */
             var mapStudent = function(student, cb){
+
+                if(!(orgIdString in latestDateAvailable)){
+                    latestDateAvailable[orgIdString] = {};
+                }
+
+                if(Object.keys(latestDateAvailable[orgIdString]).indexOf(student.school_district) === -1){
+                    latestDateAvailable[orgIdString][student.school_district] = 0;
+                }
 
                 var studentId = student._id.toString();
 
@@ -412,6 +423,22 @@ function collectCacheListStudentsAsync(force, done) {
                             benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
 
                             data = new xSre(result).getStudentSummary();
+                            //if(student.school_district === 'tukwila'){
+                            //    console.log('ASSSS', JSON.stringify(data), latestDateAvailable[orgIdString][student.school_district] < data.latestDateTime, latestDateAvailable[orgIdString][student.school_district]);
+                            //}
+                            /**
+                             * Check the data max
+                             * @type {string}
+                             */
+                            if(data.latestDateTime){
+
+                                if(latestDateAvailable[orgIdString][student.school_district] < data.latestDateTime){
+
+                                    latestDateAvailable[orgIdString][student.school_district] = data.latestDateTime;
+
+                                }
+
+                            }
 
                             var key = prefixListStudent + organization._id + '_' + student._id;
 
@@ -429,6 +456,7 @@ function collectCacheListStudentsAsync(force, done) {
 
             };
 
+            
             Student.find({
                 organization: organization._id
             }, function (err, students) {
@@ -437,18 +465,44 @@ function collectCacheListStudentsAsync(force, done) {
                     benchmark.warn(err);
                     return callback(null, organization);
                 }
+
                 studentNumber += students.length;
+
+                var orgIdString = organization._id.toString();
+
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
 
-                //async.eachSeries(students, mapStudent, function(err){
                 async.eachLimit(students, 10, mapStudent, function(err){
                     if(err){
                         benchmark.info('ERROR: ', err);
                         log(err, 'error');
                     }
 
-                    benchmark.info('Cache student from org: ', organization.name , ' Done!!');
-                    callback(null, organization);
+                    var latestDateMap = [];
+                    // console.log(latestDateAvailable);
+                    for(var l in latestDateAvailable[orgIdString]){
+                        if(latestDateAvailable[orgIdString][l] === 0){
+                            latestDateMap.push({
+                                schoolDistrict: l,
+                                latestDateTime: "",
+                                latestDate: ""
+                            });
+                        } else{
+                            var mm = moment(latestDateAvailable[orgIdString][l]);
+                            latestDateMap.push({
+                                schoolDistrict: l,
+                                latestDateTime: latestDateAvailable[orgIdString][l] || "",
+                                latestDate: mm.isValid() ? mm.format('MM/DD/YYYY') : ""
+                            });
+                        }
+                    }
+                    cache.set(prefixListStudentDate+organization._id, latestDateMap, {ttl: 86400}, function () {
+                        benchmark.info('Cache student summary date from org: ', organization.name);
+                        benchmark.info('Cache student from org: ', organization.name , ' Done!!');
+                        // latestDateAvailable = {}; //reset it back
+                        callback(null, organization);
+                    });
+
                 });
 
             });
@@ -463,6 +517,7 @@ function collectCacheListStudentsAsync(force, done) {
             benchmark.info(
                 '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DONE'
             );
+
             done(err, data, studentNumber);
         });
 

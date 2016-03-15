@@ -45,7 +45,7 @@ fs.readFile(xmlFile, function(err, data) {
                     for(var s in obj){
                         if(s.length > 1) continue;//skip other
                         var so = obj[s];
-                        if(so !== 'N/A'){
+                        if(so !== ''){
                             t.n++;
                             t.v.push(so);
                             t.total += parseFloat(so);

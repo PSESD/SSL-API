@@ -156,12 +156,15 @@ xSre.prototype.getJson = function(){
 xSre.prototype.getStudentSummary = function(){
     this.justlog.info('XSRE - START STUDENT SUMMARY');
     var summary = {
-        gradeLevel: null,
-        schoolYear: null,
-        schoolName: null,
-        attendance: null,
-        behavior: null,
-        onTrackToGraduate: null
+        gradeLevel: "",
+        schoolYear: "",
+        schoolName: "",
+        attendanceCount: [],
+        behaviorCount: [],
+        attendanceRiskFlag: [],
+        onTrackToGraduate: "",
+        latestDate: "",
+        latestDateTime: ""
     };
 
     var json = this.getJson();
@@ -176,8 +179,12 @@ xSre.prototype.getStudentSummary = function(){
 
     var attendance = this.getAttendanceBehavior();
 
-    summary.attendance = attendance.getCurrentTotalAttendance();
-    summary.behavior = attendance.getCurrentTotalBehavior();
+    summary.attendanceCount = attendance.getCurrentTotalAttendance();
+    summary.behaviorCount = attendance.getCurrentTotalBehavior();
+    summary.attendanceRiskFlag = attendance.getRiskFlag();
+    var attendanceSummary = attendance.calculateSummary();
+    summary.latestDate = attendanceSummary.date.latest;
+    summary.latestDateTime = attendanceSummary.date.max;
     summary.onTrackToGraduate = null;
 
     var academicSummary = _.get(json, 'transcriptTerm.academicSummary');
