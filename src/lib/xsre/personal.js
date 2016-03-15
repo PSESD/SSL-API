@@ -23,7 +23,7 @@ function Personal(xsre){
     //me.notAvailable = 'N/A';
     me.notAvailable = '';
 
-    me.personal.enrollmentHistories = xsre.getTranscript().getHistory().reverse();
+    me.personal.xSre.enrollmentHistories = xsre.getTranscript().getHistory().reverse();
     me.personal.summary = xsre.getAttendanceBehavior().calculateSummary();
 
 
@@ -35,18 +35,40 @@ function Personal(xsre){
 Personal.prototype.getPersonal = function(){
 
     var me = this;
-
-    me.personal.localId = l.get(me.xSre, 'localId') || me.notAvailable;
-    me.personal.birthDate = l.get(me.xSre, 'demographics.birthDate') || me.notAvailable;
-    me.personal.race = l.get(me.xSre, 'demographics.races.race.race') || me.notAvailable;
-    me.personal.sex = l.get(me.xSre, 'demographics.sex') || me.notAvailable;
+    me.personal.firstName = null;
+    me.personal.middleName = null;
+    me.personal.lastName = null;
+    me.personal.schoolDistrict = null;
     me.personal.collegeBound = null;
     me.personal.phone = null;
     me.personal.email = null;
+    me.personal.address = null;
+    me.personal.emergency1 = {
+        name: null,
+        relationship: null,
+        email: null,
+        phone: null,
+        mentor: null
+    };
+    me.personal.emergency2 = {
+        name: null,
+        relationship: null,
+        email: null,
+        phone: null,
+        mentor: null
+    };
     me.personal.xSre = {
+        localId: l.get(me.xSre, 'localId') || me.notAvailable,
+        demographics: {
+            race: l.get(me.xSre, 'demographics.races.race.race') || me.notAvailable,
+            sex: l.get(me.xSre, 'demographics.sex') || me.notAvailable,
+            birthDate: l.get(me.xSre, 'demographics.birthDate') || me.notAvailable
+        },
         email: [],
         address: l.get(me.xSre, 'address') || null,
-        phoneNumber: []
+        phoneNumber: [],
+        languages: [],
+        enrollment: {}
     };
 
     var phoneNumber = l.get(me.xSre, 'phoneNumber');
@@ -73,63 +95,72 @@ Personal.prototype.getPersonal = function(){
      * Check XSRE
      * @type {null}
      */
-    me.personal.address = null;
-    me.personal.firstName = null;
-    me.personal.lastName = null;
-    me.personal.middleName = null;
-    me.personal.schoolDistrict = null;
-    me.personal.emergency1 = {
-        name: null,
-        relationship: null,
-        email: null,
-        phone: null,
-        mentor: null
-    };
-    me.personal.emergency2 = {
-        name: null,
-        relationship: null,
-        email: null,
-        phone: null,
-        mentor: null
-    };
-
-    me.personal.enrollment = {
+    me.personal.xSre.enrollment = {
         currentSchool: null,
         expectedGraduationYear: null,
         gradeLevel: null,
         entryDate: null,
         exitDate: null
     };
-    me.personal.languages = [];
-    me.personal.enrollment.schoolYear = l.get(me.xSre, 'enrollment.schoolYear') || me.notAvailable;
-    me.personal.enrollment.schoolName = l.get(me.xSre, 'enrollment.school.schoolName') || me.notAvailable;
-    me.personal.enrollment.projectedGraduationYear = l.get(me.xSre, 'enrollment.projectedGraduationYear') || me.notAvailable;
-    me.personal.enrollment.gradeLevel = l.get(me.xSre, 'enrollment.gradeLevel') || me.notAvailable;
-    me.personal.enrollment.entryDate = l.get(me.xSre, 'enrollment.entryDate') || me.notAvailable;
-    me.personal.enrollment.exitDate = l.get(me.xSre, 'enrollment.exitDate') || me.notAvailable;
-    me.personal.enrollment.status = me.notAvailable;
-    me.personal.enrollment.description = me.notAvailable;
+    me.personal.xSre.languages = [];
+    me.personal.xSre.enrollment.schoolYear = l.get(me.xSre, 'enrollment.schoolYear') || me.notAvailable;
+    me.personal.xSre.enrollment.schoolName = l.get(me.xSre, 'enrollment.school.schoolName') || me.notAvailable;
+    me.personal.xSre.enrollment.projectedGraduationYear = l.get(me.xSre, 'enrollment.projectedGraduationYear') || me.notAvailable;
+    me.personal.xSre.enrollment.gradeLevel = l.get(me.xSre, 'enrollment.gradeLevel') || me.notAvailable;
+    me.personal.xSre.enrollment.entryDate = l.get(me.xSre, 'enrollment.entryDate') || me.notAvailable;
+    me.personal.xSre.enrollment.exitDate = l.get(me.xSre, 'enrollment.exitDate') || me.notAvailable;
+    me.personal.xSre.enrollment.enrollmentStatus = me.notAvailable;
+    me.personal.xSre.enrollment.enrollmentStatusDescription = me.notAvailable;
+
+
     var enrollment = l.get(me.xSre, 'enrollment') || [];
+
     var status = null;
+
     var description = null;
 
     if('enrollmentStatus' in enrollment){
-        status = enrollment.enrollmentStatus;
+
+        status = enrollment.enrollmentStatus || me.notAvailable;
+
     } else if('psesd:enrollmentStatus' in enrollment){
-        status = enrollment['psesd:enrollmentStatus'];
+
+        status = enrollment['psesd:enrollmentStatus'] || me.notAvailable;
+
     }
 
     if(status && 'EnrollmentStatus' in me.config && status in me.config.EnrollmentStatus){
-        description = l.get(me.config.EnrollmentStatus[status], 'description') || null;
+
+        description = l.get(me.config.EnrollmentStatus[status], 'description') || me.notAvailable;
+
+    } else {
+
+        description = me.notAvailable;
+
     }
 
-    if(status !== null){
-        me.personal.enrollment.status = status;
-    }
+    if(description === me.notAvailable){
 
-    if(description !== null){
-        me.personal.enrollment.description = description;
+        if('raw:source' in enrollment && enrollment['raw:source']){
+
+            _.each(enrollment['raw:source'], function(value, key){
+
+                var ikey = (key+'').substring(4);
+
+                if('enrollmentStatusDescription' === ikey){
+
+                    description = value;
+
+                }
+
+            });
+
+        }
+
     }
+    me.personal.xSre.enrollment.enrollmentStatus = status;
+    me.personal.xSre.enrollment.enrollmentStatusDescription = me.notAvailable;
+
     /**
      *
      */
@@ -137,7 +168,7 @@ Personal.prototype.getPersonal = function(){
     me.personal.daysAbsent = l.get(me.xSre, 'attendance.summaries.summary.daysAbsent') || me.notAvailable;
     me.personal.section504Status = l.get(me.xSre, 'programs.specialEducation.section504Status') || me.notAvailable;
     me.personal.eligibilityStatus = l.get(me.xSre, 'programs.foodService.eligibilityStatus') || me.notAvailable;
-    me.personal.enrollmentStatus = l.get(me.xSre, 'programs.foodService.enrollmentStatus') || me.notAvailable;
+    me.personal.xSre.enrollmentStatus = l.get(me.xSre, 'programs.foodService.enrollmentStatus') || me.notAvailable;
     var specialEducationServices = l.get(me.xSre, 'programs.specialEducation.services');
 
     if(_.isArray(specialEducationServices)){
@@ -157,7 +188,7 @@ Personal.prototype.getPersonal = function(){
                 newLang.description = code.description;
             }
 
-            me.personal.languages.push(newLang);
+            me.personal.xSre.languages.push(newLang);
         });
 
     }
