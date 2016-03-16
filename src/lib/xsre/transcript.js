@@ -176,7 +176,7 @@ Transcript.prototype.getHistory = function(){
 
             }
 
-            his.school = { schoolName : l.get(enrollment, 'school.schoolName') || me.notAvailable };
+            his.schoolName = l.get(enrollment, 'school.schoolName') || me.notAvailable;
             his.projectedGraduationYear = l.get(enrollment, 'projectedGraduationYear') || me.notAvailable;
             his.gradeLevel = l.get(enrollment, 'gradeLevel') || me.notAvailable;
             his.entryDate = l.get(enrollment, 'entryDate') || me.notAvailable;
@@ -371,7 +371,7 @@ Transcript.prototype.getTranscript = function(){
 
     return {
         //history: me.getHistory().reverse(), // handle in general/personal
-        course: me.course,
+        details: me.course,
         credits: me.credits,
         subject: subjectModified,
         subjectValues: subjectValues,
@@ -576,16 +576,6 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
 
     var mark = null;
 
-    //if(current){
-    //
-    //    mark = course.progressMark || course.finalMarkValue;
-    //
-    //} else {
-    //
-    //    mark = course.finalMarkValue;
-    //
-    //}
-
     mark = course.progressMark || course.finalMarkValue;
 
     if(!mark) {
@@ -604,11 +594,28 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
 
     me.transcriptFilterMark.push(icheck);
 
-    me.course[key].academicSummary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
-    me.course[key].academicSummary.totalCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+    if(me.course[key].academicSummary){
 
-    me.course[key].academicSummary.termCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
-    me.course[key].academicSummary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+        if(!('totalCreditsEarned' in me.course[key].academicSummary)){
+            me.course[key].academicSummary.totalCreditsEarned = 0;
+        }
+        if(!('totalCreditsAttempted' in me.course[key].academicSummary)){
+            me.course[key].academicSummary.totalCreditsAttempted = 0;
+        }
+        if(!('termCreditsEarned' in me.course[key].academicSummary)){
+            me.course[key].academicSummary.termCreditsEarned = 0;
+        }
+        if(!('termCreditsAttempted' in me.course[key].academicSummary)){
+            me.course[key].academicSummary.termCreditsAttempted = 0;
+        }
+
+        me.course[key].academicSummary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+        me.course[key].academicSummary.totalCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+
+        me.course[key].academicSummary.termCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+        me.course[key].academicSummary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+
+    }
 
     me.course[key].transcripts[uniqueStr].push({
         index: null,
@@ -651,15 +658,6 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
 
     var mark = null;
 
-    //if(current){
-    //
-    //    mark = course.progressMark || course.finalMarkValue;
-    //
-    //} else {
-    //
-    //    mark = course.finalMarkValue;
-    //
-    //}
 
     mark = course.progressMark || course.finalMarkValue;
 
@@ -669,11 +667,28 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
 
     }
 
-    me.course[key].academicSummary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
-    me.course[key].academicSummary.totalCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+    if(me.course[key].academicSummary){
 
-    me.course[key].academicSummary.termCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
-    me.course[key].academicSummary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+        if(!('totalCreditsEarned' in me.course[key].academicSummary)){
+            me.course[key].academicSummary.totalCreditsEarned = 0;
+        }
+        if(!('totalCreditsAttempted' in me.course[key].academicSummary)){
+            me.course[key].academicSummary.totalCreditsAttempted = 0;
+        }
+        if(!('termCreditsEarned' in me.course[key].academicSummary)){
+            me.course[key].academicSummary.termCreditsEarned = 0;
+        }
+        if(!('termCreditsAttempted' in me.course[key].academicSummary)){
+            me.course[key].academicSummary.termCreditsAttempted = 0;
+        }
+
+        me.course[key].academicSummary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+        me.course[key].academicSummary.totalCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+
+        me.course[key].academicSummary.termCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+        me.course[key].academicSummary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+
+    }
 
     me.course[key].transcripts[uniqueStr].push({
         index: null,
