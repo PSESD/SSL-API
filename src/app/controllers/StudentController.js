@@ -1069,6 +1069,13 @@ StudentController.createByOrgId = function(req, res){
             obj.protect(req.user.role, null, req.user).save(function(err){
 
                 if(err){
+
+                    if(err.code && (err.code === 11000 || err.code === 11001)){
+
+                        err = res.__('errors.duplicate_student', { districtId: req.body.district_student_id, district: req.body.school_district });
+
+                    }
+
                     return res.sendError(err);
                 }
 
@@ -1323,6 +1330,12 @@ StudentController.putStudentById = function(req, res){
             obj.protect(req.user.role, null, req.user).save(function(err){
 
                 if(err){
+
+                    if(err.code && (err.code === 11000 || err.code === 11001)){
+
+                        err = res.__('errors.duplicate_student', { districtId: req.body.district_student_id, district: req.body.school_district });
+
+                    }
 
                     return res.sendError(err);
 

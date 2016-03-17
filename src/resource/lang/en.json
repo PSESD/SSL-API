@@ -22,6 +22,7 @@
 	"done": "Done",
     "error": "The application has encountered an unknown error.",
 	"unknown": "Oops! Something went wrong.",
-	"errors.11000": "Duplicate data should not be allowed",
+	"errors.duplicate_student": "Student with id {{districtId}} in {{district}} school district already exists",
+	"errors.11001": "Duplicate data should not be allowed",
 	"errors.11001": "Duplicate data should not be allowed"
 }
