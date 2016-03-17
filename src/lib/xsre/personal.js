@@ -64,6 +64,7 @@ Personal.prototype.getPersonal = function(){
         localId: l.get(me.xSre, 'localId') || me.notAvailable,
         demographics: {
             races: races,
+            hispanicLatinoEthnicity: l.get(me.xSre, 'demographics.hispanicLatinoEthnicity') || me.notAvailable,
             sex: l.get(me.xSre, 'demographics.sex') || me.notAvailable,
             birthDate: l.get(me.xSre, 'demographics.birthDate') || me.notAvailable
         },
@@ -101,8 +102,11 @@ Personal.prototype.getPersonal = function(){
      */
     me.personal.xSre.enrollment = {};
     me.personal.xSre.languages = [];
+    me.personal.xSre.enrollment.leaRefId = l.get(me.xSre, 'enrollment.leaRefId') || me.notAvailable;
+    me.personal.xSre.enrollment.schoolRefId = l.get(me.xSre, 'enrollment.schoolRefId') || me.notAvailable;
     me.personal.xSre.enrollment.schoolYear = l.get(me.xSre, 'enrollment.schoolYear') || me.notAvailable;
     me.personal.xSre.enrollment.schoolName = l.get(me.xSre, 'enrollment.school.schoolName') || me.notAvailable;
+    me.personal.xSre.enrollment.membershipType = l.get(me.xSre, 'enrollment.membershipType') || me.notAvailable;
     me.personal.xSre.enrollment.projectedGraduationYear = l.get(me.xSre, 'enrollment.projectedGraduationYear') || me.notAvailable;
     me.personal.xSre.enrollment.gradeLevel = l.get(me.xSre, 'enrollment.gradeLevel') || me.notAvailable;
     me.personal.xSre.enrollment.entryDate = l.get(me.xSre, 'enrollment.entryDate') || me.notAvailable;

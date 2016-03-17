@@ -130,7 +130,7 @@ Transcript.prototype.getHistory = function(){
 
             }
 
-            var his = { leaId: enrollment.leaRefId, schoolId: enrollment.schoolRefId, schoolName: schoolName, schoolYear: schoolYear };
+            var his = { leaRefId: enrollment.leaRefId, schoolRefId: enrollment.schoolRefId, schoolName: schoolName, schoolYear: schoolYear };
 
             var status = null;
 
@@ -181,6 +181,7 @@ Transcript.prototype.getHistory = function(){
             his.gradeLevel = l.get(enrollment, 'gradeLevel') || me.notAvailable;
             his.entryDate = l.get(enrollment, 'entryDate') || me.notAvailable;
             his.exitDate = l.get(enrollment, 'exitDate') || me.notAvailable;
+            his.membershipType = l.get(enrollment, 'membershipType') || me.notAvailable;
             his.enrollmentStatus = status || me.notAvailable;
             his.enrollmentStatusDescription = description || me.notAvailable;
             var entryDate = moment(his.entryDate);
