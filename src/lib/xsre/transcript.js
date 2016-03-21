@@ -437,7 +437,7 @@ Transcript.prototype.processTranscript = function(transcript, current){
 
     }
 
-    var summary = {
+    var academicSummary = {
         totalCreditsEarned: 0,
         totalCreditsAttempted: 0,
         termWeightedGpa: 0,
@@ -453,38 +453,38 @@ Transcript.prototype.processTranscript = function(transcript, current){
         //transcript.academicSummary = me.extractRawSource(transcript.academicSummary);
 
         if(!_.isEmpty(transcript.academicSummary.totalCreditsEarned) && !isNaN(transcript.academicSummary.totalCreditsEarned)) {
-            summary.totalCreditsEarned = parseFloat(transcript.academicSummary.totalCreditsEarned);
+            academicSummary.totalCreditsEarned = parseFloat(transcript.academicSummary.totalCreditsEarned);
         }
         if(!_.isEmpty(transcript.academicSummary.totalCreditsAttempted) && !isNaN(transcript.academicSummary.totalCreditsAttempted)) {
-            summary.totalCreditsAttempted = parseFloat(transcript.academicSummary.totalCreditsAttempted);
+            academicSummary.totalCreditsAttempted = parseFloat(transcript.academicSummary.totalCreditsAttempted);
         }
         if(!_.isEmpty(transcript.academicSummary.termWeightedGpa) && !isNaN(transcript.academicSummary.termWeightedGpa)) {
-            summary.termWeightedGpa = parseFloat(transcript.academicSummary.termWeightedGpa);
+            academicSummary.termWeightedGpa = parseFloat(transcript.academicSummary.termWeightedGpa);
         }
         if(!_.isEmpty(transcript.academicSummary.cumulativeGpa) && !isNaN(transcript.academicSummary.cumulativeGpa)) {
-            summary.cumulativeGpa = parseFloat(transcript.academicSummary.cumulativeGpa);
+            academicSummary.cumulativeGpa = parseFloat(transcript.academicSummary.cumulativeGpa);
         }
         if(!_.isEmpty(transcript.academicSummary.termCreditsEarned) && !isNaN(transcript.academicSummary.termCreditsEarned)) {
-            summary.termCreditsEarned = parseFloat(transcript.academicSummary.termCreditsEarned);
+            academicSummary.termCreditsEarned = parseFloat(transcript.academicSummary.termCreditsEarned);
         }
         if(!_.isEmpty(transcript.academicSummary.termCreditsAttempted) && !isNaN(transcript.academicSummary.termCreditsAttempted)) {
-            summary.termCreditsAttempted = parseFloat(transcript.academicSummary.termCreditsAttempted);
+            academicSummary.termCreditsAttempted = parseFloat(transcript.academicSummary.termCreditsAttempted);
         }
         if(!_.isEmpty(transcript.academicSummary.classRank) && !isNaN(transcript.academicSummary.classRank)) {
-            summary.classRank = parseFloat(transcript.academicSummary.classRank);
+            academicSummary.classRank = parseFloat(transcript.academicSummary.classRank);
         }
         if(!_.isEmpty(transcript.academicSummary.gpaScale) && !isNaN(transcript.academicSummary.gpaScale)) {
-            summary.gpaScale = parseFloat(transcript.academicSummary.gpaScale);
+            academicSummary.gpaScale = parseFloat(transcript.academicSummary.gpaScale);
         }
 
-        me.academicSummary.totalCreditsEarned += summary.totalCreditsEarned;
-        me.academicSummary.totalCreditsAttempted += summary.totalCreditsAttempted;
-        me.academicSummary.termWeightedGpa += summary.termWeightedGpa;
-        me.academicSummary.cumulativeGpa += summary.cumulativeGpa;
-        me.academicSummary.termCreditsAttempted += summary.termCreditsAttempted;
-        me.academicSummary.termCreditsEarned += summary.termCreditsEarned;
-        me.academicSummary.classRank += summary.classRank;
-        me.academicSummary.gpaScale += summary.gpaScale;
+        me.academicSummary.totalCreditsEarned += academicSummary.totalCreditsEarned;
+        me.academicSummary.totalCreditsAttempted += academicSummary.totalCreditsAttempted;
+        me.academicSummary.termWeightedGpa += academicSummary.termWeightedGpa;
+        me.academicSummary.cumulativeGpa += academicSummary.cumulativeGpa;
+        me.academicSummary.termCreditsAttempted += academicSummary.termCreditsAttempted;
+        me.academicSummary.termCreditsEarned += academicSummary.termCreditsEarned;
+        me.academicSummary.classRank += academicSummary.classRank;
+        me.academicSummary.gpaScale += academicSummary.gpaScale;
 
     }
 
@@ -506,7 +506,7 @@ Transcript.prototype.processTranscript = function(transcript, current){
         startDateTime: 0,
         session: tSession,
         transcripts: {},
-        summary: summary
+        academicSummary: academicSummary
     };
 
     if(info.startDate){
@@ -621,9 +621,9 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
     me.course[key].transcripts[uniqueStr].push({
         index: null,
         n: me.course[key].transcripts[uniqueStr].length + 1,
-        cdesId: scedAreaCode,
-        courseId: course.leaCourseId,
-        title: course.courseTitle || me.notAvailable,
+        scedCourseSubjectAreaCode: scedAreaCode,
+        leaCourseId: course.leaCourseId,
+        courseTitle: course.courseTitle || me.notAvailable,
         mark: mark,
         gradeLevel: info.gradeLevel || me.notAvailable,
         creditsEarned: isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned),
@@ -694,9 +694,9 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
     me.course[key].transcripts[uniqueStr].push({
         index: null,
         n: me.course[key].transcripts[uniqueStr].length + 1,
-        cdesId: scedAreaCode,
-        courseId: course.leaCourseId,
-        title: course.courseTitle || me.notAvailable,
+        scedCourseSubjectAreaCode: scedAreaCode,
+        leaCourseId: course.leaCourseId,
+        courseTitle: course.courseTitle || me.notAvailable,
         mark: mark,
         gradeLevel: info.gradeLevel || me.notAvailable,
         creditsEarned: isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned),
