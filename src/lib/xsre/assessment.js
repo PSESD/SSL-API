@@ -96,35 +96,35 @@ Assessment.prototype.processAssessment = function(assessments){
                   var collectionScoreSets = {
                         schoolYear: null,
                         testSeason: null,
-                        testSchoolId: null,
-                        testSchoolName: null,
-                        testGrade: null,
+                        localId: null,
+                        schoolName: null,
+                        studentGradeLevel: null,
                         maps: [],
                         states: []
                   };
 
                   var collectionState = {
-                        TestName: null,
-                        SubjectArea: null,
-                        TestAttemptCode: null,
-                        TestAttempt: null,
+                        subTestName: null,
+                        subTestSubjectArea: null,
+                        attemptCode: null,
+                        attemptCodeDescription: null,
                         Score: null,
                         LevelCode: null,
                         MetStandard: null,
-                        TestSchool: null,
-                        TestGrade: null
+                        schoolName: null,
+                        studentGradeLevel: null
                   };
 
                   var collectionMap = {
-                        TestName: null,
-                        SubjectArea: null,
+                        subTestName: null,
+                        subTestSubjectArea: null,
                         RITScore: null,
                         PercentileRank: null,
                         MetTypicalGrowth_LastFall2ThisFall: null,
                         MetTypicalGrowth_LastSpring2ThisSpring: null,
                         MetTypicalGrowth_LastFall2ThisSpring: null,
-                        TestSchool: null,
-                        TestGrade: null
+                        schoolName: null,
+                        studentGradeLevel: null
                   };
 
                   mm = moment(new Date(assessment.actualStartDateTime));
@@ -132,9 +132,9 @@ Assessment.prototype.processAssessment = function(assessments){
                   if(mm.isValid()){
 
                         collectionScoreSets.schoolYear     = mm.format('YYYY');
-                        collectionScoreSets.testSchoolId   = l.get(assessment, 'school.localId', me.notAvailable);
-                        collectionScoreSets.testSchoolName = l.get(assessment, 'school.schoolName', me.notAvailable);
-                        collectionScoreSets.testGrade      = l.get(assessment, 'studentGradeLevel', me.notAvailable);
+                        collectionScoreSets.localId   = l.get(assessment, 'school.localId', me.notAvailable);
+                        collectionScoreSets.schoolName = l.get(assessment, 'school.schoolName', me.notAvailable);
+                        collectionScoreSets.studentGradeLevel      = l.get(assessment, 'studentGradeLevel', me.notAvailable);
 
                         if(l.has(assessment, 'scoreSets.scoreSet')){
 
@@ -157,13 +157,13 @@ Assessment.prototype.processAssessment = function(assessments){
                                            * STATE HERE
                                            */
                                           newCollection = l.assign(collectionState, {
-                                                SubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
-                                                TestName: l.get(scoreSet, 'subTestName'),
-                                                TestAttemptCode: attemptCode,
-                                                TestAttempt: l.has(me.config.xAssessmentAttemptCodeType, attemptCode) ?
+                                              subTestSubjectArea: l.get(scoreSet, 'map'),
+                                              subTestName: l.get(scoreSet, 'subTestName'),
+                                              attemptCode: attemptCode,
+                                              attemptCodeDescription: l.has(me.config.xAssessmentAttemptCodeType, attemptCode) ?
                                                       me.config.xAssessmentAttemptCodeType[attemptCode].description : null,
-                                                TestSchool: collectionScoreSets.testSchoolName,
-                                                TestGrade: collectionScoreSets.testGrade
+                                              schoolName: collectionScoreSets.schoolName,
+                                              studentGradeLevel: collectionScoreSets.studentGradeLevel
                                           });
 
                                           if(l.has(scoreSet, 'scores.score')){
@@ -197,10 +197,10 @@ Assessment.prototype.processAssessment = function(assessments){
                                            * Map Here
                                            */
                                           newCollection = l.assign(collectionMap, {
-                                                SubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
-                                                TestName: l.get(scoreSet, 'subTestName'),
-                                                TestSchool: collectionScoreSets.testSchoolName,
-                                                TestGrade: collectionScoreSets.testGrade
+                                              subTestSubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
+                                              subTestName: l.get(scoreSet, 'subTestName'),
+                                              schoolName: collectionScoreSets.schoolName,
+                                              studentGradeLevel: collectionScoreSets.studentGradeLevel
                                           });
 
                                           if(l.has(scoreSet, 'scores.score')){
