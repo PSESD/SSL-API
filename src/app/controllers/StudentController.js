@@ -186,6 +186,8 @@ StudentController.getStudentsBackpack = function(req, res){
 
                     paginate.source = _.clone(results);
 
+                    //paginate.source.transcriptTerm = results.transcriptTerm;
+
                     delete paginate.source.details;
 
                     results = results.details;
