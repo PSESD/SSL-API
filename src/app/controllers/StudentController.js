@@ -1074,7 +1074,7 @@ StudentController.createByOrgId = function(req, res){
 
                     if(err.code && (err.code === 11000 || err.code === 11001)){
 
-                        err = res.__('errors.duplicate_student', { districtId: req.body.district_student_id, district: req.body.school_district });
+                        err = res.__('errors.duplicate_student', { districtId: (''+req.body.district_student_id).toUpperCase(), district: (''+req.body.school_district).toUpperCase() });
 
                     }
 
@@ -1335,7 +1335,7 @@ StudentController.putStudentById = function(req, res){
 
                     if(err.code && (err.code === 11000 || err.code === 11001)){
 
-                        err = res.__('errors.duplicate_student', { districtId: req.body.district_student_id, district: req.body.school_district });
+                        err = res.__('errors.duplicate_student', { districtId: (''+req.body.district_student_id).toUpperCase(), district: (''+req.body.school_district).toUpperCase() });
 
                     }
 
