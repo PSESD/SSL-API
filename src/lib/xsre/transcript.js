@@ -99,7 +99,7 @@ function Transcript(xsre){
 
     me.totalCreditsAttempted = 0;
 
-    me.info = { totalEarned: 0, totalAttempted: 0, gradeLevel: 0, currentSchoolYear: null, courseTitle: [] };
+    me.info = { totalEarned: 0, totalAttempted: 0, gradeLevel: 0 };
 
 }
 /**
@@ -197,7 +197,6 @@ Transcript.prototype.getHistory = function(){
             /**
              * Check Non-promotional changes
              */
-
             me.history.push(his);
 
         });
@@ -233,8 +232,6 @@ Transcript.prototype.getTranscript = function(){
     var me = this;
 
     if(null !== me.transcriptTerm) {
-
-        me.info.currentSchoolYear = me.transcriptTerm.schoolYear;
 
         me.processTranscript(me.transcriptTerm, true);
 
@@ -381,6 +378,7 @@ Transcript.prototype.getTranscript = function(){
         totalCumulativeGpa: me.academicSummary.cumulativeGpa.toFixed(1),
         gradeLevel: me.gradeLevel,
         academicSummary: me.academicSummary,
+        transcriptTerm: { courses: l.get(me.transcriptTerm, 'courses.course', []), school: l.get(me.transcriptTerm, 'school'), schoolYear: l.get(me.transcriptTerm, 'schoolYear', []) },
         info: me.info
     };
 };
@@ -429,9 +427,11 @@ Transcript.prototype.processTranscript = function(transcript, current){
                 return;
             }
 
-            if(course.courseTitle && me.info.courseTitle.indexOf(course.courseTitle) === -1){
-                me.info.courseTitle.push(course.courseTitle);
-            }
+            //if(course.courseTitle){
+            //
+            //    me.transcriptTerm.courses.push({ courseTitle: course.courseTitle, timeTablePeriod: course.timeTablePeriod });
+            //
+            //}
 
         });
 
@@ -624,6 +624,7 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
         scedCourseSubjectAreaCode: scedAreaCode,
         leaCourseId: course.leaCourseId,
         courseTitle: course.courseTitle || me.notAvailable,
+        timeTablePeriod: course.timeTablePeriod || me.notAvailable,
         mark: mark,
         gradeLevel: info.gradeLevel || me.notAvailable,
         creditsEarned: isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned),
@@ -697,6 +698,7 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
         scedCourseSubjectAreaCode: scedAreaCode,
         leaCourseId: course.leaCourseId,
         courseTitle: course.courseTitle || me.notAvailable,
+        timeTablePeriod: course.timeTablePeriod || me.notAvailable,
         mark: mark,
         gradeLevel: info.gradeLevel || me.notAvailable,
         creditsEarned: isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned),
