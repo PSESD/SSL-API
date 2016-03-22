@@ -68,9 +68,11 @@ Personal.prototype.getPersonal = function(){
             sex: l.get(me.xSre, 'demographics.sex') || me.notAvailable,
             birthDate: l.get(me.xSre, 'demographics.birthDate') || me.notAvailable
         },
-        email: [],
+        email: {},
+        otherEmails: [],
         address: l.get(me.xSre, 'address') || null,
-        phoneNumber: [],
+        phoneNumber: {},
+        otherPhoneNumbers: [],
         languages: [],
         enrollment: {},
         otherEnrollments: me.enrollmentHistories
@@ -78,22 +80,22 @@ Personal.prototype.getPersonal = function(){
 
     var phoneNumber = l.get(me.xSre, 'phoneNumber');
     if(l.get(phoneNumber, 'number')){
-        me.personal.xSre.phoneNumber.push(phoneNumber);
+        me.personal.xSre.phoneNumber = phoneNumber;
     }
 
     l.get(me.xSre, 'otherPhoneNumbers.phoneNumber', []).forEach(function(phoneNumber){
         if(l.get(phoneNumber, 'number')){
-            me.personal.xSre.phoneNumber.push(phoneNumber);
+            me.personal.xSre.otherPhoneNumbers.push(phoneNumber);
         }
     });
 
     var email = l.get(me.xSre, 'email');
     if(l.get(email, 'emailAddress')){
-        me.personal.xSre.email.push(email);
+        me.personal.xSre.email = email;
     }
     l.get(me.xSre, 'otherEmails.email', []).forEach(function(email){
         if(l.get(email, 'emailAddress')){
-            me.personal.xSre.email.push(email);
+            me.personal.xSre.otherEmails.push(email);
         }
     });
     /**
@@ -169,6 +171,7 @@ Personal.prototype.getPersonal = function(){
     me.personal.daysInAttendance = l.get(me.xSre, 'attendance.summaries.summary.daysInAttendance') || me.notAvailable;
     me.personal.daysAbsent = l.get(me.xSre, 'attendance.summaries.summary.daysAbsent') || me.notAvailable;
     me.personal.section504Status = l.get(me.xSre, 'programs.specialEducation.section504Status') || me.notAvailable;
+    me.personal.schoolYear = l.get(me.xSre, 'programs.specialEducation.schoolYear') || me.notAvailable;
     me.personal.eligibilityStatus = l.get(me.xSre, 'programs.foodService.eligibilityStatus') || me.notAvailable;
     me.personal.enrollmentStatus = l.get(me.xSre, 'programs.foodService.enrollmentStatus') || me.notAvailable;
     var specialEducationServices = l.get(me.xSre, 'programs.specialEducation.services');
