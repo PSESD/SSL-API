@@ -376,13 +376,13 @@ function collectCacheListStudentsAsync(force, done) {
 
                     if (error) {
                         benchmark.info(error);
-                        return cb(error, data);
+                        return cb(null, data);
                     }
 
                     if (!body) {
                         benchmark.info(error);
-                        return cb('Body was empty reponse', data);
-
+                        //return cb('Body was empty reponse', data);
+                        return cb(null, data);
                     }
 
                     if (response && response.statusCode === 200) {
