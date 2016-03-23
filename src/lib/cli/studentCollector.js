@@ -376,13 +376,13 @@ function collectCacheListStudentsAsync(force, done) {
 
                     if (error) {
                         benchmark.info(error);
-                        return cb(error, data);
+                        return cb(null, data);
                     }
 
                     if (!body) {
                         benchmark.info(error);
-                        return cb('Body was empty reponse', data);
-
+                        //return cb('Body was empty reponse', data);
+                        return cb(null, data);
                     }
 
                     if (response && response.statusCode === 200) {
@@ -392,7 +392,7 @@ function collectCacheListStudentsAsync(force, done) {
                             if (err) {
                                 benchmark.info(err);
                                 log(err, 'error');
-                                return cb(err, data);
+                                return cb(null, data);
                             }
                             var msg;
 
@@ -404,7 +404,7 @@ function collectCacheListStudentsAsync(force, done) {
                                     msg = 'Data not found!';
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
-                                return cb(msg, data);
+                                return cb(null, data);
 
                             }
 
@@ -416,7 +416,7 @@ function collectCacheListStudentsAsync(force, done) {
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
                                 log('XSRE - ERROR BODY RESULT: ' + msg, 'error');
-                                return cb(msg, data);
+                                return cb(null, data);
 
                             }
 
