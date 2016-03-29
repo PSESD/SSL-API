@@ -8,7 +8,6 @@ var fs = require('fs');
 var districtFile = __dirname + '/data/districts';
 var file = __dirname + '/data/students';
 var json = require(file);
-var php = require('phpjs');
 var _ = require('underscore');
 var l = require('lodash');
 var filename = districtFile;
