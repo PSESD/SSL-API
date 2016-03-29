@@ -405,6 +405,19 @@ Api.prototype.configureExpress = function (db) {
 
             }
 
+            if(typeof err !== 'string'){
+
+                for(var o in err){
+
+                    if(o !== 'code' && o !== 'message'){
+
+                        delete err[o];
+
+                    }
+                }
+
+            }
+
             var response = { success: false, error: err };
 
             resource = new hal.Resource(response, req.originalUrl);
