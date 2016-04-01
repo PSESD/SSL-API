@@ -29,7 +29,6 @@ var xSre = require(libPath+'/xsre');
 var async = require('async');
 var districtFile = rootPath + '/test/data/districts';
 var fs = require('fs');
-var php = require('phpjs');
 var filename = districtFile;
 var prefixListStudent = '_xsre_list_students_';
 var prefixListStudentDate = 'summary_student_list_date_';
@@ -569,7 +568,7 @@ function pullStudentAsyncWithoutOrg(ok){
 
                 }
             }
-            ok(php.nl2br(ee), studentNumber);
+            ok(_funct.nl2br(ee), studentNumber);
         });
     };
 

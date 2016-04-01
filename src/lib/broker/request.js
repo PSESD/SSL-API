@@ -336,7 +336,7 @@ RequestXSRE.prototype = {
 
                         benchmark.info('REQUEST-XSRE-HZB: STORE DATA TO CACHE');
 
-                        callback(error, response, body);
+                        callback(null, response, body);
 
                     });
 

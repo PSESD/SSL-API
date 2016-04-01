@@ -31,8 +31,7 @@ var os = require('os');
 var studentCollector = require('./lib/cli/studentCollector');
 var tokenCleaner = require('./lib/cli/tokenCleaner');
 var request = require('./lib/cli/request');
-var php = require('phpjs');
-var codeSet = require('./lib/xsre/codeset');
+var _funct = require(__dirname + '/lib/function');
 var parseString = require('xml2js').parseString;
 var rollbar = require('rollbar');
 var rollbarEnv = config.util.getEnv('NODE_ENV');
@@ -115,7 +114,7 @@ function withError(err, message, params, done){
         if(err instanceof Error){
             err = err.stack.split("\n");
         }
-        utils.log('Error: ' + php.nl2br(err), 'error', function () {
+        utils.log('Error: ' + _funct.nl2br(err), 'error', function () {
             sentItEmail(message, params, done, err);
         });
     } else {
@@ -160,9 +159,9 @@ function sentItEmail(message, params, done, err){
         ireplace.push(params[i]);
     }
 
-    var subject = php.str_replace( iregex, ireplace, subjectEmail);
-    message = php.str_replace(iregex, ireplace, message);
-    bodyEmail = php.str_replace(iregex, ireplace, bodyEmail);
+    var subject = _funct.str_replace( iregex, ireplace, subjectEmail);
+    message = _funct.str_replace(iregex, ireplace, message);
+    bodyEmail = _funct.str_replace(iregex, ireplace, bodyEmail);
     message = bodyEmail + "<br><br>" + message;
     if(err){
         message += '<br><strong>' +
@@ -173,7 +172,7 @@ function sentItEmail(message, params, done, err){
     if(diff.change && diff.change.details){
         delete diff.change.details;
     }
-    message = php.nl2br(message) + "<br><br>" +
+    message = _funct.nl2br(message) + "<br><br>" +
         "Leak Detection and Heap Diffing:<br>" +
         "<pre><code>Before: " + JSON.stringify(diff.before) + '</code></pre>' +
         "<pre><code>After: " + JSON.stringify(diff.after) + '</code></pre>' +

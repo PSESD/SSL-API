@@ -15,12 +15,10 @@ var Token = require('../models/Token');
 var Organization = require('../models/Organization');
 var BaseController = require('./BaseController');
 var _ = require('underscore');
-var php = require('phpjs');
 var Request = require('../../lib/broker/request');
 var parseString = require('xml2js').parseString;
 var utils = require('../../lib/utils'), cache = utils.cache(), redirectUri = utils.getOrganizationUri;
 var ObjectId = mongoose.Types.ObjectId;
-var slug = require('slug');
 var ApplicationController = new BaseController(Client).crud();
 
 /**

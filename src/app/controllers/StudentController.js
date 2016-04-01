@@ -795,6 +795,12 @@ StudentController.getStudents = function(req, res){
                 return res.sendError(err);
             }
 
+            if(!_.isArray(results)){
+
+                results = [];
+
+            }
+
             return res.sendSuccess(null, results);
 
         });
