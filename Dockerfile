@@ -14,7 +14,7 @@ ENV NODE_CONFIG_DIR /src/config
 # Install Required Packages
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get -y install curl unzip git wget vim nginx python-setuptools libkrb5-dev
-RUN curl -sL https://deb.nodesource.com/setup | sudo -E bash -
+RUN curl https://deb.nodesource.com/setup | bash -
 RUN apt-get install -y nodejs npm
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 RUN export TERM=xterm
