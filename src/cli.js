@@ -15,7 +15,7 @@
 })();
 
 
-var memwatch = require('memwatch');
+var memwatch = require('memwatch-next');
 // Take first snapshot
 var hd = new memwatch.HeapDiff();
 var bs = require('nodestalker'),
