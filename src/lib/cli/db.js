@@ -9,17 +9,13 @@ function db() {
 
     this.mongo = mongoose;
 
-    this.dbUri = 'mongodb://' + config.get('db.mongo.host') + '/' + config.get('db.mongo.name');
+    this.dbUri = config.get('db.mongo');
 
-    var configDbMonggo = config.get('db.mongo');
-
-    if(_.isObject(configDbMonggo)){
+    if(_.isObject(this.dbUri) && config.has('db.mongo.host') && config.has('db.mongo.name')){
         this.dbUri = 'mongodb://' + config.get('db.mongo.host') + '/' + config.get('db.mongo.name');
-    } else if(_.isString(configDbMonggo)) {
-        this.dbUri = 'mongodb://' + configDbMonggo;
     }
 
-    this.mongoOptions = config.get('db.mongo_options') || {};
+    this.mongoOptions = config.has('db.mongo_options') ? config.get('db.mongo_options') : {};
 
     this.env = config.util.getEnv('NODE_ENV');
 
