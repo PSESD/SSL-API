@@ -15,9 +15,9 @@ ENV NODE_CONFIG_DIR /src/config
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get -y install curl unzip git wget vim nginx python-setuptools libkrb5-dev
 RUN curl -sL https://deb.nodesource.com/setup_0.10 | bash -
-RUN apt-get install -y nodejs
-RUN apt-get install -y npm
-RUN ln -s /usr/bin/nodejs /usr/bin/node
+#RUN apt-get install -y nodejs
+#RUN apt-get install -y npm
+#RUN ln -s /usr/bin/nodejs /usr/bin/node
 RUN export TERM=xterm
 
 # Setup Nginx
@@ -33,8 +33,12 @@ ADD /src /src
 RUN chown -R node:node /src
 RUN chown -R node:node /config
 WORKDIR /src
-RUN npm -g update npm
-RUN npm install
+RUN wget nodejs.org/dist/v0.10.36/node-v0.10.36-linux-x64.tar.gz
+RUN tar -C /usr/local --strip-components 1 -xzf node-v0.10.36-linux-x64.tar.gz
+RUN ln -s /usr/local/bin/node /usr/bin/node
+RUN ln -s /usr/local/bin/npm /usr/bin/npm
+#RUN npm -g update npm
+#RUN npm install
 
 # Setup crontab
 RUN apt-get -y install rsyslog
