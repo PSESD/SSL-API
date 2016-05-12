@@ -108,7 +108,8 @@ Rest.prototype.routeOrganization = function(){
 
     this.router.route('/:organizationId/profile' + this.format)
         .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.organizationController.profile)
-        .put(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.organizationController.updateProfile);
+        //.put(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.organizationController.updateProfile)
+    ;
 
 };
 /**
@@ -248,7 +249,7 @@ Rest.prototype.routeTest = function(){
         this.router.get('/:organizationId/students/:studentId/xsre-skip' + this.format, this.studentController.getStudentsBackpack);
         this.router.get('/dummy/test' + this.format, this.Api.controller('DummyController').index);
         this.router.get('/users/cleanup' + this.format, this.userController.cleanAll);
-        this.router.route('/organizations' + this.format).post(this.auth.isBearerAuthenticated, this.auth.isAdmin, this.organizationController.create);
+        //this.router.route('/organizations' + this.format).post(this.auth.isBearerAuthenticated, this.auth.isAdmin, this.organizationController.create);
         this.router.route('/user' + this.format)
             .post(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.userController.create)
             .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.userController.deleteByEmail)
