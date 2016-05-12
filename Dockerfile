@@ -13,7 +13,7 @@ ENV NODE_CONFIG_DIR /src/config
 
 # Install Required Packages
 RUN apt-get update && apt-get -y upgrade
-RUN apt-get -y install curl unzip git wget vim nginx python-setuptools libkrb5-dev
+RUN apt-get -y install curl unzip git wget vim nginx python-setuptools libkrb5-dev build-essential
 #RUN curl -sL https://deb.nodesource.com/setup_0.10 | bash -
 #RUN apt-get install -y nodejs
 #RUN apt-get install -y npm
@@ -37,8 +37,8 @@ RUN wget nodejs.org/dist/v0.10.45/node-v0.10.45-linux-x64.tar.gz
 RUN tar -C /usr/local --strip-components 1 -xzf node-v0.10.45-linux-x64.tar.gz
 RUN ln -s /usr/local/bin/node /usr/bin/node
 RUN ln -s /usr/local/bin/npm /usr/bin/npm
-#RUN npm -g update npm
-#RUN npm install
+RUN npm -g update npm
+RUN npm install
 
 # Setup crontab
 RUN apt-get -y install rsyslog
