@@ -16,7 +16,7 @@ checkout:
 
 dependencies:
   override:
-    - docker rm -f api
+    - docker info
     - docker build -t psesd/ssl-api:develop .
 
 test:
