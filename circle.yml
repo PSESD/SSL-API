@@ -7,6 +7,7 @@ machine:
     - docker
 checkout:
   pre:
+    - ssh cbo@cbo.upward.st
     - mkdir -p $HOME/docker
     - cd $HOME/docker
   override:
@@ -16,7 +17,7 @@ checkout:
 
 dependencies:
   override:
-    - docker info
+    - docker rm -rf api
     - docker build -t psesd/ssl-api:develop .
 
 test:
