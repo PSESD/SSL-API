@@ -1,11 +1,5 @@
-dependencies:
-  override:
-    - docker rm -rf api
-    - docker build -t psesd/ssl-api:develop .
-
 test:
   override:
-    - docker run -d --name api --link redis:redis -p 104.192.103.12:443:443 -e "NODE_ENV=development" -e "NODE_CONFIG_DIR=/config" -v /config:/config psesd/ssl-api:develop; sleep 10
     - curl --retry 10 --retry-delay 5 -v https://api.cbo.upward.st
 
 deployment:
