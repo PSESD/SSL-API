@@ -1,3 +1,7 @@
+dependencies:
+  override:
+    - apt-get install sshpass
+
 test:
   override:
     - curl --retry 10 --retry-delay 5 -v https://api.cbo.upward.st
@@ -6,6 +10,5 @@ deployment:
   push_to_server:
       branch: develop
       commands:
-        - git pull cbo@cbo.upward.st:/home/cbo/docker/api
-        - chmod +x cbo@cbo.upward.st:/docker.sh
-        - cbo@cbo.upward.st:/docker.sh
+        - chmod +x ./docker.sh
+        - ./docker.sh

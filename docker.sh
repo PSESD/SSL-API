@@ -1,5 +1,5 @@
 #!/bin/bash
-ssh cbo@cbo.upward.st
+sshpass -p '$SSH_PASSWORD' ssh $SSH_USERNAME@$SSH_HOST
 cd /home/cbo/docker/api
 git pull origin develop
 docker rm -f api
