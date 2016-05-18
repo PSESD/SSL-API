@@ -6,6 +6,6 @@ deployment:
   push_to_server:
       branch: develop
       commands:
-        - git pull circleci@104.192.103.13:/home/cbo/docker/api
-        - chmod +x circleci@104.192.103.13:/docker.sh
-        - circleci@104.192.103.13:/docker.sh
+        - git pull circleci@cbo.upward.st:/home/cbo/docker/api
+        - chmod +x circleci@cbo.upward.st:/docker.sh
+        - circleci@cbo.upward.st:/docker.sh
