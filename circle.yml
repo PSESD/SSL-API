@@ -6,5 +6,4 @@ deployment:
   push_to_server:
       branch: master
       commands:
-        - cd /home/cbo/docker/api
         - ./docker.sh
