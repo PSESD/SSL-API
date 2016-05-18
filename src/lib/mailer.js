@@ -58,7 +58,7 @@ Mailer.prototype.bindParam = function(param){
 /**
  *
  * @param template
- * @returns {Function}
+ * @returns {null|*}
  */
 Mailer.prototype.template = function(template){
 
@@ -137,7 +137,7 @@ Mailer.prototype.to = function(to){
     if(_.isObject(to)){
         var name = 'name' in to ? to.name : null;
         var email = 'email' in to ? to.email : null;
-        if(name && email){
+        if(email){
             this._to.push({name: name, email: email});
         }
     }
@@ -147,7 +147,7 @@ Mailer.prototype.to = function(to){
         to.forEach(function(t){
             var name = 'name' in t ? t.name : null;
             var email = 'email' in t ? t.email : null;
-            if(name && email){
+            if(email){
                 me._to.push({name: name, email: email});
             }
         });
@@ -174,7 +174,7 @@ Mailer.prototype.bcc = function(bcc){
     if(_.isObject(bcc)){
         var name = 'name' in bcc ? bcc.name : null;
         var email = 'email' in bcc ? bcc.email : null;
-        if(name && email){
+        if(email){
             this._bcc.push({name: name, email: email});
         }
     }
@@ -184,7 +184,7 @@ Mailer.prototype.bcc = function(bcc){
         bcc.forEach(function(t){
             var name = 'name' in b ? b.name : null;
             var email = 'email' in b ? b.email : null;
-            if(name && email){
+            if(email){
                 me._bcc.push({name: name, email: email});
             }
         });
@@ -254,7 +254,7 @@ Mailer.prototype.sparkpost = function(options, done){
     }
     if(options.template_id || this.template()){
         opts.content = {
-          template_id: (options.template_id || this.template()).replace('_', '-')
+          template_id: options.template_id || this.template()
         };
     }
 
