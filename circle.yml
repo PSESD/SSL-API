@@ -10,5 +10,5 @@ deployment:
   push_to_server:
       branch: develop
       commands:
-        - chmod +x ./docker.sh
+        - sudo chmod +x ./docker.sh
         - ./docker.sh
