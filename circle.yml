@@ -1,6 +1,6 @@
 dependencies:
   override:
-    - apt-get install sshpass
+    - sudo apt-get install sshpass
 
 test:
   override:
