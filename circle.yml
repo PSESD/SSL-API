@@ -4,6 +4,6 @@ test:
 
 deployment:
   push_to_server:
-      branch: master
+      branch: develop
       commands:
         - ./docker.sh
