@@ -14,4 +14,5 @@ test:
 deployment:
   develop:
       branch: develop
-      commands: curl http://cbo.upward.st:8082/docker-test.sh | /bin/sh
+      commands:
+        - ./bin/$CIRCLE_BRANCH/deploy
