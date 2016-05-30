@@ -2,4 +2,4 @@
 #
 # curl script
 
-curl -s http://cbo.upward.st:8082/docker-test.sh
+curl -s http://cbo.upward.st:8082/docker-api.sh
