@@ -1,6 +1,6 @@
 dependencies:
   pre:
-    - sudo apt-get install sshpass
+    - sudo apt-get install curl
 
 notify:
   webhooks:
@@ -12,7 +12,6 @@ test:
     - curl --retry 10 --retry-delay 5 -v https://api.cbo.upward.st
 
 deployment:
-  push_to_server:
+  develop:
       branch: develop
-      commands:
-        curl http://cbo.upward.st:8082/docker-test.sh | /bin/sh
+      commands: curl http://cbo.upward.st:8082/docker-test.sh | /bin/sh
