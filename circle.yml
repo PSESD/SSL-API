@@ -15,4 +15,5 @@ deployment:
   develop:
       branch: develop
       commands:
+        - sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
         - ./bin/$CIRCLE_BRANCH/deploy
