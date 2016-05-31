@@ -2,4 +2,4 @@
 #
 # curl script
 
-#curl -s http://cbo.upward.st:8082/docker-api.sh
+cd /home/ubuntu/CBO-Portal-API/src && npm update && node ./script.js
