@@ -5,21 +5,7 @@
 /**
  *
  */
-
-(function(){
-    var pathEnv = process.env.NODE_CONFIG_DIR;
-    if(!pathEnv){
-        pathEnv = __dirname + '/config';
-    }
-    var dotenv = require('dotenv').config({ path: pathEnv + '/.env' });
-    if(dotenv){
-        for(var env in dotenv){
-            process.env[env] = dotenv[env];
-        }
-    }
-})();
-
-if(process.env.NODE_ENV === 'development'){
+if(process.env.CIRCLE_BRANCH === 'develop'){
     var SSH_USERNAME = process.env.SSH_USERNAME;
     var SSH_PASSWORD = process.env.SSH_PASSWORD;
     var SSH_HOST = process.env.SSH_HOST;
