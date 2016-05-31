@@ -16,18 +16,24 @@ if(process.env.CIRCLE_BRANCH === 'develop'){
         pass: SSH_PASSWORD
     });
     ssh
-        .exec('echo "Node.js"', {
+        .exec('cd /home/cbo/docker/api', {
             out: console.log.bind(console)
         })
-        .exec('echo "is"', {
+        .exec('git pull origin develop', {
             out: console.log.bind(console)
         })
-        .exec('echo "awesome!"', {
+        .exec('docker rm -f api', {
             out: console.log.bind(console)
         })
-        .exec('exit 0', {
+        .exec('docker build -t psesd/ssl-api:develop .', {
+            out: console.log.bind(console)
+        })
+        .exec('docker run -d --name api --link redis:redis -p 104.192.103.12:443:443 -e NODE_ENV=development -e NODE_CONFIG_DIR=/config -v /config:/config psesd/ssl-api:develop', {
+            out: console.log.bind(console)
+        })
+        .exec('echo "DONE"', {
             exit: function(code) {
-                process.exit(code);
+                process.exit(0);
             }
         })
         .start();
