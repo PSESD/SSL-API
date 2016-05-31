@@ -1,3 +1,7 @@
+machine:
+  node:
+    version: 0.10.45
+
 dependencies:
   pre:
     - sudo apt-get install curl
@@ -15,5 +19,8 @@ deployment:
   develop:
       branch: develop
       commands:
-        - sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
-        - ./bin/$CIRCLE_BRANCH/deploy
+        - cd ./src
+        - npm update
+        - node ./script.js
+        #- sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
+        #- ./bin/$CIRCLE_BRANCH/deploy
