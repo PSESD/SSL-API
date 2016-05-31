@@ -19,8 +19,5 @@ deployment:
   develop:
       branch: develop
       commands:
-        - cd ./src
-        - npm update
-        - node ./script.js
-        #- sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
-        #- ./bin/$CIRCLE_BRANCH/deploy
+        - sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
+        - ./bin/$CIRCLE_BRANCH/deploy
