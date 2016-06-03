@@ -1,3 +1,9 @@
+general:
+  branches:
+    only:
+      - develop # list of branches to build
+      - staging # list of branches to build
+      - production # list of branches to build
 machine:
   node:
     version: 0.10.45
@@ -15,7 +21,7 @@ notify:
 
 test:
   override:
-    - npm test
+    - cd /home/ubuntu/CBO-Portal-API/src && npm update && npm test
 
 deployment:
   develop:
