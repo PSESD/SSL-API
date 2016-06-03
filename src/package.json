@@ -76,7 +76,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "NODE_ENV=test node app.js"
+    "test": "NODE_ENV=test mocha ./tests/test.js -t300000"
   },
   "repository": {
     "type": "git",

@@ -6,9 +6,9 @@
  *
  */
 if(process.env.CIRCLE_BRANCH === 'develop'){
-    var SSH_USERNAME = process.env.SSH_USERNAME;
-    var SSH_PASSWORD = process.env.SSH_PASSWORD;
-    var SSH_HOST = process.env.SSH_HOST;
+    var SSH_USERNAME = process.env.DEV_SSH_USERNAME;
+    var SSH_PASSWORD = process.env.DEV_SSH_PASSWORD;
+    var SSH_HOST = process.env.DEV_SSH_HOST;
     var SSH = require('simple-ssh');
     var ssh = new SSH({
         host: SSH_HOST,

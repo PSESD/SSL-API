@@ -1,6 +1,8 @@
 machine:
   node:
     version: 0.10.45
+  post:
+    - npm update -g
 
 dependencies:
   pre:
@@ -13,7 +15,7 @@ notify:
 
 test:
   override:
-    - curl --retry 10 --retry-delay 5 -v https://api.cbo.upward.st
+    - npm test
 
 deployment:
   develop:
