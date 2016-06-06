@@ -10,6 +10,10 @@ machine:
   post:
     - npm update -g
 
+checkout:
+  post:
+    - sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
+
 dependencies:
   pre:
     - sudo apt-get install curl
@@ -27,5 +31,4 @@ deployment:
   develop:
       branch: develop
       commands:
-        - sudo chmod u+x ./bin/$CIRCLE_BRANCH/deploy
         - ./bin/$CIRCLE_BRANCH/deploy
