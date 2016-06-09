@@ -55,7 +55,10 @@ function sleep(time, callback) {
     }
     callback();
 }
-
+/**
+ *
+ * @param cb
+ */
 RunscopeTrigger.prototype.run = function( cb ) {
     var me = this;
     var resultsUrl = me.process(url, TEST_TRIGGER);
@@ -67,31 +70,28 @@ RunscopeTrigger.prototype.run = function( cb ) {
     this.log("API URL:" + apiResultsUrl);
 
     setTimeout(function(){
-        while (true) {
-            resp = me.process(apiResultsUrl, TEST_RESULTS);
-            me.log("Response received:" + resp);
-
-            /* If test run is not complete, sleep 1s and try again. */
-            if (TEST_RESULTS_WORKING === resp || TEST_RESULTS_QUEUED === resp) {
-                var stop = new Date().getTime();
-                while(new Date().getTime() < stop + 1000) {
-                    ;
-                }
-            } else {
-                break;
-            }
-        }
+        async.whilst(
+            function(){
+              return TEST_RESULTS_WORKING !== resp && TEST_RESULTS_QUEUED !== resp;
+            },
+            function(next){
+                me.process(apiResultsUrl, TEST_RESULTS, function(res){
+                    resp = res;
+                    if (TEST_RESULTS_WORKING === resp || TEST_RESULTS_QUEUED === resp) {
+                        var stop = new Date().getTime();
+                        while(new Date().getTime() < stop + 1000) {
+                            ;
+                        }
+                        next(null, res);
+                    } else {
+                        next('stop');
+                    }
+                });
+            },
+            cb
+        );
     }, 10000);
 
-    async.whilst(
-        function(next){
-            me.process(apiResultsUrl, function(){
-
-            });
-        }
-    );
-
-    return resp;
 };
 
 /**
@@ -104,11 +104,10 @@ RunscopeTrigger.prototype.run = function( cb ) {
  */
 RunscopeTrigger.prototype.process = function(url, apiEndPoint, cb) {
     var me = this;
-    var result = "";
     var options = {
         timeout: 60 * 1000,
         headers: {
-            "User-Agent": "runscope-jenkins-plugin/1.47",
+            "User-Agent": "runscope-circleci/1.0"
         },
         preambleCRLF: true,
         postambleCRLF: true,
@@ -123,10 +122,10 @@ RunscopeTrigger.prototype.process = function(url, apiEndPoint, cb) {
         // body is the decompressed response body
         console.log('server encoded the data as: ' + (response.headers['content-encoding'] || 'identity'));
         console.log('the decoded data is: ' + body);
-        if (response.statusCode != 200 && response.statusCode != 201) {
-            cb('exit', TEST_RESULTS_FAIL);
+        if (error || (response.statusCode != 200 && response.statusCode != 201)) {
+            cb(TEST_RESULTS_FAIL);
         } else {
-            cb(null, me.parseJSON(body, apiEndPoint));
+            cb(me.parseJSON(body, apiEndPoint));
         }
     });
 };
