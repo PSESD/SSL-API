@@ -20,6 +20,7 @@ const TEST_RESULTS_FAIL = "fail";
 var url;
 var resp = null;
 var request = require('request');
+var async = require('async');
 /**
  *
  * @param search
@@ -42,7 +43,11 @@ function RunscopeTrigger(logger, url, accessToken) {
     this.url = url;
     this.accessToken = accessToken;
 }
-
+/**
+ *
+ * @param time
+ * @param callback
+ */
 function sleep(time, callback) {
     var stop = new Date().getTime();
     while(new Date().getTime() < stop + time) {
@@ -78,6 +83,14 @@ RunscopeTrigger.prototype.run = function( cb ) {
         }
     }, 10000);
 
+    async.whilst(
+        function(next){
+            me.process(apiResultsUrl, function(){
+
+            });
+        }
+    );
+
     return resp;
 };
 
@@ -86,74 +99,61 @@ RunscopeTrigger.prototype.run = function( cb ) {
  *
  * @param url
  * @param apiEndPoint
+ * @param cb
  * @return
  */
-RunscopeTrigger.prototype.process = function(url, apiEndPoint) {
+RunscopeTrigger.prototype.process = function(url, apiEndPoint, cb) {
+    var me = this;
     var result = "";
-    //try {
-    //    httpclient.start();
-    //
-    //    final RequestConfig config = RequestConfig.custom()
-    //        .setConnectTimeout(60 * 1000)
-    //        .setConnectionRequestTimeout(60 * 1000)
-    //        .setSocketTimeout(60 * 1000).build();
-    //
-    //    final HttpGet request = new HttpGet(url);
-    //    request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-    //    request.setHeader("User-Agent", "runscope-jenkins-plugin/1.47");
-    //    request.setConfig(config);
-    //    final Future<HttpResponse> future = httpclient.execute(request, null);
-    //    final HttpResponse response = future.get();
-    //
-    //    final int statusCode = response.getStatusLine().getStatusCode();
-    //    if (statusCode != 200 && statusCode != 201) {
-    //        this.log(String.format("Error retrieving details from Runscope API, marking as failed: %s", statusCode));
-    //        result = TEST_RESULTS_FAIL;
-    //    } else {
-    //        String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
-    //        this.log("Data received: " + responseBody);
-    //        result = parseJSON(responseBody, apiEndPoint);
-    //    }
-    //} catch (Exception e) {
-    //    LOGGER.log(Level.SEVERE, "Exception: ", e);
-    //    e.printStackTrace();
-    //} finally {
-    //    try {
-    //        httpclient.close();
-    //    } catch (IOException e) {
-    //        LOGGER.log(Level.SEVERE, "Error closing connection: ", e);
-    //        e.printStackTrace();
-    //    }
-    //}
-    return result;
-};
+    var options = {
+        timeout: 60 * 1000,
+        headers: {
+            "User-Agent": "runscope-jenkins-plugin/1.47",
+        },
+        preambleCRLF: true,
+        postambleCRLF: true,
+        uri: url,
+        method: 'GET',
+        auth: {
+            bearer: this.accessToken
+        }
+    };
 
+    request(options, function (error, response, body) {
+        // body is the decompressed response body
+        console.log('server encoded the data as: ' + (response.headers['content-encoding'] || 'identity'));
+        console.log('the decoded data is: ' + body);
+        if (response.statusCode != 200 && response.statusCode != 201) {
+            cb('exit', TEST_RESULTS_FAIL);
+        } else {
+            cb(null, me.parseJSON(body, apiEndPoint));
+        }
+    });
+};
 
 /**
  * @param data
  * @param apiEndPoint
  * @return test result
  */
-//private String parseJSON(String data, String apiEndPoint) {
-//
-//    this.log("API EndPoint: " + apiEndPoint);
-//
-//    JSONObject jsonObject = JSONObject.fromObject(data);
-//    JSONObject dataObject = (JSONObject) jsonObject.get("data");
-//
-//    if (TEST_TRIGGER.equals(apiEndPoint)) {
-//        JSONArray runsArray = dataObject.getJSONArray("runs");
-//        JSONObject runsObject = (JSONObject) runsArray.get(0);
-//        return runsObject.get("url").toString();
-//    }
-//
-//    String testResult = dataObject.get("result").toString();
-//
-//    if (TEST_RESULTS_PASS.equals(testResult)) {
-//        this.log("Test run passed successfully");
-//    } else if (TEST_RESULTS_FAIL.equals(testResult)) {
-//        this.log("Test run failed, marking the build as failed");
-//        LOGGER.log(Level.SEVERE, "Test run failed");
-//    }
-//    return testResult;
-//}
+RunscopeTrigger.prototype.parseJSON = function(data, apiEndPoint) {
+
+    this.log("API EndPoint: " + apiEndPoint);
+
+    var dataObject = data.data;
+
+    if (TEST_TRIGGER === apiEndPoint) {
+        var runsArray = dataObject.runs;
+        var runsObject = runsArray[0];
+        return runsObject.url + '';
+    }
+
+    var testResult = dataObject.result + '';
+
+    if (TEST_RESULTS_PASS === testResult) {
+        this.log("Test run passed successfully");
+    } else if (TEST_RESULTS_FAIL === testResult) {
+        this.log("Test run failed, marking the build as failed");
+    }
+    return testResult;
+};
