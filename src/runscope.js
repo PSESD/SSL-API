@@ -8,27 +8,28 @@
  *
  * @email help@runscope.com
  */
-const SCHEME = "https";
-const API_HOST = "api.runscope.com";
-const RUNSCOPE_HOST = "www.runscope.com";
-const TEST_TRIGGER = "trigger";
-const TEST_RESULTS = "results";
-const TEST_RESULTS_PASS = "pass";
-const TEST_RESULTS_WORKING = "working";
-const TEST_RESULTS_QUEUED = "queued";
-const TEST_RESULTS_FAIL = "fail";
+var SCHEME = "https";
+var API_HOST = "api.runscope.com";
+var RUNSCOPE_HOST = "www.runscope.com";
+var TEST_TRIGGER = "trigger";
+var TEST_RESULTS = "results";
+var TEST_RESULTS_PASS = "pass";
+var TEST_RESULTS_WORKING = "working";
+var TEST_RESULTS_QUEUED = "queued";
+var TEST_RESULTS_FAIL = "fail";
 var url;
 var resp = null;
 var request = require('request');
 var async = require('async');
 /**
  *
+ * @param str
  * @param search
  * @param replacement
  * @returns {string}
  */
-String.prototype.replaceAll = function(search, replacement) {
-    var target = this;
+var replaceAll = function(str, search, replacement) {
+    var target = str + '';
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 /**
@@ -61,36 +62,47 @@ function sleep(time, callback) {
  */
 RunscopeTrigger.prototype.run = function( cb ) {
     var me = this;
-    var resultsUrl = me.process(url, TEST_TRIGGER);
-    me.log("Test Results URL:" + resultsUrl);
+    me.process(me.url, TEST_TRIGGER, function(err, resultsUrl){
 
-    /* TODO: If bucketId or test run detail URI gets added to trigger
-     response, use those instead of regex */
-    var apiResultsUrl = resultsUrl.replaceAll(RUNSCOPE_HOST + "\\/radar\\/([^\\/]+)\\/([^\\/]+)\\/results\\/([^\\/]+)", API_HOST + "/buckets/$1/radar/$2/results/$3");
-    this.log("API URL:" + apiResultsUrl);
+        if(err){
+            return cb(err);
+        }
 
-    setTimeout(function(){
+        me.log("Test Results URL:" + resultsUrl);
+
+        /* TODO: If bucketId or test run detail URI gets added to trigger
+         response, use those instead of regex */
+        var apiResultsUrl = replaceAll(resultsUrl, RUNSCOPE_HOST + "\\/radar\\/([^\\/]+)\\/([^\\/]+)\\/results\\/([^\\/]+)", API_HOST + "/buckets/$1/radar/$2/results/$3");
+        me.log("API URL:" + apiResultsUrl);
+
+        var resp = null;
         async.whilst(
             function(){
-              return TEST_RESULTS_WORKING !== resp && TEST_RESULTS_QUEUED !== resp;
+                //console.log('IS RESP: ' + resp);
+                return TEST_RESULTS_WORKING === resp || TEST_RESULTS_QUEUED === resp || resp === null;
             },
             function(next){
-                me.process(apiResultsUrl, TEST_RESULTS, function(res){
-                    resp = res;
-                    if (TEST_RESULTS_WORKING === resp || TEST_RESULTS_QUEUED === resp) {
-                        var stop = new Date().getTime();
-                        while(new Date().getTime() < stop + 1000) {
-                            ;
+                setTimeout(function(){
+                    me.process(apiResultsUrl, TEST_RESULTS, function(err, res){
+                        if(err){
+                            return next(err);
                         }
-                        next(null, res);
-                    } else {
-                        next('stop');
-                    }
-                });
+                        resp = res;
+                        //console.log(' >>>> RESPONSE IN LOOP: ' + resp);
+                        if(TEST_RESULTS_WORKING === resp || TEST_RESULTS_QUEUED === resp){
+                            var stop = new Date().getTime();
+                            while(new Date().getTime() < stop + 1000){
+                                ;
+                            }
+                        }
+                        next(null, resp);
+                    });
+                }, 10000);
             },
             cb
         );
-    }, 10000);
+
+    });
 
 };
 
@@ -120,12 +132,13 @@ RunscopeTrigger.prototype.process = function(url, apiEndPoint, cb) {
 
     request(options, function (error, response, body) {
         // body is the decompressed response body
-        console.log('server encoded the data as: ' + (response.headers['content-encoding'] || 'identity'));
-        console.log('the decoded data is: ' + body);
+        //console.log('server encoded the data as: ' , (response || 'identity'));
+        //console.log('the error data is: ', error);
+        //console.log('the decoded data is: ' + body);
         if (error || (response.statusCode != 200 && response.statusCode != 201)) {
             cb(TEST_RESULTS_FAIL);
         } else {
-            cb(me.parseJSON(body, apiEndPoint));
+            cb(null, me.parseJSON(JSON.parse(body), apiEndPoint));
         }
     });
 };
@@ -154,5 +167,8 @@ RunscopeTrigger.prototype.parseJSON = function(data, apiEndPoint) {
     } else if (TEST_RESULTS_FAIL === testResult) {
         this.log("Test run failed, marking the build as failed");
     }
+    //console.log('TEST RESULT: ', testResult);
     return testResult;
 };
+
+module.exports = RunscopeTrigger;
