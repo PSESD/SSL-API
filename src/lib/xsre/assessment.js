@@ -52,14 +52,15 @@ Assessment.prototype.getAssessment = function(){
 
       me.collections.forEach(function(collection){
 
-            var key = String(collection.schoolYear);
+            var key = String(collection.studentGradeLevel);
 
             if(key in collectionObjects){
-                  collectionObjects[key].maps = collectionObjects[collection.schoolYear].maps.concat(collection.maps);
-                  collectionObjects[key].states = collectionObjects[collection.schoolYear].states.concat(collection.states);
+                  collectionObjects[key].maps = collectionObjects[collection.studentGradeLevel].maps.concat(collection.maps);
+                  collectionObjects[key].states = collectionObjects[collection.studentGradeLevel].states.concat(collection.states);
             } else {
                   collectionObjects[key] = {
-                        schoolYear: key,
+                        schoolYear: collection.schoolYear,
+                        studentGradeLevel: key,
                         maps: collection.maps,
                         states: collection.states
                   };
@@ -73,7 +74,7 @@ Assessment.prototype.getAssessment = function(){
 
       });
 
-      return _.sortBy(collections, 'schoolYear').reverse();
+      return _.sortBy(collections, 'studentGradeLevel').reverse();
 };
 /**
  *
@@ -85,12 +86,12 @@ Assessment.prototype.processAssessment = function(assessments){
 
       var mm = null;
 
-      if(_.isObject(assessments.assessment)){
+      if(!_.isArray(assessments.assessment)){
             assessments.assessment = [ assessments.assessment ];
       }
 
       if(assessments.assessment && _.isArray(assessments.assessment)){
-
+            
             assessments.assessment.forEach(function(assessment){
 
                   var collectionScoreSets = {
@@ -129,123 +130,119 @@ Assessment.prototype.processAssessment = function(assessments){
 
                   mm = moment(new Date(assessment.actualStartDateTime));
 
-                  if(mm.isValid()){
+                  collectionScoreSets.schoolYear     = mm.isValid() ? mm.format('YYYY') : me.notAvailable;
+                  collectionScoreSets.localId   = l.get(assessment, 'school.localId', me.notAvailable);
+                  collectionScoreSets.schoolName = l.get(assessment, 'school.schoolName', me.notAvailable);
+                  collectionScoreSets.studentGradeLevel      = l.get(assessment, 'studentGradeLevel', me.notAvailable);
 
-                        collectionScoreSets.schoolYear     = mm.format('YYYY');
-                        collectionScoreSets.localId   = l.get(assessment, 'school.localId', me.notAvailable);
-                        collectionScoreSets.schoolName = l.get(assessment, 'school.schoolName', me.notAvailable);
-                        collectionScoreSets.studentGradeLevel      = l.get(assessment, 'studentGradeLevel', me.notAvailable);
+                  if(l.has(assessment, 'scoreSets.scoreSet')){
 
-                        if(l.has(assessment, 'scoreSets.scoreSet')){
+                        if(!_.isArray(assessment.scoreSets.scoreSet)){
 
-                              if(!_.isArray(assessment.scoreSets.scoreSet)){
-
-                                    assessment.scoreSets.scoreSet = [assessment.scoreSets.scoreSet];
-
-                              }
-
-                              assessment.scoreSets.scoreSet.forEach(function(scoreSet){
-
-                                    var attemptCode = l.get(scoreSet, 'attemptCode');
-
-                                    var newCollection = null;
-                                    /**
-                                     * Check if its MAP or STATE
-                                     */
-                                    if(attemptCode){
-                                          /**
-                                           * STATE HERE
-                                           */
-                                          newCollection = l.assign(collectionState, {
-                                              subTestSubjectArea: l.get(scoreSet, 'map'),
-                                              subTestName: l.get(scoreSet, 'subTestName'),
-                                              attemptCode: attemptCode,
-                                              attemptCodeDescription: l.has(me.config.xAssessmentAttemptCodeType, attemptCode) ?
-                                                      me.config.xAssessmentAttemptCodeType[attemptCode].description : null,
-                                              schoolName: collectionScoreSets.schoolName,
-                                              studentGradeLevel: collectionScoreSets.studentGradeLevel
-                                          });
-
-                                          if(l.has(scoreSet, 'scores.score')){
-
-                                                if(_.isObject(scoreSet.scores.score)) {
-                                                      scoreSet.scores.score = [ scoreSet.scores.score ];
-                                                }
-
-                                                scoreSet.scores.score.forEach(function(score){
-
-                                                      switch(score.metric){
-                                                            case '03479':
-                                                                  newCollection.Score = score.scoreValue;
-                                                                  break;
-                                                            case '00503':
-                                                                  newCollection.LevelCode = score.scoreValue;
-                                                                  break;
-                                                            case '00500':
-                                                                  newCollection.MetStandard = score.scoreValue;
-                                                                  break;
-                                                      }
-
-                                                });
-
-                                          }
-
-                                          collectionScoreSets.states.push(newCollection);
-
-                                    } else{
-                                          /**
-                                           * Map Here
-                                           */
-                                          newCollection = l.assign(collectionMap, {
-                                              subTestSubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
-                                              subTestName: l.get(scoreSet, 'subTestName'),
-                                              schoolName: collectionScoreSets.schoolName,
-                                              studentGradeLevel: collectionScoreSets.studentGradeLevel
-                                          });
-
-                                          if(l.has(scoreSet, 'scores.score')){
-
-                                                if(_.isObject(scoreSet.scores.score)) {
-                                                      scoreSet.scores.score = [ scoreSet.scores.score ];
-                                                }
-
-                                                scoreSet.scores.score.forEach(function(score){
-
-                                                      switch(score.metric){
-                                                            case '00506':
-                                                                  newCollection.RITScore = score.scoreValue;
-                                                                  break;
-                                                            case '00502':
-                                                                  newCollection.PercentileRank = score.scoreValue;
-                                                                  break;
-                                                            case '03474':
-
-                                                                  var scoreValues = String(score.scoreValue).trim().split(' ');
-
-                                                                  if(scoreValues.length === 2 && l.has(newCollection, scoreValues[0]) && !_.isEmpty(scoreValues[1])){
-
-                                                                        newCollection[scoreValues[0]] = scoreValues[1].toLowerCase() === 'true' ? 'Yes' : 'No';
-
-                                                                  }
-
-                                                                  break;
-                                                      }
-
-                                                });
-
-                                          }
-
-                                          collectionScoreSets.maps.push(newCollection);
-
-                                    }
-
-                              });
+                              assessment.scoreSets.scoreSet = [assessment.scoreSets.scoreSet];
 
                         }
 
-                        me.collections.push(collectionScoreSets);
+                        assessment.scoreSets.scoreSet.forEach(function(scoreSet){
+
+                              var attemptCode = l.get(scoreSet, 'attemptCode');
+
+                              var newCollection = null;
+                              /**
+                               * Check if its MAP or STATE
+                               */
+                              if(attemptCode){
+                                    /**
+                                     * STATE HERE
+                                     */
+                                    newCollection = l.assign(collectionState, {
+                                        subTestSubjectArea: l.get(scoreSet, 'map'),
+                                        subTestName: l.get(scoreSet, 'subTestName'),
+                                        attemptCode: attemptCode,
+                                        attemptCodeDescription: l.has(me.config.xAssessmentAttemptCodeType, attemptCode) ?
+                                                me.config.xAssessmentAttemptCodeType[attemptCode].description : null,
+                                        schoolName: collectionScoreSets.schoolName,
+                                        studentGradeLevel: collectionScoreSets.studentGradeLevel
+                                    });
+
+                                    if(l.has(scoreSet, 'scores.score')){
+
+                                          if(_.isObject(scoreSet.scores.score)) {
+                                                scoreSet.scores.score = [ scoreSet.scores.score ];
+                                          }
+
+                                          scoreSet.scores.score.forEach(function(score){
+
+                                                switch(score.metric){
+                                                      case '03479':
+                                                            newCollection.Score = score.scoreValue;
+                                                            break;
+                                                      case '00503':
+                                                            newCollection.LevelCode = score.scoreValue;
+                                                            break;
+                                                      case '00500':
+                                                            newCollection.MetStandard = score.scoreValue;
+                                                            break;
+                                                }
+
+                                          });
+
+                                    }
+
+                                    collectionScoreSets.states.push(newCollection);
+
+                              } else{
+                                    /**
+                                     * Map Here
+                                     */
+                                    newCollection = l.assign(collectionMap, {
+                                        subTestSubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
+                                        subTestName: l.get(scoreSet, 'subTestName'),
+                                        schoolName: collectionScoreSets.schoolName,
+                                        studentGradeLevel: collectionScoreSets.studentGradeLevel
+                                    });
+
+                                    if(l.has(scoreSet, 'scores.score')){
+
+                                          if(_.isObject(scoreSet.scores.score)) {
+                                                scoreSet.scores.score = [ scoreSet.scores.score ];
+                                          }
+
+                                          scoreSet.scores.score.forEach(function(score){
+
+                                                switch(score.metric){
+                                                      case '00506':
+                                                            newCollection.RITScore = score.scoreValue;
+                                                            break;
+                                                      case '00502':
+                                                            newCollection.PercentileRank = score.scoreValue;
+                                                            break;
+                                                      case '03474':
+
+                                                            var scoreValues = String(score.scoreValue).trim().split(' ');
+
+                                                            if(scoreValues.length === 2 && l.has(newCollection, scoreValues[0]) && !_.isEmpty(scoreValues[1])){
+
+                                                                  newCollection[scoreValues[0]] = scoreValues[1].toLowerCase() === 'true' ? 'Yes' : 'No';
+
+                                                            }
+
+                                                            break;
+                                                }
+
+                                          });
+
+                                    }
+
+                                    collectionScoreSets.maps.push(newCollection);
+
+                              }
+
+                        });
 
                   }
+
+                  me.collections.push(collectionScoreSets);
 
             });
 

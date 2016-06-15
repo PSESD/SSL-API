@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<payload id="f195014a-a202-491a-8187-75bf2e15effc" xmlns="http://www.sifassociation.org/infrastructure/3.0.1">
+    <response><xSre refId="6b54b58b-c681-4420-b90c-a5215b2ad3a2" xmlns="" xmlns:sif="http://www.sifassociation.org/datamodel/na/3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <name>
+            <familyName cedsId="000172">Stark</familyName>
+            <givenName cedsId="000115">Rickon</givenName>
+        </name>
+        <localId cedsId="001071">123</localId>
+        <phoneNumber>
+            <number cedsId="000279">555-555-1212</number>
+            <primaryIndicator cedsId="000219">True</primaryIndicator>
+        </phoneNumber>
+        <demographics>
+            <races>
+                <race cedsId="000016">AmericanIndianOrAlaskaNative</race>
+            </races>
+            <hispanicLatinoEthnicity cedsId="000144">False</hispanicLatinoEthnicity>
+            <sex cedsId="000255">Male</sex>
+        </demographics>
+        <enrollment>
+            <leaRefId/>
+            <schoolRefId>11</schoolRefId>
+            <membershipType>Current</membershipType>
+            <entryDate cedsId="000097"/>
+            <exitDate cedsId="000107">2021</exitDate>
+            <gradeLevel>5</gradeLevel>
+            <projectedGraduationYear cedsId="000226">2021</projectedGraduationYear>
+            <schoolYear>2015</schoolYear>
+            <daysAbsent/>
+            <studentAttendanceRate/>
+            <exitType/>
+            <exitTypeDescription/>
+        </enrollment>
+        <otherEnrollments>
+            <enrollment>
+                <leaRefId/>
+                <schoolRefId>9876</schoolRefId>
+                <membershipType/>
+                <entryDate cedsId="000097">01/01/15</entryDate>
+                <exitDate cedsId="000107"/>
+                <gradeLevel>5</gradeLevel>
+                <projectedGraduationYear cedsId="000226"/>
+                <schoolYear>2015</schoolYear>
+                <daysAbsent>3</daysAbsent>
+                <studentAttendanceRate>80</studentAttendanceRate>
+                <exitType>555</exitType>
+                <exitTypeDescription>Enrolled</exitTypeDescription>
+            </enrollment>
+        </otherEnrollments>
+        <languages>
+            <language>
+                <type cedsId="000316">Dominant</type>
+                <code cedsId="000317">Common</code>
+            </language>
+            <language>
+                <type cedsId="000316">Home</type>
+                <code cedsId="000317">Common</code>
+            </language>
+        </languages>
+        <reportDate>2015-09-11</reportDate>
+        <assessments>
+            <assessment>
+                <studentGradeLevel cedsId="000126">5</studentGradeLevel>
+                <school cedsId="000126" refId="">
+                    <leaRefId/>
+                    <localId cedsId="001071">9876</localId>
+                    <schoolName cedsId="000191">Winterfell Elementary</schoolName>
+                </school>
+                <scoreSets>
+                    <scoreSet>
+                        <subTestSubjectArea cedsId="000021">Reading</subTestSubjectArea>
+                        <subTestName cedsId="000275">Valyrian</subTestName>
+                        <scores>
+                            <score>
+                                <metric cedsId="000369">00506</metric>
+                                <scoreValue cedsId="000245">80</scoreValue>
+                            </score>
+                            <score>
+                                <metric cedsId="000369">00502</metric>
+                                <scoreValue cedsId="000245">5</scoreValue>
+                            </score>
+                            <score>
+                                <metric cedsId="000369">03474</metric>
+                                <scoreValue cedsId="000245">MetTypicalGrowth_LastFall2ThisFall True</scoreValue>
+                            </score>
+                            <score>
+                                <metric cedsId="000369">03474</metric>
+                                <scoreValue cedsId="000245">MetTypicalGrowth_LastSpring2ThisSpring False</scoreValue>
+                            </score>
+                        </scores>
+                        <attemptCode/>
+                    </scoreSet>
+                </scoreSets>
+            </assessment>
+            <assessment>
+                <studentGradeLevel cedsId="000126">5</studentGradeLevel>
+                <school cedsId="000126" refId="">
+                    <leaRefId/>
+                    <localId cedsId="001071">9876</localId>
+                    <schoolName cedsId="000191">Winterfell Elementary</schoolName>
+                </school>
+                <scoreSets>
+                    <scoreSet>
+                        <subTestSubjectArea cedsId="000021">Reading</subTestSubjectArea>
+                        <subTestName cedsId="000275">Valyrian</subTestName>
+                        <scores>
+                            <score>
+                                <metric cedsId="000369">03479</metric>
+                                <scoreValue cedsId="000245">79</scoreValue>
+                            </score>
+                            <score>
+                                <metric cedsId="000369">00503</metric>
+                                <scoreValue cedsId="000245">3</scoreValue>
+                            </score>
+                            <score>
+                                <metric cedsId="000369">00500</metric>
+                                <scoreValue cedsId="000245">No</scoreValue>
+                            </score>
+                        </scores>
+                        <attemptCode>AU</attemptCode>
+                    </scoreSet>
+                </scoreSets>
+            </assessment>
+        </assessments>
+        <attendance>
+            <summaries>
+                <summary>
+                    <startDate/>
+                    <endDate/>
+                    <daysAbsent cedsId="000201">20</daysAbsent>
+                    <studentAttendanceRate cedsId="000271">80</studentAttendanceRate>
+                    <riskLevel>High</riskLevel>
+                    <trend>Worsening</trend>
+                </summary>
+                <summary>
+                    <startDate>01/01/15</startDate>
+                    <endDate/>
+                    <daysAbsent cedsId="000201"/>
+                    <studentAttendanceRate cedsId="000271"/>
+                    <riskLevel/>
+                    <trend/>
+                </summary>
+            </summaries>
+            <events>
+                <event>
+                    <school cedsId="000126" refId="">
+                        <leaRefId/>
+                        <localId cedsId="001071">9876</localId>
+                        <schoolName cedsId="000191">Winterfell Elementary</schoolName>
+                    </school>
+                    <calendarEventDate cedsId="001275">02/03/15</calendarEventDate>
+                    <dailyAttendanceStatus cedsId="000076"/>
+                    <attendanceEventType cedsId="000601">DailyAttendance</attendanceEventType>
+                    <absentAttendanceCategory cedsId="000599"/>
+                    <attendanceValue>Unexcused</attendanceValue>
+                    <course refId="">
+                        <timeTablePeriod/>
+                        <schoolRefId/>
+                        <leaCourseId cedsId="000055"/>
+                        <courseTitle cedsId="000067"/>
+                        <subject/>
+                        <scedCourseSubjectAreaCode cedsId="001518"/>
+                        <creditsAttempted cedsId="000199"/>
+                        <creditsEarned cedsId="000200"/>
+                        <progressMark cedsId="000183"/>
+                        <finalMarkValue cedsId="000124"/>
+                    </course>
+                    <timeTablePeriod/>
+                    <absentReasonDescription/>
+                </event>
+                <event>
+                    <school cedsId="000126" refId="">
+                        <leaRefId/>
+                        <localId cedsId="001071">9876</localId>
+                        <schoolName cedsId="000191">Winterfell Elementary</schoolName>
+                    </school>
+                    <calendarEventDate cedsId="001275">05/01/15</calendarEventDate>
+                    <dailyAttendanceStatus cedsId="000076">Excused</dailyAttendanceStatus>
+                    <attendanceEventType cedsId="000601">ClassSectionAttendance</attendanceEventType>
+                    <absentAttendanceCategory cedsId="000599">13303</absentAttendanceCategory>
+                    <attendanceValue/>
+                    <course refId="">
+                        <timeTablePeriod/>
+                        <schoolRefId/>
+                        <leaCourseId cedsId="000055">HCT1980</leaCourseId>
+                        <courseTitle cedsId="000067">Wilderness Survival</courseTitle>
+                        <subject/>
+                        <scedCourseSubjectAreaCode cedsId="001518"/>
+                        <creditsAttempted cedsId="000199"/>
+                        <creditsEarned cedsId="000200"/>
+                        <progressMark cedsId="000183"/>
+                        <finalMarkValue cedsId="000124"/>
+                    </course>
+                    <timeTablePeriod>1</timeTablePeriod>
+                    <absentReasonDescription>Wildling attack</absentReasonDescription>
+                </event>
+            </events>
+        </attendance>
+        <disciplineIncidents>
+            <disciplineIncident>
+                <description cedsId="000508">Loss of privileges</description>
+                <incidentDate cedsId="000502">05/01/15</incidentDate>
+                <actions>
+                    <action>
+                        <code cedsId="000488">03091</code>
+                        <reportingSchool>
+                            <localId cedsId="001071">9876</localId>
+                            <schoolName cedsId="000191">Winterfell Elementary</schoolName>
+                        </reportingSchool>
+                    </action>
+                </actions>
+                <localId>765</localId>
+            </disciplineIncident>
+        </disciplineIncidents>
+        <transcriptTerm>
+            <school cedsId="000126" refId="">
+                <leaRefId/>
+                <localId cedsId="001071">9876</localId>
+                <schoolName cedsId="000191">Winterfell Elementary</schoolName>
+            </school>
+            <schoolYear cedsId="000243">2014-15</schoolYear>
+            <session>
+                <sessionType cedsId="000254">Quarter</sessionType>
+                <sessionCode cedsId="001270">Q1 Interim</sessionCode>
+                <description cedsId="001271">2014-15 Q1 Interim</description>
+                <markingTerm cedsId="001273"/>
+                <startDate cedsId="000251"/>
+            </session>
+            <gradeLevel cedsId="000125"/>
+            <courses>
+                <course refId="">
+                    <timeTablePeriod>3</timeTablePeriod>
+                    <schoolRefId/>
+                    <leaCourseId cedsId="000055">HCT1980</leaCourseId>
+                    <courseTitle cedsId="000067">Rock Climbing</courseTitle>
+                    <subject>Bouldering</subject>
+                    <scedCourseSubjectAreaCode cedsId="001518">B101</scedCourseSubjectAreaCode>
+                    <creditsAttempted cedsId="000199"/>
+                    <creditsEarned cedsId="000200"/>
+                    <progressMark cedsId="000183">4</progressMark>
+                    <finalMarkValue cedsId="000124"/>
+                </course>
+            </courses>
+            <academicSummary>
+                <cumulativeWeightedGpa cedsId="000128"/>
+                <onTrackToGraduate>Y</onTrackToGraduate>
+                <totalCreditsEarned cedsId="000200">30</totalCreditsEarned>
+            </academicSummary>
+        </transcriptTerm>
+        <otherTranscriptTerms>
+            <transcriptTerm>
+                <school cedsId="000126" refId="">
+                    <leaRefId/>
+                    <localId cedsId="001071">9876</localId>
+                    <schoolName cedsId="000191">Winterfell Elementary</schoolName>
+                </school>
+                <schoolYear cedsId="000243">2015</schoolYear>
+                <session>
+                    <sessionType cedsId="000254">Semester</sessionType>
+                    <sessionCode cedsId="001270">1</sessionCode>
+                    <description cedsId="001271">Semester 1</description>
+                    <markingTerm cedsId="001273">true</markingTerm>
+                    <startDate cedsId="000251"/>
+                </session>
+                <gradeLevel cedsId="000125">5</gradeLevel>
+                <courses>
+                    <course refId="">
+                        <timeTablePeriod>3</timeTablePeriod>
+                        <schoolRefId/>
+                        <leaCourseId cedsId="000055">HCT1980</leaCourseId>
+                        <courseTitle cedsId="000067">Rock Climbing</courseTitle>
+                        <subject>Bouldering</subject>
+                        <scedCourseSubjectAreaCode cedsId="001518">B101</scedCourseSubjectAreaCode>
+                        <creditsAttempted cedsId="000199">8</creditsAttempted>
+                        <creditsEarned cedsId="000200">8</creditsEarned>
+                        <progressMark cedsId="000183"/>
+                        <finalMarkValue cedsId="000124">3</finalMarkValue>
+                    </course>
+                </courses>
+                <academicSummary>
+                    <cumulativeWeightedGpa cedsId="000128"/>
+                    <onTrackToGraduate/>
+                    <totalCreditsEarned cedsId="000200"/>
+                </academicSummary>
+            </transcriptTerm>
+        </otherTranscriptTerms>
+        <programs>
+            <specialEducation>
+                <schoolYear cedsId="000243">2015</schoolYear>
+                <services>
+                    <service>
+                        <ideaIndicator cedsId="000535">Y</ideaIndicator>
+                    </service>
+                </services>
+            </specialEducation>
+            <lep>
+                <lepStatus cedsId="000180">N</lepStatus>
+                <title3LepParticipationStatus cedsId="000565">N</title3LepParticipationStatus>
+            </lep>
+            <giftedTalented cedsId="000122">Yes</giftedTalented>
+            <section504 cedsId="000249">Y</section504>
+        </programs>
+    </xSre></response>
+</payload>
