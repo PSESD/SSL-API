@@ -5,8 +5,13 @@
 /**
  *
  */
+
 (function(){
-    var dotenv = require('dotenv').config({ path: process.env.NODE_CONFIG_DIR + '/.env' });
+    var pathEnv = process.env.NODE_CONFIG_DIR;
+    if(!pathEnv){
+        pathEnv = __dirname + '/config';
+    }
+    var dotenv = require('dotenv').config({ path: pathEnv + '/.env' });
     if(dotenv){
         for(var env in dotenv){
             process.env[env] = dotenv[env];
@@ -279,6 +284,32 @@ switch(what){
             }
             process.exit();
         });
+        break;
+    case 'deploy-test':
+        if(process.env.NODE_ENV === 'development'){
+            var SSH_USERNAME = process.env.SSH_USERNAME;
+            var SSH_PASSWORD = process.env.SSH_PASSWORD;
+            var SSH_HOST = process.env.SSH_HOST;
+            var SSH = require('simple-ssh');
+            var ssh = new SSH({
+                host: SSH_HOST,
+                user: SSH_USERNAME,
+                pass: SSH_PASSWORD
+            });
+            ssh
+                .exec('echo "Node.js"', {
+                    out: console.log.bind(console)
+                })
+                .exec('echo "is"', {
+                    out: console.log.bind(console)
+                })
+                .exec('echo "awesome!"', {
+                    out: console.log.bind(console)
+                })
+                .start();
+        } else {
+            throw 'Not valid environment';
+        }
         break;
     default:
         throw 'Not valid command';
