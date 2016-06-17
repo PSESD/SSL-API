@@ -189,7 +189,7 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                     }
 
-                                    collectionScoreSets.states.push(newCollection);
+                                    collectionScoreSets.states.push(me._replaceAssessmentDescriptionCollection(newCollection, scoreSet));
 
                               } else{
                                     /**
@@ -234,7 +234,7 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                     }
 
-                                    collectionScoreSets.maps.push(newCollection);
+                                    collectionScoreSets.maps.push(me._replaceAssessmentDescriptionCollection(newCollection, scoreSet));
 
                               }
 
@@ -248,6 +248,20 @@ Assessment.prototype.processAssessment = function(assessments){
 
       }
 
+};
+/**
+ *
+ * @param newCollection
+ * @param scoreSet
+ * @returns {*}
+ * @private
+ */
+Assessment.prototype._replaceAssessmentDescriptionCollection = function(newCollection, scoreSet){
+      if(newCollection.subTestSubjectArea){
+            newCollection.subTestSubjectArea = l.get(scoreSet, 'raw:source.raw:subTestSubjectArea');
+      }
+
+      return newCollection;
 };
 /**
  *
