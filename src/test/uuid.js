@@ -12,3 +12,8 @@ setTimeout(function(){
     'use strict';
     console.log('Hallo ' + (i++));
 }, 1000);
+var moment = require('moment');
+var utc = moment().utc().format("YYYY-MM-DDThh:mm:ss.SSSZZ");
+var utc = moment().utc().toISOString();
+console.log('UTC: ', utc);
+
