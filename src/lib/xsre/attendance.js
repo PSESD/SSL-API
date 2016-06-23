@@ -1259,7 +1259,10 @@ Attendance.prototype._thresholdBehavior = function(){
 
     return this;
 };
-
+/**
+ *
+ * @private
+ */
 Attendance.prototype._processCourseMerger = function(){
     var me = this;
     me.transcriptTerm = null;
@@ -1268,16 +1271,12 @@ Attendance.prototype._processCourseMerger = function(){
     me.transcriptFilterMark = [];
 
     if(me.xsre.json.otherEnrollments && _.isArray(me.xsre.json.otherEnrollments.enrollment)){
-
         _.each(me.xsre.json.otherEnrollments.enrollment, function(enrollment){
-
             me.enrollments.push(enrollment);
-
         });
     }
 
     if(me.xsre.json) {
-
         if(me.xsre.json.transcriptTerm) {
             me.transcriptTerm = me.xsre.json.transcriptTerm;
         }
@@ -1285,7 +1284,6 @@ Attendance.prototype._processCourseMerger = function(){
         if(me.xsre.json.otherTranscriptTerms && me.xsre.json.otherTranscriptTerms.transcriptTerm) {
             me.transcriptTermOther = me.xsre.json.otherTranscriptTerms.transcriptTerm;
         }
-
     }
 
 
@@ -1410,32 +1408,24 @@ Attendance.prototype._getCourseMerger = function(){
  * @param transcript
  * @param current
  */
-Transcript.prototype.processTranscript = function(transcript, current){
+Attendance.prototype.processTranscript = function(transcript, current){
 
     var me = this;
 
     if(!_.isObject(transcript.courses)){
-
         return;
-
     }
-
 
     var tSchoolYear = l.get(transcript, 'schoolYear');
     var tSession = l.get(transcript, 'session.description');
     var tSchoolName = l.get(transcript, 'school.schoolName');
 
-
     if(_.isUndefined(transcript.courses.course)){
-
         return ;
-
     }
 
     if(!_.isArray(transcript.courses.course)){
-
         transcript.courses.course = [ transcript.courses.course ];
-
     }
 
     if(current) {
@@ -1449,12 +1439,6 @@ Transcript.prototype.processTranscript = function(transcript, current){
             if (!course.leaCourseId) {
                 return;
             }
-
-            //if(course.courseTitle){
-            //
-            //    me.transcriptTerm.courses.push({ courseTitle: course.courseTitle, timeTablePeriod: course.timeTablePeriod });
-            //
-            //}
 
         });
 
@@ -1472,8 +1456,6 @@ Transcript.prototype.processTranscript = function(transcript, current){
     };
 
     if(typeof transcript.academicSummary === 'object'){
-
-        //transcript.academicSummary = me.extractRawSource(transcript.academicSummary);
 
         if(!_.isEmpty(transcript.academicSummary.totalCreditsEarned) && !isNaN(transcript.academicSummary.totalCreditsEarned)) {
             academicSummary.totalCreditsEarned = parseFloat(transcript.academicSummary.totalCreditsEarned);
@@ -1508,17 +1490,10 @@ Transcript.prototype.processTranscript = function(transcript, current){
         me.academicSummary.termCreditsEarned += academicSummary.termCreditsEarned;
         me.academicSummary.classRank += academicSummary.classRank;
         me.academicSummary.gpaScale += academicSummary.gpaScale;
-
     }
 
-    //transcript = me.extractRawSource(transcript);
-
-    //console.log(transcript);
-
     if(!tSchoolName || !tSession || !tSchoolYear){
-
         return;
-
     }
 
     var key = (tSchoolYear + ':' + tSession + ':' + tSchoolName).trim(), info = {
@@ -1540,15 +1515,12 @@ Transcript.prototype.processTranscript = function(transcript, current){
     }
 
     if(parseInt(me.info.gradeLevel) < parseInt(info.gradeLevel)){
-
         me.info.gradeLevel = info.gradeLevel;
-
     }
 
     if(Object.keys(me.course).indexOf(key) === -1) {
         me.course[key] = info;
     }
-
 
     _.each(transcript.courses.course, function (course) {
 
@@ -1563,18 +1535,12 @@ Transcript.prototype.processTranscript = function(transcript, current){
         var uniqueId = course.scedCourseSubjectAreaCode;
 
         if(uniqueId in me.scedId) {
-
             me.transcriptWithSCED(uniqueId, key, course, info, current);
-
         } else {
-
             me.transcriptWithNoSCED(uniqueId, key, course, info, current);
-
         }
 
     });
-
-
 };
 /**
  *
@@ -1584,7 +1550,7 @@ Transcript.prototype.processTranscript = function(transcript, current){
  * @param info
  * @param current
  */
-Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, info, current){
+Attendance.prototype.transcriptWithSCED = function(scedAreaCode, key, course, info, current){
 
     var me = this;
 
@@ -1599,21 +1565,14 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
     }
 
     var mark = null;
-
     mark = course.progressMark || course.finalMarkValue;
-
     if(!mark) {
-
         mark = '';
-
     }
 
     var icheck = key + '+' + uniqueStr + '+' + (course.courseTitle || me.notAvailable);
-
     if(me.transcriptFilterMark.indexOf(icheck) !== -1){
-
         return;
-
     }
 
     me.transcriptFilterMark.push(icheck);
@@ -1635,10 +1594,8 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
 
         me.course[key].academicSummary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
         me.course[key].academicSummary.totalCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
-
         me.course[key].academicSummary.termCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
         me.course[key].academicSummary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
-
     }
 
     me.course[key].transcripts[uniqueStr].push({
