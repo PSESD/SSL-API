@@ -468,6 +468,8 @@ Attendance.prototype.getAttendances = function(){
 
     var weeklyChange = 0;
 
+    me._processCourseMerger();
+
     me.weeks.forEach(function(week){
 
         var ikey = week.startString + ' - ' + week.endString;
@@ -510,6 +512,7 @@ Attendance.prototype.getAttendances = function(){
             detailColumns: [],
             details: [],
             periods: [],
+            courses: [],
             behaviors: {
                 M: [],
                 T: [],
@@ -677,7 +680,7 @@ Attendance.prototype.getAttendances = function(){
 
                         if(p === period.period) {
 
-                            b[column] = {value: period.value, event: period.event, slug: period.slug};
+                            b[column] = {value: period.value, event: period.event, slug: period.slug, courses: period.courses};
 
                             if (period.period !== me.notAvailable) {
 
@@ -717,6 +720,7 @@ Attendance.prototype.getAttendances = function(){
         for(var c = 0; c < columns.length; c++){
 
             behavior.periods.push(columns[c].title);
+            behavior.courses.push(columns[c].courses);
             behavior.detailColumns.periods.push(columns[c].title);
             behavior.detailColumns.M.push(columns[c].M);
             behavior.detailColumns.T.push(columns[c].T);
@@ -817,10 +821,6 @@ Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, da
 
     }
 
-    //summary[n].periods.push({
-    //    period: e.timeTablePeriod ? e.timeTablePeriod : me.notAvailable, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
-    //});
-
 };
 /**
  *
@@ -855,11 +855,20 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
 
         if('timeTablePeriod' in e && e.timeTablePeriod){
 
-            summary[n].periods.push({
-                period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
+            var mm = moment(e.calendarEventDate).valueOf();
+            var courses = [];
+            var course = _.find(me.course, function(c){
+               return mm >= c.startTime && mm <= c.endTime;
+            });
+            _.each(course, function (cr) {
+                courses.concat(_.find(cr.courses, function (c) {
+                    return c.timeTablePeriod === e.timeTablePeriod;
+                }));
             });
 
-            //value += isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue).toFixed(2);
+            summary[n].periods.push({
+                period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus), courses: courses
+            });
 
             if(e.attendanceStatus){
                 legend[e.attendanceStatus.toLowerCase()].push(e);
@@ -874,24 +883,12 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
         for(var i = summary[n].periods.length; i <= 6; i++){
 
             summary[n].periods.push({
-                period: me.notAvailable, value: me.notAvailable, event: null, slug: ''
+                period: me.notAvailable, value: me.notAvailable, event: null, slug: '', courses: []
             });
 
         }
 
     }
-
-    //if(summary[n].periods.length > 0){
-    //
-    //    summary[n].value = value.toFixed(2);
-    //
-    //}
-    //
-    //if(parseInt(summary[n].value) === 0) {
-    //
-    //    summary[n].value = 0;
-    //
-    //}
 
 };
 /**
@@ -1293,15 +1290,42 @@ Attendance.prototype._processCourseMerger = function(){
     me.scedSort = scedSort;
     me.scedNotFound = {};
     if(null !== me.transcriptTerm) {
-        me.processTranscript(me.transcriptTerm, true);
+        me._processTranscript(me.transcriptTerm, true);
     }
 
     if(null !== me.transcriptTermOther) {
         _.each(me.transcriptTermOther, function (transcript) {
-            me.processTranscript(transcript, false);
+            me._processTranscript(transcript, false);
         });
-
     }
+
+    me.course = _.sortBy(me.course, function(o){
+        return o.startDateTime/* * -1*/;
+    });
+
+    var newCourse = [];
+    var newTime = [];
+
+    _.each(me.course, function (c, i) {
+        var end = null;
+        var start = moment(c.startDate);
+        var addMonth = start.month() + 2;
+        if(c.session.indexOf('Quarter') !== -1){
+            end = start.month(addMonth).endOf('month');
+        } else if(c.session.indexOf('Semester') !== -1){
+            addMonth = start.month() + 5;
+            end = start.month(addMonth).endOf('month');
+        }
+        newTime.push({
+           session: c.session,
+           start: start,
+           startTime: start.valueOf(),
+           end: end,
+           endTime: end.valueOf(),
+           c: c
+        });
+    });
+    me.course = newTime;
 };
 /**
  *
@@ -1318,77 +1342,15 @@ Attendance.prototype.getCourse = function(){
 Attendance.prototype._getCourseMerger = function(){
 
     var me = this;
-
     me._processCourseMerger();
-
-    //_.each(me.course, function(course){
-    //
-    //    var courseTranscripts = {};
-    //
-    //    if(_.isObject(course.transcripts)) {
-    //
-    //        _.each(me.subject, function (subject, i) {
-    //
-    //            if (Object.keys(course.transcripts).indexOf(subject) === -1) {
-    //
-    //                courseTranscripts[subject] = null;
-    //
-    //            } else {
-    //
-    //                courseTranscripts[subject] = course.transcripts[subject];
-    //
-    //                courseTranscripts[subject].index = i;
-    //
-    //                courseTranscripts[subject].forEach(function(c){
-    //
-    //                    subjectObject[subject] += c.creditsAttempted;
-    //
-    //                    me.info.totalAttempted += c.creditsAttempted;
-    //
-    //                    me.info.totalEarned += c.creditsEarned;
-    //
-    //                    c.index = i;
-    //
-    //                });
-    //
-    //            }
-    //
-    //        });
-    //
-    //    }
-    //
-    //    course.transcripts = courseTranscripts;
-    //
-    //});
-    //
-    //var subjectValues = [];
-    //
-    //_.each(subjectModified, function(s){
-    //
-    //    subjectValues.push({ name: s, value: parseFloat(subjectObject[s]).toFixed(1) });
-    //
-    //});
-
-    if(me.gradeLevel === me.notAvailable){
-
-        me.gradeLevel = me.info.gradeLevel;
-
-    }
-
-    return {
-        details: me.course,
-        credits: me.credits,
-        gradeLevel: me.gradeLevel,
-        academicSummary: me.academicSummary,
-        info: me.info
-    };
+    return me.course;
 };
 /**
  *
  * @param transcript
  * @param current
  */
-Attendance.prototype.processTranscript = function(transcript, current){
+Attendance.prototype._processTranscript = function(transcript, current){
 
     var me = this;
 
@@ -1481,7 +1443,7 @@ Attendance.prototype.processTranscript = function(transcript, current){
 
         var uniqueId = course.scedCourseSubjectAreaCode;
         if(uniqueId in me.scedId) {
-            me.transcriptWithSCED(uniqueId, key, course, info, current);
+            me._transcriptWithSCED(uniqueId, key, course, info, current);
         }
     });
 };
@@ -1493,7 +1455,7 @@ Attendance.prototype.processTranscript = function(transcript, current){
  * @param info
  * @param current
  */
-Attendance.prototype.transcriptWithSCED = function(scedAreaCode, key, course, info, current){
+Attendance.prototype._transcriptWithSCED = function(scedAreaCode, key, course, info, current){
 
     var me = this;
     var uniqueStr = me.scedId[scedAreaCode];
@@ -1542,9 +1504,6 @@ Attendance.prototype.getMaxDateCalendarTime = function(){
 Attendance.prototype.getMinDateCalendarTime = function(){
     return this.minDateCalendar;
 };
-
-
-
 /**
  *
  * @type {Attendance}
