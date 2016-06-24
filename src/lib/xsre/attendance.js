@@ -857,14 +857,25 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
 
             var mm = moment(e.calendarEventDate).valueOf();
             var courses = [];
-            var course = _.find(me.course, function(c){
-               return mm >= c.startTime && mm <= c.endTime;
-            });
-            _.each(course, function (cr) {
-                courses.concat(_.find(cr.courses, function (c) {
-                    return c.timeTablePeriod === e.timeTablePeriod;
-                }));
-            });
+            // var course = _.filter(me.course, function(c){
+            //    return mm >= c.startTime && mm <= c.endTime;
+            // });
+
+            var course = [];
+            for(var i = 0; i < me.course.length; i++){
+                var c = me.course[i];
+                if(mm >= c.startTime && mm <= c.endTime){
+                    course.push(c);
+                }
+            }
+
+            if(_.isArray(course)) {
+                _.each(course, function (cr) {
+                    courses.concat(_.find(cr.courses, function (c) {
+                        return c.timeTablePeriod === e.timeTablePeriod;
+                    }));
+                });
+            }
 
             summary[n].periods.push({
                 period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus), courses: courses
@@ -1303,7 +1314,6 @@ Attendance.prototype._processCourseMerger = function(){
         return o.startDateTime/* * -1*/;
     });
 
-    var newCourse = [];
     var newTime = [];
 
     _.each(me.course, function (c, i) {
@@ -1311,10 +1321,10 @@ Attendance.prototype._processCourseMerger = function(){
         var start = moment(c.startDate);
         var addMonth = start.month() + 2;
         if(c.session.indexOf('Quarter') !== -1){
-            end = start.month(addMonth).endOf('month');
+            end = start.clone().month(addMonth).endOf('month');
         } else if(c.session.indexOf('Semester') !== -1){
             addMonth = start.month() + 5;
-            end = start.month(addMonth).endOf('month');
+            end = start.clone().month(addMonth).endOf('month');
         }
         newTime.push({
            session: c.session,
