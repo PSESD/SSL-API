@@ -6,9 +6,7 @@
   "private": true,
   "dependencies": {
     "async": "^2.0.0-rc.2",
-    "awssum": "^1.2.0",
-    "awssum-amazon": "^1.4.0",
-    "awssum-amazon-ec2": "^1.5.0",
+    "aws-promised": "^2.13.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.15.0",
     "cache-manager": "^2.0.0",
@@ -68,7 +66,6 @@
     "should": "^8.3.0",
     "simple-ssh": "^0.9.0",
     "slug": "^0.9.1",
-    "starter-aws": "0.0.6",
     "supertest": "^1.2.0",
     "underscore": "^1.8.3",
     "unicode": "^0.6.1",

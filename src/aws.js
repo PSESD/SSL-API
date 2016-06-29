@@ -17,39 +17,90 @@ var cfg = ini.parseSync(configuration + "/credentials");
 
 console.log(cfg);
 var fmt = require('fmt');
-var amazonEc2 = require('awssum-amazon-ec2');
-// var ec2 = new amazonEc2.Ec2({
-//     'accessKeyId'     : cfg.default.aws_access_key_id,
-//     'secretAccessKey' : cfg.default.aws_secret_access_key,
-//     'region'          : amazonEc2.US_WEST_2,
-//     'instancesId' : 'i-8ae85843'
-// });
-// ec2.DescribeInstances(function(err, data) {
-//     fmt.dump(err, 'err');
-//     fmt.dump(data, 'data');
-// });
-
-var starterAws = require('starter-aws');
-
-// API INIT CREDENTIALS
-starterAws.initCredentials({
-    'accessKeyId'     : cfg.default.aws_access_key_id,
-    'secretAccessKey' : cfg.default.aws_secret_access_key,
-    'region'          : 'us-west-2',
-    'instancesId' : 'i-8ae85843'
+var awsPromised = require('aws-promised');
+var ecs = awsPromised.ecs({
+    accessKeyId     : cfg.default.aws_access_key_id,
+    secretAccessKey : cfg.default.aws_secret_access_key,
+    region: 'us-west-2'
 });
 
-starterAws.stop(function(err, status) {
-    fmt.dump(err, 'err');
-    fmt.dump(status, 'status');
-// status my return:
-    /*[ { InstanceId: 'i-53613f18',
-     ImageId: 'ami-c37474b7',
-     InstanceType: 't1.micro',
-     State: 'stopped' },
-     { InstanceId: 'i-98f372d2',
-     ImageId: 'ami-3c5f5748',
-     InstanceType: 't1.micro',
-     State: 'stopped' } ]
-     */
-});
+var params = {
+    containerInstances: [ /* required */
+        '8d20ee00-4dc0-4f09-919a-1974b7b15bd4',
+        /* more items */
+    ],
+    taskDefinition: 'arn:aws:ecs:us-west-2:976229134916:task-definition/SSLStaging-cbo-api:8', /* required */
+    cluster: 'SSLStaging',
+};
+// ecs.startTask(params, function(err, data) {
+//     if (err) console.log(err, err.stack); // an error occurred
+//     else     console.log(data);           // successful response
+// });
+
+var params = {
+    cluster: 'SSLStaging',
+    containerInstance: '8d20ee00-4dc0-4f09-919a-1974b7b15bd4',
+    // desiredStatus: 'RUNNING | PENDING | STOPPED',
+    family: 'SSLStaging-cbo-api',
+    // maxResults: 0,
+    // nextToken: 'STRING_VALUE',
+    // serviceName: 'STRING_VALUE',
+    // startedBy: 'STRING_VALUE'
+};
+// ecs.listTasks(params, function(err, data) {
+//     if (err) console.log(err, err.stack); // an error occurred
+//     else     console.log(data);           // successful response
+
+    // data.taskArns.forEach(function (task) {
+    //     var taskParams = {
+    //         task: task.split('/').slice(-1).pop(), /* required */
+    //         cluster: params.cluster,
+    //         // reason: 'STRING_VALUE'
+    //     };
+    //     console.log(taskParams);
+    //     ecs.stopTask(taskParams, function(err, data) {
+    //         if (err) {
+    //             return console.log(err, err.stack);
+    //         } // an error occurred
+    //
+    //         if(task.desiredStatus === 'STOP'){
+    //             var params = {
+    //                 taskDefinition: task.taskDefinitionArn, /* required */
+    //                 cluster: params.cluster,
+    //                 // count: 0,
+    //                 // overrides: {
+    //                 //     containerOverrides: [
+    //                 //         {
+    //                 //             command: [
+    //                 //                 'STRING_VALUE',
+    //                 //                 /* more items */
+    //                 //             ],
+    //                 //             environment: [
+    //                 //                 {
+    //                 //                     name: 'STRING_VALUE',
+    //                 //                     value: 'STRING_VALUE'
+    //                 //                 },
+    //                 //                 /* more items */
+    //                 //             ],
+    //                 //             name: 'STRING_VALUE'
+    //                 //         },
+    //                 //         /* more items */
+    //                 //     ]
+    //                 // },
+    //                 // startedBy: 'STRING_VALUE'
+    //             };
+    //             ecs.runTask(params, function(err, data) {
+    //                 if (err) {
+    //                     return console.log(err, err.stack);
+    //                 }
+    //                 var params = {
+    //                     tasks: [ /* required */
+    //                         'STRING_VALUE',
+    //                         /* more items */
+    //                     ],
+    //                 };
+    //             });
+    //         }
+    //     });
+    // });
+// });
