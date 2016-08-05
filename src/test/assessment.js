@@ -6,7 +6,8 @@ var xSre = require(__dirname+'/../lib/xsre');
 
 var fs = require('fs');
 //var xmlFile = __dirname + '/../../../mockhzb/sid/sample1.xml';
-var xmlFile = __dirname + '/assessment.xml';
+// var xmlFile = __dirname + '/assessment.xml';
+var xmlFile = __dirname + '/assessment2.xml';
 var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
 
@@ -29,9 +30,9 @@ fs.readFile(xmlFile, function(err, data) {
         }
 
         console.log(
-              //require('prettyjson').render(
+              require('prettyjson').render(
                new xSre(result).getAssessment().getAssessment()
-              // )
+              )
         );
 
     });
