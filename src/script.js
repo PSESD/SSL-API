@@ -24,6 +24,7 @@ var fs = require("fs")
 // Read in the configuration above.
 configuration = JSON.parse(fs.readFileSync(configuration, "utf8"));
 var starterAws = require('starter-aws');
+var what = process.argv.slice(2)[0];
 
 if(branch === 'staging'){
 
@@ -57,41 +58,52 @@ if(branch === 'staging'){
 
 
 
-} else if(branch === 'develop'){
-    
+} else if(process.env.CIRCLE_BRANCH === 'develop'){
     ssh = new SSH({
         host: SSH_HOST,
         user: SSH_USERNAME,
         pass: SSH_PASSWORD
     });
-    ssh
-        .exec('cd /home/cbo/docker/api', {
-            out: console.log.bind(console)
-        })
-        .exec('git pull origin develop', {
-            out: console.log.bind(console)
-        })
-        .exec('docker rm -f api', {
-            out: console.log.bind(console)
-        })
-        .exec('docker build -t psesd/ssl-api:develop .', {
-            out: console.log.bind(console)
-        })
-        .exec('docker run -d --name api --link redis:redis -p 104.192.103.12:443:443 -e NODE_ENV=development -e NODE_CONFIG_DIR=/config -v /config:/config psesd/ssl-api:develop', {
-            out: console.log.bind(console)
-        })
-        .exec('docker login -e "'+DOCKER_EMAIL+'" -u "'+DOCKER_USER+'" -p "'+DOCKER_PASS+'"', {
-            out: console.log.bind(console)
-        })
-        .exec('docker push psesd/ssl-api:develop', {
-            out: console.log.bind(console)
-        })
-        .exec('echo "DONE"', {
-            exit: function(code) {
-                process.exit(0);
-            }
-        })
-        .start();
+    if(what === 'build') {
+        ssh
+            .exec('cd /home/cbo/docker/api', {
+                out: console.log.bind(console)
+            })
+            .exec('git fetch && git reset --hard origin/develop', {
+                out: console.log.bind(console)
+            })
+            .exec('docker rm -f api', {
+                out: console.log.bind(console)
+            })
+            .exec('docker build -t psesd/ssl-api:develop .', {
+                out: console.log.bind(console)
+            })
+            .exec('docker run -d --name api --link redis:redis -p 104.192.103.12:443:443 -e NODE_ENV=development -e NODE_CONFIG_DIR=/config -v /config:/config psesd/ssl-api:develop', {
+                out: console.log.bind(console)
+            })
+            .exec('echo "DONE"', {
+                exit: function (code) {
+                    process.exit(0);
+                }
+            });
+    } else {
+        ssh
+            .exec('cd /home/cbo/docker/api', {
+                out: console.log.bind(console)
+            })
+            .exec('docker login -e "' + DOCKER_EMAIL + '" -u "' + DOCKER_USER + '" -p "' + DOCKER_PASS + '"', {
+                out: console.log.bind(console)
+            })
+            .exec('docker push psesd/ssl-api:develop', {
+                out: console.log.bind(console)
+            })
+            .exec('echo "DONE"', {
+                exit: function (code) {
+                    process.exit(0);
+                }
+            })
+    }
+    ssh.start();
 
 } else {
     throw 'Not valid environment';
