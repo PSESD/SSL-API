@@ -36,11 +36,11 @@ var latestDateAvailable = {};
 var organizationWhere = {};
 var _funct = require(__dirname + '/../function');
 
-organizationWhere = {
-   _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
-};
+//organizationWhere = {
+//    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
+//};
 
-console.log('WHERE: ', organizationWhere);
+//console.log('WHERE: ', organizationWhere);
 function cacheDebug(done){
     var key = prefixListStudent + '*';
     cache.get(key, function(err, data){
