@@ -35,6 +35,7 @@ var os = require('os');
 //var con = require('./lib/sql');
 var studentCollector = require('./lib/cli/studentCollector');
 var tokenCleaner = require('./lib/cli/tokenCleaner');
+var dbIndexing = require('./lib/cli/dbIndexing');
 var request = require('./lib/cli/request');
 var _funct = require(__dirname + '/lib/function');
 var parseString = require('xml2js').parseString;
@@ -281,6 +282,16 @@ switch(what){
                 console.log('Remove expire token fails: ', err);
             } else{
                 console.log('Remove expire token done');
+            }
+            process.exit();
+        });
+        break;
+    case 'collection-index':
+        dbIndexing.reIndex(function(err, indexing){
+            if (err && err !== null && err !== 'null') {
+                console.log('Reindex fails: ', err);
+            } else{
+                console.log('Reindex done');
             }
             process.exit();
         });

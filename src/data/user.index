@@ -1,0 +1,3 @@
+db.users.dropIndex();
+db.users.ensureIndex({ "permissions.organization": 1, "activate": 1 }, { background: true, name: "po_a" });
+db.users.ensureIndex({ "email": 1, "is_super_admin": 1 }
