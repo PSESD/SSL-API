@@ -49,7 +49,7 @@ var indexing = [
         name: 'Tag',
         index: [
             [{ _id: 1}, { name: '_id_' }],
-            [{ slug: 1 }, { organization: 'slug_organization_1', background: true }]
+            [{ slug: 1 }, { name: 'slug_organization_1', background: true }]
         ]
     },
     {
@@ -62,21 +62,21 @@ var indexing = [
                 secret: 1,
                 userId: 1,
                 redirectUri: 1
-            }, { organization: 'client_1', background: true }]
+            }, { name: 'client_1', background: true }]
         ]
     },
     {
         name: 'Invite',
         index: [
             [{ _id: 1}, { name: '_id_' }],
-            [{ authCode: 1, organization: 1, role: 1, is_special_case_worker: 1 }, { organization: 'invite_1', background: true }]
+            [{ authCode: 1, organization: 1, role: 1, is_special_case_worker: 1 }, { name: 'invite_1', background: true }]
         ]
     },
     {
         name: 'Permission',
         index: [
             [{ _id: 1}, { name: '_id_' }],
-            [{ model: 1, allow: 1, opertaion: 1 }, { organization: 'permission_1', background: true }]
+            [{ model: 1, allow: 1, operation: 1 }, { name: 'permission_1', background: true }]
         ]
     },
     {
