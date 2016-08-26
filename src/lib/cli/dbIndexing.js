@@ -24,6 +24,7 @@ var indexing = [
             [{
                 "permissions.organization": 1,
                 "permissions.activate": 1,
+                "permissions.activateStatus": 1,
                 "permissions.role": 1
             }, { name: 'po_pa_pr_1', background: true }]
         ]
@@ -32,15 +33,91 @@ var indexing = [
         name: 'Token',
         index: [
             [{ _id: 1}, { name: '_id_' }],
-            [{ token: 1, ip: 1, clientId: 1, userId: 1, scope: 1, expired: 1 }, { name: 'token', background: true }]
+            [{ token: 1 }, { name: 'token_1', background: true, unique: true }],
+            [{ token: 1, ip: 1, clientId: 1, userId: 1, scope: 1, expired: 1 }, { name: 'ctoken_1', background: true }]
         ]
     },
     {
-        name: 'Token',
+        name: 'RefreshToken',
         index: [
             [{ _id: 1}, { name: '_id_' }],
-            [{ token: 1 }, { name: 'token_1', background: true, unique: true }],
-            [{ token: 1, ip: 1, clientId: 1, userId: 1, scope: 1, expired: 1 }, { name: 'ctoken_1', background: true }]
+            [{ refreshToken: 1 }, { name: 'refresh_token_1', background: true, unique: true }],
+            [{ refreshToken: 1, clientId: 1, userId: 1 }, { name: 'refresh_token_client_user_1', background: true }]
+        ]
+    },
+    {
+        name: 'Tag',
+        index: [
+            [{ _id: 1}, { name: '_id_' }],
+            [{ slug: 1 }, { organization: 'slug_organization_1', background: true }]
+        ]
+    },
+    {
+        name: 'Client',
+        index: [
+            [{ _id: 1}, { name: '_id_' }],
+            [{
+                name: 1,
+                id: 1,
+                secret: 1,
+                userId: 1,
+                redirectUri: 1
+            }, { organization: 'client_1', background: true }]
+        ]
+    },
+    {
+        name: 'Invite',
+        index: [
+            [{ _id: 1}, { name: '_id_' }],
+            [{ authCode: 1, organization: 1, role: 1, is_special_case_worker: 1 }, { organization: 'invite_1', background: true }]
+        ]
+    },
+    {
+        name: 'Permission',
+        index: [
+            [{ _id: 1}, { name: '_id_' }],
+            [{ model: 1, allow: 1, opertaion: 1 }, { organization: 'permission_1', background: true }]
+        ]
+    },
+    {
+        name: 'Organization',
+        index: [
+            [{ _id: 1}, { name: '_id_' }],
+            [{ name: 1, website: 1, url: 1, externalServiceId: 1, personnelId: 1, authorizedEntityId: 1 }, { name: 'organization_1', background: true }]
+        ]
+    },
+    {
+        name: 'Program',
+        index: [
+            [{ _id: 1}, { name: '_id_' }],
+            [{ name: 1 }, { name: 'program_1', background: true }]
+        ]
+    },
+    {
+        name: 'Code',
+        index: [
+            [{ _id: 1}, { name: '_id_' }],
+            [{
+                code: 1,
+                redirectUri: 1,
+                userId: 1,
+                clientId: 1
+
+            }, { name: 'code_1', background: true }]
+        ]
+    },
+    {
+        name: 'Student',
+        index: [
+            [{ _id: 1}, { name: '_id_' }],
+            [{
+                'programs.program': 1,
+                'programs.active': 1,
+                'programs.participation_start_date': 1,
+                'programs.participation_end_date': 1,
+                'programs.cohort': 1
+            }, { name: 'student_program_id_1' }],
+            [{ organization: 1, creator: 1, district_student_id: 1, school_district: 1, college_bound: 1 }, { name: 'student_1', background: true }]
         ]
     }
 ];
@@ -57,6 +134,7 @@ module.exports = {
             var Model = require('../../app/models/'+cname.name);
             Model.collection.dropIndexes(function (err) {
                 if(err){
+                    console.log(err);
                     return cb(err);
                 }
                 console.log(' ---------------------------------------------------------------------------');
