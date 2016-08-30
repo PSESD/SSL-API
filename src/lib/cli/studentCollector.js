@@ -456,7 +456,7 @@ function collectCacheListStudentsAsync(force, done) {
 
             };
 
-            
+
             Student.find({
                 organization: organization._id
             }, function (err, students) {
@@ -537,9 +537,10 @@ function pullStudentAsyncWithoutOrg(ok){
     /**
      *
      * @param err1
+     * @param sql
      */
-    var okDone = function(err1){
-        var ee = null;
+    var okDone = function(err1, sql){
+        var ee = sql || null;
         if(err1){
             ee = "\nError Progress: ";
             if(err1 instanceof Error){
@@ -575,19 +576,19 @@ function pullStudentAsyncWithoutOrg(ok){
 
     con.query('drop table if exists ' + backupTable, function(err){
         if(err){
-            return okDone(err);
+            return okDone(err, 'drop table if exists ' + backupTable);
         }
         con.query('drop table if exists ' + t2, function(err){
             if(err){
-                return okDone(err);
+                return okDone(err, 'drop table if exists ' + t2);
             }
             con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
                 if(err){
-                    return okDone(err);
+                    return okDone(err, 'create table ' + backupTable + ' like ' + masterTable);
                 }
                 con.query('create table ' + t2 + ' like ' + t1, function(err, results){
                     if(err){
-                        return okDone(err);
+                        return okDone(err, 'create table ' + t2 + ' like ' + t1);
                     }
                     /**
                      *
@@ -629,7 +630,7 @@ function pullStudentAsyncWithoutOrg(ok){
                     var sql = 'TRUNCATE TABLE ' + backupTable;
                     con.query(sql, function(err, results){
                         if(err){
-                            return okDone(err);
+                            return okDone(err, sql);
                         }
                         pullMap(function(err, students){
 
@@ -644,23 +645,23 @@ function pullStudentAsyncWithoutOrg(ok){
                             con.query(sql, function(err, results){
                                 if(err){
                                     //log(sql + ' WITH ERR: ' + err, 'error');
-                                    return okDone(err, studentNumber);
+                                    return okDone(err, sql);
                                 }
                                 sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
                                 con.query(sql, function(err, results){
                                     if(err){
                                         //log(sql + 'WITH ERR: ' + err, 'error');
-                                        return okDone(err, studentNumber);
+                                        return okDone(err, sql);
                                     }
                                     var sql = 'DROP TABLE ' + t1;
                                     con.query(sql, function(err, results){
                                         if(err){
                                             //log(sql + 'WITH ERR: ' + err, 'error');
-                                            return okDone(err, studentNumber);
+                                            return okDone(err, sql);
                                         }
                                         sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
                                         con.query(sql, function(err, results){
-                                            return okDone(err, studentNumber);
+                                            return okDone(err, sql);
                                         });
                                     });
                                 });

@@ -415,6 +415,12 @@ Request.prototype = {
             var slist = [];
             if(studentList.length > 0){
                 _.each(studentList, function(student){
+                    if('-refId' in student.organization){
+                        student.organization.refId = student.organization['-refId'];
+                    }
+                    if('-id' in student){
+                        student.id = student['-id'];
+                    }
                     var xSre = l.get(student, 'xSre');
                     var s1 = {
                         id: student.organization.refId,
@@ -439,7 +445,10 @@ Request.prototype = {
                         s1.grade_level = l.get(xSre, 'enrollment.gradeLevel');
                         s1.ethnicity = l.get(xSre, 'demographics.races.race.race');
                     }
-                    slist.push(s1);
+
+                    if(s1.id) {
+                        slist.push(s1);
+                    }
 
                 });
             }
@@ -560,7 +569,7 @@ Request.prototype = {
                     });
 
                 }
-            }, serviceNumber, where, zoneId, { noNavigationPage: true, navigationpage: pageId });
+            }, serviceNumber, where, zoneId, { /*noNavigationPage: true, navigationpage: pageId, */timestamp: moment().utc().format("YYYY-MM-DDThh:mm:ss.SSSSSS") });
         }
 
         grab(function() {
@@ -578,7 +587,18 @@ Request.prototype = {
 
         this.addHeader('messageId', this.generateUUID());
 
-        var timestamp = this.headers.timestamp = this.getTimezone();
+        var timestamp = this.getTimezone();
+
+        if('timestamp' in this.headers){
+
+            timestamp = this.headers.timestamp;
+
+        } else {
+
+            this.headers.timestamp = timestamp;
+
+        }
+
 
         var token = this._generateAuthToken(timestamp, this.sessionToken, this.secret);
 
