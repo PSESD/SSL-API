@@ -16,17 +16,22 @@ var ssh;
 var branch = process.env.CIRCLE_BRANCH;
 var dockerName = 'api';
 // Require EC2.
-var fs = require("fs")
-    , path = require("path")
-    , configuration = path.resolve(process.env.HOME, ".aws")
-    ;
 
-// Read in the configuration above.
-configuration = JSON.parse(fs.readFileSync(configuration, "utf8"));
-var starterAws = require('starter-aws');
 var what = process.argv.slice(2)[0];
 
 if(branch === 'staging'){
+    var fs = require("fs")
+        , path = require("path")
+        , configuration = path.resolve(process.env.HOME, ".aws")
+        ;
+    if(configuration && fs.statSync(configuration).isFile()){
+        // Read in the configuration above.
+        configuration = JSON.parse(fs.readFileSync(configuration, "utf8"));
+    } else {
+        configuration = {};
+    }
+
+    var starterAws = require('starter-aws');
 
     ssh = new SSH({
         host: SSH_HOST,
