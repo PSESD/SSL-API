@@ -23,9 +23,7 @@ function Personal(xsre){
     //me.notAvailable = 'N/A';
     me.notAvailable = '';
     me.enrollmentHistories = xsre.getTranscript().getHistory().reverse();
-    me.personal.summary = xsre.getAttendanceBehavior().calculateSummary();
-
-
+    me.personal.summary = xsre.getStudentSummary();
 }
 /**
  *

@@ -56,6 +56,8 @@ function Transcript(xsre){
     //me.notAvailable = 'N/A';
     me.notAvailable = '';
 
+    me.currentGPA = 0;
+
     me.academicSummary = {
         totalCreditsEarned: 0,
         totalCreditsAttempted: 0,
@@ -373,6 +375,7 @@ Transcript.prototype.getTranscript = function(){
         credits: me.credits,
         subject: subjectModified,
         subjectValues: subjectValues,
+        currentGPA: me.currentGPA,
         totalCreditsEarned: isNaN(me.totalCreditsEarned) ? 0 : parseFloat(me.totalCreditsEarned).toFixed(1),
         totalCreditsAttempted: isNaN(me.totalCreditsAttempted) ? 0 : parseFloat(me.totalCreditsAttempted).toFixed(1),
         totalCumulativeGpa: me.academicSummary.cumulativeGpa.toFixed(1),
