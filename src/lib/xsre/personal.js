@@ -34,7 +34,7 @@ function Personal(xsre){
     me.personal.summary.latestDateTime = attendanceSummary.date.max;
     me.personal.summary.onTrackToGraduate = null;
 
-    var academicSummary = _.get(xsre.getJson(), 'transcriptTerm.academicSummary');
+    var academicSummary = l.get(xsre.getJson(), 'transcriptTerm.academicSummary');
 
     if(academicSummary){
         if('onTrackToGraduate' in academicSummary){

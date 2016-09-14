@@ -187,7 +187,7 @@ xSre.prototype.getStudentSummary = function(){
     summary.latestDateTime = attendanceSummary.date.max;
     summary.onTrackToGraduate = null;
 
-    var academicSummary = l.get(json, 'transcriptTerm.academicSummary');
+    var academicSummary = _.get(json, 'transcriptTerm.academicSummary');
 
     if(academicSummary){
         if('onTrackToGraduate' in academicSummary){
