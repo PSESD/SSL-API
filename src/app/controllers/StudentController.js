@@ -501,6 +501,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                             object.legend = attendance.getLegend();
                                             break;
                                         case 'transcript':
+                                            var attendance = xsre.getAttendanceBehavior();
                                             object = xsre.getTranscript().getTranscript();
                                             object.attendance = attendance.getAttendances();
                                             break;
