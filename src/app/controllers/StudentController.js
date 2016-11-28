@@ -502,6 +502,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                             break;
                                         case 'transcript':
                                             object = xsre.getTranscript().getTranscript();
+                                            object.attendance = attendance.getAttendances();
                                             break;
                                         case 'assessment':
                                             object = xsre.getAssessment().getAssessment();
