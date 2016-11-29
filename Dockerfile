@@ -1,6 +1,6 @@
 # Dockerfile for installing and running Nginx
 # Select ubuntu as the base image
-FROM ubuntu
+FROM ubuntu:14.04
 MAINTAINER M Bintang <halilintar8@yahoo.com>
 
 VOLUME ["/config"]
