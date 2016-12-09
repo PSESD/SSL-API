@@ -568,7 +568,12 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
     var me = this;
 
     var uniqueStr = me.scedId[scedAreaCode];
-
+    var teacherNames = [];
+    if('psesd:teacherNames' in course){
+        teacherNames = course['psesd:teacherNames'].split(', ');
+    } else if('teacherNames' in course) {
+        teacherNames = course['teacherNames'].split(', ');
+    }
     if (Object.keys(me.course[key].transcripts).indexOf(uniqueStr) === -1) {
         me.course[key].transcripts[uniqueStr] = [];
     }
@@ -648,7 +653,8 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
         creditsEarned: isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned),
         creditsAttempted: isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted),
         progressMarkSessionDescription: progressMarkSessionDescription,
-        interim: interim
+        interim: interim,
+        teacherNames: teacherNames
     });
 
 };
