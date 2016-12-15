@@ -650,6 +650,8 @@ Attendance.prototype.getAttendances = function(){
 
                         });
 
+                        behavior.listCourse = p.listCourse;
+
                     }
 
                 });
@@ -893,8 +895,24 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
             //     me.print(courses);
             // }
 
+            var list_course = [];
+            var temp_list_course = course;
+            temp_list_course.forEach(function(item) {
+                var temp = {
+                    // gradeLevel: item.gradeLevel,
+                    // schoolName: item.schoolName,
+                    // schoolYear: item.schoolYear,
+                    // session: item.session,
+                    // sessionDate: item.sessionDate,
+                    // startDate: item.startDate,
+                    // startDateTime: item.startDateTime,
+                    courses: item.courses
+                };
+                list_course.push(temp);
+            });
+
             summary[n].periods.push({
-                period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus), courses: courses
+                period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus), courses: courses, listCourse: list_course
             });
 
             if(e.attendanceStatus){
@@ -910,7 +928,7 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
         for(var i = summary[n].periods.length; i <= 6; i++){
 
             summary[n].periods.push({
-                period: me.notAvailable, value: me.notAvailable, event: null, slug: '', courses: []
+                period: me.notAvailable, value: me.notAvailable, event: null, slug: '', courses: [], listCourse: []
             });
 
         }
