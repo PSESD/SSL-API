@@ -173,17 +173,21 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                           scoreSet.scores.score.forEach(function(score){
 
-                                                switch(score.metric){
-                                                      case '03479':
-                                                            newCollection.Score = score.scoreValue;
-                                                            break;
-                                                      case '00503':
-                                                            newCollection.LevelCode = score.scoreValue;
-                                                            break;
-                                                      case '00500':
-                                                            newCollection.MetStandard = score.scoreValue;
-                                                            break;
-                                                }
+                                                score.forEach(function(sc) {
+
+                                                      switch(sc.metric){
+                                                            case '03479':
+                                                                  newCollection.Score = sc.scoreValue;
+                                                                  break;
+                                                            case '00503':
+                                                                  newCollection.LevelCode = sc.scoreValue;
+                                                                  break;
+                                                            case '00500':
+                                                                  newCollection.MetStandard = sc.scoreValue;
+                                                                  break;
+                                                      }
+
+                                                });
 
                                           });
 
@@ -210,25 +214,29 @@ Assessment.prototype.processAssessment = function(assessments){
 
                                           scoreSet.scores.score.forEach(function(score){
 
-                                                switch(score.metric){
-                                                      case '00506':
-                                                            newCollection.RITScore = score.scoreValue;
-                                                            break;
-                                                      case '00502':
-                                                            newCollection.PercentileRank = score.scoreValue;
-                                                            break;
-                                                      case '03474':
+                                                score.forEach(function(sc) {
 
-                                                            var scoreValues = String(score.scoreValue).trim().split(' ');
+                                                      switch(sc.metric){
+                                                            case '00506':
+                                                                  newCollection.RITScore = sc.scoreValue;
+                                                                  break;
+                                                            case '00502':
+                                                                  newCollection.PercentileRank = sc.scoreValue;
+                                                                  break;
+                                                            case '03474':
 
-                                                            if(scoreValues.length === 2 && l.has(newCollection, scoreValues[0]) && !_.isEmpty(scoreValues[1])){
+                                                                  var scoreValues = String(sc.scoreValue).trim().split(' ');
 
-                                                                  newCollection[scoreValues[0]] = scoreValues[1].toLowerCase() === 'true' ? 'Yes' : 'No';
+                                                                  if(scoreValues.length === 2 && l.has(newCollection, scoreValues[0]) && !_.isEmpty(scoreValues[1])){
 
-                                                            }
+                                                                        newCollection[scoreValues[0]] = scoreValues[1].toLowerCase() === 'true' ? 'Yes' : 'No';
 
-                                                            break;
-                                                }
+                                                                  }
+
+                                                                  break;
+                                                      }
+
+                                                });
 
                                           });
 
