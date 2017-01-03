@@ -500,6 +500,10 @@ StudentController.getStudentsBackpack = function(req, res){
                                             object.years = attendance.getAvailableYears();
                                             object.legend = attendance.getLegend();
                                             break;
+                                        case 'attendanceV2':
+                                            var attendance = xsre.getAttendanceBehavior2();
+                                            object = attendance.getAttendances();
+                                            break;
                                         case 'transcript':
                                             var attendance = xsre.getAttendanceBehavior();
                                             object = xsre.getTranscript().getTranscript();

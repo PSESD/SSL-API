@@ -164,7 +164,7 @@ Rest.prototype.routeOrganizationStudent = function(){
 
     function separateFilter (req, res, next){
         var separate = req.params.separate;
-        var whiteList = [ 'general', 'xsre', 'report', 'attendance', 'transcript', 'assessment' ];
+        var whiteList = [ 'general', 'xsre', 'report', 'attendance', 'attendanceV2', 'transcript', 'assessment' ];
         if(whiteList.indexOf(separate) === -1){
             return next(new Error('Hacking attemp!!'));
         }

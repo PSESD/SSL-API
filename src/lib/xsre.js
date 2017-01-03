@@ -5,6 +5,7 @@
 var moment = require('moment');
 var Transcript = require(__dirname + '/xsre/transcript');
 var Attendance = require(__dirname + '/xsre/attendance');
+var Attendance2 = require(__dirname + '/xsre/attendance2');
 var Report = require(__dirname + '/xsre/report');
 var Assessment = require(__dirname + '/xsre/assessment');
 var Personal = require(__dirname + '/xsre/personal');
@@ -207,6 +208,15 @@ xSre.prototype.getStudentSummary = function(){
 xSre.prototype.getAttendanceBehavior = function(){
     this.justlog.info('XSRE - START ATTENDANCE');
     return new Attendance(this);
+
+};
+/**
+ *
+ * @returns {Attendance2}
+ */
+xSre.prototype.getAttendanceBehavior2 = function(){
+    this.justlog.info('XSRE - START ATTENDANCE2');
+    return new Attendance2(this);
 
 };
 /**
