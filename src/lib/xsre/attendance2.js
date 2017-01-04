@@ -167,7 +167,12 @@ function Attendance(xsre){
             {
                 var year = {
                     year: new_date.getFullYear(),
-                    data: []
+                    data: {
+                        semester: [],
+                        quarter: [],
+                        term: [],
+                        unknown: []
+                    }
                 };
                 list_year.push(year);
             }
@@ -232,16 +237,12 @@ function Attendance(xsre){
     });
 
 
-    console.log(total);
-    console.log(total_not_present);
-    console.log(start_date);
-    console.log(end_date);
-    console.log(list_data);
+    // console.log(total);
+    // console.log(total_not_present);
+    // console.log(start_date);
+    // console.log(end_date);
+    // console.log(list_data);
     console.log(list_year);
-
-
-
-
 
 
 
@@ -264,13 +265,175 @@ function Attendance(xsre){
         }
     }
 
+
+
+
+    transcriptCombine.sort(function(a, b) {
+        var key1 = new Date(a.schoolYear);
+        var key2 = new Date(b.schoolYear);
+
+        if (key1 < key2) {
+            return -1;
+        } else if (key1 == key2) {
+            return 0;
+        } else {
+            return 1;
+        }
+    });
+
+    list_year.forEach(function(item) {
+        transcriptCombine.forEach(function(item2) {
+            if(item.year == item2.schoolYear) {
+                if(item2.session.sessionType == 'Semester')
+                {
+                    item.data.semester.push(item2);
+                }
+                else if(item2.session.sessionType == 'Quarter')
+                {
+                    item.data.quarter.push(item2);
+                }
+                else if(item2.session.sessionType == 'Term')
+                {
+                    item.data.term.push(item2);
+                }
+                else {
+                    item.data.unknown.push(item2);
+                }
+            }
+        });
+    });
+    console.log(list_year[1]);
+    list_year.forEach(function(item) {
+        item.data.semester.sort(function(a, b) {
+            var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
+            var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
+
+            if (key1 < key2) {
+                return -1;
+            } else if (key1 == key2) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+        item.data.quarter.sort(function(a, b) {
+            var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
+            var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
+
+            if (key1 < key2) {
+                return -1;
+            } else if (key1 == key2) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+        item.data.term.sort(function(a, b) {
+            var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
+            var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
+
+            if (key1 < key2) {
+                return -1;
+            } else if (key1 == key2) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+        item.data.unknown.sort(function(a, b) {
+            var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
+            var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
+
+            if (key1 < key2) {
+                return -1;
+            } else if (key1 == key2) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+    });
+
+    console.log(list_year[1]);
+
+
+
+    // transcriptCombine.sort(function(a, b) {
+    //     var key1Year = new Date(a.schoolYear);
+    //     var key2Year = new Date(b.schoolYear);
+    //     var key1 = typeof a.session !== 'undefined' ? a.session.sessionType : 0;
+    //     var key2 = typeof b.session !== 'undefined' ? b.session.sessionType : 0;
+    //
+    //     if(key1Year == key2Year)
+    //     {
+    //         switch(key1)
+    //         {
+    //             case 'Semester' : key1 = 1; break;
+    //             case 'Quarter' : key1 = 2; break;
+    //             case 'Term' : key1 = 3; break;
+    //             default: key1 = 0; break;
+    //         }
+    //         switch(key2)
+    //         {
+    //             case 'Semester' : key2 = 1; break;
+    //             case 'Quarter' : key2 = 2; break;
+    //             case 'Term' : key2 = 3; break;
+    //             default: key2 = 0; break;
+    //         }
+    //
+    //         if (key1 > key2) {
+    //             return -1;
+    //         } else if (key1 < key2) {
+    //             return 1;
+    //         } else {
+    //             return 0;
+    //         }
+    //     }
+    // });
+    //
+    // transcriptCombine.sort(function(a, b) {
+    //     var key1Year = new Date(a.schoolYear);
+    //     var key2Year = new Date(b.schoolYear);
+    //     var key1Type = typeof a.session !== 'undefined' ? a.session.sessionType : 0;
+    //     var key2Type = typeof b.session !== 'undefined' ? b.session.sessionType : 0;
+    //
+    //     var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
+    //     var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
+    //
+    //     if(key1Year == key2Year && key1Type == key2Type)
+    //     {
+    //         switch(key1Type)
+    //         {
+    //             case 'Semester' : key1Type = 1; break;
+    //             case 'Quarter' : key1Type = 2; break;
+    //             case 'Term' : key1Type = 3; break;
+    //             default: key1Type = 0; break;
+    //         }
+    //         switch(key2Type)
+    //         {
+    //             case 'Semester' : key2Type = 1; break;
+    //             case 'Quarter' : key2Type = 2; break;
+    //             case 'Term' : key2Type = 3; break;
+    //             default: key2Type = 0; break;
+    //         }
+    //
+    //         if (key1 > key2) {
+    //             return -1;
+    //         } else if (key1 < key2) {
+    //             return 1;
+    //         } else {
+    //             return 0;
+    //         }
+    //     }
+    // });
+
     this.disciplineIncidents = xsre.json.disciplineIncidents || { disciplineIncident: [] };
-    console.log(this.disciplineIncidents);
-    console.log(transcriptCombine);
+    // console.log(this.disciplineIncidents);
+    // console.log(transcriptCombine);
 
 
 
-
+    this.abcd = list_year;
     this.allEvents = {};
     this.allDisciplines = {};
     this.minDateCalendar = 0;
@@ -322,7 +485,6 @@ function Attendance(xsre){
     this.legend.other = this.facets.EarlyDeparture;
     this.legend.unknown = this.facets.Unknown;
     this.extractRawSource = xsre.extractRawSource;
-    this.maxEventDate = null;
 
 }
 /**
@@ -364,6 +526,7 @@ Attendance.prototype.getAvailableYears = function(){
 Attendance.prototype.getAttendances = function(){
 
     var me = this;
+    return me.abcd;
 
     if(!_.isObject(me.attendances)) {
         return me.attendanceBehaviors;
