@@ -131,7 +131,7 @@ var SUCCESS = 'SUCCESS';
 function Attendance(xsre){
 
     this.attendances = xsre.json.attendance || null;
-
+/*
     var total = 0;
     var total_not_present = 0;
     var start_date = '';
@@ -140,23 +140,6 @@ function Attendance(xsre){
     var list_year = [];
 
     this.attendances.events.event.forEach(function(event){
-
-        var new_date = new Date(event.calendarEventDate);
-        if(total == 0)
-        {
-            start_date = new_date;
-            end_date = new_date;
-        }
-        else {
-            if(start_date.getTime() > new_date.getTime())
-            {
-                start_date = new_date;
-            }
-            if(end_date.getTime() < new_date.getTime())
-            {
-                end_date = new_date;
-            }
-        }
 
         if(event.attendanceStatus !== "Present")
         {
@@ -234,7 +217,7 @@ function Attendance(xsre){
         } else {
             return 1;
         }
-    });
+    });*/
 
 
     // console.log(total);
@@ -242,251 +225,208 @@ function Attendance(xsre){
     // console.log(start_date);
     // console.log(end_date);
     // console.log(list_data);
-    console.log(list_year);
-
+    //console.log(list_year);
 
 
 
     var transcriptTerm = null;
     var transcriptTermOther = null;
     var transcriptCombine = [];
+    var list_year = [];
 
     if(xsre.json) {
-        if(xsre.json.transcriptTerm) {
-            transcriptTerm = xsre.json.transcriptTerm;
-            transcriptCombine.push(transcriptTerm);
-        }
-
         if(xsre.json.otherTranscriptTerms && xsre.json.otherTranscriptTerms.transcriptTerm) {
             transcriptTermOther = xsre.json.otherTranscriptTerms.transcriptTerm;
+
+            transcriptTermOther.sort(function(a, b) {
+                if (typeof a.session === 'undefined' || typeof b.session === 'undefined') {
+                    return 0;
+                }
+                var key1 = new Date(a.session.startDate);
+                var key2 = new Date(b.session.startDate);
+
+                if (key1 < key2) {
+                    return -1;
+                } else if (key1 == key2) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            });
+
             transcriptTermOther.forEach(function(item, i) {
                 transcriptCombine.push(item);
             });
         }
+
+        // if(xsre.json.transcriptTerm) {
+        //     transcriptTerm = xsre.json.transcriptTerm;
+        //     transcriptCombine.push(transcriptTerm);
+        // }
     }
 
-
-
-
-    transcriptCombine.sort(function(a, b) {
-        var key1 = new Date(a.schoolYear);
-        var key2 = new Date(b.schoolYear);
-
-        if (key1 < key2) {
-            return -1;
-        } else if (key1 == key2) {
-            return 0;
-        } else {
-            return 1;
+    var year_now = '';
+    transcriptCombine.forEach(function(item) {
+        if(typeof item.session !== 'undefined')
+        {
+            var get_date_item = moment(new Date(item.session.startDate));
+            var get_year_item = get_date_item.format('YYYY');
+            var get_month_item = get_date_item.format('MM');
+            var get_day_item = get_date_item.format('DD');
+            if(year_now !== get_year_item)
+            {
+                year_now = get_year_item;
+                list_year.push({
+                    year: get_year_item,
+                    month: get_month_item,
+                    day: get_day_item
+                });
+            }
         }
     });
 
+    var first = true;
+    var first_year = 0;
+    var first_month = 0;
+    var last_year = 0;
+    var last_month = 0;
     list_year.forEach(function(item) {
-        transcriptCombine.forEach(function(item2) {
-            if(item.year == item2.schoolYear) {
-                if(item2.session.sessionType == 'Semester')
-                {
-                    item.data.semester.push(item2);
-                }
-                else if(item2.session.sessionType == 'Quarter')
-                {
-                    item.data.quarter.push(item2);
-                }
-                else if(item2.session.sessionType == 'Term')
-                {
-                    item.data.term.push(item2);
-                }
-                else {
-                    item.data.unknown.push(item2);
-                }
-            }
-        });
-    });
-    console.log(list_year[1]);
-    list_year.forEach(function(item) {
-        item.data.semester.sort(function(a, b) {
-            var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
-            var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
-
-            if (key1 < key2) {
-                return -1;
-            } else if (key1 == key2) {
-                return 0;
-            } else {
-                return 1;
-            }
-        });
-        item.data.quarter.sort(function(a, b) {
-            var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
-            var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
-
-            if (key1 < key2) {
-                return -1;
-            } else if (key1 == key2) {
-                return 0;
-            } else {
-                return 1;
-            }
-        });
-        item.data.term.sort(function(a, b) {
-            var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
-            var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
-
-            if (key1 < key2) {
-                return -1;
-            } else if (key1 == key2) {
-                return 0;
-            } else {
-                return 1;
-            }
-        });
-        item.data.unknown.sort(function(a, b) {
-            var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
-            var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
-
-            if (key1 < key2) {
-                return -1;
-            } else if (key1 == key2) {
-                return 0;
-            } else {
-                return 1;
-            }
-        });
+        if(first)
+        {
+            first = false;
+            first_year = item.year;
+            first_month = item.month;
+        }
+        last_year = item.year;
+        last_month = item.month;
     });
 
-    console.log(list_year[1]);
+    var generate_year = [];
+    var generate_month = [];
 
+    for(var i=first_year; i<=last_year; i++)
+    {
+        if(i == first_year) {
+            generate_month = set_generate_month(i, first_month, 12);
+        }
+        else if (i == last_year) {
+            generate_month = set_generate_month(i, 1, last_month);
+        }
+        else {
+            generate_month = set_generate_month(i, 1, 12);
+        }
 
+        generate_year.push({
+            year: parseInt(i),
+            month: generate_month,
+            data: []
+        })
 
-    // transcriptCombine.sort(function(a, b) {
-    //     var key1Year = new Date(a.schoolYear);
-    //     var key2Year = new Date(b.schoolYear);
-    //     var key1 = typeof a.session !== 'undefined' ? a.session.sessionType : 0;
-    //     var key2 = typeof b.session !== 'undefined' ? b.session.sessionType : 0;
-    //
-    //     if(key1Year == key2Year)
-    //     {
-    //         switch(key1)
-    //         {
-    //             case 'Semester' : key1 = 1; break;
-    //             case 'Quarter' : key1 = 2; break;
-    //             case 'Term' : key1 = 3; break;
-    //             default: key1 = 0; break;
-    //         }
-    //         switch(key2)
-    //         {
-    //             case 'Semester' : key2 = 1; break;
-    //             case 'Quarter' : key2 = 2; break;
-    //             case 'Term' : key2 = 3; break;
-    //             default: key2 = 0; break;
-    //         }
-    //
-    //         if (key1 > key2) {
-    //             return -1;
-    //         } else if (key1 < key2) {
-    //             return 1;
-    //         } else {
-    //             return 0;
-    //         }
-    //     }
-    // });
-    //
-    // transcriptCombine.sort(function(a, b) {
-    //     var key1Year = new Date(a.schoolYear);
-    //     var key2Year = new Date(b.schoolYear);
-    //     var key1Type = typeof a.session !== 'undefined' ? a.session.sessionType : 0;
-    //     var key2Type = typeof b.session !== 'undefined' ? b.session.sessionType : 0;
-    //
-    //     var key1 = typeof a.session !== 'undefined' ? a.session.sessionCode : 0;
-    //     var key2 = typeof b.session !== 'undefined' ? b.session.sessionCode : 0;
-    //
-    //     if(key1Year == key2Year && key1Type == key2Type)
-    //     {
-    //         switch(key1Type)
-    //         {
-    //             case 'Semester' : key1Type = 1; break;
-    //             case 'Quarter' : key1Type = 2; break;
-    //             case 'Term' : key1Type = 3; break;
-    //             default: key1Type = 0; break;
-    //         }
-    //         switch(key2Type)
-    //         {
-    //             case 'Semester' : key2Type = 1; break;
-    //             case 'Quarter' : key2Type = 2; break;
-    //             case 'Term' : key2Type = 3; break;
-    //             default: key2Type = 0; break;
-    //         }
-    //
-    //         if (key1 > key2) {
-    //             return -1;
-    //         } else if (key1 < key2) {
-    //             return 1;
-    //         } else {
-    //             return 0;
-    //         }
-    //     }
-    // });
+    }
+
 
     this.disciplineIncidents = xsre.json.disciplineIncidents || { disciplineIncident: [] };
-    // console.log(this.disciplineIncidents);
-    // console.log(transcriptCombine);
 
-
-
-    this.abcd = list_year;
-    this.allEvents = {};
-    this.allDisciplines = {};
-    this.minDateCalendar = 0;
-    this.maxDateCalendar = 0;
-    this.attendanceBehaviors = [];
-    this.allDates = [];
-    this.weeks = [];
-    this.availableYear = [moment().year()];
-    this.filterYear = xsre.params.year || null;
+    this.abcd = generate_year;
     this.xsre = xsre;
-
-    if(this.filterYear){
-        if(this.filterYear.indexOf('/') !== -1){
-            var split = this.filterYear.split('/');
-            this.academicStart = moment(new Date(split[0], 8, 1, 0, 0, 0));
-            this.academicEnd = moment(new Date(split[1], 7, 31, 0, 0, 0));
-        } else {
-            var y1 = parseInt(this.filterYear);
-            var y2 = y1 - 1;
-            this.academicStart = moment(new Date(y2, 8, 1, 0, 0, 0));
-            this.academicEnd = moment(new Date(y1, 7, 31, 0, 0, 0));
-        }
-    } else {
-        /**
-         * Try get from current year
-         * @type {null}
-         */
-        var today = new Date();
-        if(today.getMonth() <= 7){
-            this.academicStart = moment(new Date(today.getFullYear() - 1, 8, 1, 0, 0, 0));
-            this.academicEnd = moment(new Date(today.getFullYear(), 7, 31, 0, 0, 0));
-        } else {
-            this.academicStart = moment(new Date(today.getFullYear(), 8, 1, 0, 0, 0));
-            this.academicEnd = moment(new Date(today.getFullYear() + 1, 7, 31, 0, 0, 0));
-        }
-    }
 
     this.notAvailable = 'N/A';
     //this.notAvailable = '';
+}
 
-    this.currentSummary = null;
+function set_generate_month(year, start_month, end_month) {
+    var generate_month = [];
+    for(var i=start_month; i<=end_month; i++) {
+        generate_month.push({
+            month: parseInt(i),
+            week: set_generate_week(year, i),
+            data: []
+        });
+    }
 
-    this.facets = xsre.facets;
-    this.legend = {};
-    this.legend.present = this.facets.Present;
-    this.legend.excused = this.facets.ExcusedAbsence;
-    this.legend.unexcused = this.facets.UnexcusedAbsence;
-    this.legend.tardy = this.facets.Tardy;
-    this.legend.other = this.facets.EarlyDeparture;
-    this.legend.unknown = this.facets.Unknown;
-    this.extractRawSource = xsre.extractRawSource;
+    return generate_month;
 
 }
+
+function set_generate_week(year, month) {
+    var generate_week = [];
+    var get_many_day = moment(year+'-'+month, "YYYY-MM").daysInMonth();
+    var get_moment = 0;
+    var get_week_number = 0;
+    var check_last_day_number = moment(year+'-'+month+'-'+get_many_day, "YYYY-MM-DD");
+    var start_date = 0;
+    var end_date = 0;
+    for(var i=1; i<=get_many_day; i++)
+    {
+        get_moment = moment(year+'-'+month+'-'+i, "YYYY-MM-DD");
+        get_week_number = get_moment.isoWeek();
+        start_date = get_moment.startOf('isoWeek').format("YYYY-MM-DD");
+        end_date = get_moment.endOf('isoWeek').format("YYYY-MM-DD");
+        generate_week.push({
+            week: parseInt(get_week_number),
+            day: set_generate_day(start_date, end_date),
+            data: []
+        });
+
+        i += 6;
+    }
+
+    if(check_last_day_number.isoWeek() > get_week_number)
+    {
+        start_date = check_last_day_number.startOf('isoWeek').format("YYYY-MM-DD");
+        end_date = check_last_day_number.endOf('isoWeek').format("YYYY-MM-DD");
+        generate_week.push({
+            week: parseInt(check_last_day_number.isoWeek()),
+            day: set_generate_day(start_date, end_date),
+            data: []
+        });
+    }
+
+
+    return generate_week;
+
+}
+
+function set_generate_day(start_date, end_date) {
+    var generate_day = [];
+    start_date = moment(start_date);
+    end_date = moment(end_date);
+    var get_first_month = start_date.format('MM');
+    var get_last_month = end_date.format('MM');
+    var i = 0;
+    var get_start_day = parseInt(start_date.format("DD"));
+    var get_end_day = parseInt(end_date.format("DD"));
+    if(get_first_month == get_last_month)
+    {
+        for(i=get_start_day; i<=get_end_day; i++)
+        {
+            generate_day.push({
+                day: parseInt(i),
+                data: []
+            });
+        }
+    }
+    else {
+        var get_many_day = start_date.daysInMonth();
+        for(i=get_start_day; i<=get_many_day; i++)
+        {
+            generate_day.push({
+                day: parseInt(i),
+                data: []
+            });
+        }
+        for(i=1; i<=get_end_day; i++)
+        {
+            generate_day.push({
+                day: parseInt(i),
+                data: []
+            });
+        }
+    }
+
+    return generate_day;
+}
+
 /**
  *
  * @returns {behavior.legend|{present, excused, tardy, other, unexcused}|htmltag.legend|{parent}|{present: Array, excused: Array, tardy: Array, other: Array, unexcused: Array}|*}
