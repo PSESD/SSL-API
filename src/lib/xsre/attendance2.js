@@ -131,84 +131,36 @@ var SUCCESS = 'SUCCESS';
 function Attendance(xsre){
 
     this.attendances = xsre.json.attendance || null;
-/*
-    var total = 0;
-    var total_not_present = 0;
-    var start_date = '';
-    var end_date = '';
+
     var list_data = [];
-    var list_year = [];
 
     this.attendances.events.event.forEach(function(event){
 
         if(event.attendanceStatus !== "Present")
         {
-            total_not_present++;
-
-            var matchingYears = list_year.filter(function(key){ return key.year === new_date.getFullYear() });
-            if(matchingYears.length <= 0)
-            {
-                var year = {
-                    year: new_date.getFullYear(),
-                    data: {
-                        semester: [],
-                        quarter: [],
-                        term: [],
-                        unknown: []
-                    }
-                };
-                list_year.push(year);
-            }
-
-            var matchingMonths = list_data.filter(function(key){ return key.month === new_date.getMonth()+1 });
-            if(matchingMonths.length <= 0)
-            {
-                var temp_data = {
-                    schoolName: event.school.schoolName,
-                    courseTitle: '',
-                    teacherName: [],
-                    creditsAttempted: '',
-                    creditsEarned: '',
-                    gradeLevel: '',
-                    leaCourseId: '',
-                    scedCourseSubjectAreaCode: '',
-                    scedCourseSubjectAreaDescription: '',
-                    timeTablePeriod: event.timeTablePeriod || 0,
-                    attendanceEventType: event.attendanceEventType,
-                    attendanceStatus: event.attendanceStatus,
-                    attendanceValue: event.attendanceValue,
-                    attendanceCategory: event.absentAttendanceCategory,
-                    show: 1
-                };
-
-                var get_date = moment(new_date);
-
-                var temp_list = {
-                    fullDate: get_date.format('YYYY-MM-DD'),
-                    year: new_date.getFullYear(),
-                    month: new_date.getMonth()+1,
-                    day: new_date.getDate(),
-                    day2: new_date.getDay(),
-                    week: get_date.format('W'),
-                    data: temp_data,
-                    raw: event
-                };
-                list_data.push(temp_list);
-            }
-
+            var event_date = moment(new Date(event.calendarEventDate));
+            var temp = {
+                full_date: event_date.format("YYYY-MM-DD"),
+                year: parseInt(event_date.format("YYYY")),
+                month: parseInt(event_date.format("MM")),
+                week: parseInt(event_date.format("WW")),
+                day: parseInt(event_date.format("DD")),
+                school_name: event.school.schoolName,
+                calendar_date: event.calendarEventDate,
+                attendance_status: event.attendanceStatus,
+                attendance_event_type: event.attendanceEventType,
+                attendance_value: event.attendanceValue,
+                time_table_period: typeof event.timeTablePeriod !== 'undefined' ? event.timeTablePeriod : 0,
+                show: 1
+            };
+            list_data.push(temp);
         }
 
-        total++;
-
-    });
-
-    list_year.sort(function(a, b) {
-        return a.year - b.year;
     });
 
     list_data.sort(function(a, b) {
-        var key1 = new Date(a.fullDate);
-        var key2 = new Date(b.fullDate);
+        var key1 = new Date(a.full_date);
+        var key2 = new Date(b.full_date);
 
         if (key1 < key2) {
             return -1;
@@ -217,14 +169,14 @@ function Attendance(xsre){
         } else {
             return 1;
         }
-    });*/
+    });
 
 
     // console.log(total);
     // console.log(total_not_present);
     // console.log(start_date);
     // console.log(end_date);
-    // console.log(list_data);
+    console.log(list_data);
     //console.log(list_year);
 
 
@@ -266,9 +218,6 @@ function Attendance(xsre){
     }
 
     var year_now = '';
-    var list_school = [];
-    var last_school_id = '';
-    var list_course = [];
     var get_school_id = null;
     transcriptCombine.forEach(function(item) {
         get_school_id = null;
@@ -289,56 +238,9 @@ function Attendance(xsre){
                 });
             }
         }
-        if(typeof item.courses.course.length !== 'undefined')
-        {
-            item.courses.course.forEach(function(course) {
-                get_school_id = course.schoolRefId;
-            });
-        }
-        else {
-            var course = item.courses.course;
-            get_school_id = course.schoolRefId;
-        }
-
-        if(last_school_id == '') {
-            last_school_id = item.school.schoolName;
-            list_school.push({
-                name: item.school.schoolName,
-                id: get_school_id
-            })
-        }
-
-        var get_total_duplicate = list_school.filter(function(key){ return key.name === item.school.schoolName });
-        if(get_total_duplicate.length <= 0)
-        {
-            list_school.push({
-                name: item.school.schoolName,
-                id: get_school_id
-            })
-        }
 
     });
 
-    var get_total_duplicate = list_school.filter(function(key){ return key.name === transcriptTerm.school.schoolName });
-    if(get_total_duplicate.length <= 0)
-    {
-        get_school_id = null;
-        if(typeof transcriptTerm.courses.course.length !== 'undefined')
-        {
-            transcriptTerm.courses.course.forEach(function(course) {
-                get_school_id = course.schoolRefId;
-            });
-        }
-        else {
-            var course = transcriptTerm.courses.course;
-            get_school_id = course.schoolRefId;
-        }
-
-        list_school.push({
-            name: transcriptTerm.school.schoolName,
-            id: get_school_id
-        })
-    }
 
     var first = true;
     var first_year = 0;
@@ -379,6 +281,8 @@ function Attendance(xsre){
 
     }
 
+    var list_school = get_list_school(transcriptCombine, transcriptTerm);
+    var list_course = get_list_course(transcriptCombine, transcriptTerm);
 
     this.disciplineIncidents = xsre.json.disciplineIncidents || { disciplineIncident: [] };
     console.log(list_school);
@@ -481,6 +385,93 @@ function set_generate_day(start_date, end_date) {
 
     return generate_day;
 }
+
+function get_list_school(transcriptCombine, transcriptTerm) {
+
+    var list_school = [];
+    var get_school_id,
+        last_school_id = '';
+
+    transcriptCombine.forEach(function(item) {
+        get_school_id = null;
+
+        if(typeof item.courses.course.length !== 'undefined')
+        {
+            item.courses.course.forEach(function(course) {
+                get_school_id = course.schoolRefId;
+            });
+        }
+        else {
+            var course = item.courses.course;
+            get_school_id = course.schoolRefId;
+        }
+
+        if(last_school_id == '') {
+            last_school_id = item.school.schoolName;
+            list_school.push({
+                name: item.school.schoolName,
+                id: get_school_id
+            })
+        }
+
+        var get_total_duplicate = list_school.filter(function(key){ return key.name === item.school.schoolName });
+        if(get_total_duplicate.length <= 0)
+        {
+            list_school.push({
+                name: item.school.schoolName,
+                id: get_school_id
+            })
+        }
+
+    });
+
+    var get_total_duplicate = list_school.filter(function(key){ return key.name === transcriptTerm.school.schoolName });
+    if(get_total_duplicate.length <= 0)
+    {
+        get_school_id = null;
+        if(typeof transcriptTerm.courses.course.length !== 'undefined')
+        {
+            transcriptTerm.courses.course.forEach(function(course) {
+                get_school_id = course.schoolRefId;
+            });
+        }
+        else {
+            var course = transcriptTerm.courses.course;
+            get_school_id = course.schoolRefId;
+        }
+
+        list_school.push({
+            name: transcriptTerm.school.schoolName,
+            id: get_school_id
+        })
+    }
+
+    return list_school;
+}
+
+function get_list_course(transcriptCombine, transcriptTerm) {
+
+    var list_course = [];
+
+    transcriptCombine.forEach(function(item) {
+
+        if(typeof item.courses.course.length !== 'undefined')
+        {
+            item.courses.course.forEach(function(course) {
+
+            });
+        }
+        else {
+            var course = item.courses.course;
+
+        }
+
+    });
+
+    return list_course;
+
+}
+
 
 /**
  *
