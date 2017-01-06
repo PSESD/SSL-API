@@ -259,14 +259,20 @@ function Attendance(xsre){
             });
         }
 
-        // if(xsre.json.transcriptTerm) {
-        //     transcriptTerm = xsre.json.transcriptTerm;
-        //     transcriptCombine.push(transcriptTerm);
-        // }
+        if(xsre.json.transcriptTerm) {
+            transcriptTerm = xsre.json.transcriptTerm;
+            // transcriptCombine.push(transcriptTerm);
+        }
     }
 
     var year_now = '';
+    var list_school = [];
+    var last_school_id = '';
+    var list_course = [];
+    var get_school_id = null;
     transcriptCombine.forEach(function(item) {
+        get_school_id = null;
+
         if(typeof item.session !== 'undefined')
         {
             var get_date_item = moment(new Date(item.session.startDate));
@@ -283,7 +289,56 @@ function Attendance(xsre){
                 });
             }
         }
+        if(typeof item.courses.course.length !== 'undefined')
+        {
+            item.courses.course.forEach(function(course) {
+                get_school_id = course.schoolRefId;
+            });
+        }
+        else {
+            var course = item.courses.course;
+            get_school_id = course.schoolRefId;
+        }
+
+        if(last_school_id == '') {
+            last_school_id = item.school.schoolName;
+            list_school.push({
+                name: item.school.schoolName,
+                id: get_school_id
+            })
+        }
+
+        var get_total_duplicate = list_school.filter(function(key){ return key.name === item.school.schoolName });
+        if(get_total_duplicate.length <= 0)
+        {
+            list_school.push({
+                name: item.school.schoolName,
+                id: get_school_id
+            })
+        }
+
     });
+
+    var get_total_duplicate = list_school.filter(function(key){ return key.name === transcriptTerm.school.schoolName });
+    if(get_total_duplicate.length <= 0)
+    {
+        get_school_id = null;
+        if(typeof transcriptTerm.courses.course.length !== 'undefined')
+        {
+            transcriptTerm.courses.course.forEach(function(course) {
+                get_school_id = course.schoolRefId;
+            });
+        }
+        else {
+            var course = transcriptTerm.courses.course;
+            get_school_id = course.schoolRefId;
+        }
+
+        list_school.push({
+            name: transcriptTerm.school.schoolName,
+            id: get_school_id
+        })
+    }
 
     var first = true;
     var first_year = 0;
@@ -326,11 +381,11 @@ function Attendance(xsre){
 
 
     this.disciplineIncidents = xsre.json.disciplineIncidents || { disciplineIncident: [] };
-
-    this.abcd = generate_year;
+    console.log(list_school);
+    this.generate_table = generate_year;
+    this.list_school = list_school;
     this.xsre = xsre;
 
-    this.notAvailable = 'N/A';
     //this.notAvailable = '';
 }
 
@@ -466,7 +521,7 @@ Attendance.prototype.getAvailableYears = function(){
 Attendance.prototype.getAttendances = function(){
 
     var me = this;
-    return me.abcd;
+    return me.generate_table;
 
     if(!_.isObject(me.attendances)) {
         return me.attendanceBehaviors;
