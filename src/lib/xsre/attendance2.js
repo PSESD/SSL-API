@@ -489,6 +489,38 @@ function get_list_course(transcriptCombine, transcriptTerm) {
 
     });
 
+    if(typeof transcriptTerm.session !== 'undefined')
+    {
+        var start_date = moment(new Date(transcriptTerm.session.startDate));
+        var end_date = null;
+        var session_type = transcriptTerm.session.sessionType;
+        var session_code = transcriptTerm.session.sessionCode;
+        var session_description = transcriptTerm.session.description;
+        var add_date = 0;
+        switch (transcriptTerm.session.sessionType) {
+            case 'FullSchoolYear': add_date = 12; break;
+            case 'Semester': add_date = 6; break;
+            case 'Quarter': add_date = 6; break;
+            default: add_date = 3; break;
+        }
+
+        end_date = start_date.add(add_date, "months");
+
+    }
+
+    if(typeof transcriptTerm.courses.course.length !== 'undefined')
+    {
+        transcriptTerm.courses.course.forEach(function(course) {
+            var temp_course = get_course(course, start_date.format("YYYY-MM-DD"), end_date.format("YYYY-MM-DD"), session_type, session_code, session_description);
+            list_course.push(temp_course);
+        });
+    }
+    else {
+        var course = transcriptTerm.courses.course;
+        var temp_course = get_course(course, start_date.format("YYYY-MM-DD"), end_date.format("YYYY-MM-DD"), session_type, session_code, session_description);
+        list_course.push(temp_course);
+    }
+
     return list_course;
 
 }
