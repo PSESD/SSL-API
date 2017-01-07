@@ -455,21 +455,85 @@ function get_list_course(transcriptCombine, transcriptTerm) {
 
     transcriptCombine.forEach(function(item) {
 
+        if(typeof item.session !== 'undefined')
+        {
+            var start_date = moment(new Date(item.session.startDate));
+            var end_date = null;
+            var session_type = item.session.sessionType;
+            var session_code = item.session.sessionCode;
+            var session_description = item.session.description;
+            var add_date = 0;
+            switch (item.session.sessionType) {
+                case 'FullSchoolYear': add_date = 12; break;
+                case 'Semester': add_date = 6; break;
+                case 'Quarter': add_date = 6; break;
+                default: add_date = 3; break;
+            }
+
+            end_date = start_date.add(add_date, "months");
+
+        }
+
         if(typeof item.courses.course.length !== 'undefined')
         {
             item.courses.course.forEach(function(course) {
-
+                var temp_course = get_course(course, start_date.format("YYYY-MM-DD"), end_date.format("YYYY-MM-DD"), session_type, session_code, session_description);
+                list_course.push(temp_course);
             });
         }
         else {
             var course = item.courses.course;
-
+            var temp_course = get_course(course, start_date.format("YYYY-MM-DD"), end_date.format("YYYY-MM-DD"), session_type, session_code, session_description);
+            list_course.push(temp_course);
         }
 
     });
 
     return list_course;
 
+}
+
+function get_course(course, start_date, end_date, session_type, session_code, session_description) {
+    var data_course = null;
+
+    if(typeof course.timeTablePeriod !== "undefined")
+    {
+        var teacher_name = [];
+        var temp_teacher_name = typeof course.psesd.teacherNames !== 'undefined' ? course.psesd.teacherNames : null;
+
+        if(temp_teacher_name.length > 0)
+        {
+            teacher_name = temp_teacher_name.split(",");
+        }
+
+        var mark = 0;
+        if(typeof course.finalMarkValue !== 'undefined')
+        {
+            mark = course.finalMarkValue;
+        }
+        else if(typeof course.progressMark !== 'undefined')
+        {
+            mark = course.progressMark;
+        }
+
+        data_course = {
+            title: course.courseTitle,
+            course_id: course.leaCourseId,
+            credits_attempted: course.creditsAttempted,
+            credits_earned: course.creditsEarned,
+            mark: mark,
+            teacher_name: teacher_name,
+            subject_area_code: course.scedCourseSubjectAreaCode,
+            time_table: course.timeTablePeriod,
+            start_date: start_date,
+            end_date: end_date,
+            session_type: session_type,
+            session_code: session_code,
+            session_description: session_description
+        }
+    }
+
+    return data_course;
 }
 
 
