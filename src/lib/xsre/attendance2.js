@@ -131,7 +131,6 @@ var SUCCESS = 'SUCCESS';
 function Attendance(xsre){
 
     this.attendances = xsre.json.attendance || null;
-
     var list_data = get_all_attendance_data(this.attendances.events.event);
 
     var transcriptTerm = null;
@@ -238,7 +237,6 @@ function Attendance(xsre){
     var list_school = get_list_school(transcriptCombine, transcriptTerm);
     var list_course = get_list_course(transcriptCombine, transcriptTerm);
     combine_all(generate_year, list_data, list_course, list_school);
-
     this.disciplineIncidents = xsre.json.disciplineIncidents || { disciplineIncident: [] };
     this.generate_table = generate_year;
     this.xsre = xsre;
@@ -301,24 +299,6 @@ function combine_all(generate_year, list_data, list_course, list_school) {
 
     });
 
-
-    var list_type = [];
-    var list_status = [];
-    list_data.forEach(function (data) {
-        var list_type_temp = list_type.filter(function(key){ return key === data.attendance_event_type });
-        if(list_type_temp.length <= 0)
-        {
-            list_type.push(data.attendance_event_type);
-        }
-        var list_status_temp = list_status.filter(function(key){ return key === data.attendance_status });
-        if(list_status_temp.length <= 0)
-        {
-            list_status.push(data.attendance_status);
-        }
-    });
-
-    console.log(list_type, list_status);
-
     generate_year.forEach(function(itemYear) {
 
         var get_list_data_year = list_data.filter(function(key){ return parseInt(key.year) === parseInt(itemYear.year) });
@@ -352,6 +332,7 @@ function combine_all(generate_year, list_data, list_course, list_school) {
                                         if(one_get_list_data_day.missed_class > 0)
                                             day_missed_class++;
                                     });
+                                    console.log("day", day_missed_day, day_late_to_class, day_missed_class);
                                     itemDay.data.summary = {
                                         missed_day: day_missed_day,
                                         late_to_class: day_late_to_class,
@@ -372,6 +353,7 @@ function combine_all(generate_year, list_data, list_course, list_school) {
                                 if(one_get_list_data_week.missed_class > 0)
                                     week_missed_class++;
                             });
+                            console.log("week", week_missed_day, week_late_to_class, week_missed_class);
                             itemWeek.data.summary = {
                                 missed_day: week_missed_day,
                                 late_to_class: week_late_to_class,
@@ -391,6 +373,7 @@ function combine_all(generate_year, list_data, list_course, list_school) {
                         if(one_get_list_data_month.missed_class > 0)
                             month_missed_class++;
                     });
+                    console.log("month", month_missed_day, month_late_to_class, month_missed_class);
                     itemMonth.data.summary = {
                         missed_day: month_missed_day,
                         late_to_class: month_late_to_class,
@@ -709,7 +692,9 @@ function set_generate_day(start_date, end_date) {
         {
             generate_day.push({
                 day: parseInt(i),
-                data: {}
+                data: {
+                    summary: []
+                }
             });
         }
     }
@@ -719,14 +704,18 @@ function set_generate_day(start_date, end_date) {
         {
             generate_day.push({
                 day: parseInt(i),
-                data: {}
+                data: {
+                    summary: []
+                }
             });
         }
         for(i=1; i<=get_end_day; i++)
         {
             generate_day.push({
                 day: parseInt(i),
-                data: {}
+                data: {
+                    summary: []
+                }
             });
         }
     }
@@ -823,7 +812,6 @@ function get_list_course(transcriptCombine, transcriptTerm) {
             }
 
             end_date = start_date.clone().add(add_date, "months");
-
             if(typeof item.courses.course.length !== 'undefined')
             {
                 item.courses.course.forEach(function(course) {
@@ -854,7 +842,6 @@ function get_list_course(transcriptCombine, transcriptTerm) {
                     case 'Quarter': session_type_number: 2; break;
                     default: session_type_number: 1; break;
                 }
-
                 list_course.push({
                     course: temp,
                     start_date: start_date.format("YYYY-MM-DD"),
@@ -893,12 +880,13 @@ function get_course(course, session_type, session_code) {
     {
         var teacher_name = [];
         var temp_teacher_name = typeof course['psesd:teacherNames'] !== 'undefined' ? course['psesd:teacherNames'] : null;
-
-        if(temp_teacher_name.length > 0)
+        if(temp_teacher_name !== null)
         {
-            teacher_name = temp_teacher_name.split(",");
+            if(temp_teacher_name.length > 0)
+            {
+                teacher_name = temp_teacher_name.split(",");
+            }
         }
-
         var mark = 0;
         if(typeof course.finalMarkValue !== 'undefined')
         {
