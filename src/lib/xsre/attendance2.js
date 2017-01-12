@@ -302,21 +302,20 @@ function combine_all(generate_year, list_data, list_course, list_school) {
     generate_year.forEach(function(itemYear) {
 
         var get_list_data_year = list_data.filter(function(key){ return parseInt(key.year) === parseInt(itemYear.year) });
-        // console.log(get_list_data_year);
-
+        // console.log("year", get_list_data_year);
+        console.log(get_list_data_year.length);
         if(get_list_data_year.length > 0) {
+            console.log(itemYear.year);
             itemYear.month.forEach(function(itemMonth) {
 
-                var get_list_data_month = get_list_data_year.filter(function(key){ return parseInt(key.month) === parseInt(itemYear.month) });
+                var get_list_data_month = get_list_data_year.filter(function(key){ return parseInt(key.month) === parseInt(itemMonth.month) });
 
                 if(get_list_data_month.length > 0) {
-                    // console.log(get_list_data_month);
                     itemMonth.week.forEach(function (itemWeek) {
 
                         var get_list_data_week = get_list_data_month.filter(function(key){ return parseInt(key.week) === parseInt(itemWeek.week) });
 
                         if(get_list_data_week.length > 0) {
-                            // console.log(get_list_data_week);
                             itemWeek.day.forEach(function(itemDay) {
 
                                 var get_list_data_day = get_list_data_week.filter(function(key){ return parseInt(key.day) === parseInt(itemDay.day) });
@@ -332,8 +331,8 @@ function combine_all(generate_year, list_data, list_course, list_school) {
                                         if(one_get_list_data_day.missed_class > 0)
                                             day_missed_class++;
                                     });
-                                    console.log("day", day_missed_day, day_late_to_class, day_missed_class);
                                     itemDay.data.summary = {
+                                        attendances: get_list_data_day,
                                         missed_day: day_missed_day,
                                         late_to_class: day_late_to_class,
                                         missed_class: day_missed_class
@@ -353,7 +352,6 @@ function combine_all(generate_year, list_data, list_course, list_school) {
                                 if(one_get_list_data_week.missed_class > 0)
                                     week_missed_class++;
                             });
-                            console.log("week", week_missed_day, week_late_to_class, week_missed_class);
                             itemWeek.data.summary = {
                                 missed_day: week_missed_day,
                                 late_to_class: week_late_to_class,
@@ -393,6 +391,7 @@ function combine_all(generate_year, list_data, list_course, list_school) {
                 if(one_get_list_data_year.missed_class > 0)
                     year_missed_class++;
             });
+            console.log("year", year_missed_day, year_late_to_class, year_missed_class);
             itemYear.data.summary = {
                 missed_day: year_missed_day,
                 late_to_class: year_late_to_class,
