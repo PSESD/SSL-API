@@ -302,10 +302,8 @@ function combine_all(generate_year, list_data, list_course, list_school) {
     generate_year.forEach(function(itemYear) {
 
         var get_list_data_year = list_data.filter(function(key){ return parseInt(key.year) === parseInt(itemYear.year) });
-        // console.log("year", get_list_data_year);
-        console.log(get_list_data_year.length);
+
         if(get_list_data_year.length > 0) {
-            console.log(itemYear.year);
             itemYear.month.forEach(function(itemMonth) {
 
                 var get_list_data_month = get_list_data_year.filter(function(key){ return parseInt(key.month) === parseInt(itemMonth.month) });
@@ -371,7 +369,6 @@ function combine_all(generate_year, list_data, list_course, list_school) {
                         if(one_get_list_data_month.missed_class > 0)
                             month_missed_class++;
                     });
-                    console.log("month", month_missed_day, month_late_to_class, month_missed_class);
                     itemMonth.data.summary = {
                         missed_day: month_missed_day,
                         late_to_class: month_late_to_class,
@@ -391,7 +388,6 @@ function combine_all(generate_year, list_data, list_course, list_school) {
                 if(one_get_list_data_year.missed_class > 0)
                     year_missed_class++;
             });
-            console.log("year", year_missed_day, year_late_to_class, year_missed_class);
             itemYear.data.summary = {
                 missed_day: year_missed_day,
                 late_to_class: year_late_to_class,
