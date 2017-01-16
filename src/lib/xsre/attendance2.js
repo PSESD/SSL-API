@@ -686,7 +686,8 @@ function set_generate_day(start_date, end_date) {
         for(i=get_start_day; i<=get_end_day; i++)
         {
             generate_day.push({
-                day: parseInt(i),
+                date: parseInt(i),
+                day: moment(new Date(start_date.format('YYYY-MM') + '-' + i)).format('ddd'),
                 data: {
                     summary: []
                 }
@@ -698,7 +699,8 @@ function set_generate_day(start_date, end_date) {
         for(i=get_start_day; i<=get_many_day; i++)
         {
             generate_day.push({
-                day: parseInt(i),
+                date: parseInt(i),
+                day: moment(new Date(start_date.format('YYYY-MM') + '-' + i)).format('ddd'),
                 data: {
                     summary: []
                 }
@@ -707,7 +709,8 @@ function set_generate_day(start_date, end_date) {
         for(i=1; i<=get_end_day; i++)
         {
             generate_day.push({
-                day: parseInt(i),
+                date: parseInt(i),
+                day: moment(new Date(end_date.format('YYYY-MM') + '-' + i)).format('ddd'),
                 data: {
                     summary: []
                 }
