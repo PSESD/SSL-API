@@ -35,6 +35,7 @@ var prefixListStudentDate = 'summary_student_list_date_';
 var latestDateAvailable = {};
 var organizationWhere = {};
 var _funct = require(__dirname + '/../function');
+var sleep = require('sleep');
 
 //organizationWhere = {
 //    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
@@ -372,6 +373,8 @@ function collectCacheListStudentsAsync(force, done) {
                     return cb(null, data);
                 }
 
+                sleep.sleep(5);
+
                 brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
                     if (error) {
@@ -396,11 +399,11 @@ function collectCacheListStudentsAsync(force, done) {
                             }
                             var msg;
 
-                            if(result && 'error' in result){
+                            if (result && 'error' in result) {
 
                                 msg = result.error.message ? result.error.message : result.error;
                                 console.log('X1:', result);
-                                if(!msg){
+                                if (!msg) {
                                     msg = 'Data not found!';
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
@@ -408,10 +411,10 @@ function collectCacheListStudentsAsync(force, done) {
 
                             }
 
-                            if(result && 'Error' in result){
+                            if (result && 'Error' in result) {
 
                                 msg = result.Error.Message ? result.Error.Message : result.Error;
-                                if(!msg){
+                                if (!msg) {
                                     msg = 'Data not found!';
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
@@ -430,9 +433,9 @@ function collectCacheListStudentsAsync(force, done) {
                              * Check the data max
                              * @type {string}
                              */
-                            if(data.latestDateTime){
+                            if (data.latestDateTime) {
 
-                                if(latestDateAvailable[orgIdString][student.school_district] < data.latestDateTime){
+                                if (latestDateAvailable[orgIdString][student.school_district] < data.latestDateTime) {
 
                                     latestDateAvailable[orgIdString][student.school_district] = data.latestDateTime;
 
@@ -441,6 +444,7 @@ function collectCacheListStudentsAsync(force, done) {
                             }
 
                             var key = prefixListStudent + organization._id + '_' + student._id;
+
 
                             cache.set(key, data, {ttl: 86400}, function () {
                                 benchmark.info('Cache student from org: ', organization.name, ' Student ID: ' + student._id.toString());
@@ -471,6 +475,8 @@ function collectCacheListStudentsAsync(force, done) {
                 var orgIdString = organization._id.toString();
 
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
+
+                console.log("timeout");
 
                 async.eachLimit(students, 10, mapStudent, function(err){
                     if(err){
