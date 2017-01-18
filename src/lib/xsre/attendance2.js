@@ -130,10 +130,11 @@ var SUCCESS = 'SUCCESS';
  */
 function Attendance(xsre){
     this.attendances = xsre.json.attendance || null;
-    var list_data = get_all_attendance_data(this.attendances.events.event);
-
+    var generate_year = [];
     var transcriptTerm = null;
     var transcriptCombine = [];
+    var generate_calendar = [];
+    var list_data = get_all_attendance_data(this.attendances.events.event);
 
     if(xsre.json) {
 
@@ -146,18 +147,79 @@ function Attendance(xsre){
 
     }
 
-    console.log(transcriptCombine);
     if(transcriptCombine.length > 0)
     {
-        var generate_year = [];
-        transcriptCombine.forEach(function(item, i) {
-            generate_year.push({
+        generate_year = get_list_year(transcriptCombine);
+        generate_calendar = get_calendar_year_month(transcriptCombine);
 
-            })
-        });
+        console.log(transcriptCombine);
+        console.log(generate_year);
+
     }
 
     this.generate_table = transcriptCombine;
+}
+
+
+function get_list_year(transcriptCombine) {
+    var generate_year = [];
+
+    transcriptCombine.forEach(function(item, i) {
+        var check_have = generate_year.filter(function(key){
+            return parseInt(key.year) === parseInt(item.schoolYear)
+        });
+        if(check_have.length <= 0)
+        {
+            var show_year = parseInt(item.schoolYear) - 1;
+            var print_show_year = show_year + '-' + item.schoolYear;
+            generate_year.push({
+                year: item.schoolYear,
+                show_year: print_show_year
+            })
+        }
+    });
+
+    generate_year.sort(function(a, b) {
+        var key1 = a.year;
+        var key2 = b.year;
+
+        return key1 - key2;
+    });
+
+    return generate_year;
+}
+
+
+function get_calendar_year_month(transcriptCombine) {
+    var generate_calendar = [];
+
+    transcriptCombine.forEach(function(item, i) {
+        if(typeof item.session !== 'undefined') {
+            var get_start_date = moment(new Date(item.session.startDate));
+            var get_end_date = moment(new Date(item.session.endDate));
+        }
+        var check_have = generate_calendar.filter(function(key){
+            return parseInt(key.date) === parseInt(item.schoolYear)
+        });
+        if(check_have.length <= 0)
+        {
+            var show_year = parseInt(item.schoolYear) - 1;
+            var print_show_year = show_year + '-' + item.schoolYear;
+            generate_calendar.push({
+                date: item.schoolYear,
+                show_year: print_show_year
+            })
+        }
+    });
+
+    generate_calendar.sort(function(a, b) {
+        var key1 = a.year;
+        var key2 = b.year;
+
+        return key1 - key2;
+    });
+
+    return generate_calendar;
 }
 
 
@@ -253,8 +315,6 @@ function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
 
 
 function get_range_school(session_type, session_code, year) {
-
-    console.log(session_type, session_code, year);
 
     var set_session_type = session_type;
     var set_session_code = parseInt(session_code);
