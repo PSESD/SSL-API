@@ -192,36 +192,76 @@ function get_list_year(transcriptCombine) {
 
 function get_calendar_year_month(transcriptCombine) {
     var generate_calendar = [];
+    var get_all_date = [];
+    var set_date_month, check_have, i;
 
     transcriptCombine.forEach(function(item, i) {
         if(typeof item.session !== 'undefined') {
             var get_start_date = moment(new Date(item.session.startDate));
             var get_end_date = moment(new Date(item.session.endDate));
-        }
-        var check_have = generate_calendar.filter(function(key){
-            return parseInt(key.date) === parseInt(item.schoolYear)
-        });
-        if(check_have.length <= 0)
-        {
-            var show_year = parseInt(item.schoolYear) - 1;
-            var print_show_year = show_year + '-' + item.schoolYear;
-            generate_calendar.push({
-                date: item.schoolYear,
-                show_year: print_show_year
-            })
+
+            var start_year = parseInt(get_start_date.format('YYYY'));
+            var start_month = parseInt(get_start_date.format('MM'));
+
+            var end_year = parseInt(get_end_date.format('YYYY'));
+            var end_month = parseInt(get_end_date.format('MM'));
+
+            if(start_year === end_year)
+            {
+                for(i=start_month; i<=end_month; i++)
+                {
+                    set_date_month = start_year + '-' + pad(i);
+                    check_have = get_all_date.filter(function(key){
+                        return key === set_date_month
+                    });
+
+                    if(check_have.length <= 0)
+                    {
+                        get_all_date.push(set_date_month);
+                    }
+                }
+            }
+            else {
+                for(i=start_month; i<=12; i++)
+                {
+                    set_date_month = start_year + '-' + pad(i);
+                    check_have = get_all_date.filter(function(key){
+                        return key === set_date_month
+                    });
+
+                    if(check_have.length <= 0)
+                    {
+                        get_all_date.push(set_date_month);
+                    }
+                }
+                for(i=1; i<=end_month; i++)
+                {
+                    set_date_month = end_year + '-' + pad(i);
+                    check_have = get_all_date.filter(function(key){
+                        return key === set_date_month
+                    });
+
+                    if(check_have.length <= 0)
+                    {
+                        get_all_date.push(set_date_month);
+                    }
+                }
+            }
+
         }
     });
 
-    generate_calendar.sort(function(a, b) {
-        var key1 = a.year;
-        var key2 = b.year;
+    if(get_all_date.length > 0)
+        get_all_date.sort();
 
-        return key1 - key2;
-    });
+    console.log(get_all_date);
 
     return generate_calendar;
 }
 
+function pad(n) {
+    return (n < 10) ? ("0" + n) : n;
+}
 
 function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
 
@@ -322,36 +362,54 @@ function get_range_school(session_type, session_code, year) {
     var new_date;
     var get_many_day;
     var end_date;
+    var last_year;
 
     switch(set_session_type) {
         case 'FullSchoolYear':
-            var last_year = set_year - 1;
+            last_year = set_year - 1;
             new_date = moment( last_year + '-09-01' );
-            get_many_day = moment(last_year + '-09', "YYYY-MM").daysInMonth();
+            get_many_day = moment( set_year + '-08', "YYYY-MM" ).daysInMonth();
             end_date = moment( set_year + '-08-' + get_many_day );
             break;
         case 'Semester':
-            new_date = moment( set_year + '-04-01' );
-            get_many_day = moment(set_year + '-04', "YYYY-MM").daysInMonth();
-            end_date = moment( set_year + '-08-' + get_many_day );
+            if(set_session_code == 1)
+            {
+                last_year = set_year - 1;
+                new_date = moment( last_year + '-09-01' );
+                get_many_day = moment( set_year + '-03', "YYYY-MM" ).daysInMonth();
+                end_date = moment( set_year + '-03-' + get_many_day );
+            }
+            else
+            {
+                new_date = moment( set_year + '-04-01' );
+                get_many_day = moment( set_year + '-08', "YYYY-MM" ).daysInMonth();
+                end_date = moment( set_year + '-08-' + get_many_day );
+            }
             break;
         case 'Quarter':
-            if(set_session_code == 2)
+            if(set_session_code == 1)
+            {
+                last_year = set_year - 1;
+                new_date = moment( last_year + '-09-01' );
+                get_many_day = moment( last_year + '-12', "YYYY-MM" ).daysInMonth();
+                end_date = moment( last_year + '-12-' + get_many_day );
+            }
+            else if(set_session_code == 2)
             {
                 new_date = moment( set_year + '-01-01' );
-                get_many_day = moment(set_year + '-01', "YYYY-MM").daysInMonth();
-                end_date = moment( set_year + '-08-' + get_many_day );
+                get_many_day = moment( set_year + '-03', "YYYY-MM" ).daysInMonth();
+                end_date = moment( set_year + '-03-' + get_many_day );
             }
             else if(set_session_code == 3)
             {
                 new_date = moment( set_year + '-04-01' );
-                get_many_day = moment(set_year + '-04', "YYYY-MM").daysInMonth();
-                end_date = moment( set_year + '-08-' + get_many_day );
+                get_many_day = moment( set_year + '-06', "YYYY-MM" ).daysInMonth();
+                end_date = moment( set_year + '-06-' + get_many_day );
             }
             else
             {
                 new_date = moment( set_year + '-07-01' );
-                get_many_day = moment(set_year + '-07', "YYYY-MM").daysInMonth();
+                get_many_day = moment( set_year + '-08', "YYYY-MM" ).daysInMonth();
                 end_date = moment( set_year + '-08-' + get_many_day );
             }
             break;

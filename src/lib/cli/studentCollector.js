@@ -320,7 +320,7 @@ function collectCacheStudents(done) {
  * @param force
  * @param done
  */
-function collectCacheListStudentsAsync(force, done) {
+function collectCacheListStudentsAsync(force, sleep_time, done) {
     var studentNumber = 0;
     benchmark.info("CACHE-LIST-STUDENT\tSTART");
     Organization.find(organizationWhere, function (err, organizations) {
@@ -373,7 +373,7 @@ function collectCacheListStudentsAsync(force, done) {
                     return cb(null, data);
                 }
 
-                sleep.sleep(5);
+                sleep.sleep(sleep_time);
 
                 brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
@@ -475,8 +475,6 @@ function collectCacheListStudentsAsync(force, done) {
                 var orgIdString = organization._id.toString();
 
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
-
-                console.log("timeout");
 
                 async.eachLimit(students, 10, mapStudent, function(err){
                     if(err){

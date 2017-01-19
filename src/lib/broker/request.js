@@ -388,8 +388,8 @@ RequestXSRE.prototype = {
      */
     getTimezone: function(){
 
-        // return moment().utc().format("YYYY-MM-DDThh:mm:ss.SSSZZ");
-        return moment().utc().toISOString();
+        return moment().utc().format("YYYY-MM-DDThh:mm:ss.SSSSSS");
+        // return moment().utc().toISOString();
 
     },
 
