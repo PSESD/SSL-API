@@ -203,6 +203,16 @@ StudentController.getStudentsBackpack = function(req, res){
 
                 }
 
+                if(separate === 'attendanceV2'){
+
+                    paginate.source.calendar = results.calendar;
+                    paginate.source.list_years = results.list_years;
+
+                    delete results.calendar;
+                    delete results.list_years;
+
+                }
+
                 paginate.total = results.length;
 
                 if(typeof req.query.page !== 'undefined'){
@@ -502,7 +512,9 @@ StudentController.getStudentsBackpack = function(req, res){
                                             break;
                                         case 'attendanceV2':
                                             var attendance = xsre.getAttendanceBehavior2();
-                                            object = attendance.getAttendances();
+                                            object = [];
+                                            object.list_years = attendance.getGenerateYear();
+                                            object.calendar = attendance.getGenerateCalendar();
                                             break;
                                         case 'transcript':
                                             var attendance = xsre.getAttendanceBehavior();
