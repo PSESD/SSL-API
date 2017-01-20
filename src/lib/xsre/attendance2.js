@@ -40,7 +40,8 @@ function Attendance(xsre){
         generate_calendar = temp.generate_calendar;
         var get_all_date = temp.get_all_date;
         var get_list_course = get_list_course_data(transcriptCombine);
-        generate_calendar_week = get_calendar_week(transcriptCombine, generate_year, list_data);
+        generate_calendar_week = get_calendar_week(list_data, get_list_course, get_all_date);
+        console.log(generate_calendar_week);
 
     }
 
@@ -51,17 +52,70 @@ function Attendance(xsre){
 
 }
 
-function get_calendar_week(transcriptCombine, generate_year, list_event) {
+function get_calendar_week(list_event, list_course, all_date) {
 
     var generate_list_week = [];
 
-    transcriptCombine.forEach(function(item, i) {
+    all_date.forEach(function (item) {
 
+        var date = moment(item, "YYYY-MM");
 
+        generate_list_week.push({
+            name: date.format('MMMM YYYY'),
+            month: date.format('YYYY-MM'),
+            detail: get_week_detail(item, list_event, list_course)
+        })
 
     });
 
     return generate_list_week;
+
+}
+
+function get_week_detail(year_month, list_event, list_course) {
+
+    var generate_week_detail = [];
+    var week_name, i;
+
+
+    var date_year_month = moment(year_month, "YYYY-MM");
+    var get_total_day_in_one_month = date_year_month.daysInMonth();
+    var get_start_week = moment(new Date(year_month + '-01')).isoWeek();
+    var get_end_week = moment(new Date(year_month + '-' + get_total_day_in_one_month)).isoWeek();
+
+    console.log(get_start_week, get_end_week);
+
+    var get_start_week_day_start = moment(new Date(year_month + '-01')).startOf('isoWeek');
+    var get_end_week_day_end = moment(new Date(year_month + '-' + get_total_day_in_one_month)).endOf('isoWeek');
+
+    var start_date = moment(new Date(get_start_week_day_start.format('YYYY-MM-DD')));
+
+    console.log(get_start_week_day_start, get_start_week_day_end, get_end_week_day_start, get_end_week_day_end);
+
+    for(i=0; i<7; i++)
+    {
+        var get_date = start_date.clone().add(i, 'days').format('YYYY-MM-DD');
+        if(i == 0)
+        {
+            week_name = get_date + ' - ';
+        }
+
+
+
+    }
+
+    generate_week_detail.push({
+        'week_name': get_start_week_day_start.format('MMM DD YYYY') + ' - ' + get_end_week_day_end.format('MMM DD YYYY'),
+        'total_late_to_class': 0,
+        'total_missed_class': 0,
+        'total_missed_day': 0,
+        'total_behaviour_incident': 0,
+        'events': [],
+        'courses': [],
+        'days': []
+    });
+
+    return generate_week_detail;
 
 }
 
@@ -757,14 +811,14 @@ function get_list_course_data(transcriptCombine) {
                 start_date: get_start_date.format("YYYY-MM-DD"),
                 start_year: get_start_date.format("YYYY"),
                 start_month: get_start_date.format("MM"),
-                // start_week: get_start_date.isoWeek(),
+                start_week: get_start_date.isoWeek(),
                 // start_week_start: moment(new Date(get_start_date.format("YYYY") + '-01-01')).isoWeek(),
                 // start_week_end: moment(new Date(get_start_date.format("YYYY") + '-12-31')).isoWeek(),
                 start_day: get_end_date.format("DD"),
                 end_date: get_end_date.format("YYYY-MM-DD"),
                 end_year: get_end_date.format("YYYY"),
                 end_month: get_end_date.format("MM"),
-                // end_week: get_end_date.isoWeek(),
+                end_week: get_end_date.isoWeek(),
                 // end_week_start: moment(new Date(get_end_date.format("YYYY") + '-01-01')).isoWeek(),
                 // end_week_end: moment(new Date(get_end_date.format("YYYY") + '-12-31')).isoWeek(),
                 end_day: get_end_date.format("DD")
@@ -774,7 +828,7 @@ function get_list_course_data(transcriptCombine) {
 
     });
 
-    console.log(list_course);
+    // console.log(list_course);
 
     return list_course;
 
