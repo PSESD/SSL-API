@@ -74,66 +74,69 @@ function get_calendar_week(list_event, list_course, all_date) {
 function get_week_detail(year_month, list_event, list_course) {
 
     var generate_week_detail = [];
-    var week_name, i, count_day, count_day2, get_course, get_days, first, increment;
+    var week_name, i, count_day, get_course, get_days, first;
 
 
     var date_year_month = moment(year_month, "YYYY-MM");
     var get_total_day_in_one_month = date_year_month.daysInMonth();
-    var get_start_week = moment(new Date(year_month + '-01')).isoWeek();
-    var get_end_week = moment(new Date(year_month + '-' + get_total_day_in_one_month)).isoWeek();
+    // var get_start_week = moment(new Date(year_month + '-01')).isoWeek();
+    // var get_end_week = moment(new Date(year_month + '-' + get_total_day_in_one_month)).isoWeek();
 
     var get_start_week_day_start = moment(new Date(year_month + '-01')).startOf('isoWeek');
     var get_end_week_day_end = moment(new Date(year_month + '-' + get_total_day_in_one_month)).endOf('isoWeek');
     var start_date = moment(new Date(get_start_week_day_start.format('YYYY-MM-DD')));
-    var end_date_last_week = moment(new Date(get_end_week_day_end.format('x')));
-    var end_date;
+    var end_date_last_week = moment(new Date(get_end_week_day_end.format('YYYY-MM-DD'))).format('x');
+    var end_date = moment(new Date(get_end_week_day_end.format('YYYY-MM-DD')));
     var count_date = start_date.clone().format('x');
+    var temp_date = start_date;
 
     count_day = 0;
 
-    console.log(count_date);
-
     do {
 
-        console.log(count_day);
         first = 0;
         for(i=0; i<7; i++)
         {
-            var get_date = start_date.clone().add( i, 'days').format('YYYY-MM-DD');
-            count_date = start_date.clone().add( i, 'days').format('x');
+            var get_date = temp_date.clone().add( i, 'days').format('YYYY-MM-DD');
+            count_date = temp_date.clone().add( i, 'days').format('x');
             if(first == 0)
             {
-                week_name = get_date + ' - ';
+                week_name = get_date;
                 first = 1;
             }
 
             end_date = get_date;
             count_day++;
 
-            console.log(count_day);
-
         }
-        console.log("A");
-        get_course = set_course_data(start_date.format('YYYY-MM-DD'), end_date, list_course);
-        console.log("B");
-        get_days = set_day_data(start_date.format('YYYY-MM-DD'), end_date, list_event);
+
+        get_course = set_course_data(week_name, end_date, list_course);
+        get_days = set_day_data(week_name, end_date, list_event, get_course);
+        var list_days = get_days.list_days;
+        var total_missed_day = get_days.total_missed_day;
+        var total_late_to_class = get_days.total_late_to_class;
+        var total_missed_class = get_days.total_missed_class;
 
         generate_week_detail.push({
-            'week_name': week_name,
-            'total_late_to_class': 0,
-            'total_missed_class': 0,
-            'total_missed_day': 0,
+            'week_name': moment(new Date(week_name)).format('MMM DD YYYY') + ' - ' + moment(new Date(end_date)).format('MMM DD YYYY'),
+            'total_late_to_class': total_missed_class,
+            'total_missed_class': total_late_to_class,
+            'total_missed_day': total_missed_day,
             'total_behaviour_incident': 0,
-            'events': [],
+            'events': {
+                missed_day: total_missed_day > 0 ? 1 : 0,
+                late_to_class: total_late_to_class > 0 ? 1 : 0,
+                missed_class: total_missed_class > 0 ? 1 : 0,
+                incident: 0
+            },
             'courses': get_course,
-            'days': get_days
+            'days': list_days
         });
 
-        console.log(count_date, end_date_last_week, count_date >= end_date_last_week);
+        count_date = temp_date.clone().format('x');
+        temp_date = temp_date.clone().add( 7, 'days');
 
-    } while (count_date >= end_date_last_week);
-
-    console.log("done");
+    } while (count_date < end_date_last_week);
 
     return generate_week_detail;
 
@@ -144,10 +147,13 @@ function set_course_data(start_date, end_date, list_course)
 {
     var get_course = [];
     var temp_get_course = [];
+    var first = 0;
+    var temp_first = {};
+    var temp_final = {};
+    var temp_progress = {};
     var date_start = moment(new Date(start_date)).format("x");
     var date_end = moment(new Date(end_date)).format("x");
-    var course_start, course_end, session_type_number, last_table_period;
-    console.log("EE");
+    var course_start, course_end, session_type_number, last_table_period, flag_final, flag_progress;
     list_course.forEach(function(item) {
 
         course_start = moment(new Date(item.start_date)).format("x");
@@ -211,8 +217,6 @@ function set_course_data(start_date, end_date, list_course)
 
     });
 
-    console.log("DD");
-
     temp_get_course.sort(function(a, b) {
         var key1 = parseInt(a.timeTablePeriod);
         var key2 = parseInt(b.timeTablePeriod);
@@ -237,49 +241,85 @@ function set_course_data(start_date, end_date, list_course)
 
     });
 
-    console.log("EE");
-
     last_table_period = '';
+    flag_final = 0;
+    flag_progress = 0;
+    first = 0;
+    temp_first = {};
+    temp_final = {};
+    temp_progress = {};
     temp_get_course.forEach(function(course) {
+
+        var course_title = typeof course.courseTitle !== 'undefined' ? course.courseTitle : '';
+        var temp_teacher_name = typeof course['psesd:teacherNames'] !== 'undefined' ? course['psesd:teacherNames'] : null;
+        var table_period = typeof course.timeTablePeriod !== 'undefined' ? parseInt(course.timeTablePeriod) : 0;
+        var teacher_name = '';
+
+        if(temp_teacher_name !== null)
+        {
+            if(temp_teacher_name.length > 0)
+            {
+                teacher_name = temp_teacher_name;
+            }
+        }
+
+        if(last_table_period === '')
+        {
+            last_table_period = table_period;
+        }
+
+        if(last_table_period !== table_period)
+        {
+            last_table_period = table_period;
+
+            if(flag_final == 1) {
+                get_course.push(temp_final);
+            }
+            else if(flag_progress == 1) {
+                get_course.push(temp_progress);
+            }
+            else {
+                get_course.push(temp_first);
+            }
+            flag_final = 0;
+            flag_progress = 0;
+            first = 0;
+        }
 
         if(typeof course.finalMarkValue !== 'undefined')
         {
-            var course_title = typeof course.courseTitle !== 'undefined' ? course.courseTitle : '';
-            var temp_teacher_name = typeof course['psesd:teacherNames'] !== 'undefined' ? course['psesd:teacherNames'] : null;
-            var table_period = typeof course.timeTablePeriod !== 'undefined' ? parseInt(course.timeTablePeriod) : 0;
-            var teacher_name = '';
-
-            if(temp_teacher_name !== null)
+            if(flag_final == 0)
             {
-                if(temp_teacher_name.length > 0)
-                {
-                    teacher_name = temp_teacher_name.join();
+                flag_final = 1;
+                temp_final = {
+                    course_title: course_title,
+                    teacher_name: teacher_name,
+                    table_period: table_period
                 }
             }
-            console.log("CC");
-
-            if(last_table_period === '')
+        }
+        else if(typeof course.progressMark !== 'undefined')
+        {
+            if(flag_progress == 0)
             {
-                last_table_period = table_period;
-
-                get_course.push({
+                flag_progress = 1;
+                temp_progress = {
                     course_title: course_title,
                     teacher_name: teacher_name,
                     table_period: table_period
-                });
+                }
             }
-
-            if(last_table_period !== table_period)
+        }
+        else {
+            if(first == 0)
             {
-                last_table_period = table_period;
-
-                get_course.push({
+                first = 1;
+                temp_first = {
                     course_title: course_title,
                     teacher_name: teacher_name,
                     table_period: table_period
-                });
+                }
             }
-
         }
 
     });
@@ -287,13 +327,97 @@ function set_course_data(start_date, end_date, list_course)
     return get_course;
 }
 
-function set_day_data(start_date, end_date, list_event)
+function set_day_data(start_date, end_date, list_event, list_course)
 {
     var list_days = [];
+    var get_list_event = [];
+    var event, missed_day, late_to_class, missed_class;
     var date_start = moment(new Date(start_date));
-    var date_end = moment(new Date(end_date));
+    var total_late_to_class = 0;
+    var total_missed_class = 0;
+    var total_missed_day = 0;
 
-    return list_days;
+    for(var i=0; i<7; i++)
+    {
+        var set_day = date_start.clone().add( i, 'days');
+        var check_have = list_event.filter(function(key){
+            return key.full_date === set_day.format('YYYY-MM-DD');
+        });
+
+        if(check_have.length > 0)
+        {
+            event = check_have[0];
+            if(event.missed_day == 1) {
+                missed_day = event.missed_day;
+                late_to_class = 0;
+                missed_class = 0;
+
+                total_missed_day++;
+            }
+            else {
+                late_to_class = event.late_to_class;
+                missed_class = event.missed_class;
+
+                total_late_to_class += late_to_class;
+                total_missed_class += missed_class;
+            }
+
+            list_course.forEach(function(course) {
+
+                var table_period = course.table_period;
+                var temp = [];
+
+                event.attendance.forEach(function(attendance) {
+                    var time_period = typeof attendance.time_table_period !== 'undefined' ? attendance.time_table_period : 0;
+                    if(table_period == time_period)
+                    {
+                        var title = typeof attendance['psesd:absentReasonDescription '] !== 'undefined' ? attendance['psesd:absentReasonDescription '] : '';
+                        var type = typeof attendance.attendance_event_type !== 'undefined' ? attendance.attendance_event_type : '';
+                        var status = typeof attendance.attendance_status !== 'undefined' ? attendance.attendance_status : '';
+                        var status_data = '';
+                        if(missed_day == 1) {
+                            status_data = 'missed_day';
+                        }
+                        else if(late_to_class == 1) {
+                            status_data = 'late_to_class';
+                        }
+                        else if(missed_class == 1) {
+                            status_data = 'missed_class';
+                        }
+
+                        temp = {
+                            title: title,
+                            type: type,
+                            status: status,
+                            status_data: status_data,
+                            description: title
+                        }
+                    }
+                });
+
+                get_list_event.push(temp);
+                
+            });
+        }
+
+        list_days.push({
+            day: set_day.format('dddd'),
+            date: set_day.format('DD'),
+            late_to_class: late_to_class > 0 ? 1 : 0,
+            missed_class: missed_class > 0 ? 1 : 0,
+            missed_day: missed_day > 0 ? 1 : 0,
+            incident_status: 0,
+            incident_detail: [],
+            events: get_list_event
+        });
+    }
+
+    return {
+        list_days: list_days,
+        total_missed_day: total_missed_day,
+        total_late_to_class: total_late_to_class,
+        total_missed_class: total_missed_class
+    };
 }
 
 function get_list_year(transcriptCombine) {
