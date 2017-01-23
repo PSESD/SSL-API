@@ -207,9 +207,11 @@ StudentController.getStudentsBackpack = function(req, res){
 
                     paginate.source.calendar = results.calendar;
                     paginate.source.list_years = results.list_years;
+                    paginate.source.list_weeks = results.list_weeks;
 
                     delete results.calendar;
                     delete results.list_years;
+                    delete results.list_weeks;
 
                 }
 
@@ -515,6 +517,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                             object = [];
                                             object.list_years = attendance.getGenerateYear();
                                             object.calendar = attendance.getGenerateCalendar();
+                                            object.list_weeks = attendance.getGenerateCalendarWeek();
                                             break;
                                         case 'transcript':
                                             var attendance = xsre.getAttendanceBehavior();
