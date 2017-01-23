@@ -345,11 +345,6 @@ function set_day_data(start_date, end_date, list_event, list_course)
             return key.full_date === set_day.format('YYYY-MM-DD');
         });
 
-        if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
-        {
-            console.log(check_have, set_day, "start:"+i);
-        }
-
         missed_day = 0;
         late_to_class = 0;
         missed_class = 0;
@@ -377,19 +372,11 @@ function set_day_data(start_date, end_date, list_event, list_course)
 
             list_course.forEach(function(course) {
 
-                if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
-                {
-                    console.log("course");
-                }
                 temp = [];
                 table_period = course.table_period;
                 global_missed_day = 0;
 
                 event.attendance.forEach(function(attendance) {
-                    if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
-                    {
-                        console.log("attendance");
-                    }
 
                     var time_period = typeof attendance.time_table_period !== 'undefined' ? attendance.time_table_period : 0;
                     if(missed_day == 1) {
@@ -421,10 +408,6 @@ function set_day_data(start_date, end_date, list_event, list_course)
                         }
                     }
 
-                    if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
-                    {
-                        console.log("count");
-                    }
                 });
 
                 if(global_missed_day == 1) {
@@ -438,11 +421,6 @@ function set_day_data(start_date, end_date, list_event, list_course)
                 }
                 else {
                     get_list_event.push(temp);
-                }
-
-                if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
-                {
-                    console.log(get_list_event);
                 }
 
             });
