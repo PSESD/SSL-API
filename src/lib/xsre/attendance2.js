@@ -85,14 +85,14 @@ function get_week_detail(year_month, list_event, list_course) {
     var get_start_week_day_start = moment(new Date(year_month + '-01')).startOf('isoWeek');
     var get_end_week_day_end = moment(new Date(year_month + '-' + get_total_day_in_one_month)).endOf('isoWeek');
     var start_date = moment(new Date(get_start_week_day_start.format('YYYY-MM-DD')));
-    var end_date_last_week = moment(new Date(get_end_week_day_end.format('YYYY-MM-DD'))).format('x');
+    var end_date_last_week = moment(new Date(get_end_week_day_end.format('YYYY-MM-DD'))).clone().subtract(7, 'days').format('x');
     var end_date = moment(new Date(get_end_week_day_end.format('YYYY-MM-DD')));
     var count_date = start_date.clone().format('x');
     var temp_date = start_date;
 
     count_day = 0;
 
-    do {
+    while (count_date < end_date_last_week) {
 
         first = 0;
         for(i=0; i<7; i++)
@@ -119,8 +119,8 @@ function get_week_detail(year_month, list_event, list_course) {
 
         generate_week_detail.push({
             'week_name': moment(new Date(week_name)).format('MMM DD YYYY') + ' - ' + moment(new Date(end_date)).format('MMM DD YYYY'),
-            'total_late_to_class': total_missed_class,
-            'total_missed_class': total_late_to_class,
+            'total_late_to_class': total_late_to_class,
+            'total_missed_class': total_missed_class,
             'total_missed_day': total_missed_day,
             'total_behaviour_incident': 0,
             'events': {
@@ -136,7 +136,7 @@ function get_week_detail(year_month, list_event, list_course) {
         count_date = temp_date.clone().format('x');
         temp_date = temp_date.clone().add( 7, 'days');
 
-    } while (count_date < end_date_last_week);
+    }
 
     return generate_week_detail;
 
@@ -339,10 +339,23 @@ function set_day_data(start_date, end_date, list_event, list_course)
 
     for(var i=0; i<7; i++)
     {
+        get_list_event = [];
         var set_day = date_start.clone().add( i, 'days');
         var check_have = list_event.filter(function(key){
             return key.full_date === set_day.format('YYYY-MM-DD');
         });
+
+        if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
+        {
+            console.log(check_have, set_day, "start:"+i);
+        }
+
+        missed_day = 0;
+        late_to_class = 0;
+        missed_class = 0;
+        var temp = [];
+        var table_period;
+        var global_missed_day = 0;
 
         if(check_have.length > 0)
         {
@@ -364,11 +377,25 @@ function set_day_data(start_date, end_date, list_event, list_course)
 
             list_course.forEach(function(course) {
 
-                var table_period = course.table_period;
-                var temp = [];
+                if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
+                {
+                    console.log("course");
+                }
+                temp = [];
+                table_period = course.table_period;
+                global_missed_day = 0;
 
                 event.attendance.forEach(function(attendance) {
+                    if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
+                    {
+                        console.log("attendance");
+                    }
+
                     var time_period = typeof attendance.time_table_period !== 'undefined' ? attendance.time_table_period : 0;
+                    if(missed_day == 1) {
+                        global_missed_day = 1;
+                    }
+
                     if(table_period == time_period)
                     {
                         var title = typeof attendance['psesd:absentReasonDescription '] !== 'undefined' ? attendance['psesd:absentReasonDescription '] : '';
@@ -393,11 +420,33 @@ function set_day_data(start_date, end_date, list_event, list_course)
                             description: title
                         }
                     }
+
+                    if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
+                    {
+                        console.log("count");
+                    }
                 });
 
-                get_list_event.push(temp);
-                
+                if(global_missed_day == 1) {
+                    get_list_event.push({
+                        title: 'Missed Day',
+                        type: 'ClassSectionAttendance',
+                        status: 'UnexcusedAbsence',
+                        status_data: 'missed_day',
+                        description: 'Missed Day'
+                    });
+                }
+                else {
+                    get_list_event.push(temp);
+                }
+
+                if(moment(new Date(start_date)).format('YYYY-MM-DD') == '2015-11-30')
+                {
+                    console.log(get_list_event);
+                }
+
             });
+
         }
 
         list_days.push({
@@ -523,7 +572,7 @@ function get_calendar_year_month(transcriptCombine, generate_year, list_event) {
             var year_arr = get_2year.split("-");
 
             generate_calendar.push({
-                year: item.value,
+                years: item.value,
                 list_months: get_calendar_month(year_arr, get_all_date),
                 list_events: get_event_one_year(year_arr, list_event)
             });
@@ -738,7 +787,7 @@ function get_calendar_month(year, list_month) {
                 check_month = item + '-' + pad(j);
                 if(list_month.indexOf(check_month) > 0) {
                     print_list_month.push({
-                        years: item,
+                        year: item,
                         month: pad(j)
                     })
                 }
@@ -750,7 +799,7 @@ function get_calendar_month(year, list_month) {
                 check_month = item + '-' + pad(j);
                 if(list_month.indexOf(check_month) > 0) {
                     print_list_month.push({
-                        years: item,
+                        year: item,
                         month: pad(j)
                     })
                 }
