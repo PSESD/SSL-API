@@ -122,11 +122,11 @@ function get_week_detail(year_month, list_event, list_course) {
             'total_late_to_class': total_late_to_class,
             'total_missed_class': total_missed_class,
             'total_missed_day': total_missed_day,
-            'total_behaviour_incident': 0,
+            'total_behaviour_incidents': 0,
             'events': {
-                missed_day: total_missed_day > 0 ? 1 : 0,
                 late_to_class: total_late_to_class > 0 ? 1 : 0,
                 missed_class: total_missed_class > 0 ? 1 : 0,
+                missed_day: total_missed_day > 0 ? 1 : 0,
                 incident: 0
             },
             'courses': get_course,
@@ -386,17 +386,17 @@ function set_day_data(start_date, end_date, list_event, list_course)
                     if(table_period == time_period)
                     {
                         var title = typeof attendance['psesd:absentReasonDescription '] !== 'undefined' ? attendance['psesd:absentReasonDescription '] : '';
-                        var type = typeof attendance.attendance_event_type !== 'undefined' ? attendance.attendance_event_type : '';
+                        var status_data = typeof attendance.attendance_event_type !== 'undefined' ? attendance.attendance_event_type : '';
                         var status = typeof attendance.attendance_status !== 'undefined' ? attendance.attendance_status : '';
-                        var status_data = '';
+                        var type = '';
                         if(missed_day == 1) {
-                            status_data = 'missed_day';
+                            type = 'missed_day';
                         }
                         else if(late_to_class == 1) {
-                            status_data = 'late_to_class';
+                            type = 'late_to_class';
                         }
                         else if(missed_class == 1) {
-                            status_data = 'missed_class';
+                            type = 'missed_class';
                         }
 
                         temp = {
@@ -413,9 +413,9 @@ function set_day_data(start_date, end_date, list_event, list_course)
                 if(global_missed_day == 1) {
                     get_list_event.push({
                         title: 'Missed Day',
-                        type: 'ClassSectionAttendance',
+                        type: 'missed_day',
                         status: 'UnexcusedAbsence',
-                        status_data: 'missed_day',
+                        status_data: 'ClassSectionAttendance',
                         description: 'Missed Day'
                     });
                 }
@@ -426,6 +426,11 @@ function set_day_data(start_date, end_date, list_event, list_course)
             });
 
         }
+        else {
+            list_course.forEach(function(course) {
+                get_list_event.push([]);
+            });
+        }
 
         list_days.push({
             day: set_day.format('dddd'),
@@ -434,7 +439,10 @@ function set_day_data(start_date, end_date, list_event, list_course)
             missed_class: missed_class > 0 ? 1 : 0,
             missed_day: missed_day > 0 ? 1 : 0,
             incident_status: 0,
-            incident_detail: [],
+            incident_detail: [{
+                title: '',
+                description: ''
+            }],
             events: get_list_event
         });
     }
