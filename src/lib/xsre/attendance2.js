@@ -354,6 +354,10 @@ function set_day_data(start_date, end_date, list_event, list_course)
 
         if(check_have.length > 0)
         {
+            // if(start_date == '2015-10-12')
+            // {
+            //     console.log(check_have, check_have[0].attendance);
+            // }
             event = check_have[0];
             if(event.missed_day == 1) {
                 missed_day = event.missed_day;
@@ -428,7 +432,9 @@ function set_day_data(start_date, end_date, list_event, list_course)
         }
         else {
             list_course.forEach(function(course) {
-                get_list_event.push([]);
+                get_list_event.push({
+
+                });
             });
         }
 
@@ -1001,7 +1007,7 @@ function get_all_attendance_data(events) {
                 month: parseInt(event_date.format("MM")),
                 week: parseInt(event_date.format("WW")),
                 day: parseInt(event_date.format("DD")),
-                school_name: event.school.schoolName,
+                school_name: typeof event.school.schoolName !== 'undefined' ? event.school.schoolName : '',
                 calendar_date: event.calendarEventDate,
                 attendance_status: event.attendanceStatus,
                 attendance_event_type: event.attendanceEventType,

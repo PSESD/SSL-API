@@ -18,6 +18,9 @@ var hal = require('hal');
 var xSre = require('../../lib/xsre');
 var async = require('async');
 var prefixListStudent = '_xsre_list_students_';
+var crypto = require('crypto');
+var algorithm = 'aes-256-ctr',
+    password = 'ssl-encrypted-827192';
 /**
  * Get the list of all organizations that this user have access to in our system.
  * @param req
@@ -71,7 +74,7 @@ StudentController.getStudentsBackpack = function(req, res){
         }
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
-        key = new Date().getTime();
+        // key = new Date().getTime();
         /**
          *
          * @param results
@@ -438,6 +441,11 @@ StudentController.getStudentsBackpack = function(req, res){
                 authorizedEntityId: organization.authorizedEntityId
             });
 
+            if(separate == "attendanceV2")
+            {
+                key = key + '_attendance';
+            }
+
             cache.get(key, function(err, result){
 
                 if(err){
@@ -495,6 +503,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                 benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
 
                                 var object = null;
+                                var save_to_redis = {};
 
                                 var xsre = new xSre(result, body, separate, req.query).setLogger(benchmark);
 
@@ -518,6 +527,11 @@ StudentController.getStudentsBackpack = function(req, res){
                                             object.list_years = attendance.getGenerateYear();
                                             object.calendars = attendance.getGenerateCalendar();
                                             object.list_weeks = attendance.getGenerateCalendarWeek();
+                                            save_to_redis = {
+                                                'list_years': object.list_years,
+                                                'calendars': object.calendars,
+                                                'list_weeks': object.list_weeks
+                                            };
                                             break;
                                         case 'transcript':
                                             var attendance = xsre.getAttendanceBehavior();
@@ -535,18 +549,35 @@ StudentController.getStudentsBackpack = function(req, res){
 
                                 }
 
+
                                 /**
                                  * Set to cache
                                  */
-                                    //benchmark.info('XSRE - SET TO CACHE');
-                                    //cache.set(key, object, function(err){
+                                benchmark.info('XSRE - SET TO CACHE');
+                                if(separate == 'attendanceV2')
+                                {
+                                    // var cipher = crypto.createCipher(algorithm,password);
+                                    // var crypted = cipher.update(save_to_redis,'utf8','hex');
+                                    // crypted += cipher.final('hex');
+                                    cache.set(key, JSON.stringify(save_to_redis), function(err){
+
+                                        console.log(err);
+                                        log(err);
+
+                                        embeds(object);
+
+                                    });
+                                }
+                                else {
+                                    // cache.set(key, object, function(err){
                                     //
-                                    //    console.log(err);
-                                    //    log(err);
+                                    //     console.log(err);
+                                    //     log(err);
 
-                                embeds(object);
+                                        embeds(object);
 
-                                //});
+                                    // });
+                                }
 
                             });
 
