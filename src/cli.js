@@ -256,8 +256,7 @@ switch(what){
         break;
     case 'cache-list':
         var args = process.argv.slice(3)[0] ? true : false;
-        var sleep_second = process.argv.slice(4)[0] ? process.argv.slice(4)[0] : 5;
-        studentCollector.cacheList(args, sleep_second, function(err, data, studentNumber){
+        studentCollector.cacheList(args, function(err, data, studentNumber){
             if (err && err !== null && err !== 'null') {
                 withError(err, emailCacheList, { number_of_students: studentNumber }, function (err) {
                     process.exit();

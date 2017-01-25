@@ -35,7 +35,6 @@ var prefixListStudentDate = 'summary_student_list_date_';
 var latestDateAvailable = {};
 var organizationWhere = {};
 var _funct = require(__dirname + '/../function');
-var sleep = require('sleep');
 
 //organizationWhere = {
 //    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
@@ -320,7 +319,7 @@ function collectCacheStudents(done) {
  * @param force
  * @param done
  */
-function collectCacheListStudentsAsync(force, sleep_time, done) {
+function collectCacheListStudentsAsync(force, done) {
     var studentNumber = 0;
     benchmark.info("CACHE-LIST-STUDENT\tSTART");
     Organization.find(organizationWhere, function (err, organizations) {
@@ -372,8 +371,6 @@ function collectCacheListStudentsAsync(force, sleep_time, done) {
                     benchmark.info('The student not found in database');
                     return cb(null, data);
                 }
-
-                sleep.sleep(sleep_time);
 
                 brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 

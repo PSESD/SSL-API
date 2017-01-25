@@ -618,8 +618,19 @@ StudentController.getStudentsBackpack = function(req, res){
 
                 } else{
                     console.log('FROM CACHE ---------------------------');
-                    embeds(result, 1);
 
+                    if(separate == 'attendanceV2')
+                    {
+                        var temp_data = JSON.parse(result);
+                        var data = [];
+                        data.list_years = temp_data.list_years;
+                        data.calendars = temp_data.calendars;
+                        data.list_weeks = temp_data.list_weeks;
+                        embeds(data, 1);
+                    }
+                    else {
+                        embeds(result, 1);
+                    }
                 }
 
             });
@@ -676,7 +687,10 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
             if(!organization){
                 return res.sendError('The organization not found in database');
             }
+            var key2 = key + '_attendance';
+            cache.del(key2, function(err){
 
+            });
             cache.del(key, function(err){
 
                 if(err){

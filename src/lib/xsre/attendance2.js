@@ -8,6 +8,7 @@ var l = require('lodash');
 
 moment.fn.isISO = true;
 
+
 /**
  *
  * @param xsre
@@ -82,8 +83,8 @@ function get_week_detail(year_month, list_event, list_course) {
     // var get_start_week = moment(new Date(year_month + '-01')).isoWeek();
     // var get_end_week = moment(new Date(year_month + '-' + get_total_day_in_one_month)).isoWeek();
 
-    var get_start_week_day_start = moment(new Date(year_month + '-01')).startOf('isoWeek');
-    var get_end_week_day_end = moment(new Date(year_month + '-' + get_total_day_in_one_month)).endOf('isoWeek');
+    var get_start_week_day_start = moment(new Date(year_month + '-01')).startOf('Week').isoWeekday(7);
+    var get_end_week_day_end = moment(new Date(year_month + '-' + get_total_day_in_one_month)).endOf('Week').isoWeekday(7);
     var start_date = moment(new Date(get_start_week_day_start.format('YYYY-MM-DD')));
     var end_date_last_week = moment(new Date(get_end_week_day_end.format('YYYY-MM-DD'))).clone().subtract(7, 'days').format('x');
     var end_date = moment(new Date(get_end_week_day_end.format('YYYY-MM-DD')));
