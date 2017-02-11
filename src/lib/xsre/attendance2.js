@@ -360,7 +360,7 @@ function set_day_data(start_date, end_date, list_event, list_course)
             //     console.log(check_have, check_have[0].attendance);
             // }
             event = check_have[0];
-            if(event.missed_day == 1) {
+            if(event.missed_day > 0) {
                 missed_day = event.missed_day;
                 late_to_class = 0;
                 missed_class = 0;
@@ -394,13 +394,13 @@ function set_day_data(start_date, end_date, list_event, list_course)
                         var status_data = typeof attendance.attendance_event_type !== 'undefined' ? attendance.attendance_event_type : '';
                         var status = typeof attendance.attendance_status !== 'undefined' ? attendance.attendance_status : '';
                         var type = '';
-                        if(missed_day == 1) {
+                        if(missed_day > 0) {
                             type = 'missed_day';
                         }
-                        else if(late_to_class == 1) {
+                        else if(late_to_class > 0) {
                             type = 'late_to_class';
                         }
-                        else if(missed_class == 1) {
+                        else if(missed_class > 0) {
                             type = 'missed_class';
                         }
 
@@ -682,15 +682,15 @@ function get_event_one_year(year, list_event) {
                     list_raw_event = [];
                     get_event.forEach(function(item2) {
                         var temp_event_day = [];
-                        if(item2.late_to_class == 1)
+                        if(item2.late_to_class > 0)
                         {
                             temp_event_day.push('late_to_class');
                         }
-                        if(item2.missed_class == 1)
+                        if(item2.missed_class > 0)
                         {
                             temp_event_day.push('missed_class');
                         }
-                        if(item2.missed_day == 1)
+                        if(item2.missed_day > 0)
                         {
                             temp_event_day = [];
                             temp_event_day.push('missed_day');
@@ -710,7 +710,7 @@ function get_event_one_year(year, list_event) {
                             list_raw_event.forEach(function (item3) {
                                 if(item3.date === item2.full_date)
                                 {
-                                    if(item2.missed_day == 1)
+                                    if(item2.missed_day > 0)
                                     {
                                         item3.event = [];
                                         item3.event.push('missed_day');
@@ -721,7 +721,7 @@ function get_event_one_year(year, list_event) {
                                         var check_duplicate_event = item3.event.filter(function(key){ return key === 'missed_day' });
                                         if(check_duplicate_event.length <= 0)
                                         {
-                                            if(item2.late_to_class == 1)
+                                            if(item2.late_to_class > 0)
                                             {
                                                 check_duplicate_event1 = item3.event.filter(function(key){ return key === 'late_to_class' });
                                                 if(check_duplicate_event1.length <= 0)
@@ -730,7 +730,7 @@ function get_event_one_year(year, list_event) {
                                                     item3.total = item3.event.length;
                                                 }
                                             }
-                                            if(item2.missed_class == 1)
+                                            if(item2.missed_class > 0)
                                             {
                                                 check_duplicate_event1 = item3.event.filter(function(key){ return key === 'missed_class' });
                                                 if(check_duplicate_event1.length <= 0)
@@ -973,6 +973,10 @@ function get_range_school(session_type, session_code, year) {
 function get_all_attendance_data(events) {
 
     var list_data = [];
+    if(typeof events === 'undefined')
+    {
+        return list_data;
+    }
 
     events.forEach(function(event){
 

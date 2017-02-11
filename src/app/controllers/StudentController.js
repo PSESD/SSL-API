@@ -199,15 +199,6 @@ StudentController.getStudentsBackpack = function(req, res){
 
                 if(separate === 'attendance'){
 
-                    paginate.source.years = results.years;
-                    paginate.source.legend = results.legend;
-
-                    delete results.years;
-
-                }
-
-                if(separate === 'attendance'){
-
                     paginate.source.calendars = results.calendars;
                     paginate.source.list_years = results.list_years;
                     paginate.source.list_weeks = results.list_weeks;
