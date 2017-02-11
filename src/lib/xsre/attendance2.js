@@ -16,12 +16,14 @@ moment.fn.isISO = true;
  */
 function Attendance(xsre){
     this.attendances = xsre.json.attendance || null;
+    var disciplineIncidents = xsre.json.disciplineIncidents || null;
     var generate_year = [];
     var transcriptTerm = null;
     var transcriptCombine = [];
     var generate_calendar = [];
     var generate_calendar_week = [];
     var list_data = get_all_attendance_data(this.attendances.events.event);
+    var list_discipline_incident_data = get_all_discipline_incident_data(disciplineIncidents);
 
     if(xsre.json) {
 
@@ -37,11 +39,11 @@ function Attendance(xsre){
     if(transcriptCombine.length > 0)
     {
         generate_year = get_list_year(transcriptCombine);
-        var temp = get_calendar_year_month(transcriptCombine, generate_year, list_data);
+        var temp = get_calendar_year_month(transcriptCombine, generate_year, list_data, list_discipline_incident_data);
         generate_calendar = temp.generate_calendar;
         var get_all_date = temp.get_all_date;
         var get_list_course = get_list_course_data(transcriptCombine);
-        generate_calendar_week = get_calendar_week(list_data, get_list_course, get_all_date);
+        generate_calendar_week = get_calendar_week(list_data, get_list_course, get_all_date, list_discipline_incident_data);
 
     }
 
@@ -52,7 +54,7 @@ function Attendance(xsre){
 
 }
 
-function get_calendar_week(list_event, list_course, all_date) {
+function get_calendar_week(list_event, list_course, all_date, list_discipline_incident_data) {
 
     var generate_list_week = [];
 
@@ -63,7 +65,7 @@ function get_calendar_week(list_event, list_course, all_date) {
         generate_list_week.push({
             name: date.format('MMMM YYYY'),
             month: date.format('YYYY-MM'),
-            detail: get_week_detail(item, list_event, list_course)
+            detail: get_week_detail(item, list_event, list_course, list_discipline_incident_data)
         })
 
     });
@@ -72,7 +74,7 @@ function get_calendar_week(list_event, list_course, all_date) {
 
 }
 
-function get_week_detail(year_month, list_event, list_course) {
+function get_week_detail(year_month, list_event, list_course, list_discipline_incident_data) {
 
     var generate_week_detail = [];
     var week_name, i, count_day, get_course, get_days, first;
@@ -112,11 +114,12 @@ function get_week_detail(year_month, list_event, list_course) {
         }
 
         get_course = set_course_data(week_name, end_date, list_course);
-        get_days = set_day_data(week_name, end_date, list_event, get_course);
+        get_days = set_day_data(week_name, end_date, list_event, get_course, list_discipline_incident_data);
         var list_days = get_days.list_days;
         var total_missed_day = get_days.total_missed_day;
         var total_late_to_class = get_days.total_late_to_class;
         var total_missed_class = get_days.total_missed_class;
+        var total_incident = get_days.total_incident;
 
         generate_week_detail.push({
             'week_name': moment(new Date(week_name)).format('MMM DD YYYY') + ' - ' + moment(new Date(end_date)).format('MMM DD YYYY'),
@@ -128,7 +131,7 @@ function get_week_detail(year_month, list_event, list_course) {
                 late_to_class: total_late_to_class > 0 ? 1 : 0,
                 missed_class: total_missed_class > 0 ? 1 : 0,
                 missed_day: total_missed_day > 0 ? 1 : 0,
-                incident: 0
+                incident: total_incident
             },
             'courses': get_course,
             'days': list_days
@@ -328,7 +331,7 @@ function set_course_data(start_date, end_date, list_course)
     return get_course;
 }
 
-function set_day_data(start_date, end_date, list_event, list_course)
+function set_day_data(start_date, end_date, list_event, list_course, list_discipline_incident_data)
 {
     var list_days = [];
     var get_list_event = [];
@@ -337,12 +340,18 @@ function set_day_data(start_date, end_date, list_event, list_course)
     var total_late_to_class = 0;
     var total_missed_class = 0;
     var total_missed_day = 0;
+    var total_all_incident = 0;
+    var incident_total = 0;
+    var incident_detail = [];
 
     for(var i=0; i<7; i++)
     {
         get_list_event = [];
         var set_day = date_start.clone().add( i, 'days');
         var check_have = list_event.filter(function(key){
+            return key.full_date === set_day.format('YYYY-MM-DD');
+        });
+        var check_have2 = list_discipline_incident_data.filter(function(key){
             return key.full_date === set_day.format('YYYY-MM-DD');
         });
 
@@ -355,10 +364,6 @@ function set_day_data(start_date, end_date, list_event, list_course)
 
         if(check_have.length > 0)
         {
-            // if(start_date == '2015-10-12')
-            // {
-            //     console.log(check_have, check_have[0].attendance);
-            // }
             event = check_have[0];
             if(event.missed_day > 0) {
                 missed_day = event.missed_day;
@@ -439,17 +444,30 @@ function set_day_data(start_date, end_date, list_event, list_course)
             });
         }
 
+        incident_total = 0;
+        incident_detail = [];
+        if(check_have2.length > 0)
+        {
+            check_have2.forEach(function(incident) {
+                incident.action.forEach(function(action) {
+                    total_all_incident++;
+                    incident_total++;
+                    incident_detail.push({
+                        title: action.school_name,
+                        description: action.action
+                    });
+                });
+            });
+        }
+
         list_days.push({
             day: set_day.format('dddd'),
             date: set_day.format('DD'),
             late_to_class: late_to_class > 0 ? 1 : 0,
             missed_class: missed_class > 0 ? 1 : 0,
             missed_day: missed_day > 0 ? 1 : 0,
-            incident_status: 0,
-            incident_detail: [{
-                title: '',
-                description: ''
-            }],
+            incident_status: incident_total > 0 ? 1 : 0,
+            incident_detail: incident_detail,
             events: get_list_event
         });
     }
@@ -458,7 +476,8 @@ function set_day_data(start_date, end_date, list_event, list_course)
         list_days: list_days,
         total_missed_day: total_missed_day,
         total_late_to_class: total_late_to_class,
-        total_missed_class: total_missed_class
+        total_missed_class: total_missed_class,
+        total_incident: total_all_incident
     };
 }
 
@@ -493,7 +512,7 @@ function get_list_year(transcriptCombine) {
 }
 
 
-function get_calendar_year_month(transcriptCombine, generate_year, list_event) {
+function get_calendar_year_month(transcriptCombine, generate_year, list_event, list_discipline_incident_data) {
     var generate_calendar = [];
     var get_all_date = [];
     var set_date_month, check_have, i;
@@ -567,7 +586,7 @@ function get_calendar_year_month(transcriptCombine, generate_year, list_event) {
             generate_calendar.push({
                 years: item.value,
                 list_months: get_calendar_month(year_arr, get_all_date),
-                list_events: get_event_one_year(year_arr, list_event)
+                list_events: get_event_one_year(year_arr, list_event, list_discipline_incident_data)
             });
 
         });
@@ -579,10 +598,10 @@ function get_calendar_year_month(transcriptCombine, generate_year, list_event) {
     };
 }
 
-function get_event_one_year(year, list_event) {
+function get_event_one_year(year, list_event, list_discipline_incident_data) {
 
     var print_list_event = [];
-    var get_event, list_raw_event, check_duplicate_event1, j;
+    var get_event, list_raw_event, check_duplicate_event1, j, get_incident, have_incident;
 
     year.forEach(function (item, i) {
 
@@ -591,6 +610,7 @@ function get_event_one_year(year, list_event) {
             for(j=9; j<=12; j++)
             {
                 get_event = list_event.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
+                get_incident = list_discipline_incident_data.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
                 if(get_event.length > 0)
                 {
                     list_raw_event = [];
@@ -608,6 +628,23 @@ function get_event_one_year(year, list_event) {
                         {
                             temp_event_day = [];
                             temp_event_day.push('missed_day');
+                        }
+
+                        if(get_incident.length > 0)
+                        {
+                            have_incident = 0;
+                            get_incident.forEach(function(incident) {
+                                if(incident.length > 0)
+                                {
+                                    incident.action.forEach(function(action) {
+                                        if(have_incident !== 1)
+                                        {
+                                            have_incident = 1;
+                                            temp_event_day.push('behavior_incident');
+                                        }
+                                    });
+                                }
+                            });
                         }
 
                         var temp = {
@@ -677,6 +714,8 @@ function get_event_one_year(year, list_event) {
             for(j=1; j<=8; j++)
             {
                 get_event = list_event.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
+                get_incident = list_discipline_incident_data.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
+                console.log(get_incident);
                 if(get_event.length > 0)
                 {
                     list_raw_event = [];
@@ -694,6 +733,23 @@ function get_event_one_year(year, list_event) {
                         {
                             temp_event_day = [];
                             temp_event_day.push('missed_day');
+                        }
+
+                        if(get_incident.length > 0)
+                        {
+                            have_incident = 0;
+                            get_incident.forEach(function(incident) {
+                                if(incident.length > 0)
+                                {
+                                    incident.action.forEach(function(action) {
+                                        if(have_incident !== 1)
+                                        {
+                                            have_incident = 1;
+                                            temp_event_day.push('behavior_incident');
+                                        }
+                                    });
+                                }
+                            });
                         }
 
                         var temp = {
@@ -1143,6 +1199,48 @@ function get_all_attendance_data(events) {
 
 }
 
+function get_all_discipline_incident_data(discipline_incidents) {
+
+    var list_data = [];
+    if(typeof discipline_incidents === 'undefined' || discipline_incidents === null || discipline_incidents.length <= 0)
+    {
+        return list_data;
+    }
+
+    discipline_incidents.disciplineIncident.forEach(function(incident) {
+        var list_action = [];
+        if(incident.actions.length > 0)
+        {
+            incident.actions.forEach(function(action) {
+                list_action.push({
+                    school_name: typeof action.reportingSchool.schoolName !== 'undefined' ? action.reportingSchool.schoolName : '',
+                    action: typeof action['raw:source'] !== 'undefined' ? action['raw:source']['raw:code'] : ''
+                });
+            });
+        }
+        else
+        {
+            list_action.push({
+                school_name: typeof incident.actions.action.reportingSchool.schoolName !== 'undefined' ? incident.actions.action.reportingSchool.schoolName : '',
+                action: typeof incident.actions.action['raw:source'] !== 'undefined' ? incident.actions.action['raw:source']['raw:code'] : ''
+            });
+        }
+
+        var date = moment(new Date(incident.incidentDate));
+
+        list_data.push({
+            full_date: date.format('YYYY-MM-DD'),
+            year: date.format('YYYY'),
+            month: date.format('MM'),
+            day: date.format('DD'),
+            total: list_action.length,
+            action: list_action
+        });
+    });
+
+    return list_data;
+
+}
 
 function get_list_course_data(transcriptCombine) {
 
@@ -1173,8 +1271,6 @@ function get_list_course_data(transcriptCombine) {
         }
 
     });
-
-    // console.log(list_course);
 
     return list_course;
 
