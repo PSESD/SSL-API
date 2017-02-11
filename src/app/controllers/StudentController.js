@@ -548,24 +548,24 @@ StudentController.getStudentsBackpack = function(req, res){
                                     // var cipher = crypto.createCipher(algorithm,password);
                                     // var crypted = cipher.update(save_to_redis,'utf8','hex');
                                     // crypted += cipher.final('hex');
-                                    // cache.set(key, JSON.stringify(save_to_redis), function(err){
+                                    cache.set(key, JSON.stringify(save_to_redis), function(err){
 
-                                        // console.log(err);
-                                        // log(err);
+                                        console.log(err);
+                                        log(err);
 
                                         embeds(object);
 
-                                    // });
+                                    });
                                 }
                                 else {
-                                    // cache.set(key, object, function(err){
+                                    cache.set(key, object, function(err){
 
-                                        // console.log(err);
-                                        // log(err);
+                                        console.log(err);
+                                        log(err);
 
                                         embeds(object);
 
-                                    // });
+                                    });
                                 }
 
                             });
