@@ -417,6 +417,9 @@ UserSchema.virtual('organizationId').get(function(){
   var _id = [];
   if(this.permissions.length > 0){
       for(var i = 0; i < this.permissions.length; i++){
+          if(!this.permissions[i].organization){
+              continue;
+          }
           _id[i] = this.permissions[i].organization.toString();
       }
   }
@@ -447,7 +450,7 @@ UserSchema.virtual('allPermissionsByOrganization').get(function(){
 
         this.permissions.forEach(function(perm){
 
-            if(orgId === perm.organization.toString()){
+            if(perm.organization && orgId === perm.organization.toString()){
                 _permissions = perm;
             }
 
@@ -480,7 +483,7 @@ UserSchema.virtual('allStudentsByOrganization').get(function(){
 
         this.permissions.forEach(function(perm){
 
-            if(orgId === perm.organization.toString() && perm.students.length > 0 ) {
+            if(perm.organization && orgId === perm.organization.toString() && perm.students.length > 0 ) {
                 _students = perm.students;
             }
         });

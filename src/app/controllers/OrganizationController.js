@@ -127,6 +127,8 @@ OrganizationController.allUsers = function (req, res) {
     if(req.query.pending){
         criteria = { permissions: { $elemMatch: { organization: ObjectId(req.params.organizationId) }}};
     }
+
+    var currentUserId = req.user._id + '';
     //User.find({permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}}, function (err, users) {
     User.find(criteria, function (err, users) {
 
@@ -140,7 +142,7 @@ OrganizationController.allUsers = function (req, res) {
 
             var obj = user.toJSON();
 
-            if(obj._id.toString() !== req.user._id.toString()){
+            if((''+obj._id) !== currentUserId){
 
                 delete obj.permissions;
 
