@@ -601,217 +601,31 @@ function get_calendar_year_month(transcriptCombine, generate_year, list_event, l
 function get_event_one_year(year, list_event, list_discipline_incident_data) {
 
     var print_list_event = [];
-    var get_event, list_raw_event, check_duplicate_event1, j, get_incident, have_incident;
-
+    var list_raw_event, j;
     year.forEach(function (item, i) {
 
         if(i == 0)
         {
             for(j=9; j<=12; j++)
             {
-                get_event = list_event.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
-                get_incident = list_discipline_incident_data.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
-                if(get_event.length > 0)
+                list_raw_event = get_all_list_event_one_year(item, j, list_event, list_discipline_incident_data);
+                if(list_raw_event.length > 0)
                 {
-                    list_raw_event = [];
-                    get_event.forEach(function(item2) {
-                        var temp_event_day = [];
-                        if(item2.late_to_class > 0)
-                        {
-                            temp_event_day.push('late_to_class');
-                        }
-                        if(item2.missed_class > 0)
-                        {
-                            temp_event_day.push('missed_class');
-                        }
-                        if(item2.missed_day > 0)
-                        {
-                            temp_event_day = [];
-                            temp_event_day.push('missed_day');
-                        }
-
-                        if(get_incident.length > 0)
-                        {
-                            have_incident = 0;
-                            get_incident.forEach(function(incident) {
-                                if(incident.length > 0)
-                                {
-                                    incident.action.forEach(function(action) {
-                                        if(have_incident !== 1)
-                                        {
-                                            have_incident = 1;
-                                            temp_event_day.push('behavior_incident');
-                                        }
-                                    });
-                                }
-                            });
-                        }
-
-                        var temp = {
-                            date: item2.full_date,
-                            event: temp_event_day,
-                            total: temp_event_day.length
-                        };
-
-                        // Check same day
-                        var check_duplicate = list_raw_event.filter(function(key){ return key.date === item2.full_date });
-
-                        if(check_duplicate.length > 0)
-                        {
-                            list_raw_event.forEach(function (item3) {
-                                if(item3.date === item2.full_date)
-                                {
-                                    if(item2.missed_day > 0)
-                                    {
-                                        item3.event = [];
-                                        item3.event.push('missed_day');
-                                        item3.total = 1;
-                                    }
-                                    else
-                                    {
-                                        var check_duplicate_event = item3.event.filter(function(key){ return key === 'missed_day' });
-                                        if(check_duplicate_event.length <= 0)
-                                        {
-                                            if(item2.late_to_class > 0)
-                                            {
-                                                check_duplicate_event1 = item3.event.filter(function(key){ return key === 'late_to_class' });
-                                                if(check_duplicate_event1.length <= 0)
-                                                {
-                                                    item3.event.push('late_to_class');
-                                                    item3.total = item3.event.length;
-                                                }
-                                            }
-                                            if(item2.missed_class > 0)
-                                            {
-                                                check_duplicate_event1 = item3.event.filter(function(key){ return key === 'missed_class' });
-                                                if(check_duplicate_event1.length <= 0)
-                                                {
-                                                    item3.event.push('missed_class');
-                                                    item3.total = item3.event.length;
-                                                }
-                                            }
-                                        }
-
-                                    }
-                                }
-                            });
-                        }
-                        else
-                        {
-                            list_raw_event.push(temp);
-                        }
-
-                    });
-
                     list_raw_event.forEach(function(item2) {
                         print_list_event.push(item2);
                     });
-
                 }
             }
         }
         else {
             for(j=1; j<=8; j++)
             {
-                get_event = list_event.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
-                get_incident = list_discipline_incident_data.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
-                console.log(get_incident);
-                if(get_event.length > 0)
+                list_raw_event = get_all_list_event_one_year(item, j, list_event, list_discipline_incident_data);
+                if(list_raw_event.length > 0)
                 {
-                    list_raw_event = [];
-                    get_event.forEach(function(item2) {
-                        var temp_event_day = [];
-                        if(item2.late_to_class > 0)
-                        {
-                            temp_event_day.push('late_to_class');
-                        }
-                        if(item2.missed_class > 0)
-                        {
-                            temp_event_day.push('missed_class');
-                        }
-                        if(item2.missed_day > 0)
-                        {
-                            temp_event_day = [];
-                            temp_event_day.push('missed_day');
-                        }
-
-                        if(get_incident.length > 0)
-                        {
-                            have_incident = 0;
-                            get_incident.forEach(function(incident) {
-                                if(incident.length > 0)
-                                {
-                                    incident.action.forEach(function(action) {
-                                        if(have_incident !== 1)
-                                        {
-                                            have_incident = 1;
-                                            temp_event_day.push('behavior_incident');
-                                        }
-                                    });
-                                }
-                            });
-                        }
-
-                        var temp = {
-                            date: item2.full_date,
-                            event: temp_event_day,
-                            total: temp_event_day.length
-                        };
-
-                        // Check same day
-                        var check_duplicate = list_raw_event.filter(function(key){ return key.date === item2.full_date });
-
-                        if(check_duplicate.length > 0)
-                        {
-                            list_raw_event.forEach(function (item3) {
-                                if(item3.date === item2.full_date)
-                                {
-                                    if(item2.missed_day > 0)
-                                    {
-                                        item3.event = [];
-                                        item3.event.push('missed_day');
-                                        item3.total = 1;
-                                    }
-                                    else
-                                    {
-                                        var check_duplicate_event = item3.event.filter(function(key){ return key === 'missed_day' });
-                                        if(check_duplicate_event.length <= 0)
-                                        {
-                                            if(item2.late_to_class > 0)
-                                            {
-                                                check_duplicate_event1 = item3.event.filter(function(key){ return key === 'late_to_class' });
-                                                if(check_duplicate_event1.length <= 0)
-                                                {
-                                                    item3.event.push('late_to_class');
-                                                    item3.total = item3.event.length;
-                                                }
-                                            }
-                                            if(item2.missed_class > 0)
-                                            {
-                                                check_duplicate_event1 = item3.event.filter(function(key){ return key === 'missed_class' });
-                                                if(check_duplicate_event1.length <= 0)
-                                                {
-                                                    item3.event.push('missed_class');
-                                                    item3.total = item3.event.length;
-                                                }
-                                            }
-                                        }
-
-                                    }
-                                }
-                            });
-                        }
-                        else
-                        {
-                            list_raw_event.push(temp);
-                        }
-
-                    });
-
                     list_raw_event.forEach(function(item2) {
                         print_list_event.push(item2);
                     });
-
                 }
             }
         }
@@ -819,6 +633,194 @@ function get_event_one_year(year, list_event, list_discipline_incident_data) {
     });
 
     return print_list_event;
+
+}
+
+function get_all_list_event_one_year(item, j, list_event, list_discipline_incident_data) {
+
+    var list_raw_event = [];
+    var get_event, check_duplicate, check_duplicate_event, check_duplicate_event1, get_incident, have_incident, temp_event_day, temp, full_date, total_incident;
+    var count_incident = 0;
+
+    get_event = list_event.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
+    get_incident = list_discipline_incident_data.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
+    total_incident = get_incident.length;
+    if(get_event.length > 0)
+    {
+        get_event.forEach(function(item2) {
+            temp_event_day = [];
+            if(item2.late_to_class > 0)
+            {
+                temp_event_day.push('late_to_class');
+            }
+            if(item2.missed_class > 0)
+            {
+                temp_event_day.push('missed_class');
+            }
+            if(item2.missed_day > 0)
+            {
+                temp_event_day = [];
+                temp_event_day.push('missed_day');
+            }
+
+            if(get_incident.length > 0)
+            {
+                have_incident = 0;
+                get_incident.forEach(function(incident) {
+                    if(item2.full_date === incident.full_date)
+                    {
+                        incident.action.forEach(function(action) {
+                            if(have_incident !== 1)
+                            {
+                                have_incident = 1;
+                                temp_event_day.push('behavior_incident');
+                                count_incident++;
+                            }
+                        });
+                    }
+
+                });
+            }
+
+            temp = {
+                date: item2.full_date,
+                event: temp_event_day,
+                total: temp_event_day.length
+            };
+
+            // Check same day
+            check_duplicate = list_raw_event.filter(function(key){ return key.date === item2.full_date });
+            if(check_duplicate.length > 0)
+            {
+                list_raw_event.forEach(function (item3) {
+                    if(item3.date === item2.full_date)
+                    {
+                        if(item2.missed_day > 0)
+                        {
+                            item3.event = [];
+                            item3.event.push('missed_day');
+                            item3.total = 1;
+                        }
+                        else
+                        {
+                            check_duplicate_event = item3.event.filter(function(key){ return key === 'missed_day' });
+                            if(check_duplicate_event.length <= 0)
+                            {
+                                if(item2.late_to_class > 0)
+                                {
+                                    check_duplicate_event1 = item3.event.filter(function(key){ return key === 'late_to_class' });
+                                    if(check_duplicate_event1.length <= 0)
+                                    {
+                                        item3.event.push('late_to_class');
+                                        item3.total = item3.event.length;
+                                    }
+                                }
+                                if(item2.missed_class > 0)
+                                {
+                                    check_duplicate_event1 = item3.event.filter(function(key){ return key === 'missed_class' });
+                                    if(check_duplicate_event1.length <= 0)
+                                    {
+                                        item3.event.push('missed_class');
+                                        item3.total = item3.event.length;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                });
+            }
+            else
+            {
+                list_raw_event.push(temp);
+            }
+
+        });
+
+        if(count_incident < total_incident)
+        {
+            temp_event_day = [];
+            have_incident = 0;
+            full_date = '';
+            var find = 0;
+            get_incident.forEach(function(incident) {
+                full_date = incident.full_date;
+                find = 0;
+                list_raw_event.forEach(function(raw_event) {
+                    if(raw_event.date === full_date)
+                    {
+                        find = 1;
+                    }
+                });
+
+                if(find === 0)
+                {
+                    incident.action.forEach(function(action) {
+                        if(have_incident !== 1)
+                        {
+                            have_incident = 1;
+                            temp_event_day.push('behavior_incident');
+                        }
+                    });
+
+                    temp = {
+                        date: full_date,
+                        event: temp_event_day,
+                        total: temp_event_day.length
+                    };
+
+                    list_raw_event.push(temp);
+                }
+
+            });
+
+        }
+
+    }
+    else {
+        if(get_incident.length > 0)
+        {
+            temp_event_day = [];
+            have_incident = 0;
+            full_date = '';
+            get_incident.forEach(function(incident) {
+                full_date = incident.full_date;
+                incident.action.forEach(function(action) {
+                    if(have_incident !== 1)
+                    {
+                        have_incident = 1;
+                        temp_event_day.push('behavior_incident');
+                    }
+                });
+
+                temp = {
+                    date: full_date,
+                    event: temp_event_day,
+                    total: temp_event_day.length
+                };
+
+                list_raw_event.push(temp);
+
+            });
+
+        }
+    }
+
+    if(list_raw_event.length > 0)
+    {
+        list_raw_event.sort(function(a, b) {
+
+            var key1 = moment(new Date(a.date)).format('X');
+            var key2 = moment(new Date(b.date)).format('X');
+
+            var n = key1 - key2;
+            if (n != 0) {
+                return n;
+            }
+        });
+    }
+
+    return list_raw_event;
 
 }
 
