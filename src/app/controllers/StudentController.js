@@ -436,6 +436,18 @@ StudentController.getStudentsBackpack = function(req, res){
             {
                 key = key + '_attendance';
             }
+            else if(separate == "transcript")
+            {
+                key = key + '_transcript';
+            }
+            else if(separate == "assessment")
+            {
+                key = key + '_assessment';
+            }
+            else if(separate == "report")
+            {
+                key = key + '_report';
+            }
 
             cache.get(key, function(err, result){
 
@@ -606,7 +618,7 @@ StudentController.getStudentsBackpack = function(req, res){
                     });
 
                 } else{
-                    console.log('FROM CACHE ---------------------------');
+                    console.log('FROM CACHE ---------------------------', separate);
 
                     if(separate == 'attendance')
                     {
@@ -678,6 +690,18 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
             }
             var key2 = key + '_attendance';
             cache.del(key2, function(err){
+
+            });
+            var key3 = key + '_transcript';
+            cache.del(key3, function(err){
+
+            });
+            var key4 = key + '_assessment';
+            cache.del(key4, function(err){
+
+            });
+            var key5 = key + '_report';
+            cache.del(key5, function(err){
 
             });
             cache.del(key, function(err){
