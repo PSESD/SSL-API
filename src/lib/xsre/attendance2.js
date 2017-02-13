@@ -35,7 +35,6 @@ function Attendance(xsre){
         }
 
     }
-
     if(transcriptCombine.length > 0)
     {
         generate_year = get_list_year(transcriptCombine);
@@ -46,7 +45,6 @@ function Attendance(xsre){
         generate_calendar_week = get_calendar_week(list_data, get_list_course, get_all_date, list_discipline_incident_data);
 
     }
-
     this.generate_table = transcriptCombine;
     this.generate_year = generate_year.reverse();
     this.generate_calendar = generate_calendar;
@@ -131,7 +129,7 @@ function get_week_detail(year_month, list_event, list_course, list_discipline_in
                 late_to_class: total_late_to_class > 0 ? 1 : 0,
                 missed_class: total_missed_class > 0 ? 1 : 0,
                 missed_day: total_missed_day > 0 ? 1 : 0,
-                incident: total_incident
+                incident: total_incident > 0 ? 1 : 0
             },
             'courses': get_course,
             'days': list_days
@@ -868,69 +866,80 @@ function pad(n) {
 }
 
 function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
-
     var transcriptCombine = [];
     var get_grade_level = 0;
     var get_session_type = '';
     var get_session_code = 0;
     var get_start_date = new Date();
+    var session, new_start_date;
+    if(transcriptTermOther.length > 0)
+    {
+        transcriptTermOther.sort(function(a, b) {
+            if (typeof a.session === 'undefined' || typeof b.session === 'undefined') {
+                return 0;
+            }
 
-    transcriptTermOther.sort(function(a, b) {
-        if (typeof a.session === 'undefined' || typeof b.session === 'undefined') {
-            return 0;
-        }
+            var key1 = new Date(a.session.startDate);
+            var key2 = new Date(b.session.startDate);
 
-        var key1 = new Date(a.session.startDate);
-        var key2 = new Date(b.session.startDate);
+            var n = key1 - key2;
+            if (n != 0) {
+                return n;
+            }
 
-        var n = key1 - key2;
-        if (n != 0) {
-            return n;
-        }
+            var key3 = 0;
+            var key4 = 0;
 
-        var key3 = 0;
-        var key4 = 0;
+            switch (a.session.sessionType) {
+                case 'FullSchoolYear': key3 = 1; break;
+                case 'Semester': key3 = 2; break;
+                case 'Quarter': key3 = 3; break;
+                default: key3 = 4; break;
+            }
 
-        switch (a.session.sessionType) {
-            case 'FullSchoolYear': key3 = 1; break;
-            case 'Semester': key3 = 2; break;
-            case 'Quarter': key3 = 3; break;
-            default: key3 = 4; break;
-        }
+            switch (b.session.sessionType) {
+                case 'FullSchoolYear': key4 = 1; break;
+                case 'Semester': key4 = 2; break;
+                case 'Quarter': key4 = 3; break;
+                default: key4 = 4; break;
+            }
 
-        switch (b.session.sessionType) {
-            case 'FullSchoolYear': key4 = 1; break;
-            case 'Semester': key4 = 2; break;
-            case 'Quarter': key4 = 3; break;
-            default: key4 = 4; break;
-        }
+            var n1 = key3 - key4;
+            if (n1 != 0) {
+                return n1;
+            }
 
-        var n1 = key3 - key4;
-        if (n1 != 0) {
-            return n1;
-        }
+            var key5 = parseInt(a.session.sessionCode);
+            var key6 = parseInt(b.session.sessionCode);
 
-        var key5 = parseInt(a.session.sessionCode);
-        var key6 = parseInt(b.session.sessionCode);
+            return key6 - key5;
 
-        return key6 - key5;
+        });
 
-    });
-
-    transcriptTermOther.forEach(function(item, i) {
-        get_grade_level = parseInt(item.gradeLevel);
-        get_session_type = typeof item.session !== 'undefined' ? item.session.sessionType : '';
-        get_session_code = typeof item.session !== 'undefined' ? parseInt(item.session.sessionCode) : 0;
-        get_start_date = typeof item.session !== 'undefined' ? item.session.startDate : new Date();
-        var session = get_range_school(get_session_type, get_session_code, parseInt(item.schoolYear));
-        item.session.endDate = session.endDate;
-        transcriptCombine.push(item);
-    });
+        transcriptTermOther.forEach(function(item, i) {
+            get_grade_level = parseInt(item.gradeLevel);
+            get_session_type = typeof item.session !== 'undefined' ? item.session.sessionType : '';
+            get_session_code = typeof item.session !== 'undefined' ? parseInt(item.session.sessionCode) : 0;
+            get_start_date = typeof item.session !== 'undefined' ? item.session.startDate : new Date();
+            session = get_range_school(get_session_type, get_session_code, parseInt(item.schoolYear));
+            item.session.endDate = session.endDate;
+            transcriptCombine.push(item);
+        });
+    }
+    else {
+        get_grade_level = parseInt(transcriptTermOther.gradeLevel);
+        get_session_type = typeof transcriptTermOther.session !== 'undefined' ? transcriptTermOther.session.sessionType : '';
+        get_session_code = typeof transcriptTermOther.session !== 'undefined' ? parseInt(transcriptTermOther.session.sessionCode) : 0;
+        get_start_date = typeof transcriptTermOther.session !== 'undefined' ? transcriptTermOther.session.startDate : new Date();
+        session = get_range_school(get_session_type, get_session_code, parseInt(transcriptTermOther.schoolYear));
+        transcriptTermOther.session.endDate = session.endDate;
+        transcriptCombine.push(transcriptTermOther);
+    }
 
     if(transcriptTerm) {
         if(get_grade_level === parseInt(transcriptTerm.gradeLevel)) {
 
-            var session = get_range_school(get_session_type, (get_session_code + 1), parseInt(transcriptTerm.schoolYear));
+            session = get_range_school(get_session_type, (get_session_code + 1), parseInt(transcriptTerm.schoolYear));
 
             transcriptTerm.session = {
                 sessionType: get_session_type,
@@ -941,7 +950,7 @@ function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
         }
         else {
 
-            var new_start_date = parseInt(transcriptTerm.schoolYear) - 1;
+            new_start_date = parseInt(transcriptTerm.schoolYear) - 1;
 
             transcriptTerm.session = {
                 sessionType: 'FullSchoolYear',
@@ -1209,39 +1218,51 @@ function get_all_discipline_incident_data(discipline_incidents) {
         return list_data;
     }
 
-    discipline_incidents.disciplineIncident.forEach(function(incident) {
-        var list_action = [];
-        if(incident.actions.length > 0)
-        {
-            incident.actions.forEach(function(action) {
-                list_action.push({
-                    school_name: typeof action.reportingSchool.schoolName !== 'undefined' ? action.reportingSchool.schoolName : '',
-                    action: typeof action['raw:source'] !== 'undefined' ? action['raw:source']['raw:code'] : ''
-                });
-            });
-        }
-        else
-        {
-            list_action.push({
-                school_name: typeof incident.actions.action.reportingSchool.schoolName !== 'undefined' ? incident.actions.action.reportingSchool.schoolName : '',
-                action: typeof incident.actions.action['raw:source'] !== 'undefined' ? incident.actions.action['raw:source']['raw:code'] : ''
-            });
-        }
-
-        var date = moment(new Date(incident.incidentDate));
-
-        list_data.push({
-            full_date: date.format('YYYY-MM-DD'),
-            year: date.format('YYYY'),
-            month: date.format('MM'),
-            day: date.format('DD'),
-            total: list_action.length,
-            action: list_action
+    if(discipline_incidents.length  > 0)
+    {
+        discipline_incidents.disciplineIncident.forEach(function(incident) {
+            list_data.push(passing_incident(incident));
         });
-    });
+    }
+    else {
+        list_data.push(passing_incident(discipline_incidents.disciplineIncident));
+    }
 
     return list_data;
 
+}
+
+function passing_incident(incident) {
+
+    var list_action = [];
+    if(incident.actions.length > 0)
+    {
+        incident.actions.forEach(function(action) {
+            list_action.push(passing_action(action));
+        });
+    }
+    else
+    {
+        list_action.push(passing_action(incident.actions.action));
+    }
+
+    var date = moment(new Date(incident.incidentDate));
+
+    return {
+        full_date: date.format('YYYY-MM-DD'),
+        year: date.format('YYYY'),
+        month: date.format('MM'),
+        day: date.format('DD'),
+        total: list_action.length,
+        action: list_action
+    }
+}
+
+function passing_action(action) {
+    return {
+        school_name: typeof action.reportingSchool.schoolName !== 'undefined' ? action.reportingSchool.schoolName : '',
+        action: typeof action['raw:source'] !== 'undefined' ? action['raw:source']['raw:code'] : ''
+    }
 }
 
 function get_list_course_data(transcriptCombine) {
