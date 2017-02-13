@@ -126,7 +126,7 @@ function get_week_detail(year_month, list_event, list_course, list_discipline_in
             'total_late_to_class': total_late_to_class,
             'total_missed_class': total_missed_class,
             'total_missed_day': total_missed_day,
-            'total_behaviour_incidents': 0,
+            'total_behaviour_incidents': total_incident,
             'events': {
                 late_to_class: total_late_to_class > 0 ? 1 : 0,
                 missed_class: total_missed_class > 0 ? 1 : 0,
