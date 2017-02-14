@@ -7,7 +7,14 @@ var retryRequest = require('retry-request');
 var moment = require('moment');
 var uuid = require('node-uuid');
 var CryptoJS = require("crypto-js");
-var utils = require('../utils'), config = utils.config(), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark  = utils.benchmark();
+var utils = require('../utils');
+var config = utils.config();
+var hzb = config.get("hzb");
+var cache = cache = utils.cache();
+var log = utils.log;
+var md5 = utils.md5;
+var benchmark  = utils.benchmark();
+
 /**
  *
  * @param options
@@ -21,10 +28,9 @@ function RequestXSRE(options, env) {
         throw new Error("config HZ not found!");
 
     }
+    this.hzb = hzb;
 
     this.options = options || {};
-
-    this.config = config.get('hzb');
 
     this.env = env || 'dev';
 
@@ -107,6 +113,8 @@ RequestXSRE.prototype = {
      */
     create: function (what, url, method, callback) {
 
+        var domain = ""
+
         if(!('Authorization' in this.headers)){
 
             var timestamp = this.headers.timestamp = this.getTimezone();
@@ -118,16 +126,19 @@ RequestXSRE.prototype = {
                 case 'sre':
 
                     token = this.generateSREAuthToken(timestamp);
+                    domain = config.get("SRE_URL");
                     break;
 
                 case 'xsre':
 
                     token = this.generateXSREAuthToken(timestamp);
+                    domain = config.get("XSRE_URL");
                     break;
 
                 case 'prs':
 
                     token = this.generatePRSAuthToken(timestamp);
+                    domain = config.get("PRS_URL");
                     break;
 
                 default:
@@ -140,23 +151,23 @@ RequestXSRE.prototype = {
 
         }
 
-        var config = this.config[what];
+        var record = this.hzb[what];
 
         var self = this;
 
-        if('headers' in config) {
+        if('headers' in record) {
 
-            for (var name in config.headers) {
+            for (var name in record.headers) {
 
                 if(name !== undefined) {
-                    self.addHeader(name, config.headers[name]);
+                    self.addHeader(name, readers.headers[name]);
                 }
 
             }
         }
 
         var options = {
-            url: config.url + url,
+            url: domain + url,
             method: method || 'GET',
             headers: this.getHeaders(),
             qsParseOptions: { sep: ';'},
@@ -242,9 +253,9 @@ RequestXSRE.prototype = {
 
         }
 
-        var config = this.config.sre;
+        var sre = this.hzb.sre;
 
-        var url = '/requestProvider/' + config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+ config.contextId;
+        var url = '/requestProvider/' + sre.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+ sre.contextId;
 
         this.addHeader( 'districtStudentId', districtStudentId );
 
@@ -291,9 +302,9 @@ RequestXSRE.prototype = {
 
         }
 
-        var config = this.config.xsre;
+        var xsre = this.hzb.xsre;
 
-        var url = '/requestProvider/' + config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+ config.contextId;
+        var url = '/requestProvider/' + xsre.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+ xsre.contextId;
 
         this.addHeader( 'districtStudentId', districtStudentId );
 
@@ -361,9 +372,9 @@ RequestXSRE.prototype = {
      */
     clearCacheXsreKey: function(districtStudentId, zoneId, organization){
 
-        var config = this.config.xsre;
+        var xsre = this.hzb.xsre;
 
-        var url = '/requestProvider/' + config.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+ config.contextId;
+        var url = '/requestProvider/' + xsre.service +'/'+districtStudentId+';zoneId='+zoneId+';contextId='+ xsre.contextId;
 
         return md5([url, organization.personnelId, organization.authorizedEntityId, organization.externalServiceId].join('_'));
 
@@ -428,9 +439,9 @@ RequestXSRE.prototype = {
      */
     generateSREAuthToken: function(timestamp){
 
-        var sessionToken = this.config.sre.sessionToken;
+        var sessionToken = this.config.get('SRE_SESSION_TOKEN');
 
-        var secret = this.config.sre.sharedSecret;
+        var secret = this.config.get('SRE_SHARED_SECRET');
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 
@@ -443,9 +454,9 @@ RequestXSRE.prototype = {
      */
     generateXSREAuthToken: function(timestamp){
 
-        var sessionToken = this.config.xsre.sessionToken;
+        var sessionToken = this.config.get('XSRE_SESSION_TOKEN');
 
-        var secret = this.config.xsre.sharedSecret;
+        var secret = this.config.get('XSRE_SHARED_SECRET');
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 
@@ -458,9 +469,9 @@ RequestXSRE.prototype = {
      */
     generatePRSAuthToken: function(timestamp){
 
-        var sessionToken = this.config.prs.sessionToken;
+        var sessionToken = this.config.get('PRS_SESSION_TOKEN');
 
-        var secret = this.config.prs.sharedSecret;
+        var secret = this.config.prs.get('_PRS_SHARED_SECRET');
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 

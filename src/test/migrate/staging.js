@@ -14,7 +14,7 @@ var url = 'http://localhost:3000';
 var urlApiLive = 'https://api.sslstaging.studentsuccesslink.upward.st';
 var urlApi = 'http://localhost:4000';
 var config = require('config');
-var dbUri = 'mongodb://' + config.get('db.mongo.host') + '/' + config.get('db.mongo.name');
+var dbUri = 'mongodb://' + config.get('DB_HOST') + '/' + config.get('DB_NAME');
 console.log(dbUri);
 var mongoose = require('mongoose'), clearDB = require('mocha-mongoose')(dbUri, {noClear: true});
 

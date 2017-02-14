@@ -9,13 +9,9 @@ function db() {
 
     this.mongo = mongoose;
 
-    this.dbUri = config.get('db.mongo');
+    this.dbUri = process.env.DB_HOST + '/' + process.env.DB_NAME;
 
-    if(_.isObject(this.dbUri) && config.has('db.mongo.host') && config.has('db.mongo.name')){
-        this.dbUri = 'mongodb://' + config.get('db.mongo.host') + '/' + config.get('db.mongo.name');
-    }
-
-    this.mongoOptions = config.has('db.mongo_options') ? config.get('db.mongo_options') : {};
+    this.mongoOptions =  process.env.DB_MONGO_OPTIONS || {};
 
     this.env = config.util.getEnv('NODE_ENV');
 

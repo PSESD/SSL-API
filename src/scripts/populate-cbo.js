@@ -280,7 +280,7 @@ var populateCbo = {
                             }
                             var newOrg = {
                                 name: rs.organization,
-                                url: rs.url + '.' + config.get('host'),
+                                url: rs.url + '.' + config.get('HOST'),
                                 website: rs.website,
                                 description: rs.notes,
                                 addresses: []

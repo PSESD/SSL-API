@@ -14,11 +14,16 @@ var rollbar = require('rollbar');
 var _ = require('underscore');
 var methodOverride = require('method-override');
 var port = process.env.PORT || 4000;
-var config = require('config');
+
+if (process.env.NODE_ENV === "local-env") {
+    require('dotenv').config()  //get process.env sensitive values from local.env
+}   //else get values from heroku
+
 var hal = require('hal');
 var xmlmodel = require('./lib/xmlmodel');
 var utils = require('./lib/utils');
-var rollbarAccessToken = config.get('rollbar.access_token');
+var config = utils.config();
+var rollbarAccessToken = config.get('ROLLBAR_ACCESS_TOKEN');
 var compress = require('compression');
 i18n.configure({
     locales:['en'],
@@ -30,10 +35,9 @@ if (rollbarAccessToken) {
 
       // Use the rollbar error handler to send exceptions to your rollbar account
       app.use(rollbar.errorHandler(rollbarAccessToken, {handler: 'inline'}));
-      var rollbarEnv = config.util.getEnv('NODE_ENV');
       // Configure the library to send errors to api.rollbar.com
       rollbar.init(rollbarAccessToken, {
-            environment: rollbarEnv
+            environment: config.util.getEnv('NODE_ENV')
       });
       rollbar.handleUncaughtExceptions(rollbarAccessToken, { exitOnUncaughtException: true });
 
@@ -180,18 +184,16 @@ Api.prototype.registerRoute = function (cb) {
  * Connect to database
  */
 Api.prototype.connectDb = function () {
+    var dbUri =""
 
-
-    var dbUri = this.config.get('db.mongo');
-    if(_.isObject(dbUri) && this.config.has('db.mongo.host') && this.config.has('db.mongo.name')){
-        dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
+    if(this.config.has('DB_HOST') && this.config.has('DB_NAME')){
+        dbUri = 'mongodb://' + this.config.get('DB_HOST') + '/' + this.config.get('DB_NAME');
     }
-    this.mongo.connect(dbUri, this.config.has('db.mongo_options') ? this.config.get('db.mongo_options') : {});
+    this.mongo.connect(dbUri, this.config.get('DB_MONGO_OPTIONS') || {});
 
     this.mongo.connection.once('open', function (callback) {
 
         console.log("[%s] DB URI: " + dbUri, app.get('env'));
-
     });
 
     //this.mongo.set('debug', app.get('env') === 'test');
@@ -240,7 +242,7 @@ Api.prototype.configureExpress = function (db) {
 
     // Use express session support since OAuth2orize requires it
     app.use(session({
-        secret: self.config.get('session.secret'),
+        secret: self.config.get('SESSION_SECRET'),
         saveUninitialized: self.config.get('session.saveUninitialized'),
         resave: self.config.get('session.resave')
     }));
@@ -476,12 +478,13 @@ Api.prototype.configureExpress = function (db) {
  * Start Server
  */
 Api.prototype.startServer = function () {
-
+    
     app.listen(port, function () {
 
         console.log("All right ! I am alive at Port " + port + ".");
 
     });
+    
 
 };
 /**

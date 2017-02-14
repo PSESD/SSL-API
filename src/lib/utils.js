@@ -9,13 +9,19 @@ var justlog = require('justlog');
  * @returns {Config|exports|module.exports}
  */
 function getConfig() {
-    //return require('config-uncached')(true);
-    return require('config');
+    var cfg = require('config');
+    for (var prop in process.env) {
+        if (cfg[prop] != process.env[prop]) {
+            cfg[prop] = process.env[prop]; 
+        }
+    }
+    return cfg;
+
 }
 
 var config = getConfig();
 var rollbar = require('rollbar');
-var saltStatic = config.get('salt');
+var saltStatic = config.get('SALT');
 var cacheManager = require('cache-manager');
 var xml2js = require('xml2js');
 var _ = require('underscore');
@@ -205,7 +211,7 @@ var utils = {
                     var redisStore = require('cache-manager-redis');
                     options = {
                         store: redisStore,
-                        host: cache.redis.host,
+                        host: config.get('REDIS_HOST'),
                         port: cache.redis.port,
                         ttl: cache.redis.ttl
                     };
@@ -420,7 +426,7 @@ var utils = {
      */
     log: function (message, type, callback) {
 
-        var rollbarAccessToken = config.get('rollbar.access_token');
+        var rollbarAccessToken = config.get('ROLLBAR_ACCESS_TOKEN');
 
         if (message instanceof Error) {
 

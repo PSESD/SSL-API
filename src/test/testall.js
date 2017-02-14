@@ -11,7 +11,7 @@ var url = 'http://localhost:3000';
 //var url = 'https://auth.cbo.upward.st';
 var api_endpoint = 'http://localhost:4000';
 var config = require('config');
-var dbUri = 'mongodb://' + config.get('db.mongo.host') + '/' + config.get('db.mongo.name');
+var dbUri = 'mongodb://' + config.get('DB_HOST') + '/' + config.get('DB_NAME');
 console.log(dbUri);
 var mongoose = require('mongoose')
     , clearDB = require('mocha-mongoose')(dbUri, {noClear: true});

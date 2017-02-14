@@ -32,7 +32,7 @@ function Request(options, env){
 
     this.options = options || {};
 
-    this.config = config.get('hzb');
+    this.hzb = config.get('hzb');
 
     this.env = env || 'dev';
 
@@ -121,25 +121,27 @@ Request.prototype = {
      */
     push: function(data, callback, zoneId){
 
-        var config = this.config.CBOStudent.push;
+        var push = this.hzb.CBOStudent.push;
 
-        this.secret = config.sharedSecret;
+        this.secret = config.get("CBOStudent_PUSH_SHARED_SECRET");
 
-        this.sessionToken = config.sessionToken;
+        this.sessionToken = config.get("CBOSTUDENT_PUSH_SESSION_TOKEN");
 
         var self = this;
 
-        zoneId = zoneId || config.zoneId;
+        var domain = config.get("CBOSTUDENT_PUSH_URL"); 
 
-        var url = '/requestProvider/' + config.service1 + ';zoneId=' + zoneId + ';contextId=' + config.contextId;
+        zoneId = zoneId || push.zoneId;
 
-        if('headers' in config){
+        var url = '/requestProvider/' + push.service1 + ';zoneId=' + zoneId + ';contextId=' + push.contextId;
 
-            for(var name in config.headers){
+        if('headers' in push){
 
-                self.addHeader(name, config.headers[name]);
+            for(var name in push.headers){
 
-                if(name === 'requestType' && config.headers[name] === 'DELAYED'){
+                self.addHeader(name, push.headers[name]);
+
+                if(name === 'requestType' && push.headers[name] === 'DELAYED'){
 
                     self.addHeader('queueId', uuid.v1({msecs: TIME + 1}));
 
@@ -149,7 +151,7 @@ Request.prototype = {
         }
         self.addHeader('requestId', uuid.v1({msecs: TIME + 28*24*3600*1000}));
 
-        self.create(config.url + url, 'POST', data, callback);
+        self.create(domain + url, 'POST', data, callback);
     },
     /**
      *
@@ -170,17 +172,17 @@ Request.prototype = {
      */
     get: function(callback, serviceNumber, where, zoneId, headers){
 
-        var config = this.config.CBOStudent.get;
+        var cboStudentGet = this.hzb.CBOStudent.get;
 
-        this.secret = config.sharedSecret;
+        this.secret = config.get("CBOSTUDENT_GET_SHARED_SECRET");
 
-        this.sessionToken = config.sessionToken;
+        this.sessionToken = config.get("CBOSTUDENT_GET_SESSION_TOKEN");
 
         var serviceName = serviceNumber === 1 ? config.service1 : config.service2;
 
         zoneId = zoneId || config.zoneId;
 
-        var url = '/requestProvider/' + serviceName + ';zoneId=' + zoneId + ';contextId=' + config.contextId;
+        var url = '/requestProvider/' + serviceName + ';zoneId=' + zoneId + ';contextId=' + cboStudentGet.contextId;
 
         if(where){
             url += '?where='+where;
@@ -206,11 +208,11 @@ Request.prototype = {
 
         var self = this;
 
-        if('headers' in config){
+        if('headers' in cboStudentGet){
 
-            for(var name in config.headers){
+            for(var name in cboStudentGet.headers){
 
-                self.addHeader(name, config.headers[name]);
+                self.addHeader(name, cboStudentGet.headers[name]);
 
             }
         }
@@ -224,7 +226,9 @@ Request.prototype = {
             }
         }
 
-        self.create(config.url + url, 'GET', null, callback);
+        var domain = config.get("CBOSTUDENT_GET_URL");
+
+        self.create(domain + url, 'GET', null, callback);
 
     },
     /**
@@ -233,11 +237,11 @@ Request.prototype = {
      */
     codeSet: function(done){
 
-        var config = this.config.CBOStudent.get;
+        var config = this.hzb.CBOStudent.get;
 
-        this.secret = config.sharedSecret;
+        this.secret = config.get("CBOSTUDENT_GET_SHARED_SECRET");
 
-        this.sessionToken = config.sessionToken;
+        this.sessionToken = config.get("CBOSTUDENT_GET_SESSION_TOKEN");
 
         var self = this;
 
@@ -253,7 +257,9 @@ Request.prototype = {
             }
         }
 
-        self.create(config.url + url, 'GET', null, done);
+        var domain = config.get("CBOSTUDENT_GET_URL");
+
+        self.create(domain + url, 'GET', null, done);
     },
     /**
      *
@@ -688,9 +694,9 @@ Request.prototype = {
      */
     generateSREAuthToken: function(timestamp){
 
-        var sessionToken = this.config.sre.sessionToken;
+        var sessionToken = this.config.get("SRE_SESSION_TOKEN");
 
-        var secret = this.config.sre.sharedSecret;
+        var secret = this.config.get("SRE_SHARED_SECRET");
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 
@@ -703,9 +709,9 @@ Request.prototype = {
      */
     generateXSREAuthToken: function(timestamp){
 
-        var sessionToken = this.config.xsre.sessionToken;
+        var sessionToken = this.config.get("XSRE_SESSION_TOKEN");
 
-        var secret = this.config.xsre.sharedSecret;
+        var secret = this.config.get("XSRE_SHARED_SECRET");
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 
@@ -718,9 +724,9 @@ Request.prototype = {
      */
     generatePRSAuthToken: function(timestamp){
 
-        var sessionToken = this.config.prs.sessionToken;
+        var sessionToken = this.config.get("PRS_SESSION_TOKEN");
 
-        var secret = this.config.prs.sharedSecret;
+        var secret = this.config.get("PRS_SHARED_SECRET");
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 

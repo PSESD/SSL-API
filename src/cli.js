@@ -42,7 +42,7 @@ var parseString = require('xml2js').parseString;
 var rollbar = require('rollbar');
 var rollbarEnv = config.util.getEnv('NODE_ENV');
 
-var rollbarAccessToken = config.get('rollbar.access_token');
+var rollbarAccessToken = config.get('ROLLBAR_ACCESS_TOKEN');
 rollbar.init(rollbarAccessToken, {
     environment: rollbarEnv
 });
@@ -157,8 +157,8 @@ function sentItEmail(message, params, done, err){
         process.env.NODE_ENV,
         os.hostname(),
         new Date().toString(),
-        config.get('cache.redis.host'),
-        config.get('db.mysql.host')
+        config.get('REDIS_HOST'),
+        config.get('MYSQL_HOST')
     ];
     for(var i in params){
         iregex.push('${'+i+'}');
@@ -202,7 +202,7 @@ switch(what){
         });
         break;
     case 'checking':
-        if(!config.has('db')){
+        if(!config.has('DB_HOST')){
             console.log(JSON.stringify(config.util.getConfigSources()));
         } else {
             console.log('OK', config);
