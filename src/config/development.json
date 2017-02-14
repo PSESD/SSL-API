@@ -1,0 +1,118 @@
+{
+ 
+    "api": {
+        "url": "https://api.***.com"
+    },
+    "auth": {
+        "url": "https://auth.***.com"
+    },
+    "cache": {
+        "enable": true,
+        "adapter": "memory",
+        "backup": "redis",
+        "redis": {
+            "port": "6379",
+            "db": 0,
+            "ttl": 86400
+        },
+        "memory": {
+            "max": 100,
+            "ttl": 60
+        }
+    },
+    "cross": {
+        "enable": true,
+        "allow_origin": "*",
+        "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept",
+        "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
+    },
+    "hzb": {
+        "default": "xsre",
+        "sre": {
+            "object": "sres",
+            "service": "sres",
+            "contextId": "CBO",
+            "headers": {
+                "serviceType": "OBJECT",
+                "requestType": "IMMEDIATE",
+                "requestAction": "QUERY",
+                "messageType": "REQUEST",
+                "objectType": "sre",
+                "Accept": "application/xml",
+                "Content-Type": "application/xml"
+            },
+            "validation-url": "",
+            "validation-service": ""
+        },
+        "xsre": {
+            "object": "xSres",
+            "service": "xSres",
+            "contextId": "CBO",
+            "headers": {
+                "serviceType": "OBJECT",
+                "requestType": "IMMEDIATE",
+                "requestAction": "QUERY",
+                "messageType": "REQUEST",
+                "objectType": "xSre",
+                "Accept": "application/xml",
+                "Content-Type": "application/xml"
+            },
+            "validation-url": "",
+            "validation-service": ""
+        },
+        "CBOStudent": {
+            "push": {
+                "object": "xSres",
+                "service1": "CBOStudents",
+                "service2": "CBOStudentsWithXSres",
+                "zoneId": "CBOUniversal",
+                "contextId": "DEFAULT",
+                "headers": {
+                    "mustuseadvisory": true,
+                    "requestType": "DELAYED",
+                    "messageType": "REQUEST",
+                    "objectType": "CBOStudent",
+                    "requestAction": "QUERY",
+                    "Content-Type": "application/xml"
+                }
+            },
+            "get": {
+                "object": "xSres",
+                "service1": "CBOStudents",
+                "service2": "CBOStudentsWithXSres",
+                "zoneId": "CBOUniversal",
+                "contextId": "DEFAULT",
+                "headers": {
+                    "mustuseadvisory": true,
+                    "requestType": "IMMEDIATE",
+                    "messageType": "REQUEST",
+                    "objectType": "CBOStudentsWithXSre",
+                    "requestAction": "QUERY",
+                    "Content-Type": "application/xml"
+                }
+            }
+        },
+        "prs": {
+            "headers": {
+                "Accept": "application/xml"
+            },
+            "validation-url": "",
+            "validation-service": ""
+        }
+    },
+    "ratelimiter": {
+        "windowMs": 60000,
+        "delayAfter": 1,
+        "delayMs": 1000,
+        "max": 5,
+        "message": "Too many requests, please try again later.",
+        "statusCode": 429
+    },
+    "session": {
+      "saveUninitialized": true,
+      "resave": true
+    },
+    "token": {
+        "expires_in": 3600
+    }  
+}
