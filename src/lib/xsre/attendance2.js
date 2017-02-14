@@ -1218,7 +1218,9 @@ function get_all_discipline_incident_data(discipline_incidents) {
         return list_data;
     }
 
-    if(discipline_incidents.length  > 0)
+    discipline_incidents = JSON.parse(discipline_incidents);
+
+    if(discipline_incidents.disciplineIncident.length  > 0)
     {
         discipline_incidents.disciplineIncident.forEach(function(incident) {
             list_data.push(passing_incident(incident));
