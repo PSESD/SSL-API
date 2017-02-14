@@ -37,3 +37,6 @@ src/node_modules
 config
 src/config
 src/logs/*
+.vscode
+src/test-results.xml
+*-debug.*
