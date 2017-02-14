@@ -83,7 +83,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "NODE_ENV=test mocha --reporter mocha-circleci-reporter ./tests/test.js -t300000000"
+    "test": "mocha --reporter mocha-circleci-reporter ./tests/test.js -t300000000"
   },
   "repository": {
     "type": "git",
