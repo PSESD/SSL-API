@@ -140,6 +140,7 @@ function Attendance(xsre){
     this.weeks = [];
     this.availableYear = [moment().year()];
     this.filterYear = xsre.params.year || null;
+    this.xsre = xsre;
 
     if(this.filterYear){
         if(this.filterYear.indexOf('/') !== -1){
@@ -467,6 +468,8 @@ Attendance.prototype.getAttendances = function(){
 
     var weeklyChange = 0;
 
+    me._processCourseMerger();
+
     me.weeks.forEach(function(week){
 
         var ikey = week.startString + ' - ' + week.endString;
@@ -509,6 +512,7 @@ Attendance.prototype.getAttendances = function(){
             detailColumns: [],
             details: [],
             periods: [],
+            courses: [null, [], [], [], [], [], [], []],
             behaviors: {
                 M: [],
                 T: [],
@@ -610,8 +614,6 @@ Attendance.prototype.getAttendances = function(){
 
         });
 
-        //behavior.legend = legend;
-
         var columns = [];
 
         var collects = {};
@@ -633,6 +635,26 @@ Attendance.prototype.getAttendances = function(){
                 total += svalue;
 
                 maxDay.push(svalue);
+
+            }
+
+            if(s.periods.length > 0){
+
+                s.periods.forEach(function (p) {
+
+                    if(_.isArray(behavior.courses[p.period])) {
+
+                        p.courses.forEach(function(pc){
+
+                            behavior.courses[p.period].push(pc);
+
+                        });
+
+                        behavior.listCourse = p.listCourse;
+
+                    }
+
+                });
 
             }
 
@@ -658,13 +680,13 @@ Attendance.prototype.getAttendances = function(){
 
             var b = {
                 title: p,
-                M: { value: me.notAvailable, event: null, slug: '' },
-                T: { value: me.notAvailable, event: null, slug: '' },
-                W: { value: me.notAvailable, event: null, slug: '' },
-                TH: { value: me.notAvailable, event: null, slug: '' },
-                F: { value: me.notAvailable, event: null, slug: '' },
-                SA: { value: me.notAvailable, event: null, slug: '' },
-                S: { value: me.notAvailable, event: null, slug: '' }
+                M: { value: me.notAvailable, event: null, slug: '', courses: [] },
+                T: { value: me.notAvailable, event: null, slug: '', courses: [] },
+                W: { value: me.notAvailable, event: null, slug: '', courses: [] },
+                TH: { value: me.notAvailable, event: null, slug: '', courses: [] },
+                F: { value: me.notAvailable, event: null, slug: '', courses: [] },
+                SA: { value: me.notAvailable, event: null, slug: '', courses: [] },
+                S: { value: me.notAvailable, event: null, slug: '', courses: [] }
             }, title = null;
 
 
@@ -676,7 +698,7 @@ Attendance.prototype.getAttendances = function(){
 
                         if(p === period.period) {
 
-                            b[column] = {value: period.value, event: period.event, slug: period.slug};
+                            b[column] = {value: period.value, event: period.event, slug: period.slug, courses: period.courses};
 
                             if (period.period !== me.notAvailable) {
 
@@ -698,7 +720,7 @@ Attendance.prototype.getAttendances = function(){
             columns.push(b);
 
         });
-
+        
         behavior.details = columns;
 
         behavior.detailColumns = {
@@ -714,7 +736,6 @@ Attendance.prototype.getAttendances = function(){
         };
 
         for(var c = 0; c < columns.length; c++){
-
             behavior.periods.push(columns[c].title);
             behavior.detailColumns.periods.push(columns[c].title);
             behavior.detailColumns.M.push(columns[c].M);
@@ -816,10 +837,6 @@ Attendance.prototype.calculateDailyAttendance = function(behavior, events, n, da
 
     }
 
-    //summary[n].periods.push({
-    //    period: e.timeTablePeriod ? e.timeTablePeriod : me.notAvailable, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
-    //});
-
 };
 /**
  *
@@ -848,17 +865,55 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
 
     var me = this;
 
-    var value = 0;
-
     events.forEach(function(e){
 
         if('timeTablePeriod' in e && e.timeTablePeriod){
 
-            summary[n].periods.push({
-                period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus)
+            var mm = moment(e.calendarEventDate).valueOf();
+            var courses = [];
+
+            var course = [];
+            for(var i = 0; i < me.course.length; i++){
+                var c = me.course[i];
+                if(mm >= c.startTime && mm <= c.endTime){
+                    course.push(c.c);
+                }
+            }
+
+            if(_.isArray(course)) {
+                _.each(course, function (cr) {
+                    _.each(cr.courses, function(c){
+                        if(parseInt(c.timeTablePeriod) === parseInt(e.timeTablePeriod)){
+                            courses.push(c);
+                        }
+                    });
+                });
+            }
+
+            // if(courses.length >  0) {
+            //     me.print('Attendance Date: ' + e.calendarEventDate);
+            //     me.print(courses);
+            // }
+
+            var list_course = [];
+            var temp_list_course = course;
+            temp_list_course.forEach(function(item) {
+                var temp = {
+                    // gradeLevel: item.gradeLevel,
+                    // schoolName: item.schoolName,
+                    // schoolYear: item.schoolYear,
+                    // session: item.session,
+                    // sessionDate: item.sessionDate,
+                    // startDate: item.startDate,
+                    // startDateTime: item.startDateTime,
+                    courses: item.courses
+                };
+                list_course.push(temp);
             });
 
-            //value += isNaN(e.attendanceValue) ? 0 : parseFloat(e.attendanceValue).toFixed(2);
+            summary[n].periods.push({
+                period: e.timeTablePeriod, value: e.attendanceStatus, event: e, slug: me.slug(e.attendanceStatus), courses: courses, listCourse: list_course
+            });
 
             if(e.attendanceStatus){
                 legend[e.attendanceStatus.toLowerCase()].push(e);
@@ -873,24 +928,12 @@ Attendance.prototype.calculateClassSectionAttendance = function(behavior, events
         for(var i = summary[n].periods.length; i <= 6; i++){
 
             summary[n].periods.push({
-                period: me.notAvailable, value: me.notAvailable, event: null, slug: ''
+                period: me.notAvailable, value: me.notAvailable, event: null, slug: '', courses: [], listCourse: []
             });
 
         }
 
     }
-
-    //if(summary[n].periods.length > 0){
-    //
-    //    summary[n].value = value.toFixed(2);
-    //
-    //}
-    //
-    //if(parseInt(summary[n].value) === 0) {
-    //
-    //    summary[n].value = 0;
-    //
-    //}
 
 };
 /**
@@ -1065,7 +1108,9 @@ Attendance.prototype.calculateSummary = function(){
         });
 
     }
+
     allDates = [];
+
     if(_.isObject(me.disciplineIncidents) && !_.isUndefined(me.disciplineIncidents.disciplineIncident)){
 
         var n = [];
@@ -1258,6 +1303,227 @@ Attendance.prototype._thresholdBehavior = function(){
 };
 /**
  *
+ * @private
+ */
+Attendance.prototype._processCourseMerger = function(){
+    var me = this;
+    me.transcriptTerm = null;
+    me.transcriptTermOther = null;
+    me.transcriptFilterMark = [];
+
+    if(me.xsre.json) {
+        if(me.xsre.json.transcriptTerm) {
+            me.transcriptTerm = me.xsre.json.transcriptTerm;
+        }
+
+        if(me.xsre.json.otherTranscriptTerms && me.xsre.json.otherTranscriptTerms.transcriptTerm) {
+            me.transcriptTermOther = me.xsre.json.otherTranscriptTerms.transcriptTerm;
+        }
+    }
+
+    var scedId = {};
+    var scedSort = [];
+
+    for(var k = 1; k <= 23; k++){
+        var nk = k < 10 ? '0'+k : ''+k;
+        scedId[nk] = me.xsre.config.scedCourseSubjectAreaCode[nk].definition;
+        scedSort.push(me.xsre.config.scedCourseSubjectAreaCode[nk].definition);
+    }
+    me.subject = [];
+    me.course = {};
+    me.scedId = scedId;
+    me.scedSort = scedSort;
+    me.scedNotFound = {};
+    if(null !== me.transcriptTerm) {
+        me._processTranscript(me.transcriptTerm, true);
+    }
+
+    if(null !== me.transcriptTermOther) {
+        _.each(me.transcriptTermOther, function (transcript) {
+            me._processTranscript(transcript, false);
+        });
+    }
+
+    me.course = _.sortBy(me.course, function(o){
+        return o.startDateTime/* * -1*/;
+    });
+
+    var newTime = [];
+
+    _.each(me.course, function (c, i) {
+        var end = null;
+        var start = moment(c.startDate);
+        var addMonth = start.month() + 2;
+        if(c.session.indexOf('Quarter') !== -1){
+            end = start.clone().month(addMonth).endOf('month');
+        } else if(c.session.indexOf('Semester') !== -1){
+            addMonth = start.month() + 5;
+            end = start.clone().month(addMonth).endOf('month');
+        }
+        newTime.push({
+           session: c.session,
+           start: start,
+           startTime: start.valueOf(),
+           end: end,
+           endTime: end.valueOf(),
+           c: c
+        });
+    });
+    me.course = newTime;
+};
+/**
+ *
+ * @returns {Array}
+ */
+Attendance.prototype.getCourse = function(){
+    return this._getCourseMerger();
+};
+
+/**
+ *
+ * @returns {Array}
+ */
+Attendance.prototype._getCourseMerger = function(){
+
+    var me = this;
+    me._processCourseMerger();
+    return me.course;
+};
+/**
+ *
+ * @param transcript
+ * @param current
+ */
+Attendance.prototype._processTranscript = function(transcript, current){
+
+    var me = this;
+
+    if(!_.isObject(transcript.courses)){
+        return;
+    }
+
+    var tSchoolYear = l.get(transcript, 'schoolYear');
+    var tSession = l.get(transcript, 'session.description');
+    var tSchoolName = l.get(transcript, 'school.schoolName');
+    var tSessionDate = l.get(transcript, 'session.startDate');
+
+    if(_.isUndefined(transcript.courses.course)){
+        return ;
+    }
+
+    if(!_.isArray(transcript.courses.course)){
+        transcript.courses.course = [ transcript.courses.course ];
+    }
+
+    if(current) {
+
+        _.each(transcript.courses.course, function (course) {
+
+            if (!course) {
+                return;
+            }
+
+            if (!course.leaCourseId) {
+                return;
+            }
+
+        });
+
+    }
+
+    var academicSummary = {
+        totalCreditsEarned: 0,
+        totalCreditsAttempted: 0,
+        termWeightedGpa: 0,
+        cumulativeGpa: 0,
+        termCreditsAttempted: 0,
+        termCreditsEarned: 0,
+        classRank: 0,
+        gpaScale: 0
+    };
+
+    if(!tSchoolName || !tSession || !tSchoolYear || !tSessionDate){
+        return;
+    }
+
+    var key = (tSessionDate).trim(), info = {
+        gradeLevel : transcript.gradeLevel,
+        schoolYear : tSchoolYear,
+        schoolName : tSchoolName,
+        startDate: l.get(transcript, 'session.startDate'),
+        startDateTime: 0,
+        session: tSession,
+        sessionDate: tSessionDate,
+        courses: [],
+        academicSummary: academicSummary
+    };
+
+    if(info.startDate){
+        info.startDateTime = new Date(info.startDate).getTime();
+    } else {
+        info.startDate = info.tSchoolYear;
+        info.startDateTime = new Date(info.startDate).getTime();
+    }
+
+    key = info.startDateTime;
+
+    if(Object.keys(me.course).indexOf(key) === -1) {
+        me.course[key] = info;
+    }
+
+    _.each(transcript.courses.course, function (course) {
+
+        if(!course) {
+            return;
+        }
+
+        if(!course.leaCourseId) {
+            return;
+        }
+
+        if(!course.timeTablePeriod){
+            return;
+        }
+
+        var uniqueId = course.scedCourseSubjectAreaCode;
+        if(uniqueId in me.scedId) {
+            me._transcriptWithSCED(uniqueId, key, course, info, current);
+        }
+    });
+};
+/**
+ *
+ * @param scedAreaCode
+ * @param key
+ * @param course
+ * @param info
+ * @param current
+ */
+Attendance.prototype._transcriptWithSCED = function(scedAreaCode, key, course, info, current){
+
+    var me = this;
+    var uniqueStr = me.scedId[scedAreaCode];
+    var teacherNames = [];
+    if('psesd:teacherNames' in course){
+        teacherNames = course['psesd:teacherNames'].split(', ');
+    } else if('teacherNames' in course) {
+        teacherNames = course['teacherNames'].split(', ');
+    }
+    me.course[key].courses.push({
+        scedCourseSubjectAreaCode: scedAreaCode,
+        scedCourseSubjectAreaDescription: uniqueStr,
+        leaCourseId: course.leaCourseId,
+        courseTitle: course.courseTitle || me.notAvailable,
+        timeTablePeriod: parseInt(course.timeTablePeriod) || me.notAvailable,
+        gradeLevel: info.gradeLevel || me.notAvailable,
+        creditsEarned: isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned),
+        creditsAttempted: isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted),
+        teacherNames: teacherNames
+    });
+};
+
+/**
+ *
  * @param event
  * @returns {*}
  */
@@ -1289,9 +1555,6 @@ Attendance.prototype.getMaxDateCalendarTime = function(){
 Attendance.prototype.getMinDateCalendarTime = function(){
     return this.minDateCalendar;
 };
-
-
-
 /**
  *
  * @type {Attendance}

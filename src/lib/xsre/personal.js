@@ -23,9 +23,26 @@ function Personal(xsre){
     //me.notAvailable = 'N/A';
     me.notAvailable = '';
     me.enrollmentHistories = xsre.getTranscript().getHistory().reverse();
-    me.personal.summary = xsre.getAttendanceBehavior().calculateSummary();
+    me.personal.summary = {};
+    var attendance = xsre.getAttendanceBehavior();
 
+    me.personal.summary.attendanceCount = attendance.getCurrentTotalAttendance();
+    me.personal.summary.behaviorCount = attendance.getCurrentTotalBehavior();
+    me.personal.summary.attendanceRiskFlag = attendance.getRiskFlag();
+    var attendanceSummary = attendance.calculateSummary();
+    me.personal.summary.latestDate = attendanceSummary.date.latest;
+    me.personal.summary.latestDateTime = attendanceSummary.date.max;
+    me.personal.summary.onTrackToGraduate = null;
 
+    var academicSummary = l.get(xsre.getJson(), 'transcriptTerm.academicSummary');
+
+    if(academicSummary){
+        if('onTrackToGraduate' in academicSummary){
+            me.personal.summary.onTrackToGraduate = academicSummary.onTrackToGraduate;
+        } else if('psesd:onTrackToGraduate' in academicSummary) {
+            me.personal.summary.onTrackToGraduate = academicSummary['psesd:onTrackToGraduate'];
+        }
+    }
 }
 /**
  *

@@ -18,6 +18,9 @@ var hal = require('hal');
 var xSre = require('../../lib/xsre');
 var async = require('async');
 var prefixListStudent = '_xsre_list_students_';
+var crypto = require('crypto');
+var algorithm = 'aes-256-ctr',
+    password = 'ssl-encrypted-827192';
 /**
  * Get the list of all organizations that this user have access to in our system.
  * @param req
@@ -71,7 +74,7 @@ StudentController.getStudentsBackpack = function(req, res){
         }
 
         var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
-        key = new Date().getTime();
+        // key = new Date().getTime();
         /**
          *
          * @param results
@@ -196,10 +199,13 @@ StudentController.getStudentsBackpack = function(req, res){
 
                 if(separate === 'attendance'){
 
-                    paginate.source.years = results.years;
-                    paginate.source.legend = results.legend;
+                    paginate.source.calendars = results.calendars;
+                    paginate.source.list_years = results.list_years;
+                    paginate.source.list_weeks = results.list_weeks;
 
-                    delete results.years;
+                    delete results.calendars;
+                    delete results.list_years;
+                    delete results.list_weeks;
 
                 }
 
@@ -426,6 +432,23 @@ StudentController.getStudentsBackpack = function(req, res){
                 authorizedEntityId: organization.authorizedEntityId
             });
 
+            if(separate == "attendance")
+            {
+                key = key + '_attendance';
+            }
+            else if(separate == "transcript")
+            {
+                key = key + '_transcript';
+            }
+            else if(separate == "assessment")
+            {
+                key = key + '_assessment';
+            }
+            else if(separate == "report")
+            {
+                key = key + '_report';
+            }
+            console.log(key);
             cache.get(key, function(err, result){
 
                 if(err){
@@ -483,6 +506,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                 benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
 
                                 var object = null;
+                                var save_to_redis = {};
 
                                 var xsre = new xSre(result, body, separate, req.query).setLogger(benchmark);
 
@@ -494,11 +518,23 @@ StudentController.getStudentsBackpack = function(req, res){
 
                                     switch(separate){
 
+                                        // case 'attendance':
+                                        //     var attendance = xsre.getAttendanceBehavior();
+                                        //     object = attendance.getAttendances();
+                                        //     object.years = attendance.getAvailableYears();
+                                        //     object.legend = attendance.getLegend();
+                                        //     break;
                                         case 'attendance':
-                                            var attendance = xsre.getAttendanceBehavior();
-                                            object = attendance.getAttendances();
-                                            object.years = attendance.getAvailableYears();
-                                            object.legend = attendance.getLegend();
+                                            var attendance = xsre.getAttendanceBehavior2();
+                                            object = [];
+                                            object.list_years = attendance.getGenerateYear();
+                                            object.calendars = attendance.getGenerateCalendar();
+                                            object.list_weeks = attendance.getGenerateCalendarWeek();
+                                            save_to_redis = {
+                                                'list_years': object.list_years,
+                                                'calendars': object.calendars,
+                                                'list_weeks': object.list_weeks
+                                            };
                                             break;
                                         case 'transcript':
                                             object = xsre.getTranscript().getTranscript();
@@ -514,18 +550,35 @@ StudentController.getStudentsBackpack = function(req, res){
 
                                 }
 
+
                                 /**
                                  * Set to cache
                                  */
-                                    //benchmark.info('XSRE - SET TO CACHE');
-                                    //cache.set(key, object, function(err){
+                                benchmark.info('XSRE - SET TO CACHE');
+                                if(separate == 'attendance')
+                                {
+                                    // var cipher = crypto.createCipher(algorithm,password);
+                                    // var crypted = cipher.update(save_to_redis,'utf8','hex');
+                                    // crypted += cipher.final('hex');
+                                    // cache.set(key, JSON.stringify(save_to_redis), function(err){
                                     //
-                                    //    console.log(err);
-                                    //    log(err);
+                                    //     console.log(err);
+                                    //     log(err);
 
-                                embeds(object);
+                                        embeds(object);
 
-                                //});
+                                    // });
+                                }
+                                else {
+                                    // cache.set(key, object, function(err){
+                                    //
+                                    //     console.log(err);
+                                    //     log(err);
+
+                                        embeds(object);
+
+                                    // });
+                                }
 
                             });
 
@@ -565,9 +618,20 @@ StudentController.getStudentsBackpack = function(req, res){
                     });
 
                 } else{
-                    console.log('FROM CACHE ---------------------------');
-                    embeds(result, 1);
+                    console.log('FROM CACHE ---------------------------', separate);
 
+                    if(separate == 'attendance')
+                    {
+                        var temp_data = JSON.parse(result);
+                        var data = [];
+                        data.list_years = temp_data.list_years;
+                        data.calendars = temp_data.calendars;
+                        data.list_weeks = temp_data.list_weeks;
+                        embeds(data, 1);
+                    }
+                    else {
+                        embeds(result, 1);
+                    }
                 }
 
             });
@@ -624,7 +688,22 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
             if(!organization){
                 return res.sendError('The organization not found in database');
             }
+            var key2 = key + '_attendance';
+            cache.del(key2, function(err){
 
+            });
+            var key3 = key + '_transcript';
+            cache.del(key3, function(err){
+
+            });
+            var key4 = key + '_assessment';
+            cache.del(key4, function(err){
+
+            });
+            var key5 = key + '_report';
+            cache.del(key5, function(err){
+
+            });
             cache.del(key, function(err){
 
                 if(err){
@@ -793,6 +872,12 @@ StudentController.getStudents = function(req, res){
 
             if(err){
                 return res.sendError(err);
+            }
+
+            if(!_.isArray(results)){
+
+                results = [];
+
             }
 
             return res.sendSuccess(null, results);

@@ -8,7 +8,6 @@ var expect = require('chai').expect;
 var request = require('supertest');
 var cheerio = require('cheerio');
 var querystring = require('querystring');
-var php = require('phpjs');
 var _ = require('underscore');
 var urlLive = 'https://auth.sslstaging.studentsuccesslink.upward.st';
 var url = 'http://localhost:3000';
@@ -27,7 +26,7 @@ var assert = require('assert');
  * @param token
  */
 function http_build_query(post, uri, token) {
-    console.log(uri + ' ' + token +' %j', php.http_build_query(post));
+    console.log(uri + ' ' + token +' %j', _funct.http_build_query(post));
 }
 describe('Migrate Staging', function () {
 

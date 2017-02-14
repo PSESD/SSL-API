@@ -1,4 +1,5 @@
 'use strict';
+// Version 1.0.0
 var express = require("express");
 var i18n = require("i18n");
 var mongoose = require('mongoose');
@@ -181,9 +182,11 @@ Api.prototype.registerRoute = function (cb) {
 Api.prototype.connectDb = function () {
 
 
-    var dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
-
-    this.mongo.connect(dbUri);
+    var dbUri = this.config.get('db.mongo');
+    if(_.isObject(dbUri) && this.config.has('db.mongo.host') && this.config.has('db.mongo.name')){
+        dbUri = 'mongodb://' + this.config.get('db.mongo.host') + '/' + this.config.get('db.mongo.name');
+    }
+    this.mongo.connect(dbUri, this.config.has('db.mongo_options') ? this.config.get('db.mongo_options') : {});
 
     this.mongo.connection.once('open', function (callback) {
 
@@ -396,12 +399,25 @@ Api.prototype.configureExpress = function (db) {
             /**
              * Mongoose error duplicate
              */
-            if(err.code && (err.code === 11000 || err.code === 11001)){
+            if(typeof err === 'object' && err.code && (err.code === 11000 || err.code === 11001)){
 
                 err = {
                     code: err.code,
                     message: res.__('errors.' + err.code)
                 };
+
+            }
+
+            if(typeof err !== 'string'){
+
+                for(var o in err){
+
+                    if(o !== 'code' && o !== 'message'){
+
+                        delete err[o];
+
+                    }
+                }
 
             }
 

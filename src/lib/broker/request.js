@@ -336,7 +336,7 @@ RequestXSRE.prototype = {
 
                         benchmark.info('REQUEST-XSRE-HZB: STORE DATA TO CACHE');
 
-                        callback(error, response, body);
+                        callback(null, response, body);
 
                     });
 
@@ -388,7 +388,8 @@ RequestXSRE.prototype = {
      */
     getTimezone: function(){
 
-        return moment().utc().format("YYYY-MM-DDThh:mm:ss.SSSZZ");
+        return moment().utc().format("YYYY-MM-DDThh:mm:ss.SSSSSS");
+        // return moment().utc().toISOString();
 
     },
 

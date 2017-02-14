@@ -8,6 +8,7 @@ var fs = require('fs');
 //var xmlFile = __dirname + '/../../../mockhzb/sid/sample1.xml';
 //var xmlFile = __dirname + '/data/xml.xml';
 var xmlFile = __dirname + '/data/sample1.xml';
+var xmlFile = __dirname + '/transc.xml';
 var parseString = require('xml2js').parseString;
 fs.readFile(xmlFile, function(err, data) {
     if(err) {

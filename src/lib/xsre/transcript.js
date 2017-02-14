@@ -56,6 +56,8 @@ function Transcript(xsre){
     //me.notAvailable = 'N/A';
     me.notAvailable = '';
 
+    me.currentGPA = 0;
+
     me.academicSummary = {
         totalCreditsEarned: 0,
         totalCreditsAttempted: 0,
@@ -322,7 +324,7 @@ Transcript.prototype.getTranscript = function(){
 
                     courseTranscripts[subject].forEach(function(c){
 
-                        subjectObject[subject] += c.creditsAttempted;
+                        subjectObject[subject] += c.creditsEarned;
 
                         me.info.totalAttempted += c.creditsAttempted;
 
@@ -373,6 +375,7 @@ Transcript.prototype.getTranscript = function(){
         credits: me.credits,
         subject: subjectModified,
         subjectValues: subjectValues,
+        currentGPA: me.currentGPA,
         totalCreditsEarned: isNaN(me.totalCreditsEarned) ? 0 : parseFloat(me.totalCreditsEarned).toFixed(1),
         totalCreditsAttempted: isNaN(me.totalCreditsAttempted) ? 0 : parseFloat(me.totalCreditsAttempted).toFixed(1),
         totalCumulativeGpa: me.academicSummary.cumulativeGpa.toFixed(1),
@@ -526,7 +529,6 @@ Transcript.prototype.processTranscript = function(transcript, current){
         me.course[key] = info;
     }
 
-
     _.each(transcript.courses.course, function (course) {
 
         if(!course) {
@@ -566,7 +568,12 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
     var me = this;
 
     var uniqueStr = me.scedId[scedAreaCode];
-
+    var teacherNames = [];
+    if('psesd:teacherNames' in course){
+        teacherNames = course['psesd:teacherNames'].split(', ');
+    } else if('teacherNames' in course) {
+        teacherNames = course['teacherNames'].split(', ');
+    }
     if (Object.keys(me.course[key].transcripts).indexOf(uniqueStr) === -1) {
         me.course[key].transcripts[uniqueStr] = [];
     }
@@ -576,8 +583,22 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
     }
 
     var mark = null;
+    var progressMarkSessionDescription = null;
+    var interim = null;
 
-    mark = course.progressMark || course.finalMarkValue;
+    if('progressMarkSessionDescription' in course){
+        progressMarkSessionDescription = course.progressMarkSessionDescription;
+    } else if('psesd:progressMarkSessionDescription' in course){
+        progressMarkSessionDescription = course['psesd:progressMarkSessionDescription'];
+    }
+
+    mark = course.finalMarkValue || course.progressMark;
+
+    if (progressMarkSessionDescription.toLowerCase().indexOf('semester') !== -1) {
+        interim = 'final';
+    } else {
+        interim = 'interim';
+    }
 
     if(!mark) {
 
@@ -610,11 +631,13 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
             me.course[key].academicSummary.termCreditsAttempted = 0;
         }
 
-        me.course[key].academicSummary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
-        me.course[key].academicSummary.totalCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+        if(mark) {
+            me.course[key].academicSummary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+            me.course[key].academicSummary.totalCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
 
-        me.course[key].academicSummary.termCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
-        me.course[key].academicSummary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+            me.course[key].academicSummary.termCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+            me.course[key].academicSummary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+        }
 
     }
 
@@ -628,7 +651,10 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
         mark: mark,
         gradeLevel: info.gradeLevel || me.notAvailable,
         creditsEarned: isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned),
-        creditsAttempted: isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted)
+        creditsAttempted: isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted),
+        progressMarkSessionDescription: progressMarkSessionDescription,
+        interim: interim,
+        teacherNames: teacherNames
     });
 
 };
@@ -659,9 +685,32 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
     }
 
     var mark = null;
+    var progressMarkSessionDescription = null;
+    var interim = null;
 
+    if('progressMarkSessionDescription' in course){
+        progressMarkSessionDescription = course.progressMarkSessionDescription;
+    } else if('psesd:progressMarkSessionDescription' in course){
+        progressMarkSessionDescription = course['psesd:progressMarkSessionDescription'];
+    }
 
-    mark = course.progressMark || course.finalMarkValue;
+    mark = course.finalMarkValue || course.progressMark;
+
+    switch (progressMarkSessionDescription){
+        case 'Semester 1':
+        case 'Semester 2':
+            interim = 'final grade';
+            // mark = course.finalMarkValue;
+            break;
+        default:
+            // mark = course.progressMark;
+            interim = 'interim grade';
+            if(mark){
+                interim = 'mid-course grade';
+            }
+            break;
+
+    }
 
     if(!mark) {
 
@@ -684,11 +733,13 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
             me.course[key].academicSummary.termCreditsAttempted = 0;
         }
 
-        me.course[key].academicSummary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
-        me.course[key].academicSummary.totalCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+        if(mark) {
+            me.course[key].academicSummary.totalCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+            me.course[key].academicSummary.totalCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
 
-        me.course[key].academicSummary.termCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
-        me.course[key].academicSummary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+            me.course[key].academicSummary.termCreditsEarned += isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned);
+            me.course[key].academicSummary.termCreditsAttempted += isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted);
+        }
 
     }
 
@@ -702,7 +753,9 @@ Transcript.prototype.transcriptWithNoSCED = function(scedAreaCode, key, course, 
         mark: mark,
         gradeLevel: info.gradeLevel || me.notAvailable,
         creditsEarned: isNaN(course.creditsEarned) ? 0 : parseFloat(course.creditsEarned),
-        creditsAttempted: isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted)
+        creditsAttempted: isNaN(course.creditsAttempted) ? 0 : parseFloat(course.creditsAttempted),
+        progressMarkSessionDescription: progressMarkSessionDescription,
+        interim: interim
     });
 
 };

@@ -5,8 +5,13 @@
 /**
  *
  */
+
 (function(){
-    var dotenv = require('dotenv').config({ path: process.env.NODE_CONFIG_DIR + '/.env' });
+    var pathEnv = process.env.NODE_CONFIG_DIR;
+    if(!pathEnv){
+        pathEnv = __dirname + '/config';
+    }
+    var dotenv = require('dotenv').config({ path: pathEnv + '/.env' });
     if(dotenv){
         for(var env in dotenv){
             process.env[env] = dotenv[env];
@@ -15,7 +20,7 @@
 })();
 
 
-var memwatch = require('memwatch');
+var memwatch = require('memwatch-next');
 // Take first snapshot
 var hd = new memwatch.HeapDiff();
 var bs = require('nodestalker'),
@@ -30,9 +35,9 @@ var os = require('os');
 //var con = require('./lib/sql');
 var studentCollector = require('./lib/cli/studentCollector');
 var tokenCleaner = require('./lib/cli/tokenCleaner');
+var dbIndexing = require('./lib/cli/dbIndexing');
 var request = require('./lib/cli/request');
-var php = require('phpjs');
-var codeSet = require('./lib/xsre/codeset');
+var _funct = require(__dirname + '/lib/function');
 var parseString = require('xml2js').parseString;
 var rollbar = require('rollbar');
 var rollbarEnv = config.util.getEnv('NODE_ENV');
@@ -115,7 +120,7 @@ function withError(err, message, params, done){
         if(err instanceof Error){
             err = err.stack.split("\n");
         }
-        utils.log('Error: ' + php.nl2br(err), 'error', function () {
+        utils.log('Error: ' + _funct.nl2br(err), 'error', function () {
             sentItEmail(message, params, done, err);
         });
     } else {
@@ -160,9 +165,9 @@ function sentItEmail(message, params, done, err){
         ireplace.push(params[i]);
     }
 
-    var subject = php.str_replace( iregex, ireplace, subjectEmail);
-    message = php.str_replace(iregex, ireplace, message);
-    bodyEmail = php.str_replace(iregex, ireplace, bodyEmail);
+    var subject = _funct.str_replace( iregex, ireplace, subjectEmail);
+    message = _funct.str_replace(iregex, ireplace, message);
+    bodyEmail = _funct.str_replace(iregex, ireplace, bodyEmail);
     message = bodyEmail + "<br><br>" + message;
     if(err){
         message += '<br><strong>' +
@@ -173,7 +178,7 @@ function sentItEmail(message, params, done, err){
     if(diff.change && diff.change.details){
         delete diff.change.details;
     }
-    message = php.nl2br(message) + "<br><br>" +
+    message = _funct.nl2br(message) + "<br><br>" +
         "Leak Detection and Heap Diffing:<br>" +
         "<pre><code>Before: " + JSON.stringify(diff.before) + '</code></pre>' +
         "<pre><code>After: " + JSON.stringify(diff.after) + '</code></pre>' +
@@ -280,6 +285,42 @@ switch(what){
             }
             process.exit();
         });
+        break;
+    case 'collection-index':
+        dbIndexing.reIndex(function(err, indexing){
+            if (err && err !== null && err !== 'null') {
+                console.log('Reindex fails: ', err);
+            } else{
+                console.log('Reindex done');
+            }
+            process.exit();
+        });
+        break;
+    case 'deploy-test':
+        if(process.env.NODE_ENV === 'development'){
+            var SSH_USERNAME = process.env.SSH_USERNAME;
+            var SSH_PASSWORD = process.env.SSH_PASSWORD;
+            var SSH_HOST = process.env.SSH_HOST;
+            var SSH = require('simple-ssh');
+            var ssh = new SSH({
+                host: SSH_HOST,
+                user: SSH_USERNAME,
+                pass: SSH_PASSWORD
+            });
+            ssh
+                .exec('echo "Node.js"', {
+                    out: console.log.bind(console)
+                })
+                .exec('echo "is"', {
+                    out: console.log.bind(console)
+                })
+                .exec('echo "awesome!"', {
+                    out: console.log.bind(console)
+                })
+                .start();
+        } else {
+            throw 'Not valid environment';
+        }
         break;
     default:
         throw 'Not valid command';

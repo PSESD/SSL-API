@@ -13,7 +13,6 @@ var parseString = require('xml2js').parseString;
 var utils = require('./../../lib/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5;
 var ObjectId = mongoose.Types.ObjectId;
 var hal = require('hal');
-var php = require('phpjs');
 var xSre = require('./../../lib/xsre');
 var async = require('async');
 var StudentCache = {};

@@ -29,12 +29,12 @@ var xSre = require(libPath+'/xsre');
 var async = require('async');
 var districtFile = rootPath + '/test/data/districts';
 var fs = require('fs');
-var php = require('phpjs');
 var filename = districtFile;
 var prefixListStudent = '_xsre_list_students_';
 var prefixListStudentDate = 'summary_student_list_date_';
 var latestDateAvailable = {};
 var organizationWhere = {};
+var _funct = require(__dirname + '/../function');
 
 //organizationWhere = {
 //    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
@@ -376,13 +376,13 @@ function collectCacheListStudentsAsync(force, done) {
 
                     if (error) {
                         benchmark.info(error);
-                        return cb(error, data);
+                        return cb(null, data);
                     }
 
                     if (!body) {
                         benchmark.info(error);
-                        return cb('Body was empty reponse', data);
-
+                        //return cb('Body was empty reponse', data);
+                        return cb(null, data);
                     }
 
                     if (response && response.statusCode === 200) {
@@ -392,31 +392,31 @@ function collectCacheListStudentsAsync(force, done) {
                             if (err) {
                                 benchmark.info(err);
                                 log(err, 'error');
-                                return cb(err, data);
+                                return cb(null, data);
                             }
                             var msg;
 
-                            if(result && 'error' in result){
+                            if (result && 'error' in result) {
 
                                 msg = result.error.message ? result.error.message : result.error;
                                 console.log('X1:', result);
-                                if(!msg){
+                                if (!msg) {
                                     msg = 'Data not found!';
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
-                                return cb(msg, data);
+                                return cb(null, data);
 
                             }
 
-                            if(result && 'Error' in result){
+                            if (result && 'Error' in result) {
 
                                 msg = result.Error.Message ? result.Error.Message : result.Error;
-                                if(!msg){
+                                if (!msg) {
                                     msg = 'Data not found!';
                                 }
                                 benchmark.info('XSRE - ERROR BODY: ' + msg);
                                 log('XSRE - ERROR BODY RESULT: ' + msg, 'error');
-                                return cb(msg, data);
+                                return cb(null, data);
 
                             }
 
@@ -430,9 +430,9 @@ function collectCacheListStudentsAsync(force, done) {
                              * Check the data max
                              * @type {string}
                              */
-                            if(data.latestDateTime){
+                            if (data.latestDateTime) {
 
-                                if(latestDateAvailable[orgIdString][student.school_district] < data.latestDateTime){
+                                if (latestDateAvailable[orgIdString][student.school_district] < data.latestDateTime) {
 
                                     latestDateAvailable[orgIdString][student.school_district] = data.latestDateTime;
 
@@ -441,6 +441,7 @@ function collectCacheListStudentsAsync(force, done) {
                             }
 
                             var key = prefixListStudent + organization._id + '_' + student._id;
+
 
                             cache.set(key, data, {ttl: 86400}, function () {
                                 benchmark.info('Cache student from org: ', organization.name, ' Student ID: ' + student._id.toString());
@@ -456,7 +457,7 @@ function collectCacheListStudentsAsync(force, done) {
 
             };
 
-            
+
             Student.find({
                 organization: organization._id
             }, function (err, students) {
@@ -537,9 +538,10 @@ function pullStudentAsyncWithoutOrg(ok){
     /**
      *
      * @param err1
+     * @param sql
      */
-    var okDone = function(err1){
-        var ee = null;
+    var okDone = function(err1, sql){
+        var ee = sql || null;
         if(err1){
             ee = "\nError Progress: ";
             if(err1 instanceof Error){
@@ -569,25 +571,25 @@ function pullStudentAsyncWithoutOrg(ok){
 
                 }
             }
-            ok(php.nl2br(ee), studentNumber);
+            ok(_funct.nl2br(ee), studentNumber);
         });
     };
 
     con.query('drop table if exists ' + backupTable, function(err){
         if(err){
-            return okDone(err);
+            return okDone(err, 'drop table if exists ' + backupTable);
         }
         con.query('drop table if exists ' + t2, function(err){
             if(err){
-                return okDone(err);
+                return okDone(err, 'drop table if exists ' + t2);
             }
             con.query('create table ' + backupTable + ' like ' + masterTable, function(err, results){
                 if(err){
-                    return okDone(err);
+                    return okDone(err, 'create table ' + backupTable + ' like ' + masterTable);
                 }
                 con.query('create table ' + t2 + ' like ' + t1, function(err, results){
                     if(err){
-                        return okDone(err);
+                        return okDone(err, 'create table ' + t2 + ' like ' + t1);
                     }
                     /**
                      *
@@ -629,7 +631,7 @@ function pullStudentAsyncWithoutOrg(ok){
                     var sql = 'TRUNCATE TABLE ' + backupTable;
                     con.query(sql, function(err, results){
                         if(err){
-                            return okDone(err);
+                            return okDone(err, sql);
                         }
                         pullMap(function(err, students){
 
@@ -644,23 +646,23 @@ function pullStudentAsyncWithoutOrg(ok){
                             con.query(sql, function(err, results){
                                 if(err){
                                     //log(sql + ' WITH ERR: ' + err, 'error');
-                                    return okDone(err, studentNumber);
+                                    return okDone(err, sql);
                                 }
                                 sql = 'RENAME TABLE ' + backupTable + ' TO ' + masterTable;
                                 con.query(sql, function(err, results){
                                     if(err){
                                         //log(sql + 'WITH ERR: ' + err, 'error');
-                                        return okDone(err, studentNumber);
+                                        return okDone(err, sql);
                                     }
                                     var sql = 'DROP TABLE ' + t1;
                                     con.query(sql, function(err, results){
                                         if(err){
                                             //log(sql + 'WITH ERR: ' + err, 'error');
-                                            return okDone(err, studentNumber);
+                                            return okDone(err, sql);
                                         }
                                         sql = 'RENAME TABLE ' + t2 + ' TO ' + t1;
                                         con.query(sql, function(err, results){
-                                            return okDone(err, studentNumber);
+                                            return okDone(err, sql);
                                         });
                                     });
                                 });
