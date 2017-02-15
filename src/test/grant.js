@@ -8,7 +8,7 @@ var User = require( '../app/models/User' );
 var url = 'http://localhost:3000';
 //var url = 'https://auth.cbo.upward.st';
 var api_endpoint = 'http://localhost:4000';
-var config = require('config');
+var config = require("../lib/utils").config();
 var dbUri = 'mongodb://'+config.get('DB_HOST')+'/'+config.get('DB_NAME');
 console.log(dbUri);
 var mongoose = require( 'mongoose' );

@@ -10,7 +10,6 @@ var request = require( 'supertest' );
 var cheerio = require( 'cheerio' );
 var url = 'https://auth.cbo.upward.st';
 var api_endpoint = 'https://api.cbo.upward.st';
-var config = require('config');
 
 describe( 'OAuth2', function () {
 
