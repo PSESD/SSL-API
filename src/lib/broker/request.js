@@ -8,7 +8,7 @@ var moment = require('moment');
 var uuid = require('node-uuid');
 var CryptoJS = require("crypto-js");
 var utils = require('../utils');
-var config = utils.config();
+var config = require('../config').config();
 var hzb = config.get("hzb");
 var cache = cache = utils.cache();
 var log = utils.log;

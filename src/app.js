@@ -22,7 +22,7 @@ if (process.env.NODE_ENV === "local-env") {
 var hal = require('hal');
 var xmlmodel = require('./lib/xmlmodel');
 var utils = require('./lib/utils');
-var config = utils.config();
+var config = require('./lib/config').config();
 var rollbarAccessToken = config.get('ROLLBAR_ACCESS_TOKEN');
 var compress = require('compression');
 i18n.configure({

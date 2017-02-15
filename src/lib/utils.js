@@ -8,18 +8,9 @@ var justlog = require('justlog');
  *
  * @returns {Config|exports|module.exports}
  */
-function getConfig() {
-    var cfg = require('config');
-    for (var prop in process.env) {
-        if (cfg[prop] != process.env[prop]) {
-            cfg[prop] = process.env[prop]; 
-        }
-    }
-    return cfg;
 
-}
 
-var config = getConfig();
+var config = require(__dirname + '/config').config();
 var rollbar = require('rollbar');
 var saltStatic = config.get('SALT');
 var cacheManager = require('cache-manager');
@@ -284,12 +275,6 @@ var utils = {
         return crypto.createHash('md5').update(value).digest('hex');
 
     },
-    /**
-     *
-     * @param useCache
-     * @returns {*}
-     */
-    config: getConfig,
     /**
      * Return a unique identifier with the given `len`.
      *

@@ -2,8 +2,7 @@
  * Created by zaenal on 23/02/16.
  */
 var mysql = require('mysql');
-var utils = require('../lib/utils');
-var config = utils.config();
+var config = require('../lib/config').config();
 
 //console.log('CONFIG MYSQL: ', dbConfig);
 //console.log('NODE_CONFIG_DIR: ' + config.util.getEnv('NODE_CONFIG_DIR'));

@@ -14,7 +14,8 @@ var CryptoJS = require("crypto-js");
 var TIME = 1321644961388;
 var _ = require('underscore');
 var l = require('lodash');
-var utils = require(libPath+'/utils'), config = utils.config(), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
+var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
+var config = require(libPath + '/config').config()
 /**
  *
  * @param options

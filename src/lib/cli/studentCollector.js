@@ -18,8 +18,8 @@ var l = require('lodash');
 var xmlParser = require('js2xmlparser');
 var moment = require('moment');
 var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
-
-var config = utils.config(), xsreConfig = config.get('hzb').xsre;
+var config = require(libPath + '/config').config();
+var xsreConfig = config.get('hzb').xsre;
 var Request = require(libPath+'/broker/request');
 var request = require('./request');
 

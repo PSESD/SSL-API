@@ -5,8 +5,7 @@
 /**
  * Created by zaenal on 21/05/15.
  */
-var utils = require('../../lib/utils');
-var config = utils.config();
+var config = require('../../lib/config').config();
 var con = require('../../lib/sql');
 var _ = require('underscore');
 var ReportController = {};

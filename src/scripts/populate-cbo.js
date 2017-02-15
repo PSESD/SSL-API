@@ -124,7 +124,7 @@ var populateCbo = {
 
     run: function () {
         var self = this;
-        var config = require('../lib/utils').config();
+        var config = require('../lib/config').config();
 
         /**
          *

@@ -15,8 +15,7 @@ var ObjectId = mongoose.Types.ObjectId;
 var natural = require('natural'), tokenizer = new natural.WordTokenizer();
 
 var moment = require('moment');
-var utils = require('../../lib/utils');
-var config = utils.config();
+var config = require('../../lib/config').config();
 
 
 var StudentProgramController = new BaseController(StudentProgram).crud();

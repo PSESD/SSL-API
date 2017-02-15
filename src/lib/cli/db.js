@@ -2,16 +2,16 @@
  * Created by zaenal on 22/09/15.
  */
 var mongoose = require('mongoose');
-var utils = require('../utils'), config = utils.config();
+var config = require('../config').config();
 var _ = require('underscore');
 
 function db() {
 
     this.mongo = mongoose;
 
-    this.dbUri = process.env.DB_HOST + '/' + process.env.DB_NAME;
+    this.dbUri = config.get('DB_HOST') + '/' + config.get('DB_NAME');
 
-    this.mongoOptions =  process.env.DB_MONGO_OPTIONS || {};
+    this.mongoOptions =  config.get('DB_MONGO_OPTIONS') || {};
 
     this.env = config.util.getEnv('NODE_ENV');
 

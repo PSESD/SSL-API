@@ -30,7 +30,7 @@ var bs = require('nodestalker'),
 var utils = require('./lib/utils');
 
 
-var config = utils.config();
+var config = require('./lib/config').config();
 var os = require('os');
 //var con = require('./lib/sql');
 var studentCollector = require('./lib/cli/studentCollector');
