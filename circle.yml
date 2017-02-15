@@ -14,8 +14,6 @@ test:
 deployment:
   development:
     branch: development
-    heroku:
-      appname: srx-services-ssl-dev
     commands:
       - git remote add heroku git@heroku.com:srx-services-ssl-dev.git
       - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
