@@ -17,7 +17,7 @@ deployment:
     commands:
       - git remote add heroku git@heroku.com:srx-services-ssl-dev.git
       - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
-      - cd ../../.. && git subtree push --prefix src heroku master
+      - cd ./src && git subtree push --prefix src heroku master
   test:
     branch: test
     heroku:
