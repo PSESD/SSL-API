@@ -471,7 +471,7 @@ RequestXSRE.prototype = {
 
         var sessionToken = this.config.get('PRS_SESSION_TOKEN');
 
-        var secret = this.config.prs.get('_PRS_SHARED_SECRET');
+        var secret = this.config.get('_PRS_SHARED_SECRET');
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 
