@@ -695,9 +695,9 @@ Request.prototype = {
      */
     generateSREAuthToken: function(timestamp){
 
-        var sessionToken = this.config.get("SRE_SESSION_TOKEN");
+        var sessionToken = config.get("SRE_SESSION_TOKEN");
 
-        var secret = this.config.get("SRE_SHARED_SECRET");
+        var secret = config.get("SRE_SHARED_SECRET");
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 
@@ -710,9 +710,9 @@ Request.prototype = {
      */
     generateXSREAuthToken: function(timestamp){
 
-        var sessionToken = this.config.get("XSRE_SESSION_TOKEN");
+        var sessionToken = config.get("XSRE_SESSION_TOKEN");
 
-        var secret = this.config.get("XSRE_SHARED_SECRET");
+        var secret = config.get("XSRE_SHARED_SECRET");
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 
@@ -725,9 +725,9 @@ Request.prototype = {
      */
     generatePRSAuthToken: function(timestamp){
 
-        var sessionToken = this.config.get("PRS_SESSION_TOKEN");
+        var sessionToken = config.get("PRS_SESSION_TOKEN");
 
-        var secret = this.config.get("PRS_SHARED_SECRET");
+        var secret = config.get("PRS_SHARED_SECRET");
 
         return this._generateAuthToken(timestamp, sessionToken, secret);
 
