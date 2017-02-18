@@ -151,6 +151,19 @@ RequestXSRE.prototype = {
 
         }
 
+        if (!domain) {
+            switch (what) {
+                case 'sre': 
+                domain = config.get("SRE_URL");
+                break;
+                case 'xsre':
+                domain = config.get("XSRE_URL");
+                break;
+                case 'prs':
+                domain = config.get("PRS_URL");
+                break;
+            }
+        }
         var record = this.hzb[what];
 
         var self = this;
@@ -174,6 +187,7 @@ RequestXSRE.prototype = {
             strictSSL: false,
             timeout: 60000 // timeout 1 minute
         };
+        debugger;
 
         var opts = {
             retries: 3,
@@ -187,11 +201,10 @@ RequestXSRE.prototype = {
             }
         };
 
-        //console.dir(options);
 
         //return request.get(options, callback || function (error, response, body) {
         return retryRequest(options, opts, callback || function (error, response, body) {
-
+            console.log("retry request callback: ", options.url, options.headers, response.statusCode);
             if(error){
 
                 console.log('error: ', error);
@@ -324,16 +337,19 @@ RequestXSRE.prototype = {
 
         var me = this;
 
-        benchmark.info('REQUEST-XSRE-HZB: START');
+        if (districtStudentId != this.headers['districtStudentId']) {
+            url = '/requestProvider/' + xsre.service +'/'+this.headers['districtStudentId'] +';zoneId='+zoneId+';contextId='+ xsre.contextId;
+        }
+        benchmark.info('REQUEST-XSRE-HZB: START ' + districtStudentId + "/" + this.headers['districtStudentId']);
 
         cache.get(key, function(err, result){
-
+          //  console.log("cache get: ", result ? result.body : "n/a");
             var encBody;
 
             if(err || !result || (result.body && !(encBody = utils.decrypt(result.body))) || forceStore === true){
-
+                console.log("before create:", url);
                 me.create('xsre', url, 'GET', function (error, response, body) {
-
+                    console.log("after create: ", error);
                     if (error)  {
                         return callback(error, response, body);
                     }
@@ -342,7 +358,7 @@ RequestXSRE.prototype = {
                         body: utils.encrypt(body),
                         response: response
                     };
-
+                    console.log("writing to cache: ", object);
                     cache.set(key, object, {ttl: 86400}, function(){
 
                         benchmark.info('REQUEST-XSRE-HZB: STORE DATA TO CACHE');

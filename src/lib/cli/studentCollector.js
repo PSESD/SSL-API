@@ -314,6 +314,7 @@ function collectCacheStudents(done) {
 
     });
 }
+
 /**
  *
  * @param force
@@ -372,6 +373,7 @@ function collectCacheListStudentsAsync(force, done) {
                     return cb(null, data);
                 }
 
+                console.log("student district id going in: ", student.district_student_id);
                 brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
                     if (error) {
@@ -386,7 +388,7 @@ function collectCacheListStudentsAsync(force, done) {
                     }
 
                     if (response && response.statusCode === 200) {
-
+                        console.log("yay!");
                         utils.xml2js(body, function (err, result) {
 
                             if (err) {
@@ -679,6 +681,7 @@ module.exports = {
     collect: collectDataStudents,
     cache: collectCacheStudents,
     cacheList: collectCacheListStudentsAsync,
+//    newCacheList: collectCacheStudentsDifferently,
     cacheDebug: cacheDebug,
     //dumpDataDistrictId: dumpDataDistrictId,
     //pullStudentAsync: pullStudentAsync
