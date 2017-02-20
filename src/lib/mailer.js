@@ -12,11 +12,15 @@ var _ = require('underscore');
  * @constructor
  */
 function Mailer(){
-    this.current = config.get('mailer.default');
+    // this.current = config.get('mailer.default');
+    this.current = 'sparkpost';
+    /*
     if(!config.has('mailer.' + this.current)){
         throw new Error('We can\'t find any config mailer "' + this.current + '"');
     }
     this.config = config.get('mailer.' + this.current);
+    */
+    this.config = null;
     this._message = null;
     this._html = null;
     this._headers = {};
@@ -235,11 +239,13 @@ Mailer.prototype.getCurrent = function(){
  * @param done
  */
 Mailer.prototype.sparkpost = function(options, done){
+    /*
     if(!this.config.apiKey){
         throw new Error('Unknown API Key');
     }
-    var opts = {
         "sparkPostApiKey": this.config.apiKey,
+    */
+    var opts = {
         "options": {
             "open_tracking": true,
             "click_tracking": true,
@@ -359,6 +365,8 @@ Mailer.prototype.mandrill = function(options, done){
  */
 Mailer.prototype.send = function(mailOptions, done){
     var me = this;
+    me.sparkpost(mailOptions, done);
+    /*
     switch(me.getCurrent()){
         case 'sparkpost':
             me.sparkpost(mailOptions, done);
@@ -368,6 +376,7 @@ Mailer.prototype.send = function(mailOptions, done){
             break;
 
     }
+    */
 };
 /**
  *
