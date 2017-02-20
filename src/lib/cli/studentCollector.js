@@ -341,11 +341,6 @@ function collectCacheListStudentsAsync(force, done) {
             var orgIdString = orgId.toString();
             benchmark.info('ORGID: ' + orgId);
             prefix = "CACHE-LIST-STUDENT";
-            var brokerRequest = new Request({
-                externalServiceId: organization.externalServiceId,
-                personnelId: organization.personnelId,
-                authorizedEntityId: organization.authorizedEntityId
-            });
 
             /**
              *
@@ -373,7 +368,12 @@ function collectCacheListStudentsAsync(force, done) {
                     return cb(null, data);
                 }
 
-                console.log("student district id going in: ", student.district_student_id);
+                var brokerRequest = new Request({
+                    externalServiceId: organization.externalServiceId,
+                    personnelId: organization.personnelId,
+                    authorizedEntityId: organization.authorizedEntityId
+                 });
+
                 brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
 
                     if (error) {
@@ -388,7 +388,6 @@ function collectCacheListStudentsAsync(force, done) {
                     }
 
                     if (response && response.statusCode === 200) {
-                        console.log("yay!");
                         utils.xml2js(body, function (err, result) {
 
                             if (err) {
@@ -443,7 +442,7 @@ function collectCacheListStudentsAsync(force, done) {
                             }
 
                             var key = prefixListStudent + organization._id + '_' + student._id;
-
+                            console.log("writing to cache: ", data);
 
                             cache.set(key, data, {ttl: 86400}, function () {
                                 benchmark.info('Cache student from org: ', organization.name, ' Student ID: ' + student._id.toString());

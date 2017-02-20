@@ -286,6 +286,7 @@ RequestXSRE.prototype = {
      * @returns {*}
      */
     createXsre: function(districtStudentId, zoneId, callback, forceStore){
+        this.headers = {};
 
         if(this.options.personnelId) {
 
@@ -341,15 +342,14 @@ RequestXSRE.prototype = {
             url = '/requestProvider/' + xsre.service +'/'+this.headers['districtStudentId'] +';zoneId='+zoneId+';contextId='+ xsre.contextId;
         }
         benchmark.info('REQUEST-XSRE-HZB: START ' + districtStudentId + "/" + this.headers['districtStudentId']);
-
         cache.get(key, function(err, result){
-          //  console.log("cache get: ", result ? result.body : "n/a");
+
             var encBody;
 
             if(err || !result || (result.body && !(encBody = utils.decrypt(result.body))) || forceStore === true){
-                console.log("before create:", url);
+
                 me.create('xsre', url, 'GET', function (error, response, body) {
-                    console.log("after create: ", error);
+
                     if (error)  {
                         return callback(error, response, body);
                     }
@@ -358,7 +358,7 @@ RequestXSRE.prototype = {
                         body: utils.encrypt(body),
                         response: response
                     };
-                    console.log("writing to cache: ", object);
+
                     cache.set(key, object, {ttl: 86400}, function(){
 
                         benchmark.info('REQUEST-XSRE-HZB: STORE DATA TO CACHE');
