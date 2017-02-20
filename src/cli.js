@@ -11,7 +11,7 @@
     if(!pathEnv){
         pathEnv = __dirname + '/config';
     }
-    var dotenv = require('dotenv').config({ path: pathEnv + '/.env' });
+    var dotenv = require('dotenv').config();
     if(dotenv){
         for(var env in dotenv){
             process.env[env] = dotenv[env];
