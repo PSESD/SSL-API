@@ -1053,13 +1053,16 @@ function get_all_attendance_data(events) {
 
             var attendance_status = event.attendanceStatus;
             var attendance_event_type = event.attendanceEventType;
+            var attendance_value = event.attendanceValue;
             var missed_day = 0;
             var late_to_class = 0;
             var missed_class = 0;
             if(attendance_event_type === 'DailyAttendance')
             {
                 //Missed Day
-                missed_day = 1;
+                if(attendance_value == 0) {
+                    missed_day = 1;
+                }
             }
             else {
                 if(attendance_status === 'Tardy')
