@@ -130,7 +130,7 @@
             "enable": true,
             /** default: "*" */
             "allow_origin": "*",
-            "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept",
+            "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Cbo-Client-Url",
             "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
         },
         "salt": "1f3f365ffdf4eb0777899420f0aca20a_test",
