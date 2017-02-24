@@ -155,7 +155,7 @@ function set_course_data(start_date, end_date, list_course)
     var temp_progress = {};
     var date_start = moment(new Date(start_date)).format("x");
     var date_end = moment(new Date(end_date)).format("x");
-    var course_start, course_end, session_type_number, last_table_period, flag_final, flag_progress;
+    var course_start, course_end, session_type_number, last_table_period, flag_final, flag_progress, table_period;
     list_course.forEach(function(item) {
 
         course_start = moment(new Date(item.start_date)).format("x");
@@ -244,6 +244,7 @@ function set_course_data(start_date, end_date, list_course)
     });
 
     last_table_period = '';
+    table_period = '';
     flag_final = 0;
     flag_progress = 0;
     first = 0;
@@ -254,7 +255,7 @@ function set_course_data(start_date, end_date, list_course)
 
         var course_title = typeof course.courseTitle !== 'undefined' ? course.courseTitle : '';
         var temp_teacher_name = typeof course['psesd:teacherNames'] !== 'undefined' ? course['psesd:teacherNames'] : null;
-        var table_period = typeof course.timeTablePeriod !== 'undefined' ? parseInt(course.timeTablePeriod) : 0;
+        table_period = typeof course.timeTablePeriod !== 'undefined' ? parseInt(course.timeTablePeriod) : 0;
         var teacher_name = '';
 
         if(temp_teacher_name !== null)
@@ -325,6 +326,17 @@ function set_course_data(start_date, end_date, list_course)
         }
 
     });
+    if (get_course.length < last_table_period) {
+      if (flag_final == 1) {
+        get_course.push(temp_final);
+      }
+      else if (flag_progress == 1) {
+        get_course.push(temp_progress);
+      }
+      else {
+        get_course.push(temp_first);
+      }
+    }
 
     return get_course;
 }
