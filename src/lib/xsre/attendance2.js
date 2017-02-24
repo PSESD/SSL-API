@@ -155,7 +155,7 @@ function set_course_data(start_date, end_date, list_course)
     var temp_progress = {};
     var date_start = moment(new Date(start_date)).format("x");
     var date_end = moment(new Date(end_date)).format("x");
-    var course_start, course_end, session_type_number, last_table_period, flag_final, flag_progress;
+    var course_start, course_end, session_type_number, last_table_period, flag_final, flag_progress, table_period;
     list_course.forEach(function(item) {
 
         course_start = moment(new Date(item.start_date)).format("x");
@@ -244,6 +244,7 @@ function set_course_data(start_date, end_date, list_course)
     });
 
     last_table_period = '';
+    table_period = '';
     flag_final = 0;
     flag_progress = 0;
     first = 0;
@@ -254,7 +255,7 @@ function set_course_data(start_date, end_date, list_course)
 
         var course_title = typeof course.courseTitle !== 'undefined' ? course.courseTitle : '';
         var temp_teacher_name = typeof course['psesd:teacherNames'] !== 'undefined' ? course['psesd:teacherNames'] : null;
-        var table_period = typeof course.timeTablePeriod !== 'undefined' ? parseInt(course.timeTablePeriod) : 0;
+        table_period = typeof course.timeTablePeriod !== 'undefined' ? parseInt(course.timeTablePeriod) : 0;
         var teacher_name = '';
 
         if(temp_teacher_name !== null)
@@ -325,6 +326,17 @@ function set_course_data(start_date, end_date, list_course)
         }
 
     });
+    if (get_course.length < last_table_period) {
+      if (flag_final == 1) {
+        get_course.push(temp_final);
+      }
+      else if (flag_progress == 1) {
+        get_course.push(temp_progress);
+      }
+      else {
+        get_course.push(temp_first);
+      }
+    }
 
     return get_course;
 }
@@ -387,23 +399,23 @@ function set_day_data(start_date, end_date, list_event, list_course, list_discip
                 event.attendance.forEach(function(attendance) {
 
                     var time_period = typeof attendance.time_table_period !== 'undefined' ? attendance.time_table_period : 0;
+                    var title = typeof attendance['psesd:absentReasonDescription '] !== 'undefined' ? attendance['psesd:absentReasonDescription '] : '';
+                    var status_data = typeof attendance.attendance_event_type !== 'undefined' ? attendance.attendance_event_type : '';
+                    var status = typeof attendance.attendance_status !== 'undefined' ? attendance.attendance_status : '';
+                    var type = '';
                     if(missed_day == 1) {
                         global_missed_day = 1;
                     }
 
                     if(table_period == time_period)
                     {
-                        var title = typeof attendance['psesd:absentReasonDescription '] !== 'undefined' ? attendance['psesd:absentReasonDescription '] : '';
-                        var status_data = typeof attendance.attendance_event_type !== 'undefined' ? attendance.attendance_event_type : '';
-                        var status = typeof attendance.attendance_status !== 'undefined' ? attendance.attendance_status : '';
-                        var type = '';
-                        if(missed_day > 0) {
+                        if(status_data === 'DailyAttendance') {
                             type = 'missed_day';
                         }
-                        else if(late_to_class > 0) {
+                        else if(status === 'Tardy') {
                             type = 'late_to_class';
                         }
-                        else if(missed_class > 0) {
+                        else {
                             type = 'missed_class';
                         }
 
