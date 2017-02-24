@@ -399,23 +399,23 @@ function set_day_data(start_date, end_date, list_event, list_course, list_discip
                 event.attendance.forEach(function(attendance) {
 
                     var time_period = typeof attendance.time_table_period !== 'undefined' ? attendance.time_table_period : 0;
+                    var title = typeof attendance['psesd:absentReasonDescription '] !== 'undefined' ? attendance['psesd:absentReasonDescription '] : '';
+                    var status_data = typeof attendance.attendance_event_type !== 'undefined' ? attendance.attendance_event_type : '';
+                    var status = typeof attendance.attendance_status !== 'undefined' ? attendance.attendance_status : '';
+                    var type = '';
                     if(missed_day == 1) {
                         global_missed_day = 1;
                     }
 
                     if(table_period == time_period)
                     {
-                        var title = typeof attendance['psesd:absentReasonDescription '] !== 'undefined' ? attendance['psesd:absentReasonDescription '] : '';
-                        var status_data = typeof attendance.attendance_event_type !== 'undefined' ? attendance.attendance_event_type : '';
-                        var status = typeof attendance.attendance_status !== 'undefined' ? attendance.attendance_status : '';
-                        var type = '';
-                        if(missed_day > 0) {
+                        if(status_data === 'DailyAttendance') {
                             type = 'missed_day';
                         }
-                        else if(late_to_class > 0) {
+                        else if(status === 'Tardy') {
                             type = 'late_to_class';
                         }
-                        else if(missed_class > 0) {
+                        else {
                             type = 'missed_class';
                         }
 
