@@ -324,6 +324,8 @@ RequestXSRE.prototype = {
 
         this.addHeader('messageId', this.generateUUID());
 
+        this.addHeader('generatorId', 'srx-services-ssl');
+
         var key = md5([url, this.headers.personnelId, this.headers.authorizedEntityId, this.headers.externalServiceId].join('_'));
 
         if(typeof callback !== 'function'){
