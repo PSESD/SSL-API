@@ -38,7 +38,7 @@ To install dependencies enter project folder and run following command:
 
 Install the client library using git:
 
-    $ git clone https://github.com/PSESD/CBO-Portal-API.git
+    $ git clone https://github.com/PSESD/SSL-API.git
     $ cd CBO-Portal-API
     $ npm install
 
