@@ -1,7 +1,8 @@
 
 # Secure Data Portal for community-based organizations (CBO's) [![Code Climate](https://codeclimate.com/repos/565eb21ba7512d6fbb002873/badges/7f33b5f9c16306a725fd/gpa.svg)](https://codeclimate.com/repos/565eb21ba7512d6fbb002873/feed) [![Test Coverage](https://codeclimate.com/repos/565eb21ba7512d6fbb002873/badges/7f33b5f9c16306a725fd/coverage.svg)](https://codeclimate.com/repos/565eb21ba7512d6fbb002873/coverage) [![Issue Count](https://codeclimate.com/repos/565eb21ba7512d6fbb002873/badges/7f33b5f9c16306a725fd/issue_count.svg)](https://codeclimate.com/repos/565eb21ba7512d6fbb002873/feed)
 
-## Overview
+## Authorization
+### (This happens in srx-services-ssl-auth)
 The authorization sequence begins when your application redirects a browser to a CBO api URL; the URL includes query parameters that indicate the type of access being requested. As in other scenarios, CBO api server handles user authentication, session selection, and user consent. The result is an authorization code, which api returns to your application in a query string.
 
 After receiving the authorization code, your application can exchange the code (along with a client ID and client secret) for an access token and, in some cases, a refresh token.
@@ -12,43 +13,21 @@ The URL used when authenticating a user is`http://<domain>:<port>/api/oauth2/aut
 
 ## Requirements
 
-You need to have installed Node.js and MongoDB
+You need to have installed Node.js and MongoDB.
 
-Another Tools:
-#####- Mandrill [link](https://mandrillapp.com) 
-Email  service for send mail. Below example in config file: 
+Other Tools:
+##### Mandrill [link](https://mandrillapp.com) 
+Not being used currently?
 
-    
-      "mandrill": {
-            "api_key": "<api_key>"
-        }
+##### Rollbar [link](https://rollbar.com) 
+Logger service used in application.
 
-#####- Rollbar [link](https://rollbar.com) 
-Logger service. The application need token. Below example in config file: 
-   
-      "rollbar": {
-            "access_token": "<rollbar_token>"
-        }
+##### Redis [link](http://redis.io) 
+Cache where xSres are stored after being retrieved from PRS. You will need to configure your server to refresh the cache every day, as the data in it expires after `REDIS_TTL` seconds.
 
-#####- Redis [link](http://redis.io) 
-Cache adapter. Below example in config file: 
-   
-      "cache": {
-            "adapter": "memory",
-            "backup": "redis",
-            "redis": {
-                "host": "localhost",
-                "port": "6379",
-                "db": 0,
-                "ttl": 86400
-            },
-            "memory": {
-                "max": 100,
-                "ttl": 60
-            }
-        }
+You can trigger a manual cache refresh (make sure your .env file points to the right MongoDB and Redis instances!) by running the following from the command prompt, in the src directory:
 
-
+```node cli.js cache-list```
 
 ## Installation
 
@@ -66,365 +45,40 @@ Install the client library using git:
 
 ## Getting started
 
-The following examples configuration in JSON format.
+### Setting up environment variables
+Create a file in `/src` named `.env`, with the following values:
 
-**Install in your app `src` directory, and add/edit the default config file.**
+      DB_HOST=dbname:dbpassword@dburl.com:port/dbname //this is the format that works with heroku
+      DB_NAME=dbname
+      HOST=url-of-srx-apps-ssl.com
+      MYSQL_DATABASE=mysqlDbName //not sure this is currently in use
+      MYSQL_HOST=
+      MYSQL_USER=
+      MYSQL_PASSWORD=
+      PRS_SESSION_TOKEN=
+      PRS_SHARED_SECRET=
+      PRS_URL=
+      REDIS_DB=redis-cache-name
+      REDIS_HOST=redis-cache-url.com
+      REDIS_PORT=####
+      REDIS_PASSWORD=redis-cache-password
+      REDIS_TTL=86400
+      ROLLBAR_ACCESS_TOKEN=token-for-account-on-rollbar.com
+      SALT=salt-for-test-user-in-mongo-db
+      SESSION_SECRET=session-secret
+      SRE_SESSION_TOKEN=
+      SRE_SHARED_SECRET=
+      SRE_URL=
+      XSRE_SESSION_TOKEN=get-these-values-from-hostedZone
+      XSRE_SHARED_SECRET=get-these-values-from-hostedZone
+      XSRE_URL=hostedZone-root-url //ie https://whatever.hostedzone.com/svcs/dev
 
-    $ mkdir src/config
-    $ vi src/config/development.json
 
-    {
-        "host": "<host_name>",
-        "api": {
-            "url": "https://api.***.com"
-        },
-        "auth": {
-            "url": "https://auth.***.com"
-        },
-        "token": {
-            "expires_in": 3600
-        },
-        "ratelimiter": {
-            "windowMs": 60000,
-            "delayAfter": 1,
-            "delayMs": 1000,
-            "max": 5,
-            "message": "Too many requests, please try again later.",
-            "statusCode": 429
-        },
-        "db": {
-            "mongo": {
-                "host": "<mongodb host>",
-                "name": "<mongodb name>"
-            },
-            "mysql": {
-                "host": "<mysql host>",
-                "user": "<mysql user>",
-                "password": "<mysql password>",
-                "database": "ssl_cbo"
-            }
-        },
-        "session": {
-            "secret": "<secret>",
-            "saveUninitialized": true,
-            "resave": true
-        },
-        "mandrill": {
-            "api_key": "<api_key>"
-        },
-        "hzb": {
-            "default": "xsre",
-            "sre": {
-                 "url": "<api end point>",
-                "sessionToken": "<session token>",
-                "sharedSecret": "<secret>",
-                "object": "sres",
-                "service": "sres",
-                "contextId": "CBO",
-                "headers": {
-                    "serviceType": "OBJECT",
-                    "requestType": "IMMEDIATE",
-                    "requestAction": "QUERY",
-                    "messageType": "REQUEST",
-                    "objectType": "sre",
-                    "Accept": "application/xml",
-                    "Content-Type": "application/xml"
-                },
-                "validation-url": "",
-                "validation-service": ""
-            },
-            "xsre": {
-                 "url": "<api end point>",
-                "sessionToken": "<session token>",
-                "sharedSecret": "<secret>",
-                "object": "xSres",
-                "service": "xSres",
-                "contextId": "CBO",
-                "headers": {
-                    "serviceType": "OBJECT",
-                    "requestType": "IMMEDIATE",
-                    "requestAction": "QUERY",
-                    "messageType": "REQUEST",
-                    "objectType": "xSre",
-                    "Accept": "application/xml",
-                    "Content-Type": "application/xml"
-                },
-                "validation-url": "",
-                "validation-service": ""
-            },
-            "CBOStudent": {
-                "push": {
-                    "url": "<api end point>",
-                    "sessionToken": "<session token>",
-                    "sharedSecret": "<secret>",
-                    "object": "xSres",
-                    "service1": "CBOStudents",
-                    "service2": "CBOStudentsWithXSres",
-                    "zoneId": "CBOUniversal",
-                    "contextId": "DEFAULT",
-                    "headers": {
-                        "mustuseadvisory": true,
-                        "requestType": "DELAYED",
-                        "messageType": "REQUEST",
-                        "objectType": "CBOStudent",
-                        "requestAction": "QUERY",
-                        "Content-Type": "application/xml"
-                    }
-                },
-                "get": {
-                    "url": "<api end point>",
-                    "sessionToken": "<session token>",
-                    "sharedSecret": "<secret>",
-                    "object": "xSres",
-                    "service1": "CBOStudents",
-                    "service2": "CBOStudentsWithXSres",
-                    "zoneId": "CBOUniversal",
-                    "contextId": "DEFAULT",
-                    "headers": {
-                        "mustuseadvisory": true,
-                        "requestType": "IMMEDIATE",
-                        "messageType": "REQUEST",
-                        "objectType": "CBOStudentsWithXSre",
-                        "requestAction": "QUERY",
-                        "Content-Type": "application/xml"
-                    }
-                }
-            },
-            "prs": {
-                "url": "<api end point>",
-                "sessionToken": "<session token>",
-                "sharedSecret": "<secret>",
-                "headers": {
-                    "Accept": "application/xml"
-                },
-                "validation-url": "",
-                "validation-service": ""
-            }
-        },
-        "cross": {
-            "enable": true,
-            /** default: "*" */
-            "allow_origin": "*",
-            "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept",
-            "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
-        },
-        "salt": "1f3f365ffdf4eb0777899420f0aca20a_test",
-        "rollbar": {
-            "access_token": "<rollbar_token>"
-        },
-        "aws": {
-            "aws_access_key_id":"",
-            "aws_secret_access_key":""
-        },
-        "cache": {
-            "enable": true,
-            "adapter": "memory",
-            "backup": "redis",
-            "redis": {
-                "host": "localhost",
-                "port": "6379",
-                "db": 0,
-                "ttl": 86400
-            },
-            "memory": {
-                "max": 100,
-                "ttl": 60
-            }
-        }
-    }
-    
-    
-**Edit config environment variable, this will be used on the cronjob CLI process**
-    
-    $ vi src/config/.env
-    
-    NODE_ENV=development
+**Before you run the app, be sure to set the NODE_ENV.** 
 
-**Edit config overrides for production deployment:**
+In Windows, from the command prompt in the `/src` directory:
 
-    $ vi src/config/production.json
-
-    {
-            "host": "<host_name>",
-            "api": {
-                "url": "https://api.***.com"
-            },
-            "auth": {
-                "url": "https://auth.***.com"
-            },
-            "token": {
-                "expires_in": 3600
-            },
-            "ratelimiter": {
-                "windowMs": 60000,
-                "delayAfter": 1,
-                "delayMs": 1000,
-                "max": 5,
-                "message": "Too many requests, please try again later.",
-                "statusCode": 429
-            },
-            "db": {
-                "mongo": {
-                    "host": "<mongodb host>",
-                    "name": "<mongodb name>"
-                },
-                "mysql": {
-                    "host": "<mysql host>",
-                    "user": "<mysql user>",
-                    "password": "<mysql password>",
-                    "database": "ssl_cbo"
-                }
-            },
-            "session": {
-                "secret": "<secret>",
-                "saveUninitialized": true,
-                "resave": true
-            },
-            "mandrill": {
-                "api_key": "<api_key>"
-            },
-            "hzb": {
-                "default": "xsre",
-                "sre": {
-                     "url": "<api end point>",
-                    "sessionToken": "<session token>",
-                    "sharedSecret": "<secret>",
-                    "object": "sres",
-                    "service": "sres",
-                    "contextId": "CBO",
-                    "headers": {
-                        "serviceType": "OBJECT",
-                        "requestType": "IMMEDIATE",
-                        "requestAction": "QUERY",
-                        "messageType": "REQUEST",
-                        "objectType": "sre",
-                        "Accept": "application/xml",
-                        "Content-Type": "application/xml"
-                    },
-                    "validation-url": "",
-                    "validation-service": ""
-                },
-                "xsre": {
-                     "url": "<api end point>",
-                    "sessionToken": "<session token>",
-                    "sharedSecret": "<secret>",
-                    "object": "xSres",
-                    "service": "xSres",
-                    "contextId": "CBO",
-                    "headers": {
-                        "serviceType": "OBJECT",
-                        "requestType": "IMMEDIATE",
-                        "requestAction": "QUERY",
-                        "messageType": "REQUEST",
-                        "objectType": "xSre",
-                        "Accept": "application/xml",
-                        "Content-Type": "application/xml"
-                    },
-                    "validation-url": "",
-                    "validation-service": ""
-                },
-                "CBOStudent": {
-                    "push": {
-                        "url": "<api end point>",
-                        "sessionToken": "<session token>",
-                        "sharedSecret": "<secret>",
-                        "object": "xSres",
-                        "service1": "CBOStudents",
-                        "service2": "CBOStudentsWithXSres",
-                        "zoneId": "CBOUniversal",
-                        "contextId": "DEFAULT",
-                        "headers": {
-                            "mustuseadvisory": true,
-                            "requestType": "DELAYED",
-                            "messageType": "REQUEST",
-                            "objectType": "CBOStudent",
-                            "requestAction": "QUERY",
-                            "Content-Type": "application/xml"
-                        }
-                    },
-                    "get": {
-                        "url": "<api end point>",
-                        "sessionToken": "<session token>",
-                        "sharedSecret": "<secret>",
-                        "object": "xSres",
-                        "service1": "CBOStudents",
-                        "service2": "CBOStudentsWithXSres",
-                        "zoneId": "CBOUniversal",
-                        "contextId": "DEFAULT",
-                        "headers": {
-                            "mustuseadvisory": true,
-                            "requestType": "IMMEDIATE",
-                            "messageType": "REQUEST",
-                            "objectType": "CBOStudentsWithXSre",
-                            "requestAction": "QUERY",
-                            "Content-Type": "application/xml"
-                        }
-                    }
-                },
-                "prs": {
-                    "url": "<api end point>",
-                    "sessionToken": "<session token>",
-                    "sharedSecret": "<secret>",
-                    "headers": {
-                        "Accept": "application/xml"
-                    },
-                    "validation-url": "",
-                    "validation-service": ""
-                }
-            },
-            "cross": {
-                "enable": true,
-                /** default: "*" */
-                "allow_origin": "*",
-                "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept",
-                "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
-            },
-            "salt": "1f3f365ffdf4eb0777899420f0aca20a_test",
-            "rollbar": {
-                "access_token": "<rollbar_token>"
-            },
-            "aws": {
-                "aws_access_key_id":"",
-                "aws_secret_access_key":""
-            },
-            "cache": {
-                "enable": true,
-                "adapter": "memory",
-                "backup": "redis",
-                "redis": {
-                    "host": "localhost",
-                    "port": "6379",
-                    "db": 0,
-                    "ttl": 86400
-                },
-                "memory": {
-                    "max": 100,
-                    "ttl": 60
-                }
-            }
-        }
-        
-**Edit config environment variable, this will be used on the cronjob CLI process**        
-        
-        $ vi src/config/.env
-            
-        NODE_ENV=production
-        
-
-**Use configs in your code:**
-
-    var config = require('./lib/utils').config();
-    ...
-    var dbConfig = config.get('db.mongo.host');
-    db.connect(dbConfig, ...);
-
-    if (config.has('salt')) {
-      var salt = config.get('salt');
-      ...
-    }
-
-`config.get()` will throw an exception for undefined keys to help catch typos and missing values.
-Use `config.has()` to test if a configuration value is defined.
+    dir>set NODE_ENV=local-env
 
 
 **Start your app server:**
