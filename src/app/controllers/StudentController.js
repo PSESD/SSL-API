@@ -1409,6 +1409,11 @@ StudentController.putStudentById = function(req, res){
                 }
 
             }
+
+            if (!obj.creator || obj.creator == "") {
+                obj.creator = req.user.userId;
+            }
+
             // set update time and update by user
             obj.last_updated = new Date();
 

@@ -25,7 +25,7 @@ var Address = require('./schema/Address');
 var StudentSchema = new mongoose.Schema({
     organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', index: true, required: true },
     first_name: { type: String, component: 'settings' },
-    last_name: { type: String, required: true, index: true },
+    last_name: { type: String, index: true },
     middle_name: { type: String },
     district_student_id: { type: String, index: true },
     addresses: [ Address ],
