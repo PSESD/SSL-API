@@ -187,7 +187,6 @@ RequestXSRE.prototype = {
             strictSSL: false,
             timeout: 60000 // timeout 1 minute
         };
-        debugger;
 
         var opts = {
             retries: 3,

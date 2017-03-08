@@ -132,6 +132,12 @@ Personal.prototype.getPersonal = function(){
     me.personal.xSre.enrollment.exitDate = l.get(me.xSre, 'enrollment.exitDate') || me.notAvailable;
     me.personal.xSre.enrollment.enrollmentStatus = me.notAvailable;
     me.personal.xSre.enrollment.enrollmentStatusDescription = me.notAvailable;
+    me.personal.firstName = l.get(me.xSre, 'name.givenName') || me.notAvailable;
+    me.personal.lastName = l.get(me.xSre, 'name.familyName') || me.notAvailable;
+    me.personal.xSre.name = {
+        'familyName' : me.personal.lastName,
+        'givenName' : me.personal.firstName
+    }
 
 
     var enrollment = l.get(me.xSre, 'enrollment') || [];
