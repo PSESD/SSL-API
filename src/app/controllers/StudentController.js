@@ -995,23 +995,37 @@ StudentController.getStudents = function(req, res){
                 };
 
                 cache.get(key + '_' + student._id, function(err, std){
-
                     if(err){
-
                         return callback(null, newObject);
-
                     }
 
                     if(!_.isUndefined(std)){
-
                         newObject.xsre = std;
+                        callback(null, newObject);
+                    } else {
+                        var brokerRequest = new Request({
+                            externalServiceId: organization.externalServiceId,
+                            personnelId: organization.personnelId,
+                            authorizedEntityId: organization.authorizedEntityId
+                        });
 
+                        StudentController.refreshStudentSummary(brokerRequest, newObject, req.params.organizationId, function() {
+                            //You'd think this method would return the refreshed cache, huh? But it only sets it. So we have to retrieve it again.
+                            cache.get(key + '_' + student._id, function(err, std){
+                                if(err){
+                                    return callback(null, newObject);
+                                }
+
+                                if(!_.isUndefined(std)){
+                                    newObject.xsre = std;
+                                    callback(null, newObject);
+                                } else {
+                                    callback("cache retrieval failure");
+                                }
+                            });
+                        });
                     }
-
-                    callback(null, newObject);
-
                 });
-
             }, function(err, results){
 
                 res.sendSuccess(null, _.sortBy(results, sorter));
@@ -1409,6 +1423,11 @@ StudentController.putStudentById = function(req, res){
                 }
 
             }
+
+            if (!obj.creator || obj.creator == "") {
+                obj.creator = req.user.userId;
+            }
+
             // set update time and update by user
             obj.last_updated = new Date();
 
