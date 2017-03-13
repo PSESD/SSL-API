@@ -157,6 +157,8 @@ xSre.prototype.getJson = function(){
 xSre.prototype.getStudentSummary = function(){
     this.justlog.info('XSRE - START STUDENT SUMMARY');
     var summary = {
+        firstName: "",
+        lastName: "",
         gradeLevel: "",
         schoolYear: "",
         schoolName: "",
@@ -171,6 +173,11 @@ xSre.prototype.getStudentSummary = function(){
     var json = this.getJson();
 
     var personal = this.getPersonal().getPersonal();
+
+    if (personal) {
+        summary.firstName = personal.firstName;
+        summary.lastName = personal.lastName;
+    }
 
     if(personal && personal.xSre.enrollment){
         summary.gradeLevel = personal.xSre.enrollment.gradeLevel;

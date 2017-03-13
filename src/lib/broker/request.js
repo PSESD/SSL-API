@@ -187,7 +187,6 @@ RequestXSRE.prototype = {
             strictSSL: false,
             timeout: 60000 // timeout 1 minute
         };
-        debugger;
 
         var opts = {
             retries: 3,
@@ -361,8 +360,11 @@ RequestXSRE.prototype = {
                         response: response
                     };
 
-                    cache.set(key, object, {ttl: 86400}, function(){
-
+                    cache.set(key, object, {ttl: 86400}, function(error){
+                        if (error) {
+                            console.log(error);
+                        }
+                        
                         benchmark.info('REQUEST-XSRE-HZB: STORE DATA TO CACHE');
 
                         callback(null, response, body);

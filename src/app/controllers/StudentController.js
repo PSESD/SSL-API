@@ -932,36 +932,29 @@ StudentController.getStudents = function(req, res){
             }
 
             if(userId !== null){
-
                 User.findOne({
                     _id: ObjectId(userId),
                     permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
                 }, function (err, user) {
-
                     var stdlist = [];
-
                     if(!err && user){
-
                         user.getCurrentPermission(req.params.organizationId);
-
                         var obj = user.toJSON();
-
                         stdlist = _.map(obj.allStudentsByOrganization, function(v, k){
                             return v + '';
                         });
 
                     }
+
                     return res.sendSuccess(null, _.sortBy(_.map(students, function(val, key){
-                        var o = val.toObject();
+                        var o = typeof val.toObject === "function" ? val.toObject() : val;
                         delete o.programs;
                         delete o.__v;
                         o.added = stdlist.indexOf(o._id + '') !== -1;
                         return o;
                     }), sorter));
-
                 });
                 return;
-
             }
 
             if(withNoProgram){
@@ -974,9 +967,11 @@ StudentController.getStudents = function(req, res){
             }
 
             if(withNoXsre){
+
                 return res.sendSuccess(null, _.sortBy(students, sorter));
             }
 
+            //attempt to retrieve student summaries from redis cache
             var key = prefixListStudent + orgId;
 
             async.map(students, function(student, callback){
@@ -994,34 +989,54 @@ StudentController.getStudents = function(req, res){
                     "latestDate": ""
                 };
 
-                cache.get(key + '_' + student._id, function(err, std){
-
+                cache.get(key + '_' + student._id, function(err, studentFromCache){
                     if(err){
-
                         return callback(null, newObject);
-
                     }
 
-                    if(!_.isUndefined(std)){
+                    if(!_.isUndefined(studentFromCache)){
+                        newObject.xsre = studentFromCache;
+                        callback(null, newObject);
+                    } else { //the student is in the mongoDB but not the Redis Cache; request the xSre from HostedZone and update the cache.
+                        var brokerRequest = new Request({
+                            externalServiceId: organization.externalServiceId,
+                            personnelId: organization.personnelId,
+                            authorizedEntityId: organization.authorizedEntityId
+                        });
 
-                        newObject.xsre = std;
+                        StudentController.refreshStudentSummary(brokerRequest, newObject, req.params.organizationId, function() {
+                            //You'd think this method would return the refreshed cache, huh? But it only sets it. So we have to retrieve it again.
+                            cache.get(key + '_' + student._id, function(err, studentFromCache){
+                                if(err){
+                                    return callback(null, newObject);
+                                }
 
+                                if(!_.isUndefined(studentFromCache)){
+                                    newObject.xsre = studentFromCache;
+                                    //these students probably don't have names in the DB; if so we need to update them from the xsre data
+                                    if (!newObject.first_name && studentFromCache.firstName || 
+                                        !newObject.last_name && studentFromCache.lastName) {
+                                            newObject.first_name = newObject.first_name || studentFromCache.firstName;
+                                            newObject.last_name = newObject.last_name || studentFromCache.lastName; 
+                                            Student.findOneAndUpdate({_id: newObject._id}, newObject, {upsert: true}, function(err, results){
+                                                if (err) {
+                                                    console.log(err);
+                                                }
+                                            });
+                                    }
+                                    callback(null, newObject);
+                                } else {
+                                    callback("cache retrieval failure");
+                                }
+                            });
+                        });
                     }
-
-                    callback(null, newObject);
-
                 });
-
             }, function(err, results){
-
                 res.sendSuccess(null, _.sortBy(results, sorter));
-
             });
-
         });
-
     });
-
 };
 /**
  *
@@ -1409,6 +1424,11 @@ StudentController.putStudentById = function(req, res){
                 }
 
             }
+
+            if (!obj.creator || obj.creator == "") {
+                obj.creator = req.user.userId;
+            }
+
             // set update time and update by user
             obj.last_updated = new Date();
 

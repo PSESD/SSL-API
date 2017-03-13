@@ -549,7 +549,7 @@ UserController.putStudentUserById = function(req, res){
 
                 _.each(currUser.permissions, function(permission, key){
 
-                    if(permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
+                    if(permission.organization && permission.organization.toString() === obj.organization.toString() && permission.students.indexOf(obj._id) === -1){
 
                         currUser.permissions[key].students.push(obj._id);
 
