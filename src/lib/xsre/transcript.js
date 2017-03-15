@@ -594,7 +594,7 @@ Transcript.prototype.transcriptWithSCED = function(scedAreaCode, key, course, in
 
     mark = course.finalMarkValue || course.progressMark;
 
-    if (progressMarkSessionDescription.toLowerCase().indexOf('semester') !== -1) {
+    if (progressMarkSessionDescription && progressMarkSessionDescription.toLowerCase().indexOf('semester') !== -1) {
         interim = 'final';
     } else {
         interim = 'interim';
