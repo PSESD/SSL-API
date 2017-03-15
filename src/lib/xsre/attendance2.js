@@ -899,28 +899,17 @@ function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
     
 
     if(transcriptTerm) {
-        if(get_grade_level === parseInt(transcriptTerm.gradeLevel)) {
+        new_start_date = parseInt(transcriptTerm.schoolYear) - 1;
 
-            session = get_range_school(get_session_type, (get_session_code + 1), parseInt(transcriptTerm.schoolYear), transcriptTerm);
-
-            transcriptTerm.session = {
-                sessionType: get_session_type,
-                sessionCode: get_session_code + 1,
-                startDate: session.startDate,
-                endDate: session.endDate
-            }
-        }
-        else {
-
-            new_start_date = parseInt(transcriptTerm.schoolYear) - 1;
-
+        if (!transcriptTerm.session) {
             transcriptTerm.session = {
                 sessionType: 'FullSchoolYear',
                 sessionCode: '1',
                 startDate: new_start_date + '-09-01',
-                endDate: new_start_date + '-08-01'
+                endDate: transcriptTerm.schoolYear + '-08-31'
             }
         }
+
         transcriptCombine.push(transcriptTerm);
     }
 
@@ -937,7 +926,6 @@ function get_range_school(session_type, session_code, year, item) {
     var get_many_day;
     var end_date;
     var last_year;
-    var debug = item;
 
     return {
         sessionType: set_session_type,
