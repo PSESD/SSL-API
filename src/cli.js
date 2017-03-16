@@ -49,7 +49,7 @@ rollbar.init(rollbarAccessToken, {
 
 var subjectEmail = '[SSL] Scheduled Task Report for ${environment}:${hostname} on ${datetime}';
 var bodyEmail = 'On ${datetime} the following scheduled tasks have been performed in ${environment}:';
-var emailCacheList = '${status} pulling ${number_of_students} students from the P2 Broker and pushing it to ${redis_host}';
+var emailCacheList = '${status} pulling ${number_of_students} students from the P2 Broker and pushing it to redis';
 var emailPullCedarExpert = '${status} pulling ${number_of_students} students from CedarExperts';
 var emailPushCedarExpert = '${status} pushing ${number_of_students} students to CedarExperts';
 var emailPushSqlReport = '${status} pushing ${number_of_students} students from CedarExperts to MySQL DB: ${mysql_host}.';
@@ -150,14 +150,12 @@ function sentItEmail(message, params, done, err){
         '${environment}',
         '${hostname}',
         '${datetime}',
-        '${redis_host}',
         '${mysql_host}'
     ];
     var ireplace = [
         process.env.NODE_ENV,
         os.hostname(),
         new Date().toString(),
-        config.get('REDIS_HOST'),
         config.get('MYSQL_HOST')
     ];
     for(var i in params){

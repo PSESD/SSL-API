@@ -909,7 +909,7 @@ StudentController.getStudents = function(req, res){
     }
 
     var sorter = function(st){
-        return [st.first_name, st.last_name];
+        return st ? [st.first_name, st.last_name]: [];
     };
 
 
@@ -989,7 +989,9 @@ StudentController.getStudents = function(req, res){
                     "latestDate": ""
                 };
 
-                cache.get(key + '_' + student._id, function(err, studentFromCache){
+                var realKey = key + "_" + student.get("_id");
+
+                cache.get(realKey, function(err, studentFromCache){
                     if(err){
                         return callback(null, newObject);
                     }
@@ -1006,7 +1008,8 @@ StudentController.getStudents = function(req, res){
 
                         StudentController.refreshStudentSummary(brokerRequest, newObject, req.params.organizationId, function() {
                             //You'd think this method would return the refreshed cache, huh? But it only sets it. So we have to retrieve it again.
-                            cache.get(key + '_' + student._id, function(err, studentFromCache){
+                            
+                            cache.get(realKey, function(err, studentFromCache){
                                 if(err){
                                     return callback(null, newObject);
                                 }
@@ -1026,14 +1029,14 @@ StudentController.getStudents = function(req, res){
                                     }
                                     callback(null, newObject);
                                 } else {
-                                    callback("cache retrieval failure");
+                                    callback("cache retrieval failure @ " + realKey);
                                 }
                             });
                         });
                     }
                 });
             }, function(err, results){
-                res.sendSuccess(null, _.sortBy(results, sorter));
+                res.sendSuccess(null, _.sortBy(_.omit(results, _.isUndefined), sorter));
             });
         });
     });

@@ -884,93 +884,32 @@ function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
     var get_session_code = 0;
     var get_start_date = new Date();
     var session, new_start_date;
-    if(transcriptTermOther.length > 0)
-    {
-        transcriptTermOther.sort(function(a, b) {
-            if (typeof a.session === 'undefined' || typeof b.session === 'undefined') {
-                return 0;
-            }
-
-            var key1 = new Date(a.session.startDate);
-            var key2 = new Date(b.session.startDate);
-
-            var n = key1 - key2;
-            if (n != 0) {
-                return n;
-            }
-
-            var key3 = 0;
-            var key4 = 0;
-
-            switch (a.session.sessionType) {
-                case 'FullSchoolYear': key3 = 1; break;
-                case 'Semester': key3 = 2; break;
-                case 'Quarter': key3 = 3; break;
-                default: key3 = 4; break;
-            }
-
-            switch (b.session.sessionType) {
-                case 'FullSchoolYear': key4 = 1; break;
-                case 'Semester': key4 = 2; break;
-                case 'Quarter': key4 = 3; break;
-                default: key4 = 4; break;
-            }
-
-            var n1 = key3 - key4;
-            if (n1 != 0) {
-                return n1;
-            }
-
-            var key5 = parseInt(a.session.sessionCode);
-            var key6 = parseInt(b.session.sessionCode);
-
-            return key6 - key5;
-
-        });
-
-        transcriptTermOther.forEach(function(item, i) {
+    if(transcriptTermOther.length > 1) {
+        sortTranscriptTermsByDate(transcriptTermOther);
+    }
+     transcriptTermOther.forEach(function(item, i) {
             get_grade_level = parseInt(item.gradeLevel);
             get_session_type = typeof item.session !== 'undefined' ? item.session.sessionType : '';
             get_session_code = typeof item.session !== 'undefined' ? parseInt(item.session.sessionCode) : 0;
             get_start_date = typeof item.session !== 'undefined' ? item.session.startDate : new Date();
-            session = get_range_school(get_session_type, get_session_code, parseInt(item.schoolYear));
+            session = get_range_school(get_session_type, get_session_code, parseInt(item.schoolYear), item);
             item.session.endDate = session.endDate;
             transcriptCombine.push(item);
         });
-    }
-    else {
-        get_grade_level = parseInt(transcriptTermOther.gradeLevel);
-        get_session_type = typeof transcriptTermOther.session !== 'undefined' ? transcriptTermOther.session.sessionType : '';
-        get_session_code = typeof transcriptTermOther.session !== 'undefined' ? parseInt(transcriptTermOther.session.sessionCode) : 0;
-        get_start_date = typeof transcriptTermOther.session !== 'undefined' ? transcriptTermOther.session.startDate : new Date();
-        session = get_range_school(get_session_type, get_session_code, parseInt(transcriptTermOther.schoolYear));
-        transcriptTermOther.session.endDate = session.endDate;
-        transcriptCombine.push(transcriptTermOther);
-    }
+    
 
     if(transcriptTerm) {
-        if(get_grade_level === parseInt(transcriptTerm.gradeLevel)) {
+        new_start_date = parseInt(transcriptTerm.schoolYear) - 1;
 
-            session = get_range_school(get_session_type, (get_session_code + 1), parseInt(transcriptTerm.schoolYear));
-
-            transcriptTerm.session = {
-                sessionType: get_session_type,
-                sessionCode: get_session_code + 1,
-                startDate: session.startDate,
-                endDate: session.endDate
-            }
-        }
-        else {
-
-            new_start_date = parseInt(transcriptTerm.schoolYear) - 1;
-
+        if (!transcriptTerm.session) {
             transcriptTerm.session = {
                 sessionType: 'FullSchoolYear',
                 sessionCode: '1',
                 startDate: new_start_date + '-09-01',
-                endDate: new_start_date + '-08-01'
+                endDate: transcriptTerm.schoolYear + '-08-31'
             }
         }
+
         transcriptCombine.push(transcriptTerm);
     }
 
@@ -978,7 +917,7 @@ function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
 }
 
 
-function get_range_school(session_type, session_code, year) {
+function get_range_school(session_type, session_code, year, item) {
 
     var set_session_type = session_type;
     var set_session_code = parseInt(session_code);
@@ -988,62 +927,11 @@ function get_range_school(session_type, session_code, year) {
     var end_date;
     var last_year;
 
-    switch(set_session_type) {
-        case 'FullSchoolYear':
-            last_year = set_year - 1;
-            new_date = moment( last_year + '-09-01' );
-            get_many_day = moment( set_year + '-08', "YYYY-MM" ).daysInMonth();
-            end_date = moment( set_year + '-08-' + get_many_day );
-            break;
-        case 'Semester':
-            if(set_session_code == 1)
-            {
-                last_year = set_year - 1;
-                new_date = moment( last_year + '-09-01' );
-                get_many_day = moment( set_year + '-03', "YYYY-MM" ).daysInMonth();
-                end_date = moment( set_year + '-03-' + get_many_day );
-            }
-            else
-            {
-                new_date = moment( set_year + '-04-01' );
-                get_many_day = moment( set_year + '-08', "YYYY-MM" ).daysInMonth();
-                end_date = moment( set_year + '-08-' + get_many_day );
-            }
-            break;
-        case 'Quarter':
-            if(set_session_code == 1)
-            {
-                last_year = set_year - 1;
-                new_date = moment( last_year + '-09-01' );
-                get_many_day = moment( last_year + '-12', "YYYY-MM" ).daysInMonth();
-                end_date = moment( last_year + '-12-' + get_many_day );
-            }
-            else if(set_session_code == 2)
-            {
-                new_date = moment( set_year + '-01-01' );
-                get_many_day = moment( set_year + '-03', "YYYY-MM" ).daysInMonth();
-                end_date = moment( set_year + '-03-' + get_many_day );
-            }
-            else if(set_session_code == 3)
-            {
-                new_date = moment( set_year + '-04-01' );
-                get_many_day = moment( set_year + '-06', "YYYY-MM" ).daysInMonth();
-                end_date = moment( set_year + '-06-' + get_many_day );
-            }
-            else
-            {
-                new_date = moment( set_year + '-07-01' );
-                get_many_day = moment( set_year + '-08', "YYYY-MM" ).daysInMonth();
-                end_date = moment( set_year + '-08-' + get_many_day );
-            }
-            break;
-    }
-
     return {
         sessionType: set_session_type,
         sessionCode: session_code,
-        startDate: new_date.format('YYYY-MM-DD'),
-        endDate: end_date.format('YYYY-MM-DD')
+        startDate: moment(item.session.startDate).format('YYYY-MM-DD'),
+        endDate: moment(item.session.endDate).format('YYYY-MM-DD')
     }
 
 }
@@ -1314,6 +1202,53 @@ function get_list_course_data(transcriptCombine) {
 
 }
 
+function sortTranscriptTermsByDate(transcriptTerms) {
+    {
+        transcriptTerms.sort(function(a, b) {
+            if (typeof a.session === 'undefined' || typeof b.session === 'undefined') {
+                return 0;
+            }
+
+            var key1 = new Date(a.session.startDate);
+            var key2 = new Date(b.session.startDate);
+
+            var n = key1 - key2;
+            if (n != 0) {
+                return n;
+            }
+
+            var key3 = 0;
+            var key4 = 0;
+
+            switch (a.session.sessionType) {
+                case 'FullSchoolYear': key3 = 1; break;
+                case 'Semester': key3 = 2; break;
+                case 'Quarter': key3 = 3; break;
+                default: key3 = 4; break;
+            }
+
+            switch (b.session.sessionType) {
+                case 'FullSchoolYear': key4 = 1; break;
+                case 'Semester': key4 = 2; break;
+                case 'Quarter': key4 = 3; break;
+                default: key4 = 4; break;
+            }
+
+            var n1 = key3 - key4;
+            if (n1 != 0) {
+                return n1;
+            }
+
+            var key5 = parseInt(a.session.sessionCode);
+            var key6 = parseInt(b.session.sessionCode);
+
+            return key6 - key5;
+
+        });
+
+        
+    }
+}
 
 /**
  *
