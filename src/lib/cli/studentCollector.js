@@ -156,8 +156,8 @@ function collectDataStudents(callback) {
 
                     CBOStudent.programs.activities.activity.push({
                         studentActivityRefId: program.program.toString(),
-                        startDate: moment(new Date(program.participation_start_date)).format('MM/DD/YYYY'),
-                        endDate: moment(new Date(program.participation_end_date)).format('MM/DD/YYYY'),
+                        startDate: moment(program.participation_start_date),
+                        endDate: moment(program.participation_end_date),
                         active: program.active,
                         tags: {
                             tag: program.cohort
@@ -494,8 +494,8 @@ function collectCacheListStudentsAsync(force, done) {
                             latestDateMap.push({
                                 schoolDistrict: l,
                                 latestDateTime: latestDateAvailable[orgIdString][l] || "",
-                                latestDate: mm.isValid() ? mm.format('MM/DD/YYYY') : ""
-                            });
+                                latestDate: mm.isValid() ? mm : ""
+                            }); 
                         }
                     }
                     cache.set(prefixListStudentDate+organization._id, latestDateMap, {ttl: 86400}, function () {

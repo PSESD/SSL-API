@@ -155,8 +155,8 @@ OrganizationSchema.statics.pushStudent = function(user, orgId, stdId, callback){
 
                 CBOStudent.programs.activities.activity.push({
                     studentActivityRefId: program.program.toString(),
-                    startDate: moment(new Date(program.participation_start_date)).format('MM/DD/YYYY'),
-                    endDate:moment(new Date(program.participation_end_date)).format('MM/DD/YYYY'),
+                    startDate: moment(program.participation_start_date), 
+                    endDate:moment(program.participation_end_date), 
                     active: program.active,
                     tags: {
                         tag: program.cohort
