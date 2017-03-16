@@ -58,11 +58,7 @@ Create a file in `/src` named `.env`, with the following values:
       PRS_SESSION_TOKEN=
       PRS_SHARED_SECRET=
       PRS_URL=
-      REDIS_DB=redis-cache-name
-      REDIS_HOST=redis-cache-url.com
-      REDIS_PORT=####
-      REDIS_PASSWORD=redis-cache-password
-      REDIS_TTL=86400
+      REDIS_URL=redis://[:password@]host[:port][/db-number][?ttl=value]
       ROLLBAR_ACCESS_TOKEN=token-for-account-on-rollbar.com
       SALT=salt-for-test-user-in-mongo-db
       SESSION_SECRET=session-secret
