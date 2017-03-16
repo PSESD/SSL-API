@@ -359,6 +359,7 @@ function set_day_data(start_date, end_date, list_event, list_course, list_discip
         get_list_event = [];
         var set_day = date_start.clone().add( i, 'days');
         var check_have = list_event.filter(function(key){
+            var debug = key.full_date === set_day.format('YYYY-MM-DD')
             return key.full_date === set_day.format('YYYY-MM-DD');
         });
         var check_have2 = list_discipline_incident_data.filter(function(key){
@@ -398,7 +399,7 @@ function set_day_data(start_date, end_date, list_event, list_course, list_discip
 
                 event.attendance.forEach(function(attendance) {
 
-                    var time_period = typeof attendance.time_table_period !== 'undefined' ? attendance.time_table_period : 0;
+                    var time_period = typeof attendance.time_table_period !== 'undefined' ? parseInt(attendance.time_table_period) : 0;
                     var title = typeof attendance['psesd:absentReasonDescription '] !== 'undefined' ? attendance['psesd:absentReasonDescription '] : '';
                     var status_data = typeof attendance.attendance_event_type !== 'undefined' ? attendance.attendance_event_type : '';
                     var status = typeof attendance.attendance_status !== 'undefined' ? attendance.attendance_status : '';
@@ -987,7 +988,7 @@ function get_all_attendance_data(events) {
                 attendance_status: event.attendanceStatus,
                 attendance_event_type: event.attendanceEventType,
                 attendance_value: event.attendanceValue,
-                time_table_period: typeof event.timeTablePeriod !== 'undefined' ? event.timeTablePeriod : 0,
+                time_table_period: typeof event.timeTablePeriod !== 'undefined' ? parseInt(event.timeTablePeriod) : 0,
                 show: 1,
                 missed_day: missed_day,
                 late_to_class: late_to_class,
