@@ -187,14 +187,9 @@ Transcript.prototype.getHistory = function(){
             his.enrollmentStatus = status || me.notAvailable;
             his.enrollmentStatusDescription = description || me.notAvailable;
             var entryDate = moment(his.entryDate);
-            if(his.entryDate !== me.notAvailable && entryDate.isValid()){
-                his.entryDate = entryDate.format('MM/DD/YYYY');
-            }
+
             var exitDate = moment(his.exitDate);
-            if(his.exitDate !== me.notAvailable && exitDate.isValid()){
-                his.exitDate = exitDate.format('MM/DD/YYYY');
-                his.exitDateTime = exitDate.valueOf();
-            }
+
 
             /**
              * Check Non-promotional changes
@@ -381,7 +376,7 @@ Transcript.prototype.getTranscript = function(){
         totalCumulativeGpa: me.academicSummary.cumulativeGpa.toFixed(1),
         gradeLevel: me.gradeLevel,
         academicSummary: me.academicSummary,
-        transcriptTerm: { courses: l.get(me.transcriptTerm, 'courses.course', []), school: l.get(me.transcriptTerm, 'school'), schoolYear: l.get(me.transcriptTerm, 'schoolYear', []) },
+        transcriptTerm: { courses: l.get(me.transcriptTerm, 'courses.course', []), school: l.get(me.transcriptTerm, 'school'), schoolYear: l.get(me.transcriptTerm, 'schoolYear', []), session: l.get(me.transcriptTerm, 'session', "") },
         info: me.info
     };
 };
@@ -505,7 +500,8 @@ Transcript.prototype.processTranscript = function(transcript, current){
         gradeLevel : transcript.gradeLevel,
         schoolYear : tSchoolYear,
         schoolName : tSchoolName,
-        startDate: l.get(transcript, 'session.startDate'),
+        startDate: l.get(transcript, 'session.startDate', ""),
+        endDate: l.get(transcript, 'session.endDate', ""),
         startDateTime: 0,
         session: tSession,
         transcripts: {},
