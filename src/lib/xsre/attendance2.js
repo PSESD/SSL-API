@@ -18,7 +18,8 @@ function Attendance(xsre){
     this.attendances = xsre.json.attendance || null;
     var disciplineIncidents = xsre.json.disciplineIncidents || null;
     var generate_year = [];
-    var transcriptTerm = null;
+    var otherTranscriptTerms = l.get(xsre, 'json.otherTranscriptTerms.transcriptTerm', null);
+    var currentTranscriptTerm = l.get(xsre, 'json.transcriptTerm', null);
     var transcriptCombine = [];
     var generate_calendar = [];
     var generate_calendar_week = [];
@@ -27,16 +28,9 @@ function Attendance(xsre){
     var dailyAttendanceRecords = allAttendanceData.dailyAttendanceRecords;
     var list_discipline_incident_data = get_all_discipline_incident_data(disciplineIncidents);
 
-    if(xsre.json) {
 
-        if(xsre.json.otherTranscriptTerms && xsre.json.otherTranscriptTerms.transcriptTerm) {
-            if(xsre.json.transcriptTerm)
-                transcriptTerm = xsre.json.transcriptTerm;
+    transcriptCombine = set_sort_and_end_date(otherTranscriptTerms, currentTranscriptTerm);
 
-            transcriptCombine = set_sort_and_end_date(xsre.json.otherTranscriptTerms.transcriptTerm, transcriptTerm);
-        }
-
-    }
     if(transcriptCombine.length > 0)
     {
         generate_year = get_list_year(transcriptCombine);
@@ -156,16 +150,16 @@ function get_week_detail(year_month, list_event, list_course, list_discipline_in
     var week_name, i, count_day, get_course, get_days, first;
 
 
-    var date_year_month = moment(year_month, "YYYY-MM");
-    var get_total_day_in_one_month = date_year_month.daysInMonth();
-    // var get_start_week = moment(new Date(year_month + '-01')).isoWeek();
-    // var get_end_week = moment(new Date(year_month + '-' + get_total_day_in_one_month)).isoWeek();
+    var date_month_begins = moment(year_month, "YYYY-MM");
+    var get_total_day_in_one_month = moment(date_month_begins).daysInMonth();
 
-    var get_start_week_day_start = moment(new Date(year_month + '-01')).startOf('Week').isoWeekday(7);
-    var get_end_week_day_end = moment(new Date(year_month + '-' + get_total_day_in_one_month)).endOf('Week').isoWeekday(7);
-    var start_date = moment(new Date(get_start_week_day_start.format('YYYY-MM-DD')));
-    var end_date_last_week = moment(new Date(get_end_week_day_end.format('YYYY-MM-DD'))).clone().subtract(7, 'days').format('x');
-    var end_date = moment(new Date(get_end_week_day_end.format('YYYY-MM-DD')));
+    var get_start_week_day_start = moment(date_month_begins).startOf('Week');
+    var get_end_week_day_end = moment(year_month + '-' + get_total_day_in_one_month).endOf('Week');
+    var start_date = moment(get_start_week_day_start.format('YYYY-MM-DD'));
+
+    var debug = moment(get_end_week_day_end.format('YYYY-MM-DD')).clone().subtract(7, 'days').toString();
+    var end_date_last_week = moment(get_end_week_day_end.format('YYYY-MM-DD')).clone().subtract(7, 'days').format('x');
+    var end_date = moment(get_end_week_day_end.format('YYYY-MM-DD'));
     var count_date = start_date.clone().format('x');
     var temp_date = start_date;
 
@@ -198,7 +192,7 @@ function get_week_detail(year_month, list_event, list_course, list_discipline_in
         var total_incident = get_days.total_incident;
 
         generate_week_detail.push({
-            'week_name': moment(new Date(week_name)).format('MMM DD YYYY') + ' - ' + moment(new Date(end_date)).format('MMM DD YYYY'),
+            'week_name': week_name + ' - ' + end_date,
             'total_late_to_class': total_late_to_class,
             'total_missed_class': total_missed_class,
             'total_missed_day': total_missed_day,
@@ -435,7 +429,7 @@ function set_day_data(start_date, end_date, list_event, list_course, list_discip
     for(var i=0; i<7; i++)
     {
         get_list_event = [];
-        var set_day = date_start.clone().add( i, 'days');
+        var set_day = date_start.utc().clone().add( i, 'days');
         var check_have = list_event.filter(function(key){
             var debug = key.full_date === set_day.format('YYYY-MM-DD')
             return key.full_date === set_day.format('YYYY-MM-DD');
@@ -928,7 +922,7 @@ function get_calendar_month(year, list_month) {
             for(j=9; j<=12; j++)
             {
                 check_month = item + '-' + pad(j);
-                if(list_month.indexOf(check_month) > 0) {
+                if(list_month.indexOf(check_month) >= 0) {
                     print_list_month.push({
                         year: item,
                         month: pad(j)
@@ -940,7 +934,7 @@ function get_calendar_month(year, list_month) {
             for(j=1; j<=8; j++)
             {
                 check_month = item + '-' + pad(j);
-                if(list_month.indexOf(check_month) > 0) {
+                if(list_month.indexOf(check_month) >= 0) {
                     print_list_month.push({
                         year: item,
                         month: pad(j)
@@ -966,10 +960,12 @@ function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
     var get_session_code = 0;
     var get_start_date = new Date();
     var session, new_start_date;
-    if(transcriptTermOther.length > 1) {
-        sortTranscriptTermsByDate(transcriptTermOther);
-    }
-     transcriptTermOther.forEach(function(item, i) {
+
+    if (transcriptTermOther) {
+        if(transcriptTermOther.length > 1) {
+            sortTranscriptTermsByDate(transcriptTermOther);
+        }
+        transcriptTermOther.forEach(function(item, i) {
             get_grade_level = parseInt(item.gradeLevel);
             get_session_type = typeof item.session !== 'undefined' ? item.session.sessionType : '';
             get_session_code = typeof item.session !== 'undefined' ? parseInt(item.session.sessionCode) : 0;
@@ -978,7 +974,7 @@ function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
             item.session.endDate = session.endDate;
             transcriptCombine.push(item);
         });
-    
+    }
 
     if(transcriptTerm) {
         new_start_date = parseInt(transcriptTerm.schoolYear) - 1;
@@ -1036,7 +1032,7 @@ function get_all_attendance_data(events) {
 
         if(event.attendanceStatus !== "Present")
         {
-            var event_date = moment(new Date(event.calendarEventDate));
+            var event_date = moment(event.calendarEventDate);
 
             var attendance_status = event.attendanceStatus;
             var attendance_event_type = event.attendanceEventType;
