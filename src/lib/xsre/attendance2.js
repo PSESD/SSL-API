@@ -23,7 +23,9 @@ function Attendance(xsre){
     var transcriptCombine = [];
     var generate_calendar = [];
     var generate_calendar_week = [];
-    var list_data = get_all_attendance_data(this.attendances.events.event);
+    var allAttendanceData = get_all_attendance_data(this.attendances.events.event);
+    var list_data = allAttendanceData.temp_list_data;
+    var dailyAttendanceRecords = allAttendanceData.dailyAttendanceRecords;
     var list_discipline_incident_data = get_all_discipline_incident_data(disciplineIncidents);
 
 
@@ -41,13 +43,89 @@ function Attendance(xsre){
     }
     this.generate_table = transcriptCombine;
     this.generate_year = generate_year.reverse();
-    this.generate_calendar = generate_calendar;
     this.generate_calendar_week = generate_calendar_week;
+    
+    var calendars = generate_calendar;
+    var summaries = generateYearSummaries(generate_calendar_week, generate_year, dailyAttendanceRecords);
+    
+    summaries.forEach(function(yearSummary) {
+        calendars.forEach(function(schoolYearCalendar) {
+            if (yearSummary.schoolYear == schoolYearCalendar.years) {
+                schoolYearCalendar.summary = yearSummary.summary;
+            }
+        })
+    })
 
+    this.generate_calendar = calendars;
+}
+
+function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecords) {
+    var schoolYearSummaries = [];
+
+    schoolYears.forEach(function(schoolYear) {
+        var years = schoolYear.value.split("-");
+
+        var schoolYearMonths = [];
+        var daysInSchoolYear = 0;
+        for (var i in calendarMonths) {
+            var yearMonth = calendarMonths[i].month.split("-")
+
+            if ((years[0] == yearMonth[0] && parseInt(yearMonth[1]) > 7) || (years[1] == yearMonth[0] && parseInt(yearMonth[1]) < 7)) {
+                schoolYearMonths.push(calendarMonths[i]);
+            }
+        }
+
+        var lateToClass = 0;
+        var missedDay = 0;
+        var missedClass = 0;
+        var behaviorIncident = 0;
+
+        if (schoolYearMonths.length != 0) {
+            
+            schoolYearMonths.forEach(function(month) {    
+                var weeks = month.detail;
+
+                weeks.forEach(function(week) {
+                    lateToClass += week.total_late_to_class;
+                    missedDay += week.total_missed_day;
+                    missedClass += week.total_missed_class;
+                    behaviorIncident += week.total_behaviour_incidents;
+                })
+
+            })
+        }
+
+        //Calculate attendance rate 
+        var totalSchoolDaysForStudent = 0;
+        for (i in dailyAttendanceRecords) {
+            if (dailyAttendanceRecords[i].attendanceEventType === "DailyAttendance") {
+                var yearMonthDay = dailyAttendanceRecords[i].calendarEventDate.split("-");
+                if ((years[0] == yearMonthDay[0] && parseInt(yearMonthDay[1]) > 7) || (years[1] == yearMonthDay[0] && parseInt(yearMonthDay[1]) < 7)) {
+                    totalSchoolDaysForStudent += 1;
+                }
+            }
+        }
+
+        var attendanceRate = ((totalSchoolDaysForStudent - missedDay) / totalSchoolDaysForStudent) * 100;
+
+        var schoolYearSummary = {
+            schoolYear: schoolYear.value,
+            summary: {
+                lateToClass: lateToClass,
+                missedDay: missedDay,
+                missedClass: missedClass,
+                behaviorIncident: behaviorIncident,
+                attendanceRate: attendanceRate
+            }
+        };
+
+        schoolYearSummaries.push(schoolYearSummary);
+    })
+
+    return schoolYearSummaries;
 }
 
 function get_calendar_week(list_event, list_course, all_date, list_discipline_incident_data) {
-
     var generate_list_week = [];
 
     all_date.forEach(function (item) {
@@ -650,6 +728,8 @@ function get_all_list_event_one_year(item, j, list_event, list_discipline_incide
     get_event = list_event.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
     get_incident = list_discipline_incident_data.filter(function(key){ return parseInt(key.year) === parseInt(item) && parseInt(key.month) === parseInt(j) });
     total_incident = get_incident.length;
+
+    
     if(get_event.length > 0)
     {
         get_event.forEach(function(item2) {
@@ -657,6 +737,7 @@ function get_all_list_event_one_year(item, j, list_event, list_discipline_incide
             if(item2.late_to_class > 0)
             {
                 temp_event_day.push('late_to_class');
+
             }
             if(item2.missed_class > 0)
             {
@@ -937,12 +1018,17 @@ function get_range_school(session_type, session_code, year, item) {
 function get_all_attendance_data(events) {
 
     var list_data = [];
+    var dailyAttendanceRecords = [];
     if(typeof events === 'undefined')
     {
         return list_data;
     }
 
     events.forEach(function(event){
+
+        if (event.attendanceEventType === 'DailyAttendance') {
+            dailyAttendanceRecords.push(event);
+        }
 
         if(event.attendanceStatus !== "Present")
         {
@@ -991,8 +1077,7 @@ function get_all_attendance_data(events) {
                 missed_class: missed_class
             };
             list_data.push(temp);
-        }
-
+        } 
     });
 
     list_data.sort(function(a, b) {
@@ -1106,7 +1191,7 @@ function get_all_attendance_data(events) {
         });
     }
 
-    return temp_list_data;
+    return { temp_list_data: temp_list_data, dailyAttendanceRecords: dailyAttendanceRecords };
 
 }
 
