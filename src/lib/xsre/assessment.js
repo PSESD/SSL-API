@@ -156,7 +156,7 @@ Assessment.prototype.processAssessment = function(assessments){
                                      * STATE HERE
                                      */
                                     newCollection = l.assign(collectionState, {
-                                        subTestSubjectArea: l.get(scoreSet, 'map'),
+                                        subTestSubjectArea: l.get(scoreSet, 'raw:source.raw:subTestSubjectArea'),
                                         subTestName: l.get(scoreSet, 'subTestName'),
                                         attemptCode: attemptCode,
                                         attemptCodeDescription: l.has(me.config.xAssessmentAttemptCodeType, attemptCode) ?
@@ -200,7 +200,7 @@ Assessment.prototype.processAssessment = function(assessments){
                                      * Map Here
                                      */
                                     newCollection = l.assign(collectionMap, {
-                                        subTestSubjectArea: l.get(scoreSet, 'subTestSubjectArea'),
+                                        subTestSubjectArea: l.get(scoreSet, 'raw:source.raw:subTestSubjectArea'),
                                         subTestName: l.get(scoreSet, 'subTestName'),
                                         schoolName: collectionScoreSets.schoolName,
                                         studentGradeLevel: collectionScoreSets.studentGradeLevel
