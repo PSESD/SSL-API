@@ -548,7 +548,7 @@ Attendance.prototype.getAttendances = function(){
 
         _.each(week.daysOfWeek, function(day){
 
-            var dayString = day.format('MM/DD/YYYY');
+            var dayString = day;
 
             var otherFormat = day.format('MM-DD-YYYY');
 
@@ -1050,7 +1050,7 @@ Attendance.prototype.calculateSummary = function(){
         var maxDate = moment(_.max(allDates));
         var minDate = moment(_.min(allDates));
 
-        me._currentSummary.date.latest = maxDate.format('MM/DD/YYYY');
+        me._currentSummary.date.latest = maxDate;
         me._currentSummary.date.min = minDate.valueOf();
         me._currentSummary.date.max = maxDate.valueOf();
 

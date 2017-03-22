@@ -512,7 +512,7 @@ OrganizationController.allProgram = function (req, res) {
             i++;
         });
 
-        Student.protect(req.user.role, { onlyAssign: true }, req.user).find({ organization: crit.organization, programs: { $elemMatch: { program: { $in: ids } } } }, function(err, students){
+        Student.protect(req.user.role, { onlyAssign: false }, req.user).find({ organization: crit.organization, programs: { $elemMatch: { program: { $in: ids } } } }, function(err, students){
 
             if (err)  { return res.sendError(err); }
 
