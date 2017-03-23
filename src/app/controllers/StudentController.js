@@ -508,7 +508,7 @@ StudentController.getStudentsBackpack = function(req, res){
                                 var object = null;
                                 var save_to_redis = {};
 
-                                var xsre = new xSre(result, body, separate, req.query).setLogger(benchmark);
+                                var xsre = new xSre(student, result, body, separate, req.query).setLogger(benchmark);
 
                                 if(usePagination === false){
 
@@ -780,7 +780,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
                             return callback(null, student, false);
                         }
 
-                        var object = new xSre(result).getStudentSummary();
+                        var object = new xSre(student, result).getStudentSummary();
 
                         var newObject = student.toObject();
 
@@ -838,7 +838,7 @@ StudentController.refreshStudentSummary = function(brokerRequest, student, orgId
                     return callback(err, null);
                 }
 
-                var updateObject = new xSre(xmlResult).getStudentSummary();
+                var updateObject = new xSre(student, xmlResult).getStudentSummary();            
 
                 cache.set(key, updateObject, {ttl: 86400}, callback);
 

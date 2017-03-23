@@ -19,7 +19,9 @@ var pd = require('pretty-data').pd;
  * @param separate
  * @param params
  */
-function xSre(result, raw, separate, params){
+function xSre(student, result, raw, separate, params){
+    
+    this.student = student;
 
     this.params = params || {};
 
