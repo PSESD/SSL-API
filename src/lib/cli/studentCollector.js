@@ -423,7 +423,7 @@ function collectCacheListStudentsAsync(force, done) {
 
                             benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
 
-                            data = new xSre(result).getStudentSummary();
+                            data = new xSre(student, result).getStudentSummary();
                             //if(student.school_district === 'tukwila'){
                             //    console.log('ASSSS', JSON.stringify(data), latestDateAvailable[orgIdString][student.school_district] < data.latestDateTime, latestDateAvailable[orgIdString][student.school_district]);
                             //}

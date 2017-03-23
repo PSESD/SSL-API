@@ -79,7 +79,7 @@ StudentCache.cache = function () {
                                                     return log(err);
                                                 }
 
-                                                var object = new xSre(result, body).toObject();
+                                                var object = new xSre(student, result, body).toObject();
                                                 /**
                                                  * Set to cache
                                                  */
