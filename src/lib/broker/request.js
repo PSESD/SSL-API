@@ -117,7 +117,7 @@ RequestXSRE.prototype = {
 
         if(!('Authorization' in this.headers)){
 
-            var timestamp = this.headers.timestamp = this.getTimezone();
+            var timestamp = this.headers.timestamp = '2017-03-24T18:49:02.048Z';
 
             var token = '';
 
@@ -147,7 +147,7 @@ RequestXSRE.prototype = {
 
             }
 
-            this.headers.Authorization = 'SIF_HMACSHA256 ' + token;
+            this.headers.Authorization = 'SIF_HMACSHA256 YmU4NjBjNDctNmJkNS00OTUzLWFhYzAtY2Q4ZjFlYTZiYzM3OmpuYUp1b1lIZ1p2ejVxeWNVUEVuMmk5TDZEMUQ5bXlwRWZhT21iSU52Tzg9';//'SIF_HMACSHA256 ' + token;
 
         }
 
@@ -347,7 +347,7 @@ RequestXSRE.prototype = {
 
             var encBody;
 
-            if(err || !result || (result.body && !(encBody = utils.decrypt(result.body))) || forceStore === true){
+            if(err || !result || result.body.startsWith("<error") || (result.body && !(encBody = utils.decrypt(result.body))) || forceStore === true){
 
                 me.create('xsre', url, 'GET', function (error, response, body) {
 
