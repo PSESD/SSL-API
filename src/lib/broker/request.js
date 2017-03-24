@@ -117,7 +117,7 @@ RequestXSRE.prototype = {
 
         if(!('Authorization' in this.headers)){
 
-            var timestamp = this.headers.timestamp = '2017-03-24T18:49:02.048Z';
+            var timestamp = this.headers.timestamp = this.getTimezone();
 
             var token = '';
 
@@ -147,8 +147,8 @@ RequestXSRE.prototype = {
 
             }
 
-            this.headers.Authorization = 'SIF_HMACSHA256 YmU4NjBjNDctNmJkNS00OTUzLWFhYzAtY2Q4ZjFlYTZiYzM3OmpuYUp1b1lIZ1p2ejVxeWNVUEVuMmk5TDZEMUQ5bXlwRWZhT21iSU52Tzg9';//'SIF_HMACSHA256 ' + token;
-
+            this.headers.Authorization = 'SIF_HMACSHA256 ' + token;
+            
         }
 
         if (!domain) {
