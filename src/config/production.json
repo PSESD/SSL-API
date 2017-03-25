@@ -1,159 +1,116 @@
-{
-        "host": "localhost",
-        "api": {
-            "url": "https://api.***.com"
-        },
-        "auth": {
-            "url": "https://auth.***.com"
-        },
-        "token": {
-            "expires_in": 3600
-        },
-        "ratelimiter": {
-            "windowMs": 60000,
-            "delayAfter": 1,
-            "delayMs": 1000,
-            "max": 5,
-            "message": "Too many requests, please try again later.",
-            "statusCode": 429
-        },
-        "db": {
-            "mongo": {
-                "host": "localhost",
-                "name": "cbo"
+{    
+    "api": {
+        "url": "https://api.***.com"
+    },
+    "auth": {
+        "url": "https://auth.***.com"
+    },
+    "cache": {
+        "enable": true,
+        "adapter": "memory",
+        "backup": "redis",
+        "memory": {
+            "max": 100,
+            "ttl": 60
+        }
+    },
+    "cross": {
+        "enable": true,
+        "allow_origin": "*",
+        "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Cbo-Client-Url",
+        "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
+    },
+    "hzb": {
+        "default": "xsre",
+        "sre": {
+            "object": "sres",
+            "service": "sres",
+            "contextId": "CBO",
+            "headers": {
+                "serviceType": "OBJECT",
+                "requestType": "IMMEDIATE",
+                "requestAction": "QUERY",
+                "messageType": "REQUEST",
+                "objectType": "sre",
+                "Accept": "application/xml",
+                "Content-Type": "application/xml"
             },
-            "mysql": {
-                "host": "<mysql host>",
-                "user": "<mysql user>",
-                "password": "<mysql password>",
-                "database": "ssl_cbo"
-            }
+            "validation-url": "",
+            "validation-service": ""
         },
-        "session": {
-            "secret": "cbo-2015",
-            "saveUninitialized": true,
-            "resave": true
-        },
-        "mandrill": {
-            "api_key": "<api_key>"
-        },
-        "hzb": {
-            "default": "xsre",
-            "sre": {
-                 "url": "https://psesd.hostedzone.com/svcs/dev/requestProvider",
-                "sessionToken": "be860c47-6bd5-4953-aac0-cd8f1ea6bc37",
-                "sharedSecret": "zsdKbxbtUk23",
-                "object": "sres",
-                "service": "sres",
-                "contextId": "CBO",
-                "headers": {
-                    "serviceType": "OBJECT",
-                    "requestType": "IMMEDIATE",
-                    "requestAction": "QUERY",
-                    "messageType": "REQUEST",
-                    "objectType": "sre",
-                    "Accept": "application/xml",
-                    "Content-Type": "application/xml"
-                },
-                "validation-url": "",
-                "validation-service": ""
+        "xsre": {
+            "object": "xSres",
+            "service": "xSres",
+            "contextId": "CBO",
+            "headers": {
+                "serviceType": "OBJECT",
+                "requestType": "IMMEDIATE",
+                "requestAction": "QUERY",
+                "messageType": "REQUEST",
+                "objectType": "xSre",
+                "Accept": "application/xml",
+                "Content-Type": "application/xml"
             },
-            "xsre": {
-                 "url": "https://psesd.hostedzone.com/svcs/dev/requestProvider",
-                "sessionToken": "be860c47-6bd5-4953-aac0-cd8f1ea6bc37",
-                "sharedSecret": "zsdKbxbtUk23",
+            "validation-url": "",
+            "validation-service": ""
+        },
+        "CBOStudent": {
+            "push": {
                 "object": "xSres",
-                "service": "xSres",
-                "contextId": "CBO",
+                "service1": "CBOStudents",
+                "service2": "CBOStudentsWithXSres",
+                "zoneId": "CBOUniversal",
+                "contextId": "DEFAULT",
                 "headers": {
-                    "serviceType": "OBJECT",
-                    "requestType": "IMMEDIATE",
-                    "requestAction": "QUERY",
+                    "mustuseadvisory": true,
+                    "requestType": "DELAYED",
                     "messageType": "REQUEST",
-                    "objectType": "xSre",
-                    "Accept": "application/xml",
+                    "objectType": "CBOStudent",
+                    "requestAction": "QUERY",
                     "Content-Type": "application/xml"
-                },
-                "validation-url": "",
-                "validation-service": ""
-            },
-            "CBOStudent": {
-                "push": {
-                    "url": "<api end point>",
-                    "sessionToken": "<session token>",
-                    "sharedSecret": "<secret>",
-                    "object": "xSres",
-                    "service1": "CBOStudents",
-                    "service2": "CBOStudentsWithXSres",
-                    "zoneId": "CBOUniversal",
-                    "contextId": "DEFAULT",
-                    "headers": {
-                        "mustuseadvisory": true,
-                        "requestType": "DELAYED",
-                        "messageType": "REQUEST",
-                        "objectType": "CBOStudent",
-                        "requestAction": "QUERY",
-                        "Content-Type": "application/xml"
-                    }
-                },
-                "get": {
-                    "url": "<api end point>",
-                    "sessionToken": "<session token>",
-                    "sharedSecret": "<secret>",
-                    "object": "xSres",
-                    "service1": "CBOStudents",
-                    "service2": "CBOStudentsWithXSres",
-                    "zoneId": "CBOUniversal",
-                    "contextId": "DEFAULT",
-                    "headers": {
-                        "mustuseadvisory": true,
-                        "requestType": "IMMEDIATE",
-                        "messageType": "REQUEST",
-                        "objectType": "CBOStudentsWithXSre",
-                        "requestAction": "QUERY",
-                        "Content-Type": "application/xml"
-                    }
                 }
             },
-            "prs": {
-                "url": "https://psesd.hostedzone.com/svcs/dev/requestProvider",
-                "sessionToken": "be860c47-6bd5-4953-aac0-cd8f1ea6bc37",
-                "sharedSecret": "zsdKbxbtUk23",
+            "get": {
+                "object": "xSres",
+                "service1": "CBOStudents",
+                "service2": "CBOStudentsWithXSres",
+                "zoneId": "CBOUniversal",
+                "contextId": "DEFAULT",
                 "headers": {
-                    "Accept": "application/xml"
-                },
-                "validation-url": "",
-                "validation-service": ""
+                    "mustuseadvisory": true,
+                    "requestType": "IMMEDIATE",
+                    "messageType": "REQUEST",
+                    "objectType": "CBOStudentsWithXSre",
+                    "requestAction": "QUERY",
+                    "Content-Type": "application/xml"
+                }
             }
         },
-        "cross": {
-            "enable": true,
-            /** default: "*" */
-            "allow_origin": "*",
-            "allow_headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Cbo-Client-Url",
-            "allow_method": "POST, GET, PUT, OPTIONS, DELETE"
-        },
-        "salt": "1f3f365ffdf4eb0777899420f0aca20a_test",
-        "rollbar": {
-            "access_token": "e0f67e505472424ca9728934a41fc416"
-        },
-        "aws": {
-            "aws_access_key_id":"",
-            "aws_secret_access_key":""
-        },
-        "cache": {
-            "enable": true,
-            "adapter": "memory",
-            "backup": "redis",
-            "redis": {
-                "host": "localhost",
-                "port": "6379",
-                "db": 0,
-                "ttl": 86400
+        "prs": {
+            "headers": {
+                "Accept": "application/xml"
             },
-            "memory": {
-                "max": 100,
-                "ttl": 60
-            }
+            "validation-url": "",
+            "validation-service": ""
         }
-    }
+    },
+    "ratelimiter": {
+        "windowMs": 60000,
+        "delayAfter": 1,
+        "delayMs": 1000,
+        "max": 5,
+        "message": "Too many requests, please try again later.",
+        "statusCode": 429
+    },
+    "session": {
+      "saveUninitialized": true,
+      "resave": true
+    },
+    "token": {
+        "expires_in": 3600
+    },
+    "test": {
+        
+    } 
+
+}
