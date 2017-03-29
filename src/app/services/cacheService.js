@@ -150,11 +150,7 @@ var cacheService = {
                 var studentXsre = new xSre(student, result);
 
                 var key = self.getKeyForJsonXsre(student);
-                var rawKey = self.getKeyForXmlXrse(student);
-                self.writeRawXmlToCache(rawKey, body)
-                .then(function(ok){
-                    return self.writeStudentSummaryFromJsToCache(studentXsre, student._id, student.school_district, orgIdString)
-                })
+                self.writeStudentSummaryFromJsToCache(studentXsre, student._id, student.school_district, orgIdString)
                 .then(function(studentSummary) {
                     return self.writeXsreJsonToCache(key, studentXsre)
                 }).then(function() {

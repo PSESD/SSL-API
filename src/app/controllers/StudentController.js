@@ -45,7 +45,21 @@ StudentController.getStudentsBackpack = function(req, res){
         var resource = new hal.Resource(xsre, req.originalUrl);
         embedProgramsAndUsers(req, resource)
         .then(function(results){
+
+            delete results.facets;
+            delete results.config;
+            delete results.justlog;
+            delete results.params;
+            delete results.separate;
+
+            results.attendance = {
+                calendars: results.attendance.calendars,
+                list_years: results.attendance.list_years,
+                list_weeks: results.attendance.list_weeks
+            }
+
             return res.sendSuccess(null, results);  
+
         }, function(err){
             return res.sendError(err);
         });
@@ -1049,7 +1063,7 @@ function embedProgramsAndUsers(req, resource) {
             }
         };
 
-        Student.protect(req.user.role, { students: studentId, value: studentId }, req.user)
+        Student.protect(req.user.role, { students: ObjectId(studentId), value: ObjectId(studentId) }, req.user)
         .findOne({_id: studentId, organization: orgId}, function(err, student){
             if (err || !student) {
                 reject(err || "student not found");
