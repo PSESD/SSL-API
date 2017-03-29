@@ -14,12 +14,12 @@ var _ = require('lodash');
 var pd = require('pretty-data').pd;
 /**
  * @constructor
- * @param result
+ * @param body
  * @param raw
  * @param separate
  * @param params
  */
-function xSre(student, result, raw, separate, params){
+function xSre(student, body, raw, separate, params){
     
     this.student = student;
 
@@ -27,15 +27,17 @@ function xSre(student, result, raw, separate, params){
 
     this.config = new CodeSet().get();
 
-    if(result.payload && result.payload.response){
+    if(body.payload && body.payload.response){
 
-        this.json = result.payload.response.xSre;
+        this.json = body.payload.response.xSre;
 
     } else {
 
-        this.json = result.xSre;
+        this.json = body.xSre;
 
     }
+
+    this.xsre = body.xSre;
 
     this.raw = raw;
 
@@ -122,6 +124,11 @@ function xSre(student, result, raw, separate, params){
         error: function(){}
     };
 
+    this.assessment = new Assessment(this).getAssessment();
+    this.attendance = new Attendance2(this);
+    this.transcript = new Transcript(this).getTranscript();
+    this.personal = this.getPersonal().getPersonal();
+
 }
 /**
  *
@@ -174,7 +181,7 @@ xSre.prototype.getStudentSummary = function(){
 
     var json = this.getJson();
 
-    var personal = this.getPersonal().getPersonal();
+    var personal = this.personal;
 
     if (personal) {
         summary.firstName = personal.firstName;
@@ -349,11 +356,10 @@ xSre.prototype.toObject = function(){
     if(json.disciplineIncidents) {
         delete json.disciplineIncidents;
     }
-    this.justlog.info('XSRE - RETURN RESULT');
+    this.justlog.info('XSRE - RETURN body');
     return json;
 
 };
-
 
 /**
  *

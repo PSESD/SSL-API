@@ -140,7 +140,7 @@ var populateCbo = {
             var zoneId = 'federalway';
             var brokerRequest = new Request();
             brokerRequest.addHeader( 'districtStudentId', studentId );
-            var request = brokerRequest.create('/validation-sre/' + studentId + ';zoneId='+zoneId+';contextId=CBO', 'GET', function (error, response, body) {
+            var request = brokerRequest.makeRequest('/validation-sre/' + studentId + ';zoneId='+zoneId+';contextId=CBO', 'GET', function (error, response, body) {
                 if(response.statusCode === '200'){
                     parseString(body, function (err, result) {
                         var json = result.sre;

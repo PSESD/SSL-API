@@ -17,629 +17,94 @@ var StudentController = new BaseController(Student).crud();
 var hal = require('hal');
 var xSre = require('../../lib/xsre');
 var async = require('async');
-var prefixListStudent = '_xsre_list_students_';
+var prefixListStudent = 'student_summary_';
 var crypto = require('crypto');
 var algorithm = 'aes-256-ctr',
     password = 'ssl-encrypted-827192';
+var rootPath = __dirname + '/../../';
+var appPath = rootPath + 'app';
+var cacheService = require(appPath+'/services/cacheService');
+
+
 /**
- * Get the list of all organizations that this user have access to in our system.
+ * Get all details for a student.
  * @param req
  * @param res
  * @returns {*}
  */
 StudentController.getStudentsBackpack = function(req, res){
 
-    var orgId = ObjectId(req.params.organizationId);
-
-    var studentId = ObjectId(req.params.studentId);
-
-    var separate = req.params.separate;
-
-    var usePagination = false;
-
-    if(!separate){
-
-        separate = 'xsre';
-
+    if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')) {
+        res.header('Content-Type', 'text/xml');
+        res.xmlOptions = res.xmlKey = 'CBOStudentDetail';
+        res.bigXml = true;
+        return res.sendSuccess(null, results.raw);
     }
 
-    if(separate !== 'general' && separate !== 'xsre'){
-
-        usePagination = true;
-
-    }
-
-    benchmark.info('XSRE - START GET STUDENT BACKPACK => ' + separate);
-
-    var showRaw = false;
-
-    if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')){
-        showRaw = true;
-    }
-    benchmark.info('XSRE - GET STUDENT');
-
-    Student.protect(req.user.role, { students: studentId, value: studentId }, req.user).findOne({
-        _id: studentId,
-        organization: orgId
-    }, function(err, student){
-
-        if(err){
+    getStudentXsre(req, res).then(function(xsre){
+        var resource = new hal.Resource(xsre, req.originalUrl);
+        embedProgramsAndUsers(req, resource)
+        .then(function(results){
+            return res.sendSuccess(null, results);  
+        }, function(err){
             return res.sendError(err);
-        }
-        /**
-         * If student is empty from database
-         */
-        if(!student){
-            return res.sendError('The student not found in database');
-        }
-
-        var key = md5([orgId.toString(), studentId.toString(), student.district_student_id, student.school_district, req.params.format, separate].join('_'));
-        // key = new Date().getTime();
-        /**
-         *
-         * @param results
-         * @param isFromCache
-         */
-        function embeds(results, isFromCache){
-
-            res.header('X-Cached-Sre', isFromCache ? 1 : 0);
-
-            benchmark.info('XSRE - EMBED RESULTS => ' + (isFromCache ? ' FROM CACHE' : ' FROM SERVER'));
-
-            /**
-             * Defined paging here
-             */
-            if(usePagination !== false){
-
-                benchmark.info('XSRE - USING PAGINATION ON( ' + separate + ')');
-
-                benchmark.info('XSRE - FINISH 3');
-
-                if(results.raw){
-
-                    delete results.raw;
-
-                }
-                /**
-                 * Only for REPORT HERE START
-                 * @type {{total: number, pageSize: number, pageCount: number, currentPage: number, data: Array, source: {}}}
-                 */
-                if(separate === 'report'){
-
-                    var programsId = {};
-                    var programId = [];
-
-                    _.each(student.programs, function(program){
-
-                        if(Object.keys(programsId).indexOf(program.program.toString()) === -1){
-                            programsId[program.program.toString()] = [];
-                        }
-
-                        programsId[program.program.toString()].push(program.toObject());
-
-                        programId.push(program.program);
-
-                    });
-                    if(programId.length > 0){
-
-                        var reportCrit = { _id: { $in: programId } };
-
-                        if(req.query.from && req.query.to){
-
-                            reportCrit.participation_start_date = { $gte : new Date(req.query.from )};
-                            reportCrit.participation_end_date = { $lte : new Date(req.query.to )};
-
-                        }
-
-                        console.log('REPORT CRIT: ', reportCrit);
-                        Program.find(reportCrit).sort({ participation_end_date: -1 }).exec(function(err, programs){
-
-                            if(err){
-                                return res.sendError(err);
-                            }
-
-                            _.each(programs, function(program){
-
-                                if(program._id.toString() in programsId){
-
-                                    programsId[program._id.toString()].forEach(function(prgm){
-
-                                        results.programs.push({
-                                            name: program.name,
-                                            from: prgm.participation_start_date,
-                                            to: prgm.participation_end_date
-                                        });
-
-                                    });
-
-                                }
-
-                            });
-
-                            benchmark.info('XSRE - FINISH 1');
-
-                            return res.sendSuccess(null, new hal.Resource(results, req.originalUrl).toJSON());
-
-                        });
-
-
-                    } else{
-
-                        benchmark.info('XSRE - FINISH 2');
-
-                        return res.sendSuccess(null, new hal.Resource(results, req.originalUrl).toJSON());
-
-                    }
-                    return;
-                }
-                 /** END OF REPORT **/
-
-                var paginate = {
-                    total: 0,
-                    pageSize: 10,
-                    pageCount: 0,
-                    currentPage: 1,
-                    data: [],
-                    source: {}
-                };
-
-                var arrayList = [];
-
-                if(separate === 'transcript'){
-
-                    paginate.source = _.clone(results);
-
-                    //paginate.source.transcriptTerm = results.transcriptTerm;
-
-                    delete paginate.source.details;
-
-                    results = results.details;
-
-                }
-
-                if(separate === 'attendance'){
-
-                    paginate.source.calendars = results.calendars;
-                    paginate.source.list_years = results.list_years;
-                    paginate.source.list_weeks = results.list_weeks;
-
-                    delete results.calendars;
-                    delete results.list_years;
-                    delete results.list_weeks;
-
-                }
-
-                paginate.total = results.length;
-
-                if(typeof req.query.page !== 'undefined'){
-
-                    paginate.currentPage = +req.query.page;
-
-                }
-
-                if(typeof req.query.pageSize !== 'undefined'){
-
-                    if(req.query.pageSize === 'all'){
-
-                        paginate.pageSize = paginate.total;
-
-                    } else{
-
-                        paginate.pageSize = +req.query.pageSize;
-
-                    }
-                }
-
-                //split list into groups
-                //console.log('PAGE: ', paginate);
-                while(results.length > 0){
-                    arrayList.push(results.splice(0, paginate.pageSize));
-                }
-
-                paginate.data = arrayList[+paginate.currentPage - 1];
-
-                paginate.pageCount = Math.ceil(paginate.total / paginate.pageSize);
-
-                var resource = new hal.Resource(paginate, req.originalUrl);
-
-                if(paginate.currentPage + 1 <= paginate.pageCount){
-                    var nextUrl = req.originalUrl;
-                    if(nextUrl.indexOf('?') === -1){
-                        nextUrl += '?';
-                    } else{
-                        nextUrl += '&';
-                    }
-                    resource.link(new hal.Link('nextUrl', nextUrl + 'page=' + (+paginate.currentPage + 1)));
-                }
-
-                return res.sendSuccess(null, resource.toJSON());
-
-            }
-            /**
-             * Set personal
-             */
-            results.personal.collegeBound = _.isUndefined(student.college_bound) ? /*"N/A"*/"" : student.college_bound;
-            results.personal.phone = _.isUndefined(student.phone) ? /*"N/A"*/"" : student.phone;
-            results.personal.email = _.isUndefined(student.email) ? /*"N/A"*/"" : student.email;
-            results.personal.firstName = _.isUndefined(student.first_name) ? /*"N/A"*/"" : student.first_name;
-            results.personal.lastName = _.isUndefined(student.last_name) ? /*"N/A"*/"" : student.last_name;
-            results.personal.middleName = _.isUndefined(student.middle_name) ? /*"N/A"*/"" : student.middle_name;
-            results.personal.schoolDistrict = _.isUndefined(student.school_district) ? /*"N/A"*/"" : student.school_district;
-            results.personal.address = _.isUndefined(student.address) ? /*"N/A"*/"" : student.address;
-
-            results.personal.emergency1 = {
-                name: _.isUndefined(student.emergency1_name) ? /*"N/A"*/"" : student.emergency1_name,
-                relationship: _.isUndefined(student.emergency1_relationship) ? /*"N/A"*/"" : student.emergency1_relationship,
-                email: _.isUndefined(student.emergency1_email) ? /*"N/A"*/"" : student.emergency1_email,
-                phone: _.isUndefined(student.emergency1_phone) ? /*"N/A"*/"" : student.emergency1_phone,
-                mentor: _.isUndefined(student.mentor1_name) ? /*"N/A"*/"" : student.mentor1_name
-            };
-
-            results.personal.emergency2 = {
-                name: _.isUndefined(student.emergency2_name) ? /*"N/A"*/"" : student.emergency2_name,
-                relationship: _.isUndefined(student.emergency2_relationship) ? /*"N/A"*/"" : student.emergency2_relationship,
-                email: _.isUndefined(student.emergency2_email) ? /*"N/A"*/"" : student.emergency2_email,
-                phone: _.isUndefined(student.emergency2_phone) ? /*"N/A"*/"" : student.emergency2_phone,
-                mentor: _.isUndefined(student.mentor2_name) ? /*"N/A"*/"" : student.mentor2_name
-            };
-
-            if(showRaw){
-
-                res.header('Content-Type', 'text/xml');
-
-                return res.send(results.raw);
-
-            }
-
-            if(results.raw){
-                delete results.raw;
-            }
-
-            res.xmlOptions = res.xmlKey = 'CBOStudentDetail';
-
-            res.bigXml = true;
-
-            var crit = {
-                permissions: {
-                    $elemMatch: {
-                        organization: orgId,
-                        students: studentId
-                    }
-                }
-            };
-            benchmark.info('XSRE - EMBED USER');
-            User.find(crit, function(err, users){
-
-                if(err){
-                    return res.sendError(err);
-                }
-
-                if(!users){
-                    users = [];
-                }
-
-                var resource = new hal.Resource(results, req.originalUrl);
-
-                var embedsUsers = [];
-
-                var embedsPrograms = [];
-
-                _.each(users, function(user){
-
-                    var fullname = [];
-
-                    if(user.first_name){
-                        fullname.push(user.first_name);
-                    }
-                    if(user.middle_name){
-                        fullname.push(user.middle_name);
-                    }
-                    if(user.last_name){
-                        fullname.push(user.last_name);
-                    }
-
-                    embedsUsers.push(new hal.Resource({
-                        id: user._id.toString(),
-                        email: user.email,
-                        fullname: fullname.join(' ')
-                    }, '/' + orgId + '/users/' + user._id));
-
-                });
-
-                var programsId = {};
-
-                var programId = [];
-
-                _.each(student.programs, function(program){
-
-                    if(Object.keys(programsId).indexOf(program.program.toString()) === -1){
-                        programsId[program.program.toString()] = [];
-                    }
-
-                    programsId[program.program.toString()].push(program.toObject());
-
-                    programId.push(program.program);
-
-                });
-
-                if(!_.isEmpty(programsId)){
-                    benchmark.info('XSRE - EMBED PROGRAM');
-                    Program.find({ _id: { $in: programId } }).sort({ participation_end_date: -1}).exec(function(err, programs){
-
-                        if(err){
-                            return res.sendError(err);
-                        }
-
-                        _.each(programs, function(program){
-
-                            if(program._id.toString() in programsId){
-
-                                programsId[program._id.toString()].forEach(function(prgm){
-
-                                    prgm.program_name = program.name;
-
-                                    embedsPrograms.push(new hal.Resource(prgm));
-
-                                });
-
-                            }
-
-                        });
-
-                        resource.embed('users', embedsUsers);
-
-                        resource.embed('programs', embedsPrograms);
-
-                        benchmark.info('XSRE - FINISH 1');
-
-                        res.sendSuccess(null, resource.toJSON());
-
-                    });
-
-
-                } else{
-
-                    resource.embed('users', embedsUsers);
-
-                    resource.embed('programs', embedsPrograms);
-
-                    benchmark.info('XSRE - FINISH 2');
-
-                    res.sendSuccess(null, resource.toJSON());
-
-                }
-
-            });
-        }
-
-        benchmark.info('XSRE - GET ORGANIZATION');
-
-        Organization.findOne({ _id: orgId }, function(err, organization){
-
-            if(err){
-                return res.sendError(err);
-            }
-            /**
-             * If organization is empty from database
-             */
-            if(!organization){
-                return res.sendError('The organization not found in database');
-            }
-
-            var brokerRequest = new Request({
-                externalServiceId: organization.externalServiceId,
-                personnelId: organization.personnelId,
-                authorizedEntityId: organization.authorizedEntityId
-            });
-
-            if(separate == "attendance")
-            {
-                key = key + '_attendance';
-            }
-            else if(separate == "transcript")
-            {
-                key = key + '_transcript';
-            }
-            else if(separate == "assessment")
-            {
-                key = key + '_assessment';
-            }
-            else if(separate == "report")
-            {
-                key = key + '_report';
-            }
-            console.log(key);
-            cache.get(key, function(err, result){
-
-                if(err){
-                    log(err);
-                }
-
-                if(!result){
-                    benchmark.info('XSRE - REQUEST XSRE');
-                    brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
-                        benchmark.info('XSRE - GET RESPONSE');
-                        if(error){
-                            return res.sendError(error);
-                        }
-
-                        if(!body){
-
-                            res.statusCode = response.statusCode || 404;
-
-                            return res.sendError('Data not found in database xsre');
-
-                        }
-
-                        if(response && response.statusCode === 200){
-                            benchmark.info('XSRE - PARSING DATA FROM XML TO JS');
-                            utils.xml2js(body, function(err, result){
-
-                                if(err){
-                                    return res.sendError(err);
-                                }
-                                var msg;
-
-                                if(result && 'error' in result){
-
-                                    msg = result.error.message ? result.error.message : result.error;
-                                    console.log('X1:', result);
-                                    if(!msg){
-                                        msg = 'Data not found!';
-                                    }
-                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
-                                    return res.sendError(msg);
-
-                                }
-
-                                if(result && 'Error' in result){
-
-                                    msg = result.Error.Message ? result.Error.Message : result.Error;
-                                    if(!msg){
-                                        msg = 'Data not found!';
-                                    }
-                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
-                                    return res.sendError(msg);
-
-                                }
-
-                                benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
-
-                                var object = null;
-                                var save_to_redis = {};
-
-                                var xsre = new xSre(student, result, body, separate, req.query).setLogger(benchmark);
-
-                                if(usePagination === false){
-
-                                    object = xsre.toObject();
-
-                                } else {
-
-                                    switch(separate){
-
-                                        // case 'attendance':
-                                        //     var attendance = xsre.getAttendanceBehavior();
-                                        //     object = attendance.getAttendances();
-                                        //     object.years = attendance.getAvailableYears();
-                                        //     object.legend = attendance.getLegend();
-                                        //     break;
-                                        case 'attendance':
-                                            var attendance = xsre.getAttendanceBehavior2();
-                                            object = [];
-                                            object.list_years = attendance.getGenerateYear();
-                                            object.calendars = attendance.getGenerateCalendar();
-                                            object.list_weeks = attendance.getGenerateCalendarWeek();
-                                            save_to_redis = {
-                                                'list_years': object.list_years,
-                                                'calendars': object.calendars,
-                                                'list_weeks': object.list_weeks
-                                            };
-                                            break;
-                                        case 'transcript':
-                                            object = xsre.getTranscript().getTranscript();
-                                            break;
-                                        case 'assessment':
-                                            object = xsre.getAssessment().getAssessment();
-                                            break;
-                                        case 'report':
-                                            object = xsre.getReport().serialize();
-                                            break;
-
-                                    }
-
-                                }
-
-
-                                /**
-                                 * Set to cache
-                                 */
-                                benchmark.info('XSRE - SET TO CACHE');
-                                if(separate == 'attendance')
-                                {
-                                    // var cipher = crypto.createCipher(algorithm,password);
-                                    // var crypted = cipher.update(save_to_redis,'utf8','hex');
-                                    // crypted += cipher.final('hex');
-                                    // cache.set(key, JSON.stringify(save_to_redis), function(err){
-                                    //
-                                    //     console.log(err);
-                                    //     log(err);
-
-                                        embeds(object);
-
-                                    // });
-                                }
-                                else {
-                                    // cache.set(key, object, function(err){
-                                    //
-                                    //     console.log(err);
-                                    //     log(err);
-
-                                        embeds(object);
-
-                                    // });
-                                }
-
-                            });
-
-                        } else{
-                            benchmark.info('XSRE - PARSING DATA ERROR FROM XML TO JS');
-                            utils.xml2js(body, function(err, result){
-                                if(err){
-                                    return res.sendError(err);
-                                }
-                                var msg;
-
-                                if(result && 'error' in result){
-
-                                    msg = result.error.message ? result.error.message : result.error;
-                                    if(!msg){
-                                        msg = 'Data not found!';
-                                    }
-                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
-                                    return res.sendError(msg);
-
-                                }
-                                if(result && 'Error' in result){
-
-                                    msg = result.Error.Message ? result.Error.Message : result.Error;
-                                    if(!msg){
-                                        msg = 'Data not found!';
-                                    }
-                                    benchmark.info('XSRE - ERROR BODY: ' + msg);
-                                    return res.sendError(msg);
-
-                                }
-                                console.log('X2:', result);
-                                return res.sendError('Data not found!');
-
-                            });
-                        }
-                    });
-
-                } else{
-                    console.log('FROM CACHE ---------------------------', separate);
-
-                    if(separate == 'attendance')
-                    {
-                        var temp_data = JSON.parse(result);
-                        var data = [];
-                        data.list_years = temp_data.list_years;
-                        data.calendars = temp_data.calendars;
-                        data.list_weeks = temp_data.list_weeks;
-                        embeds(data, 1);
-                    }
-                    else {
-                        embeds(result, 1);
-                    }
-                }
-
-            });
-
         });
-
     });
+};
 
+/*
+*
+* Preserving deprecated functionality of previous version of getStudentsBackpack.
+* Use the new getStudentsBackpack if possible.
+*
+*/
+StudentController.getPortionOfStudentData = function(req, res) {
+
+    var portionToRetrieve = req.params.separate;
+
+    if('raw' in req.query && (parseInt(req.query.raw) > 0 || req.query.raw === 'true')) {
+        res.header('Content-Type', 'text/xml');
+        res.xmlOptions = res.xmlKey = 'CBOStudentDetail';
+        res.bigXml = true;
+        return res.sendSuccess(null, results.raw);
+    }
+    
+    getStudentXsre(req, res).then(function(xsre) {
+        switch (portionToRetrieve) {
+            case "assessment": 
+                var assessment = createPaginatedResource(xsre.assessment, req.originalUrl);
+                return res.sendSuccess(null, assessment);
+            case "attendance": 
+                var attendance = createPaginatedResource(xsre.attendance, req.originalUrl);
+                return res.sendSuccess(null, attendance);
+                break;    
+            case "transcript":
+                var resource = createPaginatedResource(xsre.transcript, req.originalUrl);
+                return res.sendSuccess(null, resource);
+                break;
+            case "report":
+                formatReport(req, req.params.studentId).then(function(result){
+                    return res.sendSuccess(null, createPaginatedResource(result, req.originalUrl))
+                }, function (err){
+                    return res.sendError(err);
+                });
+                break;
+            case "general":
+            case "xsre":
+                var resource = new hal.Resource(xsre, req.originalUrl);
+                embedProgramsAndUsers(req, resource)
+                .then(function(results){
+                    return res.sendSuccess(null, xsre);
+                }, function(err){
+                    return res.sendError(err);
+                });
+                break;
+            default:
+               return res.sendError("How did you get here? This should be unreachable.");
+        }
+    }, function(err) {
+        return res.sendError(err);
+    });
 };
 /**
  *
@@ -750,7 +215,7 @@ StudentController.deleteCacheStudentsBackpack = function(req, res){
  */
 StudentController.getStudentDetail = function(brokerRequest, student, orgId, callback){
 
-    var key = md5(['_xSre_', orgId.toString(), student._id.toString(), student.district_student_id, student.school_district].join('_'));
+    var key = cacheService.getKeyForJsonXsre(student);
 
     cache.get(key, function(err, result){
 
@@ -760,7 +225,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
 
         if(!result){
 
-            brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
+            brokerRequest.getXsre(student.district_student_id, student.school_district, orgId.toString(), function(error, response, body){
 
                 if(error){
                     return callback(null, student, false);
@@ -818,9 +283,7 @@ StudentController.getStudentDetail = function(brokerRequest, student, orgId, cal
  */
 StudentController.refreshStudentSummary = function(brokerRequest, student, orgId, callback){
 
-    var key = prefixListStudent + orgId + '_' + student._id.toString();
-
-    brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
+    brokerRequest.getXsre(student.district_student_id, student.school_district, orgId.toString(), function(error, response, body){
 
         if(error){
             return callback(error);
@@ -829,23 +292,13 @@ StudentController.refreshStudentSummary = function(brokerRequest, student, orgId
         if(!body){
             return callback('Empty response');
         }
-        //console.log('COUNT 3: ' + Object.keys(result).length);
+
         if(response && response.statusCode === 200){
-
-            utils.xml2js(body, function(err, xmlResult){
-
-                if(err){
-                    return callback(err, null);
-                }
-
-                var updateObject = new xSre(student, xmlResult).getStudentSummary();            
-
-                cache.set(key, updateObject, {ttl: 86400}, callback);
-
+            cacheService.writeStudentSummaryFromXmlToCache(body, orgId, student._id.toString())
+            .then(function(updatedSummary) {
+                callback(updatedSummary)
             });
-
         } else{
-
             callback();
         }
 
@@ -868,7 +321,7 @@ StudentController.getStudents = function(req, res){
      */
     if(req.query.summary){
 
-        cache.get('summary_student_list_date_' + orgId, function(err, results){
+        cache.get(cacheService.getKeyForOrganizationSummary(orgId), function(err, results){
 
             if(err){
                 return res.sendError(err);
@@ -972,7 +425,7 @@ StudentController.getStudents = function(req, res){
             }
 
             //attempt to retrieve student summaries from redis cache
-            var key = prefixListStudent + orgId;
+            var key = cacheService.getKeyForOrganizationSummary(orgId);
 
             async.map(students, function(student, callback){
 
@@ -989,7 +442,7 @@ StudentController.getStudents = function(req, res){
                     "latestDate": ""
                 };
 
-                var realKey = key + "_" + student.get("_id");
+                var realKey = cacheService.getKeyForStudentSummary(student.get("_id"), orgId);
 
                 cache.get(realKey, function(err, studentFromCache){
                     if(err){
@@ -1006,32 +459,24 @@ StudentController.getStudents = function(req, res){
                             authorizedEntityId: organization.authorizedEntityId
                         });
 
-                        StudentController.refreshStudentSummary(brokerRequest, newObject, req.params.organizationId, function() {
-                            //You'd think this method would return the refreshed cache, huh? But it only sets it. So we have to retrieve it again.
-                            
-                            cache.get(realKey, function(err, studentFromCache){
-                                if(err){
-                                    return callback(null, newObject);
+                        StudentController.refreshStudentSummary(brokerRequest, newObject, req.params.organizationId, function(studentFromCache) {
+                            if(!_.isUndefined(studentFromCache)){
+                                newObject.xsre = studentFromCache;
+                                //these students probably don't have names in the DB; if so we need to update them from the xsre data
+                                if (!newObject.first_name && studentFromCache.firstName || 
+                                    !newObject.last_name && studentFromCache.lastName) {
+                                        newObject.first_name = newObject.first_name || studentFromCache.firstName;
+                                        newObject.last_name = newObject.last_name || studentFromCache.lastName; 
+                                        Student.findOneAndUpdate({_id: newObject._id}, newObject, {upsert: true}, function(err, results){
+                                            if (err) {
+                                                console.log(err);
+                                            }
+                                        });
                                 }
-
-                                if(!_.isUndefined(studentFromCache)){
-                                    newObject.xsre = studentFromCache;
-                                    //these students probably don't have names in the DB; if so we need to update them from the xsre data
-                                    if (!newObject.first_name && studentFromCache.firstName || 
-                                        !newObject.last_name && studentFromCache.lastName) {
-                                            newObject.first_name = newObject.first_name || studentFromCache.firstName;
-                                            newObject.last_name = newObject.last_name || studentFromCache.lastName; 
-                                            Student.findOneAndUpdate({_id: newObject._id}, newObject, {upsert: true}, function(err, results){
-                                                if (err) {
-                                                    console.log(err);
-                                                }
-                                            });
-                                    }
-                                    callback(null, newObject);
-                                } else {
-                                    callback("cache retrieval failure @ " + realKey);
-                                }
-                            });
+                                callback(null, newObject);
+                            } else {
+                                callback("cache retrieval failure @ " + realKey);
+                            }
                         });
                     }
                 });
@@ -1200,9 +645,9 @@ StudentController.createByOrgId = function(req, res){
                         return res.sendError(err);
                     }
 
-                    StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(){
+                    StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(updatedSummary){
 
-                        res.sendSuccess(res.__('data_added'), obj);
+                        res.sendSuccess(res.__('data_added'), updatedSummary);
 
                     });
 
@@ -1338,7 +783,9 @@ StudentController.deleteStudentById = function(req, res){
                     return res.sendError(err);
                 }
 
-                cache.get(prefixListStudent + orgId + '_' + req.params.studentId, function(err, xsre){
+                var key = cacheService.getKeyForStudentSummary(req.params.studentId, orgId);
+
+                cache.get(key, function(err, xsre){
 
                     if(err || !xsre){
 
@@ -1352,7 +799,7 @@ StudentController.deleteStudentById = function(req, res){
                         /**
                          * Restore cache again
                          */
-                        cache.set(prefixListStudent + orgId + '_' + req.params.studentId, xsre, { ttl: 86400 }, function(){
+                        cache.set(key, xsre, { ttl: 86400 }, function(){
 
                             res.sendSuccess(res.__('data_deleted'));
 
@@ -1451,9 +898,9 @@ StudentController.putStudentById = function(req, res){
 
                 }
 
-                StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(){
+                StudentController.refreshStudentSummary(brokerRequest, obj, orgId.toString(), function(updatedSummary){
 
-                    res.sendSuccess(res.__('data_updated'), obj);
+                    res.sendSuccess(res.__('data_updated'), updatedSummary);
 
                 });
 
@@ -1464,6 +911,273 @@ StudentController.putStudentById = function(req, res){
 
 };
 
+
+function getStudentXsre(req, res) {
+    return new Promise(function(resolve, reject){
+
+        var orgId = ObjectId(req.params.organizationId);
+        var studentId = ObjectId(req.params.studentId);
+
+        //get the student from the database
+        Student.protect(req.user.role, { students: studentId, value: studentId }, req.user).findOne({
+                _id: studentId,
+                organization: orgId
+            }, function(err, student){
+                if(err || !student){
+                    reject(err || "student not found");
+                }
+
+                //get the organization
+                Organization.findOne({ _id: orgId }, function(err, organization){
+
+                    if(err){
+                        reject(err);
+                    }
+
+                    if(!organization){
+                        reject('The organization not found in database');
+                    }
+
+                    var brokerRequest = new Request({
+                        externalServiceId: organization.externalServiceId,
+                        personnelId: organization.personnelId,
+                        authorizedEntityId: organization.authorizedEntityId
+                    });
+
+                    //look for the xsre in cache
+                    var key = cacheService.getKeyForJsonXsre(student);
+                    console.log("looking for key " + key);
+                    cacheService.get(key)
+                    .then(function(result) {
+                        //request from hostedzone and save to cache if not found
+                        if(!result){
+                            benchmark.info("requesting from HostedZone...");
+                            brokerRequest.getXsre(student.district_student_id, student.school_district, orgId.toString(), function(error, response, body){
+                                if(error){
+                                    reject(error);
+                                }
+
+                                if(!body){
+                                    res.statusCode = response.statusCode || 404;
+                                    reject('Xsre could not be found');
+                                }
+
+                                if(response && response.statusCode === 200){
+                                    cacheService.writeStudentToCache(student, body, orgId.toString())
+                                    .then(function(studentXsre){
+                                        resolve(studentXsre);
+                                    }, 
+                                    function(err){
+                                        reject(err);
+                                    });
+                                } 
+                                else {
+                                reject("Something went wrong");
+                                }
+                            });
+                        
+                        
+                        //return record from cache if found
+                        } else {
+                        benchmark.info("retrieving from cache...");
+                            resolve(result);
+                        }
+                    }, function(err){
+                        reject(err);
+                    });
+                });
+        });
+    });
+}
+
+function createPaginatedResource(resource, url, pageSize) {
+     var paginate = {
+        total: resource.length,
+        pageSize: pageSize || 10,
+        pageCount: 0,
+        currentPage: 1,
+        data: [],
+        source: resource
+    };
+
+    var arrayList = [];
+
+     if (resource.details) {
+        paginate.source = _.clone(resource);
+        resource = resource.details;
+    }
+
+    for (var i = 0; i < resource.length + pageSize; i +=pageSize) {
+        arrayList.push(resource.slice(i, i + pageSize));
+    }                  
+
+    paginate.data = arrayList[+paginate.currentPage - 1];
+
+    if (!paginate.data) {
+        paginate.data = resource;
+    }
+
+    paginate.pageCount = Math.ceil(paginate.total / paginate.pageSize);
+
+   
+
+    var result = new hal.Resource(paginate, url);
+
+    if(paginate.currentPage + 1 <= paginate.pageCount){
+        var nextUrl = req.originalUrl;
+        if(nextUrl.indexOf('?') === -1){
+            nextUrl += '?';
+        } else{
+            nextUrl += '&';
+        }
+        result.link(new hal.Link('nextUrl', nextUrl + 'page=' + (+paginate.currentPage + 1)));
+    }
+
+    return result.toJSON();
+}
+
+function embedProgramsAndUsers(req, resource) {
+    return new Promise(function(resolve, reject){
+        var studentId = req.params.studentId;
+        var orgId = req.params.organizationId;
+        var options = {
+            permissions: {
+                $elemMatch: {
+                    organization: ObjectId(orgId),
+                    students: ObjectId(studentId)
+                }
+            }
+        };
+
+        Student.protect(req.user.role, { students: studentId, value: studentId }, req.user)
+        .findOne({_id: studentId, organization: orgId}, function(err, student){
+            if (err || !student) {
+                reject(err || "student not found");
+            }
+            User.find(options, function(err, users){
+                if(err){
+                    reject(err);
+                }
+                if(!users){
+                    users = [];
+                }
+
+                var embedsUsers = [];
+                var embedsPrograms = [];
+                
+                _.each(users, function(user){
+                    var fullname = [];
+                    if(user.first_name){
+                        fullname.push(user.first_name);
+                    }
+                    if(user.middle_name){
+                        fullname.push(user.middle_name);
+                    }
+                    if(user.last_name){
+                        fullname.push(user.last_name);
+                    }
+
+                    embedsUsers.push(new hal.Resource({
+                        id: user._id.toString(),
+                        email: user.email,
+                        fullname: fullname.join(' ')
+                    }, '/' + orgId + '/users/' + user._id));
+                });
+
+                var programsId = {};
+                var programId = [];
+
+                _.each(student.programs, function(program){
+                    if(Object.keys(programsId).indexOf(program.program.toString()) === -1){
+                        programsId[program.program.toString()] = [];
+                    }
+                    
+                    programsId[program.program.toString()].push(program.toObject());
+                    programId.push(program.program);
+                });
+
+                if(!_.isEmpty(programsId)){
+                    benchmark.info('XSRE - EMBED PROGRAM');
+                    Program.find({ _id: { $in: programId } }).sort({ participation_end_date: -1}).exec(function(err, programs){
+                        if(err){
+                            reject(err);
+                        }
+
+                        _.each(programs, function(program){
+                            if(program._id.toString() in programsId){
+                                programsId[program._id.toString()].forEach(function(prgm){
+                                    prgm.program_name = program.name;
+                                    embedsPrograms.push(new hal.Resource(prgm));
+                                });
+                            }
+                        });
+
+                        resource.embed('users', embedsUsers);
+                        resource.embed('programs', embedsPrograms);
+                        resolve(resource.toJSON());
+                    });
+                } else{
+                    resource.embed('users', embedsUsers);
+                    resource.embed('programs', embedsPrograms);
+                    resolve(resource.toJSON());
+                }
+            });
+        });
+    });
+}
+
+function formatReport(req, studentId) {
+    return new Promise(function(resolve, reject){
+        Student.protect(req.user.role, { students: studentId, value: studentId }, req.user)
+        .findOne({_id: studentId, organization: orgId}, function(err, student){
+            if (err | !student) {
+                reject(err || "student not found");
+            }
+            var programsId = {};
+            var programId = [];
+
+            _.each(student.programs, function(program){
+                if(Object.keys(programsId).indexOf(program.program.toString()) === -1){
+                    programsId[program.program.toString()] = [];
+                }
+
+                programsId[program.program.toString()].push(program.toObject());
+                programId.push(program.program);
+            });
+            
+            if(programId.length > 0){
+                var options = { _id: { $in: programId } };
+                if(req.query.from && req.query.to){
+                    reportCrit.participation_start_date = { $gte : new Date(req.query.from )};
+                    reportCrit.participation_end_date = { $lte : new Date(req.query.to )};
+                }
+
+                Program.find(options).sort({ participation_end_date: -1 }).exec(function(err, programs){
+                    if(err){
+                        reject(err);
+                    }
+
+                    _.each(programs, function(program){
+                        if(program._id.toString() in programsId){
+                            programsId[program._id.toString()].forEach(function(prgm){
+                                results.programs.push({
+                                    name: program.name,
+                                    from: prgm.participation_start_date,
+                                    to: prgm.participation_end_date
+                                });
+                            });
+                        }
+                    });
+
+                    resolve(new hal.Resource(results, req.originalUrl).toJSON());
+                });
+
+            } else{
+                resolve(new hal.Resource(results, req.originalUrl).toJSON());
+            }
+        });
+    });
+}
 
 /**
  *

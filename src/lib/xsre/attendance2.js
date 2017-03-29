@@ -44,19 +44,21 @@ function Attendance(xsre){
     this.generate_table = transcriptCombine;
     this.generate_year = generate_year.reverse();
     this.generate_calendar_week = generate_calendar_week;
+    this.list_years = this.getGenerateYear();
+    this.list_weeks = this.getGenerateCalendarWeek();
     
-    var calendars = generate_calendar;
     var summaries = generateYearSummaries(generate_calendar_week, generate_year, dailyAttendanceRecords);
     
     summaries.forEach(function(yearSummary) {
-        calendars.forEach(function(schoolYearCalendar) {
+        generate_calendar.forEach(function(schoolYearCalendar) {
             if (yearSummary.schoolYear == schoolYearCalendar.years) {
                 schoolYearCalendar.summary = yearSummary.summary;
             }
         })
     })
 
-    this.generate_calendar = calendars;
+    this.generate_calendar = generate_calendar;
+    this.calendars = this.getGenerateCalendar();
 }
 
 function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecords) {
@@ -965,6 +967,10 @@ function set_sort_and_end_date(transcriptTermOther, transcriptTerm) {
         if(transcriptTermOther.length > 1) {
             sortTranscriptTermsByDate(transcriptTermOther);
         }
+        if (!Array.isArray(transcriptTermOther)){
+            transcriptTermOther = [transcriptTermOther];
+        }
+
         transcriptTermOther.forEach(function(item, i) {
             get_grade_level = parseInt(item.gradeLevel);
             get_session_type = typeof item.session !== 'undefined' ? item.session.sessionType : '';

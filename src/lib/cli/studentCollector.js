@@ -17,24 +17,16 @@ var _ = require('underscore');
 var l = require('lodash');
 var xmlParser = require('js2xmlparser');
 var moment = require('moment');
-var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, md5 = utils.md5, benchmark = utils.benchmark();
+var utils = require(libPath+'/utils'), cache = utils.cache(), log = utils.log, benchmark = utils.benchmark();
 var config = require(libPath + '/config').config();
 var xsreConfig = config.get('hzb').xsre;
 var Request = require(libPath+'/broker/request');
 var request = require('./request');
-
 var con = require(libPath + '/sql');
-var parseString = require('xml2js').parseString;
-var xSre = require(libPath+'/xsre');
 var async = require('async');
-var districtFile = rootPath + '/test/data/districts';
-var fs = require('fs');
-var filename = districtFile;
-var prefixListStudent = '_xsre_list_students_';
-var prefixListStudentDate = 'summary_student_list_date_';
-var latestDateAvailable = {};
 var organizationWhere = {};
 var _funct = require(__dirname + '/../function');
+var cacheService = require(appPath+'/services/cacheService');
 
 //organizationWhere = {
 //    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
@@ -289,7 +281,7 @@ function collectCacheStudents(done) {
                     /**
                      * Request can handle store into cache, so we use force to store or update the data
                      */
-                    brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
+                    brokerRequest.getXsre(student.district_student_id, student.school_district, orgId, function (error, response, body) {
 
                         if (error) {
                             benchmark.info(error);
@@ -322,14 +314,15 @@ function collectCacheStudents(done) {
  */
 function collectCacheListStudentsAsync(force, done) {
     var studentNumber = 0;
-    benchmark.info("CACHE-LIST-STUDENT\tSTART");
+    benchmark.info("Starting cache refresh for all students");
+
     Organization.find(organizationWhere, function (err, organizations) {
 
         if (err) {
             return benchmark.info(err);
         }
         var prefix = "";
-        benchmark.info("CACHE-LIST-STUDENT\tORG FOUND: " + organizations.length);
+        benchmark.info("Organizations to refresh: " + organizations.length);
 
         /**
          *
@@ -348,14 +341,9 @@ function collectCacheListStudentsAsync(force, done) {
              * @param cb
              */
             var mapStudent = function(student, cb){
+                benchmark.info("starting mapStudent " + student._id);
 
-                if(!(orgIdString in latestDateAvailable)){
-                    latestDateAvailable[orgIdString] = {};
-                }
-
-                if(Object.keys(latestDateAvailable[orgIdString]).indexOf(student.school_district) === -1){
-                    latestDateAvailable[orgIdString][student.school_district] = 0;
-                }
+                cacheService.setLatestDateAvailable(orgIdString, student.school_district);
 
                 var studentId = student._id.toString();
 
@@ -374,9 +362,9 @@ function collectCacheListStudentsAsync(force, done) {
                     authorizedEntityId: organization.authorizedEntityId
                  });
 
-                brokerRequest.createXsre(student.district_student_id, student.school_district, function (error, response, body) {
+                brokerRequest.getXsre(student.district_student_id, student.school_district, orgIdString, function (error, response, body) {
 
-                    if (error) {
+                    if (error || !body ) {
                         benchmark.info(error);
                         return cb(null, data);
                     }
@@ -388,76 +376,18 @@ function collectCacheListStudentsAsync(force, done) {
                     }
 
                     if (response && response.statusCode === 200) {
-                        utils.xml2js(body, function (err, result) {
-
-                            if (err) {
-                                benchmark.info(err);
-                                log(err, 'error');
-                                return cb(null, data);
-                            }
-                            var msg;
-
-                            if (result && 'error' in result) {
-
-                                msg = result.error.message ? result.error.message : result.error;
-                                console.log('X1:', result);
-                                if (!msg) {
-                                    msg = 'Data not found!';
-                                }
-                                benchmark.info('XSRE - ERROR BODY: ' + msg);
-                                return cb(null, data);
-
-                            }
-
-                            if (result && 'Error' in result) {
-
-                                msg = result.Error.Message ? result.Error.Message : result.Error;
-                                if (!msg) {
-                                    msg = 'Data not found!';
-                                }
-                                benchmark.info('XSRE - ERROR BODY: ' + msg);
-                                log('XSRE - ERROR BODY RESULT: ' + msg, 'error');
-                                return cb(null, data);
-
-                            }
-
-                            benchmark.info('XSRE - CREATE AND MANIPULATE XSRE OBJECT');
-
-                            data = new xSre(student, result).getStudentSummary();
-                            //if(student.school_district === 'tukwila'){
-                            //    console.log('ASSSS', JSON.stringify(data), latestDateAvailable[orgIdString][student.school_district] < data.latestDateTime, latestDateAvailable[orgIdString][student.school_district]);
-                            //}
-                            /**
-                             * Check the data max
-                             * @type {string}
-                             */
-                            if (data.latestDateTime) {
-
-                                if (latestDateAvailable[orgIdString][student.school_district] < data.latestDateTime) {
-
-                                    latestDateAvailable[orgIdString][student.school_district] = data.latestDateTime;
-
-                                }
-
-                            }
-
-                            var key = prefixListStudent + organization._id + '_' + student._id;
-                            console.log("writing to cache: ", data);
-
-                            cache.set(key, data, {ttl: 86400}, function () {
-                                benchmark.info('Cache student from org: ', organization.name, ' Student ID: ' + student._id.toString());
-                                cb(null, data);
-                            });
-
+                        cacheService.writeStudentToCache(student, body, orgIdString)
+                        .then(function(response) {
+                            cb(null, response)
+                        }, function(err){
+                            cb(err, null);
                         });
-
                     } else {
                         cb(null, data);
                     }
                 }, force);
 
             };
-
 
             Student.find({
                 organization: organization._id
@@ -474,45 +404,19 @@ function collectCacheListStudentsAsync(force, done) {
 
                 benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
 
-                async.eachLimit(students, 10, mapStudent, function(err){
-                    if(err){
-                        benchmark.info('ERROR: ', err);
-                        log(err, 'error');
-                    }
-
-                    var latestDateMap = [];
-                    // console.log(latestDateAvailable);
-                    for(var l in latestDateAvailable[orgIdString]){
-                        if(latestDateAvailable[orgIdString][l] === 0){
-                            latestDateMap.push({
-                                schoolDistrict: l,
-                                latestDateTime: "",
-                                latestDate: ""
-                            });
-                        } else{
-                            var mm = moment(latestDateAvailable[orgIdString][l]);
-                            latestDateMap.push({
-                                schoolDistrict: l,
-                                latestDateTime: latestDateAvailable[orgIdString][l] || "",
-                                latestDate: mm.isValid() ? mm : ""
-                            }); 
-                        }
-                    }
-                    cache.set(prefixListStudentDate+organization._id, latestDateMap, {ttl: 86400}, function () {
-                        benchmark.info('Cache student summary date from org: ', organization.name);
-                        benchmark.info('Cache student from org: ', organization.name , ' Done!!');
-                        // latestDateAvailable = {}; //reset it back
+                async.eachLimit(students, 10, mapStudent, function(err) {
+                    cacheService.writeOrganizationTimestampToCache(err, organization).then(function(response) {
                         callback(null, organization);
-                    });
-
+                    }, function(err) {
+                        callback(err, null);
+                    })
                 });
-
             });
         };
 
         async.each(organizations, map, function (err, data) {
             if(err){
-                benchmark.info(err);
+                benchmark.info(err, data);
                 log(err, 'error');
             }
 
@@ -680,7 +584,6 @@ module.exports = {
     collect: collectDataStudents,
     cache: collectCacheStudents,
     cacheList: collectCacheListStudentsAsync,
-//    newCacheList: collectCacheStudentsDifferently,
     cacheDebug: cacheDebug,
     //dumpDataDistrictId: dumpDataDistrictId,
     //pullStudentAsync: pullStudentAsync

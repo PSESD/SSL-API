@@ -14,6 +14,9 @@ var cache = cache = utils.cache();
 var log = utils.log;
 var md5 = utils.md5;
 var benchmark  = utils.benchmark();
+var rootPath = __dirname + '/../../';
+var appPath = rootPath + 'app';
+var cacheService = require(appPath+'/services/cacheService');
 
 /**
  *
@@ -111,7 +114,7 @@ RequestXSRE.prototype = {
      * @param callback
      * @returns {*}
      */
-    create: function (what, url, method, callback) {
+    makeRequest: function (what, url, method, callback) {
 
         var domain = ""
 
@@ -273,18 +276,16 @@ RequestXSRE.prototype = {
 
         this.addHeader('messageId', this.generateUUID());
 
-        return this.create('sre', url, 'GET', callback);
+        return this.makeRequest('sre', url, 'GET', callback);
 
     },
-    /**
+    /*
      *
-     * @param districtStudentId
-     * @param zoneId
-     * @param callback
-     * @param forceStore
-     * @returns {*}
+     * Retrieves xsre as xml.
+     * From cache, or from hostedZone if not in cache.
+     * 
      */
-    createXsre: function(districtStudentId, zoneId, callback, forceStore){
+    getXsre: function(districtStudentId, zoneId, organizationId, callback, forceStore){
         this.headers = {};
 
         if(this.options.personnelId) {
@@ -325,7 +326,10 @@ RequestXSRE.prototype = {
 
         this.addHeader('generatorId', 'srx-services-ssl');
 
-        var key = md5([url, this.headers.personnelId, this.headers.authorizedEntityId, this.headers.externalServiceId].join('_'));
+        var key = cacheService.getKeyForJsonXsre({
+            district_student_id: districtStudentId, 
+            organization: organizationId
+            });
 
         if(typeof callback !== 'function'){
 
@@ -342,44 +346,29 @@ RequestXSRE.prototype = {
         if (districtStudentId != this.headers['districtStudentId']) {
             url = '/requestProvider/' + xsre.service +'/'+this.headers['districtStudentId'] +';zoneId='+zoneId+';contextId='+ xsre.contextId;
         }
-        benchmark.info('REQUEST-XSRE-HZB: START ' + districtStudentId + "/" + this.headers['districtStudentId']);
-        cache.get(key, function(err, result){
+        benchmark.info('START ' + districtStudentId);
 
-            var encBody;
+        console.log("looking for key " + key);
 
-            if(err || !result || result.body.startsWith("<error") || (result.body && !(encBody = utils.decrypt(result.body))) || forceStore === true){
+        cacheService.get(key)
+        .then(function(result){
+            var xmlBody = result;
 
-                me.create('xsre', url, 'GET', function (error, response, body) {
+            if (!cacheService.isValid(result)) { 
+                benchmark.info("retrieving from hostedzone: " + districtStudentId);
 
-                    if (error)  {
-                        return callback(error, response, body);
-                    }
-
-                    var object = {
-                        body: utils.encrypt(body),
-                        response: response
-                    };
-
-                    cache.set(key, object, {ttl: 86400}, function(error){
-                        if (error) {
-                            console.log(error);
-                        }
-                        
-                        benchmark.info('REQUEST-XSRE-HZB: STORE DATA TO CACHE');
-
-                        callback(null, response, body);
-
-                    });
-
+                //this is what makes the actual http request
+                me.makeRequest('xsre', url, 'GET', function (error, response, body) {
+                    //todo: if error response - delete student?
+                    callback(error, response, body);
                 });
 
             } else {
-
-                benchmark.info('REQUEST-XSRE-HZB: GET DATA FROM CACHE');
-
-                callback(null, result.response, encBody);
-
+                callback(null, result, result);
             }
+            
+        }, function (err) {
+
         });
 
     },

@@ -59,7 +59,7 @@ StudentCache.cache = function () {
                                     authorizedEntityId: organization.authorizedEntityId
                               });
 
-                              brokerRequest.createXsre(student.district_student_id, student.school_district, function(error, response, body){
+                              brokerRequest.getXsre(student.district_student_id, student.school_district, orgId, function(error, response, body){
 
                                     if(error)  {
                                         return log(error);

@@ -162,7 +162,10 @@ Rest.prototype.routeOrganizationStudent = function(){
         .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.deleteCacheStudentsBackpack);
     //.get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
 
-    function separateFilter (req, res, next){
+    this.router.route('/:organizationId/students/:studentId/details' + this.format)
+        .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
+ 
+ function separateFilter (req, res, next){
         var separate = req.params.separate;
         var whiteList = [ 'general', 'xsre', 'report', 'attendance', 'transcript', 'assessment' ];
         if(whiteList.indexOf(separate) === -1){
@@ -170,10 +173,12 @@ Rest.prototype.routeOrganizationStudent = function(){
         }
         return next();
     }
+    
 
     this.router.route('/:organizationId/students/:studentId/:separate' + this.format)
-        .get(separateFilter, this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getStudentsBackpack);
-
+        .get(separateFilter, this.auth.isBearerAuthenticated, this.auth.hasAccess, this.studentController.getPortionOfStudentData);
+    
+    
 };
 /**
  *
