@@ -60,6 +60,23 @@ var cacheService = {
                     latestDateAvailable[orgIdString][schoolDistrict] = 0;
                 }
     },
+    writeInvalidStudentToCache: function(student, orgIdString) {
+        return new Promise(function(resolve, reject){
+
+            var record = {
+                isUnavailable: true
+            }
+
+            var key = self.getKeyForStudentSummary(student._id, orgIdString);
+            console.log(key);
+            self.writeXsreJsonToCache(key, record)
+            .then(function(){
+                resolve(record);
+            }, function(err){
+                reject(err);
+            });
+        });
+    },
     writeOrganizationTimestampToCache : function(err, organization) {
         return new Promise(function (resolve, reject) {  
             var orgIdString = organization._id.toString();  
@@ -78,12 +95,13 @@ var cacheService = {
                     latestDate: mm.isValid() ? mm : ""
                 }); 
             }
-            cache.set(self.getKeyForOrganizationSummary, latestDateMap, redisOptions, function () {
+            cache.set(self.getKeyForOrganizationSummary(orgIdString), latestDateMap, redisOptions, function () {
                 benchmark.info('Cache student summary date from org: ', orgIdString);
                 resolve(organization);
             });
         });
     },
+    //this is not currently being used, but I am not positive the API has no use for it, so I'm leaving it in. - KO 3/29/17
     writeRawXmlToCache: function(key, xml) {
         return new Promise(function(resolve, reject) {
             benchmark.info("writing xml to cache: ", key);

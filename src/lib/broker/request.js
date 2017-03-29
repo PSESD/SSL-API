@@ -359,7 +359,6 @@ RequestXSRE.prototype = {
 
                 //this is what makes the actual http request
                 me.makeRequest('xsre', url, 'GET', function (error, response, body) {
-                    //todo: if error response - delete student?
                     callback(error, response, body);
                 });
 

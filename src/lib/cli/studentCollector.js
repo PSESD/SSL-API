@@ -375,15 +375,25 @@ function collectCacheListStudentsAsync(force, done) {
                         return cb(null, data);
                     }
 
+                    if (response.body.startsWith("<error")) {
+                        benchmark.error("Not found!" + response);
+                        cacheService.writeInvalidStudentToCache(student, orgIdString)
+                        .then(function(response) {
+                            return cb(null, response)
+                        }, function(err){
+                            return cb(err, null);
+                        });
+                    }
+
                     if (response && response.statusCode === 200) {
                         cacheService.writeStudentToCache(student, body, orgIdString)
                         .then(function(response) {
-                            cb(null, response)
+                            return cb(null, response)
                         }, function(err){
-                            cb(err, null);
+                            return cb(err, null);
                         });
                     } else {
-                        cb(null, data);
+                        return cb(null, data);
                     }
                 }, force);
 

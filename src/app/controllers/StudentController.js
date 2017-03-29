@@ -307,6 +307,15 @@ StudentController.refreshStudentSummary = function(brokerRequest, student, orgId
             return callback('Empty response');
         }
 
+        if (response.body.startsWith("<error")) {
+            cacheService.writeInvalidStudentToCache(student, orgIdString)
+            .then(function(record){
+                return callback(record);
+            }, function(err){
+                return callback(err);
+            });
+        }
+
         if(response && response.statusCode === 200){
             cacheService.writeStudentSummaryFromXmlToCache(body, orgId, student._id.toString())
             .then(function(updatedSummary) {
@@ -461,6 +470,10 @@ StudentController.getStudents = function(req, res){
                 cache.get(realKey, function(err, studentFromCache){
                     if(err){
                         return callback(null, newObject);
+                    }
+
+                    if (studentFromCache.isUnavailable) {
+                        return callback(null, undefined);
                     }
 
                     if(!_.isUndefined(studentFromCache)){
