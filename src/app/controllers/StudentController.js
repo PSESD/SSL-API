@@ -308,7 +308,7 @@ StudentController.refreshStudentSummary = function(brokerRequest, student, orgId
         }
 
         if (response.body.startsWith("<error")) {
-            cacheService.writeInvalidStudentToCache(student, orgIdString)
+            cacheService.writeInvalidStudentToCache(student, orgId)
             .then(function(record){
                 return callback(record);
             }, function(err){
@@ -472,40 +472,37 @@ StudentController.getStudents = function(req, res){
                         return callback(null, newObject);
                     }
 
-                    if (studentFromCache.isUnavailable) {
-                        return callback(null, undefined);
-                    }
-
-                    if(!_.isUndefined(studentFromCache)){
-                        newObject.xsre = studentFromCache;
-                        callback(null, newObject);
-                    } else { //the student is in the mongoDB but not the Redis Cache; request the xSre from HostedZone and update the cache.
+                    if (_.isUndefined(studentFromCache)){
+                        //the student is in the mongoDB but not the Redis Cache; request the xSre from HostedZone and update the cache.
                         var brokerRequest = new Request({
                             externalServiceId: organization.externalServiceId,
                             personnelId: organization.personnelId,
                             authorizedEntityId: organization.authorizedEntityId
                         });
 
-                        StudentController.refreshStudentSummary(brokerRequest, newObject, req.params.organizationId, function(studentFromCache) {
-                            if(!_.isUndefined(studentFromCache)){
-                                newObject.xsre = studentFromCache;
+                        StudentController.refreshStudentSummary(brokerRequest, newObject, req.params.organizationId, function(refreshedStudent) {
+                            if(!_.isUndefined(refreshedStudent) && !refreshedStudent.isUnavailable){
+                                newObject.xsre = refreshedStudent;
                                 //these students probably don't have names in the DB; if so we need to update them from the xsre data
-                                if (!newObject.first_name && studentFromCache.firstName || 
-                                    !newObject.last_name && studentFromCache.lastName) {
-                                        newObject.first_name = newObject.first_name || studentFromCache.firstName;
-                                        newObject.last_name = newObject.last_name || studentFromCache.lastName; 
+                                if (!newObject.first_name && refreshedStudent.firstName || 
+                                    !newObject.last_name && refreshedStudent.lastName) {
+                                        newObject.first_name = newObject.first_name || refreshedStudent.firstName;
+                                        newObject.last_name = newObject.last_name || refreshedStudent.lastName; 
                                         Student.findOneAndUpdate({_id: newObject._id}, newObject, {upsert: true}, function(err, results){
                                             if (err) {
                                                 console.log(err);
                                             }
                                         });
                                 }
-                                callback(null, newObject);
-                            } else {
-                                callback("cache retrieval failure @ " + realKey);
+                                return callback(null, newObject);
                             }
                         });
-                    }
+                    } else if (studentFromCache.isUnavailable) {
+                        return callback(null, undefined);
+                    } else {
+                        newObject.xsre = studentFromCache;
+                        callback(null, newObject);
+                    } 
                 });
             }, function(err, results){
                 res.sendSuccess(null, _.sortBy(_.omit(results, _.isUndefined), sorter));
@@ -987,6 +984,15 @@ function getStudentXsre(req, res) {
                                 if(!body){
                                     res.statusCode = response.statusCode || 404;
                                     reject('Xsre could not be found');
+                                }
+                                if (response.body.startsWith("<error")) {
+                                    benchmark.info("not found: " + student.district_student_id);
+                                    cacheService.writeInvalidStudentToCache(student, orgId)
+                                    .then(function(record){
+                                        return callback(record);
+                                    }, function(err){
+                                        return callback(err);
+                                    });
                                 }
 
                                 if(response && response.statusCode === 200){

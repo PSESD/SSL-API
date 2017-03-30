@@ -170,7 +170,7 @@ var cacheService = {
                 var key = self.getKeyForJsonXsre(student);
                 self.writeStudentSummaryFromJsToCache(studentXsre, student._id, student.school_district, orgIdString)
                 .then(function(studentSummary) {
-                    return self.writeXsreJsonToCache(key, studentXsre)
+                    self.writeXsreJsonToCache(key, studentXsre)
                 }).then(function() {
                     resolve(studentXsre)
                 },
@@ -181,14 +181,16 @@ var cacheService = {
         });
     },
     writeXsreJsonToCache: function(key, xsre) {
-        benchmark.info("writing full xsre json to cache: " + key)
-        cache.set(key, xsre, redisOptions, function(err){
-            if (err) {
-                return err;
-            } else {
-                return;
-            }
-        })
+        return new Promise(function(resolve, reject) {
+            benchmark.info("writing full xsre json to cache: " + key);
+            cache.set(key, xsre, redisOptions, function(err){
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 }
 

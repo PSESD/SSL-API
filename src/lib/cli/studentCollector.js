@@ -376,7 +376,7 @@ function collectCacheListStudentsAsync(force, done) {
                     }
 
                     if (response.body.startsWith("<error")) {
-                        benchmark.error("Not found!" + response);
+                        benchmark.info("Not found (probably expired consent): " + student.district_student_id);
                         cacheService.writeInvalidStudentToCache(student, orgIdString)
                         .then(function(response) {
                             return cb(null, response)
