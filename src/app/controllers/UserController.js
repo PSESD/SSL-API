@@ -98,11 +98,7 @@ UserController.updateAccount = function (req, res) {
     var crit = { _id: req.user._id };
 
     //Set reset/change password disabled
-    var canChangePassword = false;
-
-    if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'){
-        canChangePassword = true;
-    }
+    var canChangePassword = true;
 
     if(canChangePassword){
         if('password' in req.body){
@@ -175,11 +171,7 @@ UserController.save = function (req, res) {
     //    delete req.body.email;
     //}
 
-    var canChangePassword = false;
-
-    if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'){
-        canChangePassword = true;
-    }
+    var canChangePassword = true;
 
     if(canChangePassword){
         if('password' in req.body){
