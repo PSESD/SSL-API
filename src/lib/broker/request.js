@@ -285,7 +285,7 @@ RequestXSRE.prototype = {
      * From cache, or from hostedZone if not in cache.
      * 
      */
-    getXsre: function(districtStudentId, zoneId, organizationId, callback, forceStore){
+    getXsre: function(districtStudentId, zoneId, organizationId, callback, forceStore, ignoreCache){
         this.headers = {};
 
         if(this.options.personnelId) {
@@ -348,27 +348,38 @@ RequestXSRE.prototype = {
         }
         benchmark.info('START ' + districtStudentId);
 
-        console.log("looking for key " + key);
-
-        cacheService.get(key)
-        .then(function(result){
-            var xmlBody = result;
-
-            if (!cacheService.isValid(result)) { 
-                benchmark.info("retrieving from hostedzone: " + districtStudentId);
-
-                //this is what makes the actual http request
+        if (ignoreCache) {
+            benchmark.info("retrieving from hostedzone: " + url);
+            //this is what makes the actual http request
                 me.makeRequest('xsre', url, 'GET', function (error, response, body) {
-                    callback(error, response, body);
+                   return callback(error, response, body);
                 });
+        }
 
-            } else {
-                callback(null, result, result);
-            }
-            
-        }, function (err) {
+        else {
 
-        });
+            console.log("checking cache for key: " + key);
+
+            cacheService.get(key)
+            .then(function(result){
+                var xmlBody = result;
+
+                if (!cacheService.isValid(result)) { 
+                    benchmark.info("retrieving from hostedzone: " + url);
+
+                    //this is what makes the actual http request
+                    me.makeRequest('xsre', url, 'GET', function (error, response, body) {
+                        callback(error, response, body);
+                    });
+
+                } else {
+                    callback(null, result, result);
+                }
+                
+            }, function (err) {
+
+            });
+        }
 
     },
     /**

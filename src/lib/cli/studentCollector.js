@@ -27,6 +27,7 @@ var async = require('async');
 var organizationWhere = {};
 var _funct = require(__dirname + '/../function');
 var cacheService = require(appPath+'/services/cacheService');
+var waitTime = 0;
 
 //organizationWhere = {
 //    _id: mongoose.Types.ObjectId('55913fc817aac10c2bbfe1e7')
@@ -314,7 +315,7 @@ function collectCacheStudents(done) {
  */
 function collectCacheListStudentsAsync(force, done) {
     var studentNumber = 0;
-    benchmark.info("Starting cache refresh for all students");
+    benchmark.info("****Starting cache refresh for all students****");
 
     Organization.find(organizationWhere, function (err, organizations) {
 
@@ -324,15 +325,10 @@ function collectCacheListStudentsAsync(force, done) {
         var prefix = "";
         benchmark.info("Organizations to refresh: " + organizations.length);
 
-        /**
-         *
-         * @param organization
-         * @param callback
-         */
         var map = function(organization, callback){
             var orgId = organization._id;
             var orgIdString = orgId.toString();
-            benchmark.info('ORGID: ' + orgId);
+            benchmark.info('Starting function \'map\' for organization: ' + orgId);
             prefix = "CACHE-LIST-STUDENT";
 
             /**
@@ -341,62 +337,62 @@ function collectCacheListStudentsAsync(force, done) {
              * @param cb
              */
             var mapStudent = function(student, cb){
-                benchmark.info("starting mapStudent " + student._id);
+                setTimeout(function(){
+                    benchmark.info("Starting 'mapStudent' for student " + student._id);
 
-                cacheService.setLatestDateAvailable(orgIdString, student.school_district);
+                    cacheService.setLatestDateAvailable(orgIdString, student.school_district);
 
-                var studentId = student._id.toString();
+                    var studentId = student._id.toString();
 
-                var data = {};
-                /**
-                 * If student is empty from database
-                 */
-                if (!student) {
-                    benchmark.info('The student not found in database');
-                    return cb(null, data);
-                }
+                    var data = {};
 
-                var brokerRequest = new Request({
-                    externalServiceId: organization.externalServiceId,
-                    personnelId: organization.personnelId,
-                    authorizedEntityId: organization.authorizedEntityId
-                 });
-
-                brokerRequest.getXsre(student.district_student_id, student.school_district, orgIdString, function (error, response, body) {
-
-                    if (error || !body ) {
-                        benchmark.info(error);
+                    if (!student) {
+                        benchmark.info('The student not found in database');
                         return cb(null, data);
                     }
 
-                    if (!body) {
-                        benchmark.info(error);
-                        //return cb('Body was empty reponse', data);
-                        return cb(null, data);
-                    }
+                    var brokerRequest = new Request({
+                        externalServiceId: organization.externalServiceId,
+                        personnelId: organization.personnelId,
+                        authorizedEntityId: organization.authorizedEntityId
+                    });
 
-                    if (response.body.startsWith("<error")) {
-                        benchmark.info("Not found (probably expired consent): " + student.district_student_id);
-                        cacheService.writeInvalidStudentToCache(student, orgIdString)
-                        .then(function(response) {
-                            return cb(null, response)
-                        }, function(err){
-                            return cb(err, null);
-                        });
-                    }
+                    brokerRequest.getXsre(student.district_student_id, student.school_district, orgIdString, function (error, response, body) {
+                        benchmark.info("HZ request complete");
 
-                    if (response && response.statusCode === 200) {
-                        cacheService.writeStudentToCache(student, body, orgIdString)
-                        .then(function(response) {
-                            return cb(null, response)
-                        }, function(err){
-                            return cb(err, null);
-                        });
-                    } else {
-                        return cb(null, data);
-                    }
-                }, force);
+                        if (error || !body ) {
+                            benchmark.info(error);
+                            return cb(null, data);
+                        }
 
+                        if (!body) {
+                            benchmark.info(error);
+                            //return cb('Body was empty reponse', data);
+                            return cb(null, data);
+                        }
+
+                        if (response.body.startsWith("<error")) {
+                            benchmark.info("Not found (probably expired consent): " + student.district_student_id);
+                            cacheService.writeInvalidStudentToCache(student, orgIdString)
+                            .then(function(response) {
+                                return cb(null, response)
+                            }, function(err){
+                                return cb(err, null);
+                            });
+                        }
+
+                        if (response && response.statusCode === 200) {
+                            cacheService.writeStudentToCache(student, body, orgIdString)
+                            .then(function(response) {
+                                return cb(null, response)
+                            }, function(err){
+                                return cb(err, null);
+                            });
+                        } else {
+                            return cb(null, data);
+                        }
+                    }, force, true);
+                }, waitTime);
             };
 
             Student.find({
@@ -412,9 +408,8 @@ function collectCacheListStudentsAsync(force, done) {
 
                 var orgIdString = organization._id.toString();
 
-                benchmark.info(prefix + "\tBEFORE-STUDENTS: " + students.length + "\tORGID: " + organization._id + "\tORG: " + organization.name);
-
-                async.eachLimit(students, 10, mapStudent, function(err) {
+                //we want this to be synchronous so as not to overload the recipient of all these requests
+                async.eachSeries(students, mapStudent, function(err) {
                     cacheService.writeOrganizationTimestampToCache(err, organization).then(function(response) {
                         callback(null, organization);
                     }, function(err) {
@@ -424,7 +419,8 @@ function collectCacheListStudentsAsync(force, done) {
             });
         };
 
-        async.each(organizations, map, function (err, data) {
+        //we want this to be synchronous so as not to overload the recipient of all these requests
+        async.eachSeries(organizations, map, function (err, data) {
             if(err){
                 benchmark.info(err, data);
                 log(err, 'error');
