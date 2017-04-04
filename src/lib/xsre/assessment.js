@@ -5,6 +5,8 @@
 var moment = require('moment');
 var _ = require('underscore');
 var l = require('lodash');
+var gradeLevelAndSchoolYears = {};
+
 /**
  *
  * @param xsre
@@ -31,6 +33,22 @@ function Assessment(xsre){
 
       this.facets = xsre.facets;
 
+      //build map of grade levels-enrollment dates
+     
+
+      gradeLevelAndSchoolYears[xsre.json.enrollment.gradeLevel] = xsre.json.enrollment.schoolYear;
+      
+      var otherEnrollments = l.get(xsre, 'json.otherEnrollments.enrollment', []);
+
+      if (!_.isArray(otherEnrollments)) {
+            otherEnrollments = [otherEnrollments];
+      }
+
+      otherEnrollments.forEach(function(enrollment){
+            if (!gradeLevelAndSchoolYears[enrollment.gradeLevel]) {
+                  gradeLevelAndSchoolYears[enrollment.gradeLevel] = enrollment.schoolYear
+            }
+      });
 }
 /**
  *
@@ -84,8 +102,6 @@ Assessment.prototype.processAssessment = function(assessments){
 
       var me = this;
 
-      var mm = null;
-
       if(!_.isArray(assessments.assessment)){
             assessments.assessment = [ assessments.assessment ];
       }
@@ -128,9 +144,7 @@ Assessment.prototype.processAssessment = function(assessments){
                         studentGradeLevel: null
                   };
 
-                  mm = moment(new Date(assessment.actualStartDateTime));
-
-                  collectionScoreSets.schoolYear     = mm.isValid() ? mm.format('YYYY') : me.notAvailable;
+                  collectionScoreSets.schoolYear = gradeLevelAndSchoolYears[assessment.studentGradeLevel] || me.notAvailable;
                   collectionScoreSets.localId   = l.get(assessment, 'school.localId', me.notAvailable);
                   collectionScoreSets.schoolName = l.get(assessment, 'school.schoolName', me.notAvailable);
                   collectionScoreSets.studentGradeLevel      = l.get(assessment, 'studentGradeLevel', me.notAvailable);
