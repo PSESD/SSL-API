@@ -28,7 +28,7 @@ function Attendance(xsre){
     var dailyAttendanceRecords = allAttendanceData.dailyAttendanceRecords;
     var list_discipline_incident_data = get_all_discipline_incident_data(disciplineIncidents);
 
-
+ 
     transcriptCombine = set_sort_and_end_date(otherTranscriptTerms, currentTranscriptTerm);
 
     if(transcriptCombine.length > 0)
@@ -63,38 +63,76 @@ function Attendance(xsre){
 
 function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecords) {
     var schoolYearSummaries = [];
+    var schoolYearMonths = {};
+
+    for (var i in schoolYears) {
+        var years = schoolYears[i].value.split("-");
+        var keyYear = years[1];
+
+        if (!schoolYearMonths[keyYear]) {
+           schoolYearMonths[keyYear] = {
+               September: {},
+               October: {},
+               November: {},
+               December: {},
+               January: {},
+               February: {},
+               March: {},
+               April: {},
+               May: {},
+               June: {},
+               July: {},
+               August: {}
+           }
+        }
+
+    }
+    
+    for (var i in calendarMonths) {
+        var yearMonth = {
+            year: parseInt(calendarMonths[i].month.split("-")[0]),
+            month: moment.months()[parseInt(calendarMonths[i].month.split("-")[1]) - 1],  //returns full month name
+        }
+
+        var keyYear = parseInt(getSchoolYear(calendarMonths[i].month));
+
+        
+        //Not sure it's possible to have 2 intances of a given month in the data -
+        //say a student changes schools - but if so, this should at least preserve all data.
+        if (schoolYearMonths[keyYear][yearMonth.month].detail) {
+            schoolYearMonths[keyYear][yearMonth.month].detail = _.union(schoolYearMonths[keyYear][yearMonth.month].detail, calendarMonths[i].detail)
+        }
+        else {
+            schoolYearMonths[keyYear][yearMonth.month] = calendarMonths[i];
+        }
+    }
 
     schoolYears.forEach(function(schoolYear) {
         var years = schoolYear.value.split("-");
+        var keyYear = years[1];
 
-        var schoolYearMonths = [];
         var daysInSchoolYear = 0;
-        for (var i in calendarMonths) {
-            var yearMonth = calendarMonths[i].month.split("-")
-
-            if ((years[0] == yearMonth[0] && parseInt(yearMonth[1]) > 7) || (years[1] == yearMonth[0] && parseInt(yearMonth[1]) < 7)) {
-                schoolYearMonths.push(calendarMonths[i]);
-            }
-        }
-
+        
         var lateToClass = 0;
         var missedDay = 0;
         var missedClass = 0;
         var behaviorIncident = 0;
 
-        if (schoolYearMonths.length != 0) {
-            
-            schoolYearMonths.forEach(function(month) {    
-                var weeks = month.detail;
+        if (schoolYearMonths[keyYear]) {
+           for (var month in schoolYearMonths[keyYear]) { 
+               var m = schoolYearMonths[keyYear][month];   
 
-                weeks.forEach(function(week) {
-                    lateToClass += week.total_late_to_class;
-                    missedDay += week.total_missed_day;
-                    missedClass += week.total_missed_class;
-                    behaviorIncident += week.total_behaviour_incidents;
-                })
+               var weeks = m.detail;
+               if (weeks) {
+                    weeks.forEach(function(week) {
+                        lateToClass += week.total_late_to_class;
+                        missedDay += week.total_missed_day;
+                        missedClass += week.total_missed_class;
+                        behaviorIncident += week.total_behaviour_incidents;
+                    });
+               }
 
-            })
+            }
         }
 
         //Calculate attendance rate 
@@ -159,7 +197,6 @@ function get_week_detail(year_month, list_event, list_course, list_discipline_in
     var get_end_week_day_end = moment(year_month + '-' + get_total_day_in_one_month).endOf('Week');
     var start_date = moment(get_start_week_day_start.format('YYYY-MM-DD'));
 
-    var debug = moment(get_end_week_day_end.format('YYYY-MM-DD')).clone().subtract(7, 'days').toString();
     var end_date_last_week = moment(get_end_week_day_end.format('YYYY-MM-DD')).clone().subtract(7, 'days').format('x');
     var end_date = moment(get_end_week_day_end.format('YYYY-MM-DD'));
     var count_date = start_date.clone().format('x');
@@ -186,7 +223,7 @@ function get_week_detail(year_month, list_event, list_course, list_discipline_in
         }
 
         get_course = set_course_data(week_name, end_date, list_course);
-        get_days = set_day_data(week_name, end_date, list_event, get_course, list_discipline_incident_data);
+        get_days = set_day_data(week_name, end_date, list_event, get_course, list_discipline_incident_data, year_month);
         var list_days = get_days.list_days;
         var total_missed_day = get_days.total_missed_day;
         var total_late_to_class = get_days.total_late_to_class;
@@ -415,7 +452,7 @@ function set_course_data(start_date, end_date, list_course)
     return get_course;
 }
 
-function set_day_data(start_date, end_date, list_event, list_course, list_discipline_incident_data)
+function set_day_data(start_date, end_date, list_event, list_course, list_discipline_incident_data, year_month)
 {
     var list_days = [];
     var get_list_event = [];
@@ -428,12 +465,13 @@ function set_day_data(start_date, end_date, list_event, list_course, list_discip
     var incident_total = 0;
     var incident_detail = [];
 
+    var month = moment(year_month).month() + 1;
+
     for(var i=0; i<7; i++)
     {
         get_list_event = [];
         var set_day = date_start.utc().clone().add( i, 'days');
         var check_have = list_event.filter(function(key){
-            var debug = key.full_date === set_day.format('YYYY-MM-DD')
             return key.full_date === set_day.format('YYYY-MM-DD');
         });
         var check_have2 = list_discipline_incident_data.filter(function(key){
@@ -447,7 +485,7 @@ function set_day_data(start_date, end_date, list_event, list_course, list_discip
         var table_period;
         var global_missed_day = 0;
 
-        if(check_have.length > 0)
+        if(check_have.length > 0 && isInMonth(check_have[0], month))
         {
             event = check_have[0];
             if(event.missed_day > 0) {
@@ -1223,6 +1261,10 @@ function get_all_discipline_incident_data(discipline_incidents) {
 
 }
 
+function isInMonth(date, month) {
+    return moment(date.full_date).month() + 1 == month;
+}
+
 function passing_incident(incident) {
 
     var list_action = [];
@@ -1336,6 +1378,53 @@ function sortTranscriptTermsByDate(transcriptTerms) {
 
         
     }
+}
+
+function generateSummaryData(xsre) {
+    var summaries = {};
+    summaries[xsre.json.enrollment.schoolYear] = {
+        late_to_class : 0,
+        missed_class: 0,
+        missed_day: 0,
+        start_date : xsre.json.enrollment.entryDate,
+        end_date : xsre.json.enrollment.exitDate || ""
+    };
+
+    var enrollments = _.isArray(xsre.json.otherEnrollments.enrollment) ? xsre.json.otherEnrollments.enrollment : [xsre.json.otherEnrollments.enrollment];
+
+    enrollments.forEach(function(enrollment){
+        if (!summaries[enrollment.schoolYear]) {
+            summaries[enrollment.schoolYear] = {
+                late_to_class : 0,
+                missed_class: 0,
+                missed_day: 0,
+                start_date : xsre.json.enrollment.entryDate,
+                end_date : xsre.json.enrollment.exitDate || ""
+            };
+        }
+    });
+
+    xsre.json.attendance.events.event.forEach(function(event){
+        if (event.attendanceStatus != "Present") {
+            var schoolYear = getSchoolYear(event.calendarEventDate);
+            switch (event.attendanceStatus) {
+                case "ExcusedAbscence":
+                    if (attendanceValue == 0) {
+                        summaries[schoolYear].missed_day++;
+                    }
+                    break;
+            }
+        }
+    });
+
+}
+
+function getSchoolYear(d) {
+
+    if (moment(d).month() >= 8) {
+        return moment(d).year() + 1;
+    }
+    return moment(d).year();
 }
 
 /**
