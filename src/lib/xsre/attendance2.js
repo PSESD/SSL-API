@@ -20,6 +20,7 @@ function Attendance(xsre){
     var generate_year = [];
     var otherTranscriptTerms = l.get(xsre, 'json.otherTranscriptTerms.transcriptTerm', null);
     var currentTranscriptTerm = l.get(xsre, 'json.transcriptTerm', null);
+    var currentSchoolYear = parseInt(currentTranscriptTerm.schoolYear - 1) + "-" + currentTranscriptTerm.schoolYear;
     var transcriptCombine = [];
     var generate_calendar = [];
     var generate_calendar_week = [];
@@ -59,6 +60,65 @@ function Attendance(xsre){
 
     this.generate_calendar = generate_calendar;
     this.calendars = this.getGenerateCalendar();
+    this.summary = calculateSummary(this.calendars, currentSchoolYear);
+}
+
+function calculateSummary(cals, currentSchoolYear) {
+
+    //if this month is 4, last month is 3, which is what you get if you ask for moment('2017-04-01').month().
+    //Moment is zero-indexed on months but we're using the normal recknoning of 1-12.
+    var lastMonth = moment().month();
+    if (lastMonth == 0) {
+        lastMonth = 12;
+    }
+
+    var currentCalendar = _.find(cals, function(cal){ return cal.years == currentSchoolYear});
+
+    var attendanceCount = [];
+    var behaviorCount = [];
+
+    attendanceCount.push({
+        type: "currentAcademicYear",
+        flag: "not in use",
+        count: currentCalendar.summary.missedDay
+    });
+
+    behaviorCount.push({
+        type: "currentAcademicYear",
+        flag: "not in use",
+        count: currentCalendar.summary.behaviorIncident
+    });
+
+    var lastMonthAttendanceCount = 0;
+    var lastMonthBehaviorCount = 0;
+    for (var event in currentCalendar.list_events) {
+        if (moment(event.date).month() + 1 == lastMonth) {
+            for (var i in event.event) {
+                if (event.event[i] == "missed_day") {
+                    lastMonthAttendanceCount++;
+                } else if (event.event[i] == behavior_incident) {
+                    console.log("behavior event on " + event.date);
+                    lastMonthBehaviorCount++;
+                }
+            }
+        } 
+    }
+    
+    attendanceCount.push({
+        type: "lastMonth",
+        flag: "not in use",
+        count: lastMonthAttendanceCount
+    });
+    behaviorCount.push({
+        type: "lastMonth",
+        flag: "not in use",
+        count: lastMonthBehaviorCount
+    });
+    
+    return {
+        attendanceCount: attendanceCount,
+        behaviorCount: behaviorCount
+    }
 }
 
 function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecords) {
@@ -569,7 +629,7 @@ function set_day_data(start_date, end_date, list_event, list_course, list_discip
 
         incident_total = 0;
         incident_detail = [];
-        if(check_have2.length > 0)
+        if(check_have2.length > 0 && isInMonth(check_have2[0], month))
         {
             check_have2.forEach(function(incident) {
                 incident.action.forEach(function(action) {

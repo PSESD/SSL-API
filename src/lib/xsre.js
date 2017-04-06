@@ -194,15 +194,11 @@ xSre.prototype.getStudentSummary = function(){
         summary.schoolName = personal.xSre.enrollment.schoolName;
     }
 
-    var attendance = this.getAttendanceBehavior();
-
-    summary.attendanceCount = attendance.getCurrentTotalAttendance();
-    summary.behaviorCount = attendance.getCurrentTotalBehavior();
-    summary.attendanceRiskFlag = attendance.getRiskFlag();
-    var attendanceSummary = attendance.calculateSummary();
-    summary.latestDate = attendanceSummary.date.latest;
-    summary.latestDateTime = attendanceSummary.date.max;
-    summary.onTrackToGraduate = null;
+    for (var prop in this.attendance.summary) {
+        if (this.attendance.summary.hasOwnProperty(prop)) {
+            summary[prop] = this.attendance.summary[prop];
+        }
+    }
 
     var academicSummary = _.get(json, 'transcriptTerm.academicSummary');
 
