@@ -211,6 +211,7 @@ function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecor
         var schoolYearSummary = {
             schoolYear: schoolYear.value,
             summary: {
+                totalDays: totalSchoolDaysForStudent,
                 lateToClass: lateToClass,
                 missedDay: missedDay,
                 missedClass: missedClass,
