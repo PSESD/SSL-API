@@ -123,7 +123,7 @@ Rest.prototype.routeOrganizationUser = function(){
 
     this.router.route('/:organizationId/users/:userId' + this.format)
         .put(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.organizationController.putUser)
-        .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.organizationController.getUser)
+        .get(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.organizationController.getUser)
         .delete(this.auth.isBearerAuthenticated, this.auth.hasAccess, this.auth.isAdmin, this.organizationController.deleteUser)
     ;
     this.router.route('/:organizationId/pending/users' + this.format)

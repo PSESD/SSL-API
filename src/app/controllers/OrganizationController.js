@@ -207,29 +207,32 @@ OrganizationController.pending = function (req, res) {
  */
 OrganizationController.getUser = function (req, res) {
 
+    if (req.user.isAdmin() || req.user.get("id") == req.params.userId) {
+        User.findOne({
+            _id: ObjectId(req.params.userId),
+            permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
+        }, function (err, user) {
 
-    User.findOne({
-        _id: ObjectId(req.params.userId),
-        permissions: {$elemMatch: {organization: ObjectId(req.params.organizationId)}}
-    }, function (err, user) {
+            if (err)  { return res.sendError(err); }
 
-        if (err)  { return res.sendError(err); }
+            if(!user) {
+                return res.sendError(res.__('user_not_found'));
+            }
 
-        if(!user) {
-            return res.sendError(res.__('user_not_found'));
-        }
+            user.getCurrentPermission(req.params.organizationId);
 
-        user.getCurrentPermission(req.params.organizationId);
+            var obj = user.toJSON();
 
-        var obj = user.toJSON();
+            res.xmlOptions = 'user';
 
-        res.xmlOptions = 'user';
+            res.sendSuccess(obj);
 
-        res.sendSuccess(obj);
-
-    });
-
+        });
+    } else {
+        res.sendError("unauthorized");
+    }
 };
+
 /**
  *
  * @param req
