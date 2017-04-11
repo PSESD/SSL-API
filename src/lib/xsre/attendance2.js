@@ -48,7 +48,9 @@ function Attendance(xsre){
     this.list_years = this.getGenerateYear();
     this.list_weeks = this.getGenerateCalendarWeek();
     
-    var summaries = generateYearSummaries(generate_calendar_week, generate_year, dailyAttendanceRecords);
+    var currentTermSummary = _.find(xsre.json.attendance.summaries.summary, function(summary){return summary.endDate == undefined});
+
+    var summaries = generateYearSummaries(generate_calendar_week, generate_year, dailyAttendanceRecords, currentTermSummary);
     
     summaries.forEach(function(yearSummary) {
         generate_calendar.forEach(function(schoolYearCalendar) {
@@ -60,10 +62,10 @@ function Attendance(xsre){
 
     this.generate_calendar = generate_calendar;
     this.calendars = this.getGenerateCalendar();
-    this.summary = calculateSummary(this.calendars, currentSchoolYear);
+    this.summary = calculateSummary(this.calendars, currentSchoolYear, currentTermSummary);
 }
 
-function calculateSummary(cals, currentSchoolYear) {
+function calculateSummary(cals, currentSchoolYear, currentTermSummary) {
 
     //if this month is 4, last month is 3, which is what you get if you ask for moment('2017-04-01').month().
     //Moment is zero-indexed on months but we're using the normal recknoning of 1-12.
@@ -80,7 +82,7 @@ function calculateSummary(cals, currentSchoolYear) {
     attendanceCount.push({
         type: "currentAcademicYear",
         flag: "not in use",
-        count: currentCalendar.summary.missedDay
+        count: currentTermSummary.daysAbsent
     });
 
     behaviorCount.push({
@@ -121,7 +123,7 @@ function calculateSummary(cals, currentSchoolYear) {
     }
 }
 
-function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecords) {
+function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecords, currentTermSummary) {
     var schoolYearSummaries = [];
     var schoolYearMonths = {};
 
@@ -195,28 +197,15 @@ function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecor
             }
         }
 
-        //Calculate attendance rate 
-        var totalSchoolDaysForStudent = 0;
-        for (i in dailyAttendanceRecords) {
-            if (dailyAttendanceRecords[i].attendanceEventType === "DailyAttendance") {
-                var yearMonthDay = dailyAttendanceRecords[i].calendarEventDate.split("-");
-                if ((years[0] == yearMonthDay[0] && parseInt(yearMonthDay[1]) > 7) || (years[1] == yearMonthDay[0] && parseInt(yearMonthDay[1]) < 7)) {
-                    totalSchoolDaysForStudent += 1;
-                }
-            }
-        }
-
-        var attendanceRate = ((totalSchoolDaysForStudent - missedDay) / totalSchoolDaysForStudent) * 100;
-
         var schoolYearSummary = {
             schoolYear: schoolYear.value,
             summary: {
-                totalDays: totalSchoolDaysForStudent,
+                totalDays: parseFloat(currentTermSummary.daysAbsent) + parseFloat(currentTermSummary.daysInAttendance),
                 lateToClass: lateToClass,
                 missedDay: missedDay,
                 missedClass: missedClass,
                 behaviorIncident: behaviorIncident,
-                attendanceRate: attendanceRate
+                attendanceRate: parseFloat(currentTermSummary.studentAttendanceRate)
             }
         };
 
