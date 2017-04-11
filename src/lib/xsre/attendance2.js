@@ -50,7 +50,7 @@ function Attendance(xsre){
     
     var currentTermSummary = _.find(xsre.json.attendance.summaries.summary, function(summary){return summary.endDate == undefined});
 
-    var summaries = generateYearSummaries(generate_calendar_week, generate_year, dailyAttendanceRecords, currentTermSummary);
+    var summaries = generateYearSummaries(generate_calendar_week, generate_year, dailyAttendanceRecords, xsre.json.attendance.summaries.summary);
     
     summaries.forEach(function(yearSummary) {
         generate_calendar.forEach(function(schoolYearCalendar) {
@@ -123,7 +123,7 @@ function calculateSummary(cals, currentSchoolYear, currentTermSummary) {
     }
 }
 
-function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecords, currentTermSummary) {
+function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecords, xsreAttendanceSummaries) {
     var schoolYearSummaries = [];
     var schoolYearMonths = {};
 
@@ -197,15 +197,26 @@ function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecor
             }
         }
 
+        var currentTermSummary = _.find(xsreAttendanceSummaries, function(summary){
+            //grabs the whole-term summary, rather than the per-month summary
+            return moment(summary.startDate).year() == keyYear - 1 && summary.school == undefined
+        });
+
+        var totalDaysInTerm = currentTermSummary ? parseFloat(currentTermSummary.daysAbsent) + parseFloat(currentTermSummary.daysInAttendance)
+        : calculateSchoolTotalDaysForStudent(dailyAttendanceRecords, years);
+
+        var summaryAttendanceRate = currentTermSummary ? parseFloat(currentTermSummary.studentAttendanceRate) : 
+            totalDaysInTerm ? ((totalDaysInTerm - missedDay) / totalDaysInTerm) : 0;
+
         var schoolYearSummary = {
             schoolYear: schoolYear.value,
             summary: {
-                totalDays: parseFloat(currentTermSummary.daysAbsent) + parseFloat(currentTermSummary.daysInAttendance),
+                totalDays: totalDaysInTerm,
                 lateToClass: lateToClass,
                 missedDay: missedDay,
                 missedClass: missedClass,
                 behaviorIncident: behaviorIncident,
-                attendanceRate: parseFloat(currentTermSummary.studentAttendanceRate)
+                attendanceRate: summaryAttendanceRate
             }
         };
 
@@ -213,6 +224,19 @@ function generateYearSummaries(calendarMonths, schoolYears, dailyAttendanceRecor
     })
 
     return schoolYearSummaries;
+}
+
+function calculateSchoolTotalDaysForStudent(dailyAttendanceRecords, years) {
+        var totalSchoolDaysForStudent = 0;
+        for (var i in dailyAttendanceRecords) {
+            if (dailyAttendanceRecords[i].attendanceEventType === "DailyAttendance") {
+                var yearMonthDay = dailyAttendanceRecords[i].calendarEventDate.split("-");
+                if ((years[0] == yearMonthDay[0] && parseInt(yearMonthDay[1]) > 7) || (years[1] == yearMonthDay[0] && parseInt(yearMonthDay[1]) < 7)) {
+                    totalSchoolDaysForStudent += 1;
+                }
+            }
+        }
+        return totalSchoolDaysForStudent;
 }
 
 function get_calendar_week(list_event, list_course, all_date, list_discipline_incident_data) {
