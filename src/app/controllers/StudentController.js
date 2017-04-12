@@ -63,6 +63,8 @@ StudentController.getStudentsBackpack = function(req, res){
         }, function(err){
             return res.sendError(err);
         });
+    }, function (err){
+        return res.sendStatus(404);
     });
 };
 
@@ -949,76 +951,77 @@ function getStudentXsre(req, res) {
             }, function(err, student){
                 if(err || !student){
                     reject(err || "student not found");
-                }
+                } else {
 
-                //get the organization
-                Organization.findOne({ _id: orgId }, function(err, organization){
+                    //get the organization
+                    Organization.findOne({ _id: orgId }, function(err, organization){
 
-                    if(err){
-                        reject(err);
-                    }
-
-                    if(!organization){
-                        reject('The organization not found in database');
-                    }
-
-                    var brokerRequest = new Request({
-                        externalServiceId: organization.externalServiceId,
-                        personnelId: organization.personnelId,
-                        authorizedEntityId: organization.authorizedEntityId
-                    });
-
-                    //look for the xsre in cache
-                    var key = cacheService.getKeyForJsonXsre(student);
-                    console.log("looking for key " + key);
-                    cacheService.get(key)
-                    .then(function(result) {
-                        //request from hostedzone and save to cache if not found
-                        if(!result){
-                            benchmark.info("requesting from HostedZone...");
-                            brokerRequest.getXsre(student.district_student_id, student.school_district, orgId.toString(), function(error, response, body){
-                                if(error){
-                                    reject(error);
-                                }
-
-                                if(!body){
-                                    res.statusCode = response.statusCode || 404;
-                                    reject('Xsre could not be found');
-                                }
-                                if (response.body.startsWith("<error")) {
-                                    benchmark.info("not found: " + student.district_student_id);
-                                    cacheService.writeInvalidStudentToCache(student, orgId)
-                                    .then(function(record){
-                                        return callback(record);
-                                    }, function(err){
-                                        return callback(err);
-                                    });
-                                }
-
-                                if(response && response.statusCode === 200){
-                                    cacheService.writeStudentToCache(student, body, orgId.toString())
-                                    .then(function(studentXsre){
-                                        resolve(studentXsre);
-                                    }, 
-                                    function(err){
-                                        reject(err);
-                                    });
-                                } 
-                                else {
-                                reject("Something went wrong");
-                                }
-                            });
-                        
-                        
-                        //return record from cache if found
-                        } else {
-                        benchmark.info("retrieving from cache...");
-                            resolve(result);
+                        if(err){
+                            reject(err);
                         }
-                    }, function(err){
-                        reject(err);
+
+                        if(!organization){
+                            reject('The organization not found in database');
+                        }
+
+                        var brokerRequest = new Request({
+                            externalServiceId: organization.externalServiceId,
+                            personnelId: organization.personnelId,
+                            authorizedEntityId: organization.authorizedEntityId
+                        });
+
+                        //look for the xsre in cache
+                        var key = cacheService.getKeyForJsonXsre(student);
+                        console.log("looking for key " + key);
+                        cacheService.get(key)
+                        .then(function(result) {
+                            //request from hostedzone and save to cache if not found
+                            if(!result){
+                                benchmark.info("requesting from HostedZone...");
+                                brokerRequest.getXsre(student.district_student_id, student.school_district, orgId.toString(), function(error, response, body){
+                                    if(error){
+                                        reject(error);
+                                    }
+
+                                    if(!body){
+                                        res.statusCode = response.statusCode || 404;
+                                        reject('Xsre could not be found');
+                                    }
+                                    if (response.body.startsWith("<error")) {
+                                        benchmark.info("not found: " + student.district_student_id);
+                                        cacheService.writeInvalidStudentToCache(student, orgId)
+                                        .then(function(record){
+                                            return callback(record);
+                                        }, function(err){
+                                            return callback(err);
+                                        });
+                                    }
+
+                                    if(response && response.statusCode === 200){
+                                        cacheService.writeStudentToCache(student, body, orgId.toString())
+                                        .then(function(studentXsre){
+                                            resolve(studentXsre);
+                                        }, 
+                                        function(err){
+                                            reject(err);
+                                        });
+                                    } 
+                                    else {
+                                    reject("Something went wrong");
+                                    }
+                                });
+                            
+                            
+                            //return record from cache if found
+                            } else {
+                            benchmark.info("retrieving from cache...");
+                                resolve(result);
+                            }
+                        }, function(err){
+                            reject(err);
+                        });
                     });
-                });
+                }
         });
     });
 }
